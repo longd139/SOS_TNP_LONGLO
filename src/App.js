@@ -2,12 +2,12 @@ import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import Sidebar from './components/Sidebar';
 import Header from './components/Header';
-import Dashboard from './pages/Dashboard';
-import ReportsList from './pages/ReportsList';
-import ReportDetail from './pages/ReportDetail';
-import NewsManager from './pages/NewsManager';
-import ProceduresManager from './pages/ProceduresManager';
-import Login from './pages/Login';
+import ReportDetail from './pages/Reports/ReportDetail';
+import ReportList from './pages/Reports/ReportList';
+import Dashboard from './pages/Dashboard/Dashboard';
+import Login from './pages/Auth/Login';
+import ProceduresManager from './pages/Procedures/ProceduresManager';
+import NewsManager from './pages/News/NewsManager';
 
 export default function App(){
   return (
@@ -19,7 +19,7 @@ export default function App(){
           <Routes>
             <Route path="/login" element={<Login />} />
             <Route path="/" element={<Dashboard />} />
-            <Route path="/reports" element={<ReportsList />} />
+            <Route path="/reports" element={<ReportList />} />
             <Route path="/reports/:id" element={<ReportDetail />} />
             <Route path="/news" element={<NewsManager />} />
             <Route path="/procedures" element={<ProceduresManager />} />
