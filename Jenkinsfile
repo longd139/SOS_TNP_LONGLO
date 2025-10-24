@@ -23,7 +23,7 @@ pipeline {
   }
 
   stages {
-    stage('Guard: only main or PR->main') {
+    stage('only main or PR->main') {
       when {
         not {
           anyOf {
