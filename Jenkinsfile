@@ -123,7 +123,7 @@ pipeline {
           if (false) {
           withCredentials([usernamePassword(credentialsId: DOCKER_REGISTRY_CREDENTIALS_ID, usernameVariable: 'REGUSER', passwordVariable: 'REGPASS')]) {
             if (isUnix()) {
-              sh '''
+              sh ```
                 set -euxo pipefail
                 echo "$REGPASS" | docker login "$DOCKER_REGISTRY" -u "$REGUSER" --password-stdin
                 docker build \
@@ -134,9 +134,9 @@ pipeline {
                 docker push '"'${DOCKER_REGISTRY}/${DOCKER_IMAGE}:${BUILD_NUMBER}'"'
                 docker push '"'${imageRef}'"'
                 docker logout "$DOCKER_REGISTRY"
-              '''
+              ```
             } else {
-              bat '''
+              bat ```
                 set DOCKER_BUILDKIT=1
                 docker login %DOCKER_REGISTRY% -u %REGUSER% -p %REGPASS%
                 docker build --secret id=env,src=.env -t temp_build_image .
@@ -145,21 +145,21 @@ pipeline {
                 docker push %DOCKER_REGISTRY%/%DOCKER_IMAGE%:%BUILD_NUMBER%
                 docker push ${imageRef}
                 docker logout %DOCKER_REGISTRY%
-              '''
+              ```
             }
           }
           }
           if (isUnix()) {
-            sh '''
+            sh ```
               set -euxo pipefail
               export DOCKER_BUILDKIT=1
               docker build --secret id=env,src=.env -t ${IMAGE_REF} .
-            '''
+            ```
           } else {
-            bat '''
+            bat ```
               set DOCKER_BUILDKIT=1
               docker build --secret id=env,src=.env -t %IMAGE_REF% .
-            '''
+            ```
           }
           env.IMAGE_TAG = tag
           env.IMAGE_REF = imageRef
@@ -180,14 +180,14 @@ pipeline {
         script {
           echo "Deploying container locally: ${CONTAINER_NAME} from ${env.IMAGE_REF}"
           if (isUnix()) {
-            sh '''
+            sh ```
               set -euxo pipefail
               if docker ps -a --format '{{.Names}}' | grep -q '^${CONTAINER_NAME}$'; then
                 docker rm -f ${CONTAINER_NAME} || true
               fi
               docker run -d --restart=always \
                 --name ${CONTAINER_NAME} \
-                --env-file ./.env \
+                --env-file .env \
                 -p ${HOST_PORT}:${CONTAINER_PORT} \
                 ${IMAGE_REF}
 
@@ -207,12 +207,12 @@ pipeline {
                 docker rmi -f "$ID" || true
               done
               rm -f "$TMP_LIST"
-            '''
+            ```
           } else {
-            bat '''
+            bat ```
               for /f %%i in ('docker ps -a --format "{{.Names}}" ^| findstr /r /c:"^%CONTAINER_NAME%$"') do docker rm -f %CONTAINER_NAME%
-              docker run -d --restart=always --name %CONTAINER_NAME% --env-file .\.env -p %HOST_PORT%:%CONTAINER_PORT% %IMAGE_REF%
-            '''
+              docker run -d --restart=always --name %CONTAINER_NAME% --env-file .env -p %HOST_PORT%:%CONTAINER_PORT% %IMAGE_REF%
+            ```
           }
         }
       }
@@ -225,4 +225,10 @@ pipeline {
     }
   }
 }
+
+
+
+
+
+
 
