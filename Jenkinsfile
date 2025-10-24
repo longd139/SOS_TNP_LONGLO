@@ -27,10 +27,31 @@ pipeline {
     stage('Detect Branch') {
       steps {
         script {
-          def b = sh(script: "git rev-parse --abbrev-ref HEAD", returnStdout: true).trim()
+          // Prefer Jenkins-provided variables first
+          def b = env.BRANCH_NAME ?: env.GIT_BRANCH
+
+          // Fallback: parse refs from the commit when in detached HEAD
+          if (!b || b.trim() == '') {
+            b = sh(
+              script: "git show -s --pretty=%D HEAD | sed 's/,/ /g'",
+              returnStdout: true
+            ).trim()
+          }
+
           env.CURRENT_BRANCH = b
-          env.IS_TARGET = (b == 'longt2').toString()
-          echo "Current branch: ${b} | IS_TARGET=${env.IS_TARGET}"
+
+          def isTarget = false
+          if (b) {
+            isTarget = (
+              b == 'longt2' ||
+              b.endsWith('/longt2') ||
+              b.contains('refs/heads/longt2') ||
+              b.contains('origin/longt2')
+            )
+          }
+
+          env.IS_TARGET = isTarget.toString()
+          echo "Detected branch: ${b} | IS_TARGET=${env.IS_TARGET}"
         }
       }
     }
