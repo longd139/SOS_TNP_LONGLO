@@ -23,13 +23,13 @@ pipeline {
   }
 
   stages {
-    stage('only main or PR->main') {
+    stage('Guard: only main or PR->main') {
       when {
-        not {
-          anyOf {
-            branch 'main'
-            changeRequest target: 'main'
-          }
+        expression {
+          def b = env.BRANCH_NAME ?: env.GIT_BRANCH ?: ''
+          def isMain = (b == 'main' || b == 'origin/main' || b == 'refs/heads/main')
+          def isPRToMain = ((env.CHANGE_TARGET ?: '') == 'main')
+          return !(isMain || isPRToMain)
         }
       }
       steps {
@@ -42,9 +42,11 @@ pipeline {
 
     stage('Checkout') {
       when {
-        anyOf {
-          branch 'main'
-          changeRequest target: 'main'
+        expression {
+          def b = env.BRANCH_NAME ?: env.GIT_BRANCH ?: ''
+          def isMain = (b == 'main' || b == 'origin/main' || b == 'refs/heads/main')
+          def isPRToMain = ((env.CHANGE_TARGET ?: '') == 'main')
+          return (isMain || isPRToMain)
         }
       }
       steps {
@@ -54,9 +56,11 @@ pipeline {
 
     stage('Load .env from Secret file') {
       when {
-        anyOf {
-          branch 'main'
-          changeRequest target: 'main'
+        expression {
+          def b = env.BRANCH_NAME ?: env.GIT_BRANCH ?: ''
+          def isMain = (b == 'main' || b == 'origin/main' || b == 'refs/heads/main')
+          def isPRToMain = ((env.CHANGE_TARGET ?: '') == 'main')
+          return (isMain || isPRToMain)
         }
       }
       steps {
@@ -74,9 +78,11 @@ pipeline {
 
     stage('Install & Build (optional)') {
       when {
-        anyOf {
-          branch 'main'
-          changeRequest target: 'main'
+        expression {
+          def b = env.BRANCH_NAME ?: env.GIT_BRANCH ?: ''
+          def isMain = (b == 'main' || b == 'origin/main' || b == 'refs/heads/main')
+          def isPRToMain = ((env.CHANGE_TARGET ?: '') == 'main')
+          return (isMain || isPRToMain)
         }
       }
       steps {
@@ -100,9 +106,11 @@ pipeline {
 
     stage('Docker: Build & Push') {
       when {
-        anyOf {
-          branch 'main'
-          changeRequest target: 'main'
+        expression {
+          def b = env.BRANCH_NAME ?: env.GIT_BRANCH ?: ''
+          def isMain = (b == 'main' || b == 'origin/main' || b == 'refs/heads/main')
+          def isPRToMain = ((env.CHANGE_TARGET ?: '') == 'main')
+          return (isMain || isPRToMain)
         }
       }
       steps {
@@ -151,9 +159,11 @@ pipeline {
 
     stage('Docker: Deploy to Remote') {
       when {
-        anyOf {
-          branch 'main'
-          changeRequest target: 'main'
+        expression {
+          def b = env.BRANCH_NAME ?: env.GIT_BRANCH ?: ''
+          def isMain = (b == 'main' || b == 'origin/main' || b == 'refs/heads/main')
+          def isPRToMain = ((env.CHANGE_TARGET ?: '') == 'main')
+          return (isMain || isPRToMain)
         }
       }
       steps {
