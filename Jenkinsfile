@@ -91,11 +91,11 @@ pipeline {
             if (isUnix()) {
               sh 'node -v || true'
               sh 'npm ci'
-              sh 'npm run build'
+              sh 'CI=false npm run build'
             } else {
               bat 'node -v'
               bat 'npm ci'
-              bat 'npm run build'
+              bat 'set CI=false && npm run build'
             }
           } else {
             echo 'No package.json detected. Skipping build.'
