@@ -1,6 +1,8 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import AdminLayout from "../layouts/AdminLayout";
 import AuthLayout from "../layouts/AuthLayout";
+import ProtectedRoute from "../components/ProtectedRoute";
+import { ROLE } from "../constants/role";
 
 import Login from "../pages/Auth/Login";
 import Dashboard from "../pages/Dashboard/Dashboard";
@@ -28,7 +30,11 @@ function AppRoutes() {
         </Route>
 
         {/* Admin Layout */}
-        <Route element={<AdminLayout />}>
+        <Route element={
+          <ProtectedRoute requiredRole={ROLE.ADMIN}>
+            <AdminLayout />
+          </ProtectedRoute>
+        }>
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/reports" element={<ReportList />} />
           <Route path="/reports/:id" element={<ReportDetail />} />
