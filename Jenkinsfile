@@ -8,7 +8,7 @@ pipeline {
     IMAGE_VERSIONED = "${IMAGE_NAME}:${IMAGE_TAG}"
     CONTAINER_NAME = 'ubnd-fe'
     HOST_PORT = '8881'
-    CONTAINER_PORT = '8881'
+    CONTAINER_PORT = '8881' //aaa
   }
 
   options {
