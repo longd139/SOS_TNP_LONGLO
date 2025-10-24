@@ -29,14 +29,14 @@ pipeline {
         script {
           def b = sh(script: "git rev-parse --abbrev-ref HEAD", returnStdout: true).trim()
           env.CURRENT_BRANCH = b
-          env.IS_MAIN = (b == 'main').toString()
-          echo "Current branch: ${b} | IS_MAIN=${env.IS_MAIN}"
+          env.IS_TARGET = (b == 'longt2').toString()
+          echo "Current branch: ${b} | IS_TARGET=${env.IS_TARGET}"
         }
       }
     }
 
     stage('Prepare .env') {
-      when { expression { return env.IS_MAIN == 'true' } }
+      when { expression { return env.IS_TARGET == 'true' } }
       steps {
         withCredentials([file(credentialsId: 'env-file-credential-id', variable: 'ENV_FILE')]) {
           sh '''
@@ -52,7 +52,7 @@ pipeline {
     }
 
     stage('Build Docker Image') {
-      when { expression { return env.IS_MAIN == 'true' } }
+      when { expression { return env.IS_TARGET == 'true' } }
       steps {
         sh '''
           set -euxo pipefail
@@ -62,7 +62,7 @@ pipeline {
     }
 
     stage('Deploy Container') {
-      when { expression { return env.IS_MAIN == 'true' } }
+      when { expression { return env.IS_TARGET == 'true' } }
       steps {
         sh '''
           set -euxo pipefail
@@ -83,7 +83,7 @@ pipeline {
     }
 
     stage('Cleanup Old Images') {
-      when { expression { return env.IS_MAIN == 'true' } }
+      when { expression { return env.IS_TARGET == 'true' } }
       steps {
         sh '''
           set -euxo pipefail
@@ -102,10 +102,10 @@ pipeline {
 
   post {
     success {
-      script { if (env.IS_MAIN == 'true') { echo "Deployment successful: http://103.48.193.165:${HOST_PORT}/" } }
+      script { if (env.IS_TARGET == 'true') { echo "Deployment successful: http://103.48.193.165:${HOST_PORT}/" } }
     }
     always {
-      script { if (env.IS_MAIN == 'true') { sh 'docker ps --filter name=${CONTAINER_NAME} --format "table {{.Names}}\t{{.Image}}\t{{.Status}}" || true' } }
+      script { if (env.IS_TARGET == 'true') { sh 'docker ps --filter name=${CONTAINER_NAME} --format "table {{.Names}}\t{{.Image}}\t{{.Status}}" || true' } }
     }
   }
 }
