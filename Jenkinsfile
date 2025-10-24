@@ -23,22 +23,22 @@ pipeline {
     DEPLOY_SSH_CREDENTIALS_ID = 'deploy-ssh-key-credentials-id'
     DEPLOY_HOST = 'docker-server.example.com'
     CONTAINER_NAME = 'ubnd-phuong-fe'
-    HOST_PORT = '8080'
-    CONTAINER_PORT = '80'
+    HOST_PORT = '8881'
+    CONTAINER_PORT = '8881'
   }
 
   stages {
-    stage('Guard: only longt2 or PR->longt2') {
+    stage('Guard: only main or PR->main') {
       when {
         not {
           anyOf {
-            branch 'longt2'
-            changeRequest target: 'longt2'
+            branch 'main'
+            changeRequest target: 'main'
           }
         }
       }
       steps {
-        echo "Skipping: not on 'longt2' nor PR targeting 'longt2'."
+        echo "Skipping: not on 'main' nor PR targeting 'main'."
         script {
           currentBuild.result = 'NOT_BUILT'
         }
@@ -48,8 +48,8 @@ pipeline {
     stage('Checkout') {
       when {
         anyOf {
-          branch 'longt2'
-          changeRequest target: 'longt2'
+          branch 'main'
+          changeRequest target: 'main'
         }
       }
       steps {
@@ -60,8 +60,8 @@ pipeline {
     stage('Load .env from Secret file') {
       when {
         anyOf {
-          branch 'longt2'
-          changeRequest target: 'longt2'
+          branch 'main'
+          changeRequest target: 'main'
         }
       }
       steps {
@@ -80,8 +80,8 @@ pipeline {
     stage('Install & Build (optional)') {
       when {
         anyOf {
-          branch 'longt2'
-          changeRequest target: 'longt2'
+          branch 'main'
+          changeRequest target: 'main'
         }
       }
       steps {
@@ -106,8 +106,8 @@ pipeline {
     stage('Docker: Build & Push') {
       when {
         anyOf {
-          branch 'longt2'
-          changeRequest target: 'longt2'
+          branch 'main'
+          changeRequest target: 'main'
         }
       }
       steps {
@@ -163,8 +163,8 @@ pipeline {
     stage('Docker: Deploy to Remote') {
       when {
         anyOf {
-          branch 'longt2'
-          changeRequest target: 'longt2'
+          branch 'main'
+          changeRequest target: 'main'
         }
       }
       steps {
