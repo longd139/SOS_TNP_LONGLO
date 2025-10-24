@@ -71,7 +71,6 @@ pipeline {
           }
         }
       }
-    }
 
     stage('Install & Build (optional)') {
       when {
@@ -143,7 +142,7 @@ pipeline {
               """
             }
           }
-
+          }
           env.IMAGE_TAG = tag
           env.IMAGE_REF = imageRef
         }
