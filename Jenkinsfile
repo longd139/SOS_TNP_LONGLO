@@ -19,24 +19,24 @@ pipeline {
 
   stages {
     stage('Checkout') {
-      when {
-        anyOf {
-          branch 'main'
-          expression { env.GIT_BRANCH == 'origin/main' || env.BRANCH_NAME == 'main' }
-        }
-      }
       steps {
         checkout scm
       }
     }
 
-    stage('Prepare .env') {
-      when {
-        anyOf {
-          branch 'main'
-          expression { env.GIT_BRANCH == 'origin/main' || env.BRANCH_NAME == 'main' }
+    stage('Detect Branch') {
+      steps {
+        script {
+          def b = sh(script: "git rev-parse --abbrev-ref HEAD", returnStdout: true).trim()
+          env.CURRENT_BRANCH = b
+          env.IS_MAIN = (b == 'main').toString()
+          echo "Current branch: ${b} | IS_MAIN=${env.IS_MAIN}"
         }
       }
+    }
+
+    stage('Prepare .env') {
+      when { expression { return env.IS_MAIN == 'true' } }
       steps {
         withCredentials([file(credentialsId: 'env-file-credential-id', variable: 'ENV_FILE')]) {
           sh '''
@@ -52,12 +52,7 @@ pipeline {
     }
 
     stage('Build Docker Image') {
-      when {
-        anyOf {
-          branch 'main'
-          expression { env.GIT_BRANCH == 'origin/main' || env.BRANCH_NAME == 'main' }
-        }
-      }
+      when { expression { return env.IS_MAIN == 'true' } }
       steps {
         sh '''
           set -euxo pipefail
@@ -67,12 +62,7 @@ pipeline {
     }
 
     stage('Deploy Container') {
-      when {
-        anyOf {
-          branch 'main'
-          expression { env.GIT_BRANCH == 'origin/main' || env.BRANCH_NAME == 'main' }
-        }
-      }
+      when { expression { return env.IS_MAIN == 'true' } }
       steps {
         sh '''
           set -euxo pipefail
@@ -93,12 +83,7 @@ pipeline {
     }
 
     stage('Cleanup Old Images') {
-      when {
-        anyOf {
-          branch 'main'
-          expression { env.GIT_BRANCH == 'origin/main' || env.BRANCH_NAME == 'main' }
-        }
-      }
+      when { expression { return env.IS_MAIN == 'true' } }
       steps {
         sh '''
           set -euxo pipefail
@@ -117,18 +102,10 @@ pipeline {
 
   post {
     success {
-      script {
-        if (env.BRANCH_NAME == 'main' || env.GIT_BRANCH == 'origin/main') {
-          echo "Deployment successful: http://103.48.193.165:${HOST_PORT}/"
-        }
-      }
+      script { if (env.IS_MAIN == 'true') { echo "Deployment successful: http://103.48.193.165:${HOST_PORT}/" } }
     }
     always {
-      script {
-        if (env.BRANCH_NAME == 'main' || env.GIT_BRANCH == 'origin/main') {
-          sh 'docker ps --filter name=${CONTAINER_NAME} --format "table {{.Names}}\t{{.Image}}\t{{.Status}}" || true'
-        }
-      }
+      script { if (env.IS_MAIN == 'true') { sh 'docker ps --filter name=${CONTAINER_NAME} --format "table {{.Names}}\t{{.Image}}\t{{.Status}}" || true' } }
     }
   }
 }
