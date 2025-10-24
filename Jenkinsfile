@@ -136,7 +136,7 @@ pipeline {
                 docker logout "$DOCKER_REGISTRY"
               '''
             } else {
-              bat """
+              bat '''
                 set DOCKER_BUILDKIT=1
                 docker login %DOCKER_REGISTRY% -u %REGUSER% -p %REGPASS%
                 docker build --secret id=env,src=.env -t temp_build_image .
@@ -145,7 +145,7 @@ pipeline {
                 docker push %DOCKER_REGISTRY%/%DOCKER_IMAGE%:%BUILD_NUMBER%
                 docker push ${imageRef}
                 docker logout %DOCKER_REGISTRY%
-              """
+              '''
             }
           }
           }
@@ -156,10 +156,10 @@ pipeline {
               docker build --secret id=env,src=.env -t ${IMAGE_REF} .
             '''
           } else {
-            bat """
+            bat '''
               set DOCKER_BUILDKIT=1
               docker build --secret id=env,src=.env -t %IMAGE_REF% .
-            """
+            '''
           }
           env.IMAGE_TAG = tag
           env.IMAGE_REF = imageRef
@@ -209,10 +209,10 @@ pipeline {
               rm -f "$TMP_LIST"
             '''
           } else {
-            bat """
+            bat '''
               for /f %%i in ('docker ps -a --format "{{.Names}}" ^| findstr /r /c:"^%CONTAINER_NAME%$"') do docker rm -f %CONTAINER_NAME%
               docker run -d --restart=always --name %CONTAINER_NAME% --env-file .\.env -p %HOST_PORT%:%CONTAINER_PORT% %IMAGE_REF%
-            """
+            '''
           }
         }
       }
@@ -225,3 +225,4 @@ pipeline {
     }
   }
 }
+
