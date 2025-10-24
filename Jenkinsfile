@@ -14,9 +14,7 @@ pipeline {
     // Secret file credential that holds your .env content
     ENV_FILE_CREDENTIALS_ID = 'env-file-credential-id'
 
-    // Remote deploy settings
-    DEPLOY_SSH_CREDENTIALS_ID = 'deploy-ssh-key-credentials-id'
-    DEPLOY_HOST = 'docker-server.example.com'
+    // Local deploy settings (no SSH)
     CONTAINER_NAME = 'ubnd-phuong-fe'
     HOST_PORT = '8881'
     CONTAINER_PORT = '8881'
@@ -104,7 +102,7 @@ pipeline {
       }
     }
 
-    stage('Docker: Build & Push') {
+    stage('Docker: Build') {
       when {
         expression {
           def b = env.BRANCH_NAME ?: env.GIT_BRANCH ?: ''
@@ -119,7 +117,7 @@ pipeline {
           def tag = "${env.BRANCH_NAME ?: 'branch'}-${env.BUILD_NUMBER}-${shortSha}"
           def imageRef = "${CONTAINER_NAME}:${tag}"
 
-          echo "Will build image on remote server: ${imageRef}"
+          echo "Building local Docker image: ${imageRef}"
 
 
           if (false) {
@@ -151,13 +149,25 @@ pipeline {
             }
           }
           }
+          if (isUnix()) {
+            sh '''
+              set -euxo pipefail
+              export DOCKER_BUILDKIT=1
+              docker build --secret id=env,src=.env -t ${IMAGE_REF} .
+            '''
+          } else {
+            bat """
+              set DOCKER_BUILDKIT=1
+              docker build --secret id=env,src=.env -t %IMAGE_REF% .
+            """
+          }
           env.IMAGE_TAG = tag
           env.IMAGE_REF = imageRef
         }
       }
     }
 
-    stage('Docker: Deploy to Remote') {
+    stage('Docker: Deploy') {
       when {
         expression {
           def b = env.BRANCH_NAME ?: env.GIT_BRANCH ?: ''
@@ -168,74 +178,41 @@ pipeline {
       }
       steps {
         script {
-          echo "Deploying ${env.IMAGE_REF} to ${DEPLOY_HOST} as container ${CONTAINER_NAME}"
-
-          // Upload source + .env, then build and run container on remote host
-          def remoteScript = '''
-            set -euo pipefail
-            APP_DIR=/opt/apps/${CONTAINER_NAME}
-            BUILD_DIR=/tmp/${CONTAINER_NAME}_build_${BUILD_NUMBER}
-            SRC_TAR=/tmp/${CONTAINER_NAME}_src_${BUILD_NUMBER}.tar
-            sudo mkdir -p "$APP_DIR"
-            if [ -f /tmp/.env ]; then sudo mv /tmp/.env "$APP_DIR/.env"; fi
-            rm -rf "$BUILD_DIR" && mkdir -p "$BUILD_DIR"
-            tar -xf "$SRC_TAR" -C "$BUILD_DIR"
-            cd "$BUILD_DIR"
-            export DOCKER_BUILDKIT=1
-            sudo docker build --secret id=env,src="$APP_DIR/.env" -t ${IMAGE_REF} .
-            if sudo docker ps -a --format '{{.Names}}' | grep -q '^${CONTAINER_NAME}$'; then
-              sudo docker rm -f ${CONTAINER_NAME} || true
-            fi
-            sudo docker run -d --restart=always \
-              --name ${CONTAINER_NAME} \
-              --env-file "$APP_DIR/.env" \
-              -p ${HOST_PORT}:${CONTAINER_PORT} \
-              ${IMAGE_REF}
-
-            echo "Cleaning up old images; keeping latest 3 for ${CONTAINER_NAME}"
-            # Build a list of image IDs for this repository, sorted by creation time desc
-            TMP_LIST=$(mktemp)
-            sudo docker images --format '{{.Repository}} {{.Tag}} {{.ID}}' "${CONTAINER_NAME}" \
-              | awk '$2!="<none>" {print $1":"$2, $3}' \
-              | while read REF ID; do \
-                  CREATED=$(sudo docker image inspect -f '{{.Created}}' "$ID" 2>/dev/null || echo 0); \
-                  echo "$CREATED $ID $REF"; \
-                done \
-              | sort -r > "$TMP_LIST"
-
-            # Keep top 3 image IDs
-            KEEP_IDS=$(head -n 3 "$TMP_LIST" | awk '{print $2}')
-            ALL_IDS=$(awk '{print $2}' "$TMP_LIST")
-
-            for ID in $ALL_IDS; do
-              if echo "$KEEP_IDS" | grep -q "$ID"; then
-                continue
+          echo "Deploying container locally: ${CONTAINER_NAME} from ${env.IMAGE_REF}"
+          if (isUnix()) {
+            sh '''
+              set -euxo pipefail
+              if docker ps -a --format '{{.Names}}' | grep -q '^${CONTAINER_NAME}$'; then
+                docker rm -f ${CONTAINER_NAME} || true
               fi
-              # Try to remove by ID; ignore if in use
-              sudo docker rmi -f "$ID" || true
-            done
-            rm -f "$TMP_LIST"
-          '''
+              docker run -d --restart=always \
+                --name ${CONTAINER_NAME} \
+                --env-file ./.env \
+                -p ${HOST_PORT}:${CONTAINER_PORT} \
+                ${IMAGE_REF}
 
-          sshagent([DEPLOY_SSH_CREDENTIALS_ID]) {
-            if (isUnix()) {
-              sh '''
-                set -euxo pipefail
-                git archive -o app.tar HEAD
-                scp -o StrictHostKeyChecking=no app.tar ${DEPLOY_HOST}:/tmp/${CONTAINER_NAME}_src_${BUILD_NUMBER}.tar
-                scp -o StrictHostKeyChecking=no .env ${DEPLOY_HOST}:/tmp/.env
-              '''
-              sh "ssh -o StrictHostKeyChecking=no ${DEPLOY_HOST} bash -lc '${remoteScript.replace("'", "'\\''")}'"
-            } else {
-              bat (
-                """
-                git archive -o app.tar HEAD
-                scp -o StrictHostKeyChecking=no app.tar %DEPLOY_HOST%:/tmp/%CONTAINER_NAME%_src_%BUILD_NUMBER%.tar
-                scp -o StrictHostKeyChecking=no .env %DEPLOY_HOST%:/tmp/.env
-                ssh -o StrictHostKeyChecking=no %DEPLOY_HOST% "bash -lc \"${remoteScript.replace('"', '\\"')}\""
-                """
-              )
-            }
+              echo "Cleaning up old images; keeping latest 3"
+              TMP_LIST=$(mktemp)
+              docker images --format '{{.Repository}} {{.Tag}} {{.ID}}' "${CONTAINER_NAME}" \
+                | awk '$2!="<none>" {print $1":"$2, $3}' \
+                | while read REF ID; do \
+                    CREATED=$(docker image inspect -f '{{.Created}}' "$ID" 2>/dev/null || echo 0); \
+                    echo "$CREATED $ID $REF"; \
+                  done \
+                | sort -r > "$TMP_LIST"
+              KEEP_IDS=$(head -n 3 "$TMP_LIST" | awk '{print $2}')
+              ALL_IDS=$(awk '{print $2}' "$TMP_LIST")
+              for ID in $ALL_IDS; do
+                echo "$KEEP_IDS" | grep -q "$ID" && continue
+                docker rmi -f "$ID" || true
+              done
+              rm -f "$TMP_LIST"
+            '''
+          } else {
+            bat """
+              for /f %%i in ('docker ps -a --format "{{.Names}}" ^| findstr /r /c:"^%CONTAINER_NAME%$"') do docker rm -f %CONTAINER_NAME%
+              docker run -d --restart=always --name %CONTAINER_NAME% --env-file .\.env -p %HOST_PORT%:%CONTAINER_PORT% %IMAGE_REF%
+            """
           }
         }
       }
