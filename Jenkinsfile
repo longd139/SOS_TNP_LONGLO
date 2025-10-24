@@ -61,7 +61,7 @@ pipeline {
       steps {
         withCredentials([file(credentialsId: 'env-file-credential-id', variable: 'ENV_FILE')]) {
           sh '''
-            set -euxo pipefail
+            set -eux
             # Create .env in workspace from Jenkins secret file
             cp "$ENV_FILE" .env
             # Optionally mirror into src/.env for compatibility with current project layout
@@ -76,7 +76,7 @@ pipeline {
       when { expression { return env.IS_TARGET == 'true' } }
       steps {
         sh '''
-          set -euxo pipefail
+          set -eux
           docker build -t ${IMAGE_VERSIONED} -t ${IMAGE_LATEST} .
         '''
       }
@@ -86,7 +86,7 @@ pipeline {
       when { expression { return env.IS_TARGET == 'true' } }
       steps {
         sh '''
-          set -euxo pipefail
+          set -eux
 
           # Stop and remove any existing container with the same name
           if [ "$(docker ps -aq -f name=^${CONTAINER_NAME}$)" ]; then
@@ -107,7 +107,7 @@ pipeline {
       when { expression { return env.IS_TARGET == 'true' } }
       steps {
         sh '''
-          set -euxo pipefail
+          set -eux
 
           # Keep only the 3 most recent unique images for this repo
           # List image IDs in creation order (newest first), unique by ID
@@ -130,3 +130,4 @@ pipeline {
     }
   }
 }
+
