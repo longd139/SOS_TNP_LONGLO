@@ -7,23 +7,23 @@ WORKDIR /app
 # Install dependencies first (better layer caching)
 COPY package*.json ./
 RUN set -eux; \
-    if [ -f package-lock.json ]; then npm ci; else npm install; fi
+  if [ -f package-lock.json ]; then npm ci; else npm install; fi
 
 # Copy source
 COPY . .
 
-# Optionally mount .env as a build secret so tools like Vite/Next/CRA can read it
+# Optionally mount .env as a build secret so tools like Vite/Next/CRA can read it nani
 # The Jenkinsfile passes --secret id=env,src=.env
 RUN --mount=type=secret,id=env,dst=/tmp/.env \
-    set -eux; \
-    if [ -f /tmp/.env ]; then cp /tmp/.env .env; fi; \
-    npm run build || (echo "No build script found; ensure package.json has a build script" && exit 1); \
-    rm -f .env || true; \
-    mkdir -p /out; \
-    if [ -d dist ]; then cp -R dist/* /out/; \
-    elif [ -d build ]; then cp -R build/* /out/; \
-    elif [ -d public ]; then cp -R public/* /out/; \
-    else echo "No build output found (expected dist/ or build/)." && exit 1; fi
+  set -eux; \
+  if [ -f /tmp/.env ]; then cp /tmp/.env .env; fi; \
+  npm run build || (echo "No build script found; ensure package.json has a build script" && exit 1); \
+  rm -f .env || true; \
+  mkdir -p /out; \
+  if [ -d dist ]; then cp -R dist/* /out/; \
+  elif [ -d build ]; then cp -R build/* /out/; \
+  elif [ -d public ]; then cp -R public/* /out/; \
+  else echo "No build output found (expected dist/ or build/)." && exit 1; fi
 
 # ---- Runtime stage: serve with Nginx ----
 FROM nginx:1.25-alpine AS runtime
