@@ -1,42 +1,27 @@
-# syntax=docker/dockerfile:1.6
+# Multi-stage build: build React app, then serve with Nginx
 
-# ---- Build stage: compile front-end assets ----
+# --- Build stage ---
 FROM node:20-alpine AS builder
 WORKDIR /app
 
-# Install dependencies first (better layer caching)
+# Install dependencies
 COPY package*.json ./
-RUN set -eux; \
-  if [ -f package-lock.json ]; then npm ci; else npm install; fi
+RUN npm ci
 
-# Copy source
+# Copy source and build
 COPY . .
+RUN npm run build
 
-# Optionally mount .env as a build secret so tools like Vite/Next/CRA can read it nani
-# The Jenkinsfile passes --secret id=env,src=.env
-RUN --mount=type=secret,id=env,dst=/tmp/.env \
-  set -eux; \
-  if [ -f /tmp/.env ]; then cp /tmp/.env .env; fi; \
-  npm run build || (echo "No build script found; ensure package.json has a build script" && exit 1); \
-  rm -f .env || true; \
-  mkdir -p /out; \
-  if [ -d dist ]; then cp -R dist/* /out/; \
-  elif [ -d build ]; then cp -R build/* /out/; \
-  elif [ -d public ]; then cp -R public/* /out/; \
-  else echo "No build output found (expected dist/ or build/)." && exit 1; fi
+# --- Run stage ---
+FROM nginx:alpine
 
-# ---- Runtime stage: serve with Nginx ----
-FROM nginx:1.25-alpine AS runtime
-
-# Nginx config for SPA/static site
+# Use custom Nginx config (listens on 8881 and serves SPA)
 COPY docker/nginx.conf /etc/nginx/conf.d/default.conf
 
-# Static assets
-COPY --from=builder /out /usr/share/nginx/html
+# Copy build artifacts to Nginx html directory
+COPY --from=builder /app/build /usr/share/nginx/html
 
 EXPOSE 8881
-HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
-  CMD wget -qO- http://127.0.0.1:8881/ >/dev/null 2>&1 || exit 1
 
-# Default command
 CMD ["nginx", "-g", "daemon off;"]
+
