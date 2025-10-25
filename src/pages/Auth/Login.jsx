@@ -1,8 +1,46 @@
-import { useState } from "react";
-import { ShieldCheck } from "lucide-react";
+import { useState, useEffect } from "react";
+import { ShieldCheck, AlertCircle, Loader2 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { useLogin } from "../../hooks/useLogin";
+import { useAuth } from "../../contexts/AuthContext";
 
 export default function Login() {
     const [twoFA, setTwoFA] = useState(false);
+    const [tenDangNhap, setTenDangNhap] = useState("");
+    const [matKhau, setMatKhau] = useState("");
+    
+    const { login, loading, errors, apiError, clearErrors } = useLogin();
+    const { isAuthenticated, isAdmin } = useAuth();
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        if (isAuthenticated && isAdmin()) {
+            navigate('/dashboard', { replace: true });
+        }
+    }, [isAuthenticated, isAdmin, navigate]);
+
+    useEffect(() => {
+        if (Object.keys(errors).length > 0 || apiError) {
+            clearErrors();
+        }
+    }, [tenDangNhap, matKhau]);
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        
+        const credentials = {
+            tenDangNhap,
+            matKhau
+        };
+
+        const result = await login(credentials);
+        
+        if (result.success) {
+            console.log('Login successful:', result.user);
+        } else {
+            console.error('Login failed:', result.error);
+        }
+    };
 
     return (
         <div className="flex items-center justify-center min-h-screen bg-gray-100">
@@ -18,16 +56,31 @@ export default function Login() {
                     Ứng dụng công dân Phường Tăng Nhơn Phú
                 </p>
 
-                <form className="space-y-4 text-left">
+                {apiError && (
+                    <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg flex items-center gap-2">
+                        <AlertCircle className="w-4 h-4" />
+                        <span className="text-sm">{apiError}</span>
+                    </div>
+                )}
+
+                <form onSubmit={handleSubmit} className="space-y-4 text-left">
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
                             Tên đăng nhập
                         </label>
                         <input
                             type="text"
+                            value={tenDangNhap}
+                            onChange={(e) => setTenDangNhap(e.target.value)}
                             placeholder="Nhập tên đăng nhập"
-                            className="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                            className={`w-full border rounded-lg p-2 focus:ring-2 focus:ring-blue-500 focus:outline-none ${
+                                errors.tenDangNhap ? 'border-red-400' : 'border-gray-300'
+                            }`}
+                            disabled={loading}
                         />
+                        {errors.tenDangNhap && (
+                            <p className="text-red-500 text-xs mt-1">{errors.tenDangNhap}</p>
+                        )}
                     </div>
 
                     <div>
@@ -36,9 +89,17 @@ export default function Login() {
                         </label>
                         <input
                             type="password"
+                            value={matKhau}
+                            onChange={(e) => setMatKhau(e.target.value)}
                             placeholder="Nhập mật khẩu"
-                            className="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                            className={`w-full border rounded-lg p-2 focus:ring-2 focus:ring-blue-500 focus:outline-none ${
+                                errors.matKhau ? 'border-red-400' : 'border-gray-300'
+                            }`}
+                            disabled={loading}
                         />
+                        {errors.matKhau && (
+                            <p className="text-red-500 text-xs mt-1">{errors.matKhau}</p>
+                        )}
                     </div>
 
                     <div className="flex items-center gap-2">
@@ -48,6 +109,7 @@ export default function Login() {
                             checked={twoFA}
                             onChange={(e) => setTwoFA(e.target.checked)}
                             className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                            disabled={loading}
                         />
                         <label htmlFor="2fa" className="text-sm text-gray-700">
                             Bật xác thực 2 yếu tố (2FA)
@@ -56,9 +118,11 @@ export default function Login() {
 
                     <button
                         type="submit"
-                        className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition"
+                        disabled={loading}
+                        className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                     >
-                        Đăng nhập
+                        {loading && <Loader2 className="w-4 h-4 animate-spin" />}
+                        {loading ? 'Đang đăng nhập...' : 'Đăng nhập'}
                     </button>
 
                     <div className="text-center mt-2">
