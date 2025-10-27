@@ -49,7 +49,7 @@ const menuItems = [
         id: 'schedule',
         label: 'Lịch tiếp dân',
         icon: <Calendar />,
-        path: '/schedule',
+        path: '/schedules',
         hasSubmenu: false
     },
     {

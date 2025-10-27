@@ -70,7 +70,7 @@ export default function Dashboard() {
                                         <span className="text-sm font-semibold text-gray-700">{report.id}</span>
                                         {report.isUrgent && (
                                             <span className="inline-flex items-center px-2 py-1 bg-red-100 text-red-700 text-xs font-medium rounded-full">
-                                                ⚠ Khẩn
+                                                <AlertTriangle /> Khẩn
                                             </span>
                                         )}
                                     </div>

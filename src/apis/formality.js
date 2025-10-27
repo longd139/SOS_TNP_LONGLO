@@ -1,7 +1,7 @@
 import apiClient from "../utils/apiClient";
 
 const getFormalityApi = async ({
-    page = 0,
+    page = 1,
     size = 10,
     search = '',
     id_linh_vuc,
@@ -20,7 +20,16 @@ const getFormalityApi = async ({
         }
 
         const response = await apiClient.get("/api/thu-tuc", { params });
-        if (response.data.success) return response.data.data;
+        if (response.data.success) {
+            const apiData = response.data.data;
+            return {
+                content: apiData.data || [],
+                totalElements: apiData.pagination?.totalItems || 0,
+                totalPages: apiData.pagination?.totalPages || 0,
+                currentPage: apiData.pagination?.currentPage || 1,
+                pageSize: apiData.pagination?.pageSize || size
+            };
+        }
         else throw new Error("Lấy danh sách thủ tục hành chính thất bại");
     } catch (error) {
         console.error('Error fetching formality data:', error);

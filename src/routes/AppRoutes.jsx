@@ -19,6 +19,7 @@ import ContactInfo from "../pages/Contact/ContactInfo";
 import WorkSchedule from "../pages/Schedules/WorkSchedule";
 import AdminManager from "../pages/AdminAccounts/AdminManager";
 import NotFound from "../pages/NotFound";
+import Statistics from "../pages/Statistic/Statistic";
 
 function AppRoutes() {
   return (
@@ -45,6 +46,7 @@ function AppRoutes() {
           <Route path="/templates" element={<TemplateManager />} />
           <Route path="/contact" element={<ContactInfo />} />
           <Route path="/schedules" element={<WorkSchedule />} />
+          <Route path="/statistics" element={<Statistics />} />
           <Route path="/accounts" element={<AdminManager />} />
         </Route>
 
