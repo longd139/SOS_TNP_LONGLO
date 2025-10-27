@@ -5,10 +5,9 @@ import { useLogin } from "../../hooks/useLogin";
 import { useAuth } from "../../contexts/AuthContext";
 
 export default function Login() {
-    const [twoFA, setTwoFA] = useState(false);
     const [tenDangNhap, setTenDangNhap] = useState("");
     const [matKhau, setMatKhau] = useState("");
-    
+
     const { login, loading, errors, apiError, clearErrors } = useLogin();
     const { isAuthenticated, isAdmin } = useAuth();
     const navigate = useNavigate();
@@ -27,14 +26,14 @@ export default function Login() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        
+
         const credentials = {
             tenDangNhap,
             matKhau
         };
 
         const result = await login(credentials);
-        
+
         if (result.success) {
             console.log('Login successful:', result.user);
         } else {
@@ -73,9 +72,8 @@ export default function Login() {
                             value={tenDangNhap}
                             onChange={(e) => setTenDangNhap(e.target.value)}
                             placeholder="Nhập tên đăng nhập"
-                            className={`w-full border rounded-lg p-2 focus:ring-2 focus:ring-blue-500 focus:outline-none ${
-                                errors.tenDangNhap ? 'border-red-400' : 'border-gray-300'
-                            }`}
+                            className={`w-full border rounded-lg p-2 focus:ring-2 focus:ring-blue-500 focus:outline-none ${errors.tenDangNhap ? 'border-red-400' : 'border-gray-300'
+                                }`}
                             disabled={loading}
                         />
                         {errors.tenDangNhap && (
@@ -92,28 +90,13 @@ export default function Login() {
                             value={matKhau}
                             onChange={(e) => setMatKhau(e.target.value)}
                             placeholder="Nhập mật khẩu"
-                            className={`w-full border rounded-lg p-2 focus:ring-2 focus:ring-blue-500 focus:outline-none ${
-                                errors.matKhau ? 'border-red-400' : 'border-gray-300'
-                            }`}
+                            className={`w-full border rounded-lg p-2 focus:ring-2 focus:ring-blue-500 focus:outline-none ${errors.matKhau ? 'border-red-400' : 'border-gray-300'
+                                }`}
                             disabled={loading}
                         />
                         {errors.matKhau && (
                             <p className="text-red-500 text-xs mt-1">{errors.matKhau}</p>
                         )}
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                        <input
-                            id="2fa"
-                            type="checkbox"
-                            checked={twoFA}
-                            onChange={(e) => setTwoFA(e.target.checked)}
-                            className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                            disabled={loading}
-                        />
-                        <label htmlFor="2fa" className="text-sm text-gray-700">
-                            Bật xác thực 2 yếu tố (2FA)
-                        </label>
                     </div>
 
                     <button

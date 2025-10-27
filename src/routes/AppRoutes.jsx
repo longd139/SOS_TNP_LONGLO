@@ -24,12 +24,10 @@ function AppRoutes() {
   return (
     <Router>
       <Routes>
-        {/* Auth Layout */}
         <Route element={<AuthLayout />}>
           <Route path="/" element={<Login />} />
         </Route>
 
-        {/* Admin Layout */}
         <Route element={
           <ProtectedRoute requiredRole={ROLE.ADMIN}>
             <AdminLayout />
