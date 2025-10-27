@@ -73,14 +73,14 @@ export default function Sidebar() {
 
     return (
         <aside className="w-full bg-white border-r border-gray-200 h-full overflow-y-auto sidebar-scroll">
-            <div className="p-6 border-b border-gray-200 sticky top-0 bg-white z-10">
+            <div className="p-6 border-b border-gray-200 bg-white">
                 <h3 className="text-lg font-bold text-gray-800 mb-1">
                     Phường Tăng Nhơn Phú
                 </h3>
                 <p className="text-sm text-gray-500">Cổng quản trị</p>
             </div>
 
-            <nav className="px-4 py-6">
+            <nav className="px-4 py-6 flex-1">
                 <ul className="space-y-2">
                     {menuItems.map((item) => {
                         const isActive = location.pathname === item.path;
@@ -107,7 +107,7 @@ export default function Sidebar() {
                 </ul>
             </nav>
 
-            <div className="p-4 border-t border-gray-200 sticky bottom-0 bg-white">
+            <div className="p-4 border-t border-gray-200 bg-white mt-auto">
                 <p className="text-xs text-gray-400 text-center">v1.0.0</p>
             </div>
         </aside>

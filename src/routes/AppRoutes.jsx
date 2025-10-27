@@ -45,7 +45,7 @@ function AppRoutes() {
           <Route path="/templates" element={<TemplateManager />} />
           <Route path="/contact" element={<ContactInfo />} />
           <Route path="/schedules" element={<WorkSchedule />} />
-          <Route path="/admins" element={<AdminManager />} />
+          <Route path="/accounts" element={<AdminManager />} />
         </Route>
 
         {/* 404 */}
