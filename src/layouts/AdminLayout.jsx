@@ -4,17 +4,23 @@ import Sidebar from "../components/Sidebar";
 import Header from "../components/Header";
 
 const AdminLayout = () => {
-  return (
-    <div className="flex min-h-screen bg-gray-50">
-      <Sidebar />
-      <div className="flex-1 flex flex-col">
-        <Header />
-        <main className="p-6 flex-1">
-          <Outlet />
-        </main>
-      </div>
-    </div>
-  );
+    return (
+        <div className="flex h-screen overflow-hidden">
+            <div className="w-64 relative">
+                <Sidebar />
+            </div>
+
+            <div className="flex-1 flex flex-col h-screen">
+                <Header />
+
+                <main className="flex-1 overflow-y-auto bg-gray-50 main-content-scroll">
+                    <div className="p-6 h-full">
+                        <Outlet />
+                    </div>
+                </main>
+            </div>
+        </div>
+    );
 };
 
 export default AdminLayout;
