@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { ShieldCheck, AlertCircle, Loader2 } from "lucide-react";
+import { ShieldCheck, AlertCircle, Loader2, Lock, User } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useLogin } from "../../hooks/useLogin";
 import { useAuth } from "../../contexts/AuthContext";
@@ -43,7 +43,7 @@ export default function Login() {
 
     return (
         <div className="flex items-center justify-center min-h-screen bg-gray-100">
-            <div className="bg-white shadow-lg rounded-2xl p-8 w-[380px] text-center">
+            <div className="bg-white shadow-lg rounded-2xl p-8 w-[450px] text-center">
                 <div className="flex justify-center mb-4">
                     <div className="bg-blue-100 p-3 rounded-full">
                         <ShieldCheck className="text-blue-600 w-8 h-8" />
@@ -67,15 +67,18 @@ export default function Login() {
                         <label className="block text-sm font-medium text-gray-700 mb-1">
                             Tên đăng nhập
                         </label>
-                        <input
-                            type="text"
-                            value={tenDangNhap}
-                            onChange={(e) => setTenDangNhap(e.target.value)}
-                            placeholder="Nhập tên đăng nhập"
-                            className={`w-full border rounded-lg p-2 focus:ring-2 focus:ring-blue-500 focus:outline-none ${errors.tenDangNhap ? 'border-red-400' : 'border-gray-300'
-                                }`}
-                            disabled={loading}
-                        />
+                        <div className="relative">
+                            <User className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                            <input
+                                type="text"
+                                value={tenDangNhap}
+                                onChange={(e) => setTenDangNhap(e.target.value)}
+                                placeholder="Nhập tên đăng nhập"
+                                className={`pl-10 w-full border rounded-lg py-2 ${errors.tenDangNhap ? 'border-red-400' : 'border-gray-300'
+                                    }`}
+                                disabled={loading}
+                            />
+                        </div>
                         {errors.tenDangNhap && (
                             <p className="text-red-500 text-xs mt-1">{errors.tenDangNhap}</p>
                         )}
@@ -85,15 +88,18 @@ export default function Login() {
                         <label className="block text-sm font-medium text-gray-700 mb-1">
                             Mật khẩu
                         </label>
-                        <input
-                            type="password"
-                            value={matKhau}
-                            onChange={(e) => setMatKhau(e.target.value)}
-                            placeholder="Nhập mật khẩu"
-                            className={`w-full border rounded-lg p-2 focus:ring-2 focus:ring-blue-500 focus:outline-none ${errors.matKhau ? 'border-red-400' : 'border-gray-300'
-                                }`}
-                            disabled={loading}
-                        />
+                        <div className="relative">
+                            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                            <input
+                                type="password"
+                                value={matKhau}
+                                onChange={(e) => setMatKhau(e.target.value)}
+                                placeholder="Nhập mật khẩu"
+                                className={`pl-10 pr-10 w-full border rounded-lg py-2 ${errors.matKhau ? 'border-red-400' : 'border-gray-300'
+                                    }`}
+                                disabled={loading}
+                            />
+                        </div>
                         {errors.matKhau && (
                             <p className="text-red-500 text-xs mt-1">{errors.matKhau}</p>
                         )}
