@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import BaseModal, { ModalFooter } from '../components/BaseModal';
-import { ROLE, ROLE_LABELS } from '../constants/role';
-import { validateUserForm } from '../validator/userValidator';
+import BaseModal, { ModalFooter } from '../BaseModal';
+import { ROLE, ROLE_LABELS } from '../../constants/role';
+import { validateUserForm } from '../../validator/userValidator';
 
 const UserModal = ({
     isOpen = false,
@@ -70,22 +70,19 @@ const UserModal = ({
             setErrors(result.errors || {});
             return result.isValid;
         } catch (error) {
-            console.error('Validation error:', error);
             return false;
         }
     };
 
     const handleSubmit = async () => {
         const isValid = await validateForm();
+        
         if (isValid) {
             const submitData = { ...formData };
-
-            if (isEditMode && !submitData.password) {
+            if (isEditMode && !formData.password) {
                 delete submitData.password;
                 delete submitData.confirmPassword;
             }
-
-            delete submitData.confirmPassword;
 
             onSubmit(submitData);
         }

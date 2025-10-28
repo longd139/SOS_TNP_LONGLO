@@ -5,8 +5,6 @@ const vietnamesePhoneRegex = /^(\+84|84|0)?([3578])[0-9]{8}$|^(\+84|84|0)?([2-9]
 
 const usernameRegex = /^[a-zA-Z0-9_.]+$/;
 
-const vietnameseNameRegex = /^[a-zA-ZÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯĂẰẮẲẴẶĂẤẦẨẪẬẤẦẨêẬÉÈẺẼẸÉÈẺẼẸÊÊỀẾỂỄỆÊÊỀẾỂỄỆÍÌỈĨỊÍÌỈĨỊÓÒỎÕỌÓÒỎÕỌÔỒỐỔỖỘÔỒỐỔỖỘƠỜỚỞỠỢƠỜỚỞỠỢÚÙỦŨỤÚÙỦŨỤƯỪỨỬỮỰƯỪỨỬỮỰÝỲỶỸỴÝỲỶỸỴ\s.'-]+$/;
-
 export const createUserSchema = yup.object().shape({
     username: yup
         .string()
@@ -20,7 +18,6 @@ export const createUserSchema = yup.object().shape({
         .required("Họ và tên là bắt buộc")
         .min(2, "Họ và tên phải có ít nhất 2 ký tự")
         .max(100, "Họ và tên không được vượt quá 100 ký tự")
-        .matches(vietnameseNameRegex, "Họ và tên chứa ký tự không hợp lệ")
         .test('trim', 'Họ và tên là bắt buộc', value => value && value.trim().length > 0),
 
     email: yup
@@ -56,7 +53,6 @@ export const updateUserSchema = yup.object().shape({
         .required("Họ và tên là bắt buộc")
         .min(2, "Họ và tên phải có ít nhất 2 ký tự")
         .max(100, "Họ và tên không được vượt quá 100 ký tự")
-        .matches(vietnameseNameRegex, "Họ và tên chứa ký tự không hợp lệ")
         .test('trim', 'Họ và tên là bắt buộc', value => value && value.trim().length > 0),
 
     email: yup
@@ -81,7 +77,7 @@ export const createUserWithPhoneSchema = createUserSchema.shape({
         .nullable()
         .notRequired()
         .test('phone-format', 'Số điện thoại không hợp lệ', function (value) {
-            if (!value || value.trim() === '') return true; // Optional field
+            if (!value || value.trim() === '') return true;
             const cleanPhone = value.replace(/[\s\-()]/g, '');
             return vietnamesePhoneRegex.test(cleanPhone);
         })
@@ -93,7 +89,7 @@ export const updateUserWithPhoneSchema = updateUserSchema.shape({
         .nullable()
         .notRequired()
         .test('phone-format', 'Số điện thoại không hợp lệ', function (value) {
-            if (!value || value.trim() === '') return true; // Optional field
+            if (!value || value.trim() === '') return true;
             const cleanPhone = value.replace(/[\s\-()]/g, '');
             return vietnamesePhoneRegex.test(cleanPhone);
         })
@@ -143,6 +139,8 @@ export async function validateChangePassword(data) {
 }
 
 export async function validateUserForm(userData, isEditMode = false, includePhone = false) {
+    console.log('validateUserForm called with:', { userData, isEditMode, includePhone });
+    
     let schema;
 
     if (isEditMode) {
@@ -151,7 +149,11 @@ export async function validateUserForm(userData, isEditMode = false, includePhon
         schema = includePhone ? createUserWithPhoneSchema : createUserSchema;
     }
 
+    console.log('Schema selected:', isEditMode ? 'update' : 'create', 'with phone:', includePhone);
+    
     const result = await validateSchema(schema, userData);
+    console.log('Validation result:', result);
+    
     return { isValid: result.valid, errors: result.errors };
 }
 

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import BaseTable from '../../components/BaseTable';
-import UserModal from '../../components/UserModal';
+import UserModal from '../../components/users/UserModal';
 import { ConfirmModal } from '../../components/BaseModal';
 import { USER_API } from '../../apis/user';
 import UserService from '../../services/userService';
