@@ -44,7 +44,6 @@ export default function AdminManager() {
             });
         } catch (error) {
             console.error('Error loading users:', error);
-            // You could add toast notification here
         } finally {
             setLoading(false);
         }
@@ -84,13 +83,11 @@ export default function AdminManager() {
             setModalLoading(true);
 
             if (userModal.user) {
-                // Update existing user
                 await UserService.updateUserByAdmin({
                     ...userData,
                     id: userModal.user.id
                 });
             } else {
-                // Create new user account
                 await UserService.createAccount(userData);
             }
 
@@ -99,7 +96,6 @@ export default function AdminManager() {
 
         } catch (error) {
             console.error('Error saving user:', error);
-            // You could add toast notification here
         } finally {
             setModalLoading(false);
         }
@@ -119,7 +115,6 @@ export default function AdminManager() {
             console.log('User deleted successfully:', deleteModal.user.username);
         } catch (error) {
             console.error('Error deleting user:', error);
-            // You could add toast notification here
         }
     };
 
@@ -132,7 +127,8 @@ export default function AdminManager() {
             title: 'ID',
             dataIndex: 'id',
             key: 'id',
-            width: '60px'
+            width: '60px',
+            render: (value, record, index) => `#${index + 1 + (pagination.current - 1) * pagination.pageSize}`
         },
         {
             title: 'Tên đăng nhập',

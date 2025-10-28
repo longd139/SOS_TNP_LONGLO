@@ -24,6 +24,69 @@ export const news = [
     { id: 'N-2', title: 'Hướng dẫn nộp hồ sơ trực tuyến', publishedAt: '2025-09-15', status: 'Bản nháp' }
 ];
 
+export const newsList = [
+    {
+        id: "#1",
+        title: "Thông báo lịch tiếp dân tháng 11/2025",
+        category: "Quan trọng",
+        categoryBg: "#FEE2E2",
+        categoryColor: "#DC2626",
+        status: "Đã xuất bản",
+        statusBg: "#D1FAE5",
+        statusColor: "#059669",
+        publishedDate: "2025-10-20",
+        views: 1234
+    },
+    {
+        id: "#2",
+        title: "Hướng dẫn đăng ký làm căn cước công dân gắn chip",
+        category: "Tin tức",
+        categoryBg: "#DBEAFE",
+        categoryColor: "#2563EB",
+        status: "Đã xuất bản",
+        statusBg: "#D1FAE5",
+        statusColor: "#059669",
+        publishedDate: "2025-10-19",
+        views: 892
+    },
+    {
+        id: "#3",
+        title: "Lịch cắt nước định kỳ tuần tới",
+        category: "Quan trọng",
+        categoryBg: "#FEE2E2",
+        categoryColor: "#DC2626",
+        status: "Đã xuất bản",
+        statusBg: "#D1FAE5",
+        statusColor: "#059669",
+        publishedDate: "2025-10-18",
+        views: 2156
+    },
+    {
+        id: "#4",
+        title: "Khai mạc Festival Văn hóa Phường",
+        category: "Sự kiện",
+        categoryBg: "#E9D5FF",
+        categoryColor: "#7C3AED",
+        status: "Bản nháp",
+        statusBg: "#FEF3C7",
+        statusColor: "#D97706",
+        publishedDate: "2025-10-17",
+        views: 0
+    },
+    {
+        id: "#5",
+        title: "Chính sách hỗ trợ người có công mới nhất",
+        category: "Tin tức",
+        categoryBg: "#DBEAFE",
+        categoryColor: "#2563EB",
+        status: "Đã xuất bản",
+        statusBg: "#D1FAE5",
+        statusColor: "#059669",
+        publishedDate: "2025-10-15",
+        views: 567
+    }
+];
+
 export const procedures = [
     { id: 'P-1', name: 'Đăng ký kinh doanh', field: 'Kinh tế', processingTime: '7 ngày', status: 'Cập nhật' },
     { id: 'P-2', name: 'Cấp chứng minh', field: 'Hành chính', processingTime: '10 ngày', status: 'Cập nhật' }
@@ -104,5 +167,141 @@ export const recentReports = [
         status: "Chờ xử lý",
         statusColor: "#FDE68A",
         isUrgent: false
+    }
+];
+
+export const feedbackList = [
+    {
+        id: "#1234",
+        title: "Vấn đề về sinh môi trường tại đường Số 10",
+        category: "Môi trường",
+        status: "Mới",
+        statusBg: "#FEE2E2",
+        statusColor: "#DC2626",
+        urgency: "Cao",
+        urgencyIcon: "⚠",
+        urgencyColor: "#DC2626",
+        urgencyBg: "#FEE2E2",
+        submittedDate: "2025-10-22",
+        daysOpen: "0 ngày",
+        contact: {
+            name: "Nguyễn Văn A",
+            phone: "0901234567"
+        }
+    },
+    {
+        id: "#1233",
+        title: "Đèn đường bị hỏng tại Khu phố 3",
+        category: "Hạ tầng",
+        status: "Đang xử lý",
+        statusBg: "#DBEAFE",
+        statusColor: "#2563EB",
+        urgency: "Trung bình",
+        urgencyIcon: null,
+        urgencyColor: "#D97706",
+        urgencyBg: "#FEF3C7",
+        submittedDate: "2025-10-21",
+        daysOpen: "1 ngày",
+        contact: {
+            name: "Ẩn danh",
+            phone: null
+        }
+    },
+    {
+        id: "#1232",
+        title: "Kiến nghị về giờ giấc hoạt động của chợ",
+        category: "Kiến nghị",
+        status: "Đã giải quyết",
+        statusBg: "#D1FAE5",
+        statusColor: "#059669",
+        urgency: "Thấp",
+        urgencyIcon: null,
+        urgencyColor: "#059669",
+        urgencyBg: "#D1FAE5",
+        submittedDate: "2025-10-20",
+        daysOpen: "2 ngày",
+        contact: {
+            name: "Trần Thị B",
+            phone: "0912345678"
+        }
+    },
+    {
+        id: "#1231",
+        title: "Ô nhiễm tiếng ồn từ quán karaoke",
+        category: "Môi trường",
+        status: "Mới",
+        statusBg: "#FEE2E2",
+        statusColor: "#DC2626",
+        urgency: "Trung bình",
+        urgencyIcon: null,
+        urgencyColor: "#D97706",
+        urgencyBg: "#FEF3C7",
+        submittedDate: "2025-10-22",
+        daysOpen: "0 ngày",
+        contact: {
+            name: "Lê Văn C",
+            phone: null
+        }
+    },
+    {
+        id: "#1230",
+        title: "Đường xuống cấp tại ngõ 123",
+        category: "Hạ tầng",
+        status: "Đang xử lý",
+        statusBg: "#DBEAFE",
+        statusColor: "#2563EB",
+        urgency: "Cao",
+        urgencyIcon: "⚠",
+        urgencyColor: "#DC2626",
+        urgencyBg: "#FEE2E2",
+        submittedDate: "2025-10-19",
+        daysOpen: "3 ngày",
+        contact: {
+            name: null,
+            phone: "0923456789"
+        }
+    }
+];
+
+export const templatesList = [
+    {
+        id: "#1",
+        name: "Đơn đăng ký thường trú",
+        relatedProcedure: "Đăng ký thường trú",
+        fileSize: "245 KB",
+        uploadedDate: "2025-10-15",
+        downloads: 342
+    },
+    {
+        id: "#2",
+        name: "Giấy khai sinh",
+        relatedProcedure: "Đăng ký khai sinh",
+        fileSize: "189 KB",
+        uploadedDate: "2025-10-12",
+        downloads: 256
+    },
+    {
+        id: "#3",
+        name: "Đơn xin giấy phép kinh doanh",
+        relatedProcedure: "Đăng ký kinh doanh hộ cá thể",
+        fileSize: "312 KB",
+        uploadedDate: "2025-10-10",
+        downloads: 128
+    },
+    {
+        id: "#4",
+        name: "Đơn xác nhận hộ nghèo",
+        relatedProcedure: "Xác nhận hộ nghèo, cận nghèo",
+        fileSize: "198 KB",
+        uploadedDate: "2025-10-08",
+        downloads: 89
+    },
+    {
+        id: "#5",
+        name: "Đơn xin giấy phép xây dựng",
+        relatedProcedure: "Giấy phép xây dựng tạm",
+        fileSize: "425 KB",
+        uploadedDate: "2025-10-05",
+        downloads: 167
     }
 ];
