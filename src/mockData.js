@@ -305,3 +305,37 @@ export const templatesList = [
         downloads: 167
     }
 ];
+
+export const contactInfo = {
+    address: {
+        full: "123 Đường Tăng Nhơn Phú, Quận 9, TP. Thủ Đức",
+        latitude: 10.8231,
+        longitude: 106.6297
+    },
+    contact: {
+        mainPhone: "028-1234-5678",
+        departments: {
+            administrative: "028-1234-5679",
+            socialWelfare: "028-1234-5680"
+        },
+        email: "ubnd@tangnhonphu.gov.vn",
+        fax: "028-1234-5677"
+    },
+    workingHours: {
+        morning: {
+            start: "07:30",
+            end: "11:30"
+        },
+        afternoon: {
+            start: "13:00",
+            end: "17:00"
+        },
+        workingDays: "Thứ 2 đến Thứ 6 (trừ ngày lễ, Tết)",
+        note: "Lịch tiếp dân: Thứ 2 và Thứ 5 hàng tuần"
+    },
+    additional: {
+        website: "https://tangnhonphu.gov.vn",
+        facebook: "https://facebook.com/tangnhonphu",
+        hotline: "0900-123-456"
+    }
+};
