@@ -305,3 +305,125 @@ export const templatesList = [
         downloads: 167
     }
 ];
+
+export const contactInfo = {
+    address: {
+        full: "123 Đường Tăng Nhơn Phú, Quận 9, TP. Thủ Đức",
+        latitude: 10.8231,
+        longitude: 106.6297
+    },
+    contact: {
+        mainPhone: "028-1234-5678",
+        departments: {
+            administrative: "028-1234-5679",
+            socialWelfare: "028-1234-5680"
+        },
+        email: "ubnd@tangnhonphu.gov.vn",
+        fax: "028-1234-5677"
+    },
+    workingHours: {
+        morning: {
+            start: "07:30",
+            end: "11:30"
+        },
+        afternoon: {
+            start: "13:00",
+            end: "17:00"
+        },
+        workingDays: "Thứ 2 đến Thứ 6 (trừ ngày lễ, Tết)",
+        note: "Lịch tiếp dân: Thứ 2 và Thứ 5 hàng tuần"
+    },
+    additional: {
+        website: "https://tangnhonphu.gov.vn",
+        facebook: "https://facebook.com/tangnhonphu",
+        hotline: "0900-123-456"
+    }
+};
+
+export const scheduleList = [
+    {
+        id: 1,
+        date: "2025-10-23",
+        time: "08:00 - 10:00",
+        leader: "Ông Nguyễn Văn A - Chủ tích UBND",
+        location: "Phòng tiếp dân - Tầng 1",
+        purpose: "Tiếp dân định kỳ"
+    },
+    {
+        id: 2,
+        date: "2025-10-24",
+        time: "14:00 - 16:00",
+        leader: "Bà Trần Thị B - Phó Chủ tịch",
+        location: "Phòng họp A",
+        purpose: "Tư vấn pháp luật"
+    },
+    {
+        id: 3,
+        date: "2025-10-28",
+        time: "08:00 - 10:00",
+        leader: "Ông Lê Văn C - Phó Chủ tịch",
+        location: "Phòng tiếp dân - Tầng 1",
+        purpose: "Tiếp dân định kỳ"
+    },
+    {
+        id: 4,
+        date: "2025-10-30",
+        time: "09:00 - 11:00",
+        leader: "Ông Nguyễn Văn A - Chủ tịch UBND",
+        location: "Phòng tiếp dân - Tầng 1",
+        purpose: "Giải quyết khiếu nại"
+    }
+];
+
+export const statisticsData = {
+    summary: {
+        totalUsers: 12458,
+        activeUsers: 8942,
+        totalReports: "Phản ánh",
+        avgResponseTime: "5m 32s"
+    },
+    reportsByCategory: [
+        { category: "Môi trường", count: 98, percentage: 39, color: "#3B82F6" },
+        { category: "Hạ tầng", count: 70, percentage: 28, color: "#10B981" },
+        { category: "Kiến nghị", count: 40, percentage: 16, color: "#F59E0B" },
+        { category: "An ninh", count: 25, percentage: 10, color: "#EF4444" },
+        { category: "Khác", count: 17, percentage: 7, color: "#6B7280" }
+    ],
+    reportsByStatus: [
+        { status: "Mới", count: 32 },
+        { status: "Đang xử lý", count: 45 },
+        { status: "Đã giải quyết", count: 156 },
+        { status: "Đã đóng", count: 89 }
+    ],
+    feedbackTrend: [
+        { month: "T6", count: 145 },
+        { month: "T7", count: 167 },
+        { month: "T8", count: 198 },
+        { month: "T9", count: 178 },
+        { month: "T10", count: 213 }
+    ],
+    topIssues: [
+        { title: "Vệ sinh môi trường không được đảm bảo", count: 45 },
+        { title: "Đường xương cấp, hư hỏng", count: 38 },
+        { title: "Đèn đường hỏng", count: 24 },
+        { title: "Ô nhiễm tiếng ồn", count: 18 },
+        { title: "Chậm giải quyết thủ tục", count: 15 }
+    ],
+    userActivityByDay: [
+        { day: "T2", users: 1245, sessions: 1567 },
+        { day: "T3", users: 1356, sessions: 1723 },
+        { day: "T4", users: 1589, sessions: 1945 },
+        { day: "T5", users: 1423, seconds: 1689 },
+        { day: "T6", users: 1678, sessions: 2067 },
+        { day: "T7", users: 1834, sessions: 2398 },
+        { day: "CN", users: 1456, sessions: 1812 }
+    ],
+    feedbackStats: {
+        withIdentity: 68,
+        anonymous: 32
+    },
+    deviceStats: {
+        mobile: 82,
+        desktop: 18
+    }
+};
