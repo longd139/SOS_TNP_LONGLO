@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import dayjs from 'dayjs';
 import 'dayjs/locale/vi';
+import { Search, RotateCcw } from 'lucide-react';
 import BaseTable from '../../components/BaseTable';
 import ProcedureForm from '../../components/procedures/ProcedureForm';
 import ProcedureDetailModal from '../../components/procedures/ProcedureDetailModal';
@@ -125,8 +126,8 @@ export default function ProceduresManager() {
             </div>
 
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 md:p-6 mb-4 md:mb-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                    <div>
+                <div className="flex flex-col md:flex-row gap-3 items-end">
+                    <div className="flex-1 w-full md:w-auto">
                         <label className="block text-sm font-medium text-gray-700 mb-2">
                             Tìm kiếm thủ tục
                         </label>
@@ -140,7 +141,7 @@ export default function ProceduresManager() {
                         />
                     </div>
 
-                    <div>
+                    <div className="flex-1 w-full md:w-auto">
                         <label className="block text-sm font-medium text-gray-700 mb-2">
                             Lĩnh vực
                         </label>
@@ -157,10 +158,8 @@ export default function ProceduresManager() {
                             ))}
                         </select>
                     </div>
-                </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 items-end">
-                    <div>
+                    <div className="w-full md:w-48">
                         <label className="block text-sm font-medium text-gray-700 mb-2">
                             Trạng thái
                         </label>
@@ -174,7 +173,7 @@ export default function ProceduresManager() {
                         </select>
                     </div>
 
-                    <div>
+                    <div className="w-full md:w-32">
                         <label className="block text-sm font-medium text-gray-700 mb-2">
                             Hiển thị
                         </label>
@@ -190,24 +189,26 @@ export default function ProceduresManager() {
                         </select>
                     </div>
 
-                    <div className="sm:col-span-2 flex gap-3">
+                    <div className="flex gap-2 w-full md:w-auto">
                         <button
                             onClick={searchProcedures}
-                            className="flex-1 px-6 py-2 text-sm font-medium bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
+                            className="flex-1 md:flex-none p-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
+                            title="Tìm kiếm"
                         >
-                            Tìm kiếm
+                            <Search className="w-5 h-5" />
                         </button>
                         <button
                             onClick={resetFilters}
-                            className="flex-1 px-6 py-2 text-sm font-medium bg-gray-500 text-white rounded-lg hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors"
+                            className="flex-1 md:flex-none p-2.5 bg-gray-500 text-white rounded-lg hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors"
+                            title="Đặt lại"
                         >
-                            Đặt lại
+                            <RotateCcw className="w-5 h-5" />
                         </button>
                     </div>
                 </div>
             </div>
 
-            <div className="mb-4 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
+            <div className="mb-4 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 bg-white p-4 rounded-lg shadow-sm border border-gray-200">
                 <div className="flex items-center gap-3">
                     <div className="text-xs md:text-sm text-gray-600">
                         Danh sách thủ tục ({pagination.total})
