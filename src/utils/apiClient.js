@@ -69,6 +69,7 @@ const apiFormClient = axios.create({
     baseURL: API_URL,
     timeout: 10000,
     headers: {
+        "Authorization": `Bearer ${localStorage.getItem("accessToken")}`,
         "Content-Type": "multipart/form-data",
     }
 })

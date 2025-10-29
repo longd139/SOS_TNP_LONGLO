@@ -22,9 +22,11 @@ const updateForm = async (formId, formData) => {
     }
 }
 
-const getAllForms = async () => {
+const getAllForms = async (isRemoved = false) => {
     try {
-        const response = await apiFormClient.get('/api/mau-don');
+        const response = await apiFormClient.get('/api/mau-don', {
+            params: { isRemoved }
+        });
         if (response.data.success) return response.data.data;
         else throw new Error("Lấy tất cả biểu mẫu thất bại");
     } catch (error) {
