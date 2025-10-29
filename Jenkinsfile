@@ -77,6 +77,14 @@ pipeline {
       steps {
         sh '''
           set -eux
+          # Prepare build.env containing only REACT_APP_* for build-time injection
+          if [ -f .env ]; then
+            grep -E '^REACT_APP_' .env > build.env || true
+            echo "Generated build.env with REACT_APP_* keys:" || true
+            cat build.env || true
+          else
+            echo ".env not found; skipping build.env generation"
+          fi
           docker build -t ${IMAGE_VERSIONED} -t ${IMAGE_LATEST} .
         '''
       }
