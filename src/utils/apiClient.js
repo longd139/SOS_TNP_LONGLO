@@ -57,7 +57,7 @@ apiClient.interceptors.response.use(
             } catch (refreshError) {
                 console.error("Refresh token expired:", refreshError);
                 localStorage.clear();
-                window.location.replace("/login");
+                window.location.replace("/");
                 return Promise.reject(refreshError);
             }
         }
