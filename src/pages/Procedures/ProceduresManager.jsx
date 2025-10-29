@@ -1,9 +1,277 @@
-import React from 'react'
+import React, { useState } from 'react';
+import dayjs from 'dayjs';
+import 'dayjs/locale/vi';
+import BaseTable from '../../components/BaseTable';
+import ProcedureForm from '../../components/procedures/ProcedureForm';
+import ProcedureDetailModal from '../../components/procedures/ProcedureDetailModal';
+import { useProcedures } from '../../hooks/useProcedures';
+import { getProcedureColumns } from '../../components/procedures/columns';
+dayjs.locale('vi');
 
 export default function ProceduresManager() {
-  return (
-    <div>
-      <h2>Quản lý thủ tục</h2>
-    </div>
-  )
+    const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+    const [selectedProcedure, setSelectedProcedure] = useState(null);
+    const [showRemoved, setShowRemoved] = useState(false);
+
+    const {
+        procedures,
+        areas,
+        loading,
+        pagination,
+        filters,
+        searchProcedures,
+        changePage,
+        changePageSize,
+        resetFilters,
+        updateFilters,
+        createProcedure,
+        updateProcedure,
+        deleteProcedure,
+        getProcedureById
+    } = useProcedures(showRemoved);
+
+    const columns = getProcedureColumns(pagination);
+    const openCreateModal = () => {
+        setIsCreateModalOpen(true);
+    };
+
+    const closeCreateModal = () => {
+        setIsCreateModalOpen(false);
+    };
+
+    const openEditModal = () => {
+        setIsEditModalOpen(true);
+    };
+
+    const closeEditModal = () => {
+        setIsEditModalOpen(false);
+        setSelectedProcedure(null);
+    };
+
+    const openDetailModal = () => {
+        setIsDetailModalOpen(true);
+    };
+
+    const closeDetailModal = () => {
+        setIsDetailModalOpen(false);
+        setSelectedProcedure(null);
+    };
+
+    const handleSubmitNewProcedure = async (formData) => {
+        const result = await createProcedure(formData);
+        if (result.success) {
+            closeCreateModal();
+            alert('Tạo thủ tục thành công!');
+        } else {
+            throw new Error(result.error?.message || 'Failed to create procedure');
+        }
+    };
+
+    const handleSubmitEditProcedure = async (formData) => {
+        if (!selectedProcedure) return;
+
+        const result = await updateProcedure(selectedProcedure.id, formData);
+        if (result.success) {
+            closeEditModal();
+            alert('Cập nhật thủ tục thành công!');
+        } else {
+            throw new Error(result.error?.message || 'Failed to update procedure');
+        }
+    };
+
+    const handleEdit = async (procedure) => {
+        const result = await getProcedureById(procedure.id);
+        if (result.success) {
+            setSelectedProcedure(result.data);
+            openEditModal();
+        }
+    };
+
+
+    const handleDelete = async (procedure) => {
+        await deleteProcedure(procedure.id, procedure.ten_thu_tuc || procedure.tenThuTuc);
+    };
+
+    const handleView = async (procedure) => {
+        const result = await getProcedureById(procedure.id);
+        if (result.success) {
+            setSelectedProcedure(result.data);
+            openDetailModal();
+        }
+    };
+
+
+    const handleSearchKeywordChange = (value) => {
+        updateFilters({ searchKeyword: value });
+    };
+
+    const handleDomainChange = (value) => {
+        updateFilters({ selectedDomain: value });
+    };
+
+    const handleSearchKeyPress = (e) => {
+        if (e.key === 'Enter') {
+            searchProcedures();
+        }
+    };
+
+    return (
+        <div className="p-4 md:p-6">
+            <div className="mb-4 md:mb-6">
+                <h1 className="text-xl md:text-2xl font-bold text-gray-900 mb-2">Quản lý thủ tục hành chính</h1>
+                <p className="text-sm md:text-base text-gray-600">Quản lý các thủ tục được hiển thị trong ứng dụng</p>
+            </div>
+
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3 md:p-4 mb-4 md:mb-6">
+                <div className="flex flex-col gap-3 md:gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
+                        <div className="md:col-span-2 lg:col-span-1">
+                            <label className="block text-xs md:text-sm font-medium text-gray-700 mb-1 md:mb-2">
+                                Tìm kiếm thủ tục
+                            </label>
+                            <input
+                                type="text"
+                                value={filters.searchKeyword}
+                                onChange={(e) => handleSearchKeywordChange(e.target.value)}
+                                placeholder="Nhập từ khóa tìm kiếm..."
+                                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                onKeyPress={handleSearchKeyPress}
+                            />
+                        </div>
+
+                        <div>
+                            <label className="block text-xs md:text-sm font-medium text-gray-700 mb-1 md:mb-2">
+                                Lĩnh vực
+                            </label>
+                            <select
+                                value={filters.selectedDomain}
+                                onChange={(e) => handleDomainChange(e.target.value)}
+                                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            >
+                                <option value="">Tất cả lĩnh vực</option>
+                                {areas.map((area) => (
+                                    <option key={area.id} value={area.id}>
+                                        {area.ten_linh_vuc}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+                        <div>
+                            <label className="block text-xs md:text-sm font-medium text-gray-700 mb-1 md:mb-2">
+                                Trạng thái
+                            </label>
+                            <select
+                                value={showRemoved ? 'removed' : 'active'}
+                                onChange={(e) => setShowRemoved(e.target.value === 'removed')}
+                                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            >
+                                <option value="active">Hoạt động</option>
+                                <option value="removed">Đã xóa</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label className="block text-xs md:text-sm font-medium text-gray-700 mb-1 md:mb-2">
+                                Hiển thị
+                            </label>
+                            <select
+                                value={pagination.pageSize}
+                                onChange={(e) => changePageSize(Number(e.target.value))}
+                                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            >
+                                <option value={5}>5</option>
+                                <option value={10}>10</option>
+                                <option value={20}>20</option>
+                                <option value={50}>50</option>
+                            </select>
+                        </div>
+
+                        <div className="col-span-2 flex gap-2 items-end">
+                            <button
+                                onClick={searchProcedures}
+                                className="flex-1 md:flex-none px-4 py-2 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                            >
+                                Tìm kiếm
+                            </button>
+                            <button
+                                onClick={resetFilters}
+                                className="flex-1 md:flex-none px-4 py-2 text-sm bg-gray-500 text-white rounded-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+                            >
+                                Đặt lại
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div className="mb-4 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
+                <div className="flex items-center gap-3">
+                    <div className="text-xs md:text-sm text-gray-600">
+                        Danh sách thủ tục ({pagination.total})
+                    </div>
+                    {showRemoved && (
+                        <span className="px-2 md:px-3 py-1 bg-red-100 text-red-800 text-xs font-medium rounded-full">
+                            Đã xóa
+                        </span>
+                    )}
+                    {!showRemoved && (
+                        <span className="px-3 py-1 bg-green-100 text-green-800 text-xs font-medium rounded-full">
+                            Đang hoạt động
+                        </span>
+                    )}
+                </div>
+                <button
+                    onClick={openCreateModal}
+                    className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center"
+                >
+                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                    </svg>
+                    Thêm thủ tục mới
+                </button>
+            </div>
+
+            <BaseTable
+                data={procedures}
+                columns={columns}
+                loading={loading}
+                pagination={pagination}
+                onPageChange={changePage}
+                onEdit={handleEdit}
+                onDelete={handleDelete}
+                onView={handleView}
+                showActions={true}
+                emptyMessage="Không có thủ tục nào được tìm thấy"
+                className="mb-4"
+            />
+
+            <ProcedureForm
+                isOpen={isCreateModalOpen}
+                onClose={closeCreateModal}
+                onSubmit={handleSubmitNewProcedure}
+                areas={areas}
+                mode="create"
+            />
+
+            <ProcedureForm
+                isOpen={isEditModalOpen}
+                onClose={closeEditModal}
+                onSubmit={handleSubmitEditProcedure}
+                areas={areas}
+                initialData={selectedProcedure}
+                mode="edit"
+            />
+
+            <ProcedureDetailModal
+                isOpen={isDetailModalOpen}
+                onClose={closeDetailModal}
+                procedure={selectedProcedure}
+            />
+        </div>
+    );
 }
