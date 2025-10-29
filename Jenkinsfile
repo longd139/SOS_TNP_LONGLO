@@ -103,6 +103,38 @@ pipeline {
       }
     }
 
+    stage('Log Env (sanitized)') {
+      when { expression { return env.IS_TARGET == 'true' } }
+      steps {
+        sh '''
+          set -eu
+
+          echo "===== .env (sanitized) ====="
+          if [ -f .env ]; then
+            # Show only key=value for non-sensitive keys; mask likely secrets
+            # Handles simple KEY=VALUE lines; ignores comments/blank lines
+            grep -E '^[A-Za-z_][A-Za-z0-9_]*=' .env | \
+              awk -F= 'BEGIN{IGNORECASE=1} {
+                key=$1; val=substr($0, index($0,$2));
+                if (key ~ /(SECRET|TOKEN|KEY|PASS|PASSWORD|PRIVATE|API|ACCESS)/) {
+                  print key"=****";
+                } else {
+                  print key"="val;
+                }
+              }'
+          else
+            echo ".env not found in workspace"
+          fi
+
+          echo "===== Container env (docker inspect) ====="
+          docker inspect ${CONTAINER_NAME} --format '{{range .Config.Env}}{{println .}}{{end}}' || true
+
+          echo "===== Container env (printenv inside) ====="
+          docker exec -i ${CONTAINER_NAME} sh -lc 'printenv | sort' || true
+        '''
+      }
+    }
+
     stage('Cleanup Old Images') {
       when { expression { return env.IS_TARGET == 'true' } }
       steps {
