@@ -23,7 +23,7 @@ const debugLogger = {
     }
 };
 
-export const useProcedures = () => {
+export const useProcedures = (showRemoved = false) => {
     const [procedures, setProcedures] = useState([]);
     const [areas, setAreas] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -33,14 +33,14 @@ export const useProcedures = () => {
         selectedDomain: ''
     });
 
-    const loadProcedures = useCallback(async (page = 1, size = DEFAULT_PAGE_SIZE, search = '', id_linh_vuc = '') => {
+    const loadProcedures = useCallback(async (page = 1, size = DEFAULT_PAGE_SIZE, search = '', id_linh_vuc = '', is_removed = false) => {
         setLoading(true);
         try {
             const params = {
                 page,
                 size,
                 search,
-                is_removed: false
+                is_removed
             };
 
             if (id_linh_vuc) {
@@ -89,26 +89,26 @@ export const useProcedures = () => {
         try {
             debugLogger.log('Creating procedure:', formData);
             await FORMALITY_API.createFormality(formData);
-            await loadProcedures(pagination.current, pagination.pageSize, filters.searchKeyword, filters.selectedDomain);
+            await loadProcedures(pagination.current, pagination.pageSize, filters.searchKeyword, filters.selectedDomain, showRemoved);
             return { success: true };
         } catch (error) {
             debugLogger.error('Error creating procedure:', error);
             return { success: false, error };
         }
-    }, [pagination.current, pagination.pageSize, filters.searchKeyword, filters.selectedDomain, loadProcedures]);
+    }, [pagination.current, pagination.pageSize, filters.searchKeyword, filters.selectedDomain, showRemoved, loadProcedures]);
 
     const updateProcedure = useCallback(async (procedureId, formData) => {
         try {
             debugLogger.log('Updating procedure:', procedureId, formData);
             await FORMALITY_API.updateFormality(procedureId, formData);
-            await loadProcedures(pagination.current, pagination.pageSize, filters.searchKeyword, filters.selectedDomain);
+            await loadProcedures(pagination.current, pagination.pageSize, filters.searchKeyword, filters.selectedDomain, showRemoved);
             return { success: true };
         } catch (error) {
             debugLogger.error('Error updating procedure:', error);
             alert('Có lỗi xảy ra khi cập nhật thủ tục!');
             return { success: false, error };
         }
-    }, [pagination.current, pagination.pageSize, filters.searchKeyword, filters.selectedDomain, loadProcedures]);
+    }, [pagination.current, pagination.pageSize, filters.searchKeyword, filters.selectedDomain, showRemoved, loadProcedures]);
 
     const deleteProcedure = useCallback(async (procedureId, procedureName) => {
         const confirmed = window.confirm(`Bạn có chắc chắn muốn xóa thủ tục "${procedureName}"?`);
@@ -116,14 +116,14 @@ export const useProcedures = () => {
 
         try {
             await FORMALITY_API.deleteFormality(procedureId);
-            await loadProcedures(pagination.current, pagination.pageSize, filters.searchKeyword, filters.selectedDomain);
+            await loadProcedures(pagination.current, pagination.pageSize, filters.searchKeyword, filters.selectedDomain, showRemoved);
             return { success: true };
         } catch (error) {
             debugLogger.error('Error deleting procedure:', error);
             alert('Có lỗi xảy ra khi xóa thủ tục!');
             return { success: false, error };
         }
-    }, [pagination.current, pagination.pageSize, filters.searchKeyword, filters.selectedDomain, loadProcedures]);
+    }, [pagination.current, pagination.pageSize, filters.searchKeyword, filters.selectedDomain, showRemoved, loadProcedures]);
 
     const getProcedureById = useCallback(async (procedureId) => {
         try {
@@ -138,33 +138,34 @@ export const useProcedures = () => {
     }, []);
 
     const searchProcedures = useCallback(() => {
-        loadProcedures(1, pagination.pageSize, filters.searchKeyword, filters.selectedDomain);
-    }, [pagination.pageSize, filters.searchKeyword, filters.selectedDomain, loadProcedures]);
+        loadProcedures(1, pagination.pageSize, filters.searchKeyword, filters.selectedDomain, showRemoved);
+    }, [pagination.pageSize, filters.searchKeyword, filters.selectedDomain, showRemoved, loadProcedures]);
 
     const changePage = useCallback((page) => {
-        loadProcedures(page, pagination.pageSize, filters.searchKeyword, filters.selectedDomain);
-    }, [pagination.pageSize, filters.searchKeyword, filters.selectedDomain, loadProcedures]);
+        loadProcedures(page, pagination.pageSize, filters.searchKeyword, filters.selectedDomain, showRemoved);
+    }, [pagination.pageSize, filters.searchKeyword, filters.selectedDomain, showRemoved, loadProcedures]);
 
     const changePageSize = useCallback((size) => {
-        loadProcedures(1, size, filters.searchKeyword, filters.selectedDomain);
-    }, [filters.searchKeyword, filters.selectedDomain, loadProcedures]);
+        loadProcedures(1, size, filters.searchKeyword, filters.selectedDomain, showRemoved);
+    }, [filters.searchKeyword, filters.selectedDomain, showRemoved, loadProcedures]);
 
     const resetFilters = useCallback(() => {
         setFilters({
             searchKeyword: '',
             selectedDomain: ''
         });
-        loadProcedures(1, pagination.pageSize, '', '');
-    }, [pagination.pageSize, loadProcedures]);
+        loadProcedures(1, pagination.pageSize, '', '', showRemoved);
+    }, [pagination.pageSize, showRemoved, loadProcedures]);
 
     const updateFilters = useCallback((newFilters) => {
         setFilters(prev => ({ ...prev, ...newFilters }));
     }, []);
 
     useEffect(() => {
-        loadProcedures();
+        loadProcedures(1, pagination.pageSize, filters.searchKeyword, filters.selectedDomain, showRemoved);
         loadAreas();
-    }, [loadProcedures, loadAreas]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [showRemoved]);
 
     return {
         procedures,

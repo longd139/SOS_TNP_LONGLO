@@ -13,6 +13,7 @@ export default function ProceduresManager() {
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
     const [selectedProcedure, setSelectedProcedure] = useState(null);
+    const [showRemoved, setShowRemoved] = useState(false);
 
     const {
         procedures,
@@ -29,7 +30,7 @@ export default function ProceduresManager() {
         updateProcedure,
         deleteProcedure,
         getProcedureById
-    } = useProcedures();
+    } = useProcedures(showRemoved);
 
     const columns = getProcedureColumns(pagination);
     const openCreateModal = () => {
@@ -70,7 +71,7 @@ export default function ProceduresManager() {
 
     const handleSubmitEditProcedure = async (formData) => {
         if (!selectedProcedure) return;
-        
+
         const result = await updateProcedure(selectedProcedure.id, formData);
         if (result.success) {
             closeEditModal();
@@ -157,6 +158,20 @@ export default function ProceduresManager() {
                         </select>
                     </div>
 
+                    <div className="min-w-40">
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Trạng thái
+                        </label>
+                        <select
+                            value={showRemoved ? 'removed' : 'active'}
+                            onChange={(e) => setShowRemoved(e.target.value === 'removed')}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        >
+                            <option value="active">Đang hoạt động</option>
+                            <option value="removed">Đã xóa</option>
+                        </select>
+                    </div>
+
                     <div className="min-w-32">
                         <label className="block text-sm font-medium text-gray-700 mb-2">
                             Hiển thị
@@ -191,8 +206,20 @@ export default function ProceduresManager() {
             </div>
 
             <div className="mb-4 flex justify-between items-center">
-                <div className="text-sm text-gray-600">
-                    Danh sách thủ tục ({pagination.total})
+                <div className="flex items-center gap-3">
+                    <div className="text-sm text-gray-600">
+                        Danh sách thủ tục ({pagination.total})
+                    </div>
+                    {showRemoved && (
+                        <span className="px-3 py-1 bg-red-100 text-red-800 text-xs font-medium rounded-full">
+                            Đã xóa
+                        </span>
+                    )}
+                    {!showRemoved && (
+                        <span className="px-3 py-1 bg-green-100 text-green-800 text-xs font-medium rounded-full">
+                            Đang hoạt động
+                        </span>
+                    )}
                 </div>
                 <button
                     onClick={openCreateModal}
