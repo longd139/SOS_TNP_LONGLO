@@ -1,24 +1,42 @@
 import React, { useState } from 'react';
 import { FileText, Download, Pencil, Trash2, Plus } from 'lucide-react';
-import { templatesList } from '../../mockData';
 import BaseTable from '../../components/BaseTable';
 import { ConfirmModal } from '../../components/BaseModal';
+import TemplateFormModal from '../../components/templates/TemplateFormModal';
+import { useTemplates } from '../../hooks/useTemplates';
+import dayjs from 'dayjs';
+import 'dayjs/locale/vi';
+
+dayjs.locale('vi');
 
 export default function TemplateManager() {
-    const [templates, setTemplates] = useState(templatesList);
+    const [showRemoved, setShowRemoved] = useState(false);
+    const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [selectedTemplate, setSelectedTemplate] = useState(null);
     const [deleteModal, setDeleteModal] = useState({
         isOpen: false,
         template: null
     });
 
+    const {
+        templates,
+        loading,
+        createTemplate,
+        updateTemplate,
+        deleteTemplate
+    } = useTemplates(showRemoved);
+
+
     const handleView = (template) => {
-        console.log('View template:', template);
-        // Open file in new window or download
+        const baseUrl = process.env.REACT_APP_API_URL;
+        const fileUrl = `${baseUrl}${template.url_file_pdf}`;
+        window.open(fileUrl, '_blank');
     };
 
     const handleEdit = (template) => {
-        console.log('Edit template:', template);
-        // Navigate to edit page or open edit modal
+        setSelectedTemplate(template);
+        setIsEditModalOpen(true);
     };
 
     const handleDelete = (template) => {
@@ -28,20 +46,59 @@ export default function TemplateManager() {
         });
     };
 
-    const handleConfirmDelete = () => {
-        console.log('Delete template:', deleteModal.template);
-        setTemplates(templates.filter(t => t.id !== deleteModal.template.id));
+    const handleConfirmDelete = async () => {
+        const result = await deleteTemplate(deleteModal.template.id, deleteModal.template.ten_mau_don);
+        if (result.success) {
+            alert('Xóa biểu mẫu thành công!');
+        }
         setDeleteModal({ isOpen: false, template: null });
     };
 
     const handleDownload = (template) => {
-        console.log('Download template:', template);
-        // Trigger file download
+        const baseUrl = process.env.REACT_APP_API_URL;
+        const fileUrl = `${baseUrl}${template.url_file_pdf}`;
+        const link = document.createElement('a');
+        link.href = fileUrl;
+        link.download = template.ten_mau_don;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
     };
 
     const handleCreateTemplate = () => {
-        console.log('Create new template');
-        // Navigate to create page or open create modal
+        setIsCreateModalOpen(true);
+    };
+
+    const handleSubmitCreate = async (formData) => {
+        const result = await createTemplate(formData);
+        if (result.success) {
+            setIsCreateModalOpen(false);
+            alert('Tạo biểu mẫu thành công!');
+        } else {
+            throw new Error(result.error?.message || 'Failed to create template');
+        }
+    };
+
+    const handleSubmitEdit = async (formData) => {
+        if (!selectedTemplate) return;
+        
+        const result = await updateTemplate(selectedTemplate.id, formData);
+        if (result.success) {
+            setIsEditModalOpen(false);
+            setSelectedTemplate(null);
+            alert('Cập nhật biểu mẫu thành công!');
+        } else {
+            throw new Error(result.error?.message || 'Failed to update template');
+        }
+    };
+
+    const closeCreateModal = () => {
+        setIsCreateModalOpen(false);
+    };
+
+    const closeEditModal = () => {
+        setIsEditModalOpen(false);
+        setSelectedTemplate(null);
     };
 
     const columns = [
@@ -49,15 +106,17 @@ export default function TemplateManager() {
             title: 'ID',
             dataIndex: 'id',
             key: 'id',
-            width: '60px',
+            width: '80px',
             render: (value) => (
-                <span className="text-sm font-medium text-gray-900">{value}</span>
+                <span className="text-sm font-medium text-gray-900">
+                    {value.substring(0, 8)}...
+                </span>
             )
         },
         {
             title: 'Tên biểu mẫu',
-            dataIndex: 'name',
-            key: 'name',
+            dataIndex: 'ten_mau_don',
+            key: 'ten_mau_don',
             width: '300px',
             render: (value) => (
                 <div className="flex items-center gap-2">
@@ -67,39 +126,32 @@ export default function TemplateManager() {
             )
         },
         {
-            title: 'Thủ tục liên quan',
-            dataIndex: 'relatedProcedure',
-            key: 'relatedProcedure',
+            title: 'Mô tả',
+            dataIndex: 'mo_ta',
+            key: 'mo_ta',
             width: '250px',
             render: (value) => (
-                <span className="text-sm text-gray-600">{value}</span>
+                <span className="text-sm text-gray-600">{value || '-'}</span>
             )
         },
         {
             title: 'Kích thước',
-            dataIndex: 'fileSize',
-            key: 'fileSize',
+            dataIndex: 'kich_thuoc_file_mb',
+            key: 'kich_thuoc_file_mb',
             width: '100px',
             render: (value) => (
-                <span className="text-sm text-gray-600">{value}</span>
+                <span className="text-sm text-gray-600">{value} MB</span>
             )
         },
         {
             title: 'Cập nhật',
-            dataIndex: 'uploadedDate',
-            key: 'uploadedDate',
-            width: '120px',
+            dataIndex: 'thoi_gian_cap_nhap',
+            key: 'thoi_gian_cap_nhap',
+            width: '150px',
             render: (value) => (
-                <span className="text-sm text-gray-600">{value}</span>
-            )
-        },
-        {
-            title: 'Lượt tải',
-            dataIndex: 'downloads',
-            key: 'downloads',
-            width: '100px',
-            render: (value) => (
-                <span className="text-sm text-gray-600">{value}</span>
+                <span className="text-sm text-gray-600">
+                    {dayjs(value).format('DD/MM/YYYY HH:mm')}
+                </span>
             )
         }
     ];
@@ -147,9 +199,34 @@ export default function TemplateManager() {
             </div>
 
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-4 px-6 py-4">
-                <h3 className="font-semibold text-gray-900">
-                    Danh sách biểu mẫu ({templates.length})
-                </h3>
+                <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                        <h3 className="font-semibold text-gray-900">
+                            Danh sách biểu mẫu ({templates.length})
+                        </h3>
+                        {showRemoved && (
+                            <span className="px-3 py-1 bg-red-100 text-red-800 text-xs font-medium rounded-full">
+                                Đã xóa
+                            </span>
+                        )}
+                        {!showRemoved && (
+                            <span className="px-3 py-1 bg-green-100 text-green-800 text-xs font-medium rounded-full">
+                                Đang hoạt động
+                            </span>
+                        )}
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <label className="text-sm font-medium text-gray-700">Trạng thái:</label>
+                        <select
+                            value={showRemoved ? 'removed' : 'active'}
+                            onChange={(e) => setShowRemoved(e.target.value === 'removed')}
+                            className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        >
+                            <option value="active">Đang hoạt động</option>
+                            <option value="removed">Đã xóa</option>
+                        </select>
+                    </div>
+                </div>
             </div>
 
             <div className="bg-white rounded-lg shadow-sm border border-gray-200">
@@ -172,7 +249,15 @@ export default function TemplateManager() {
                             </tr>
                         </thead>
                         <tbody className="bg-white divide-y divide-gray-200">
-                            {templates.length === 0 ? (
+                            {loading ? (
+                                <tr>
+                                    <td colSpan={columns.length + 1} className="px-6 py-8 text-center text-gray-500">
+                                        <div className="flex justify-center items-center">
+                                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            ) : templates.length === 0 ? (
                                 <tr>
                                     <td colSpan={columns.length + 1} className="px-6 py-8 text-center text-gray-500">
                                         Không có biểu mẫu nào
@@ -200,12 +285,28 @@ export default function TemplateManager() {
                 </div>
             </div>
 
+            <TemplateFormModal
+                isOpen={isCreateModalOpen}
+                onClose={closeCreateModal}
+                onSubmit={handleSubmitCreate}
+                mode="create"
+            />
+
+            <TemplateFormModal
+                isOpen={isEditModalOpen}
+                onClose={closeEditModal}
+                onSubmit={handleSubmitEdit}
+                initialData={selectedTemplate}
+                mode="edit"
+            />
+
+            {/* Delete Confirmation Modal */}
             <ConfirmModal
                 isOpen={deleteModal.isOpen}
                 onClose={() => setDeleteModal({ isOpen: false, template: null })}
                 onConfirm={handleConfirmDelete}
                 title="Xác nhận xóa"
-                message={`Bạn có chắc chắn muốn xóa biểu mẫu "${deleteModal.template?.name}"?`}
+                message={`Bạn có chắc chắn muốn xóa biểu mẫu "${deleteModal.template?.ten_mau_don}"?`}
                 confirmText="Xóa"
                 cancelText="Hủy"
                 type="danger"

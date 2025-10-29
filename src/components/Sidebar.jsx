@@ -1,104 +1,147 @@
-import { BarChart3, Calendar, FileText, FolderOpen, LayoutDashboard, MessageSquare, Newspaper, Phone, UserCog } from 'lucide-react';
+import { BarChart3, Calendar, FileText, FolderOpen, LayoutDashboard, MessageSquare, Newspaper, Phone, UserCog, Menu, ChevronLeft } from 'lucide-react';
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import PropTypes from 'prop-types';
 
 const menuItems = [
     {
         id: 'overview',
         label: 'Tổng quan',
-        icon: <LayoutDashboard />,
+        icon: LayoutDashboard,
         path: '/dashboard',
         hasSubmenu: false
     },
     {
         id: 'reports',
         label: 'Quản lý phản ánh',
-        icon: <MessageSquare />,
+        icon: MessageSquare,
         path: '/reports',
         hasSubmenu: false
     },
     {
         id: 'news',
         label: 'Tin tức & Thông báo',
-        icon: <Newspaper />,
+        icon: Newspaper,
         path: '/news',
         hasSubmenu: false
     },
     {
         id: 'procedures',
         label: 'Thủ tục hành chính',
-        icon: <FileText />,
+        icon: FileText,
         path: '/procedures',
         hasSubmenu: false
     },
     {
         id: 'templates',
         label: 'Biểu mẫu',
-        icon: <FolderOpen />,
+        icon: FolderOpen,
         path: '/templates',
         hasSubmenu: false
     },
     {
         id: 'contact',
         label: 'Thông tin liên hệ',
-        icon: <Phone />,
+        icon: Phone,
         path: '/contact',
         hasSubmenu: false
     },
     {
         id: 'schedule',
         label: 'Lịch tiếp dân',
-        icon: <Calendar />,
+        icon: Calendar,
         path: '/schedules',
         hasSubmenu: false
     },
     {
         id: 'statistics',
         label: 'Báo cáo & Thống kê',
-        icon: <BarChart3 />,
+        icon: BarChart3,
         path: '/statistics',
         hasSubmenu: false
     },
     {
         id: 'accounts',
         label: 'Quản lý tài khoản',
-        icon: <UserCog />,
+        icon: UserCog,
         path: '/accounts',
         hasSubmenu: false
     }
 ];
 
-export default function Sidebar() {
+export default function Sidebar({ collapsed, onToggle }) {
     const location = useLocation();
 
     return (
-        <aside className="w-full bg-white border-r border-gray-200 h-full overflow-y-auto sidebar-scroll">
-            <div className="p-6 border-b border-gray-200 bg-white">
-                <h3 className="text-lg font-bold text-gray-800 mb-1">
-                    Phường Tăng Nhơn Phú
-                </h3>
-                <p className="text-sm text-gray-500">Cổng quản trị</p>
+        <aside 
+            className={`
+                bg-white border-r border-gray-200 h-screen overflow-y-auto sidebar-scroll
+                transition-all duration-300 ease-in-out flex-shrink-0
+                ${collapsed ? 'w-20' : 'w-64'}
+            `}
+        >
+            <div className={`border-b border-gray-200 bg-white transition-all duration-300 ${collapsed ? 'p-4' : 'p-6'}`}>
+                <div className="flex items-center justify-between">
+                    {!collapsed && (
+                        <div className="flex-1">
+                            <h3 className="text-lg font-bold text-gray-800 mb-1">
+                                Phường Tăng Nhơn Phú
+                            </h3>
+                            <p className="text-sm text-gray-500">Cổng quản trị</p>
+                        </div>
+                    )}
+                    <button
+                        onClick={onToggle}
+                        className={`
+                            p-2 rounded-lg hover:bg-gray-100 transition-colors
+                            ${collapsed ? 'mx-auto' : 'ml-auto'}
+                        `}
+                        title={collapsed ? 'Mở rộng sidebar' : 'Thu gọn sidebar'}
+                    >
+                        {collapsed ? (
+                            <Menu className="w-5 h-5 text-gray-600" />
+                        ) : (
+                            <ChevronLeft className="w-5 h-5 text-gray-600" />
+                        )}
+                    </button>
+                </div>
             </div>
 
-            <nav className="px-4 py-6 flex-1">
+            <nav className={`py-6 transition-all duration-300 ${collapsed ? 'px-2' : 'px-4'}`}>
                 <ul className="space-y-2">
                     {menuItems.map((item) => {
                         const isActive = location.pathname === item.path;
+                        const Icon = item.icon;
+                        
                         return (
                             <li key={item.id}>
                                 <Link
                                     to={item.path}
-                                    className={`flex items-center px-4 py-3 text-sm rounded-lg transition-colors ${isActive
+                                    className={`
+                                        flex items-center text-sm rounded-lg transition-all duration-200
+                                        ${collapsed ? 'px-3 py-3 justify-center' : 'px-4 py-3'}
+                                        ${isActive
                                             ? 'bg-blue-50 text-blue-600 border-r-2 border-blue-600'
                                             : 'text-gray-700 hover:bg-gray-50'
-                                        }`}
+                                        }
+                                    `}
+                                    title={collapsed ? item.label : ''}
                                 >
-                                    <span className={`mr-3 ${isActive ? 'text-blue-600' : 'text-gray-500'}`}>
-                                        {item.icon}
-                                    </span>
-                                    <span className="font-medium">{item.label}</span>
-                                    {item.hasSubmenu && (
-                                        <span className="ml-auto text-gray-400">▶</span>
+                                    <Icon 
+                                        className={`
+                                            w-5 h-5 flex-shrink-0
+                                            ${isActive ? 'text-blue-600' : 'text-gray-500'}
+                                            ${collapsed ? '' : 'mr-3'}
+                                        `}
+                                    />
+                                    
+                                    {!collapsed && (
+                                        <>
+                                            <span className="font-medium flex-1">{item.label}</span>
+                                            {item.hasSubmenu && (
+                                                <span className="ml-auto text-gray-400">▶</span>
+                                            )}
+                                        </>
                                     )}
                                 </Link>
                             </li>
@@ -107,9 +150,17 @@ export default function Sidebar() {
                 </ul>
             </nav>
 
-            <div className="p-4 border-t border-gray-200 bg-white mt-auto">
-                <p className="text-xs text-gray-400 text-center">v1.0.0</p>
+            {/* Footer Version */}
+            <div className={`border-t border-gray-200 bg-white transition-all duration-300 ${collapsed ? 'p-2' : 'p-4'}`}>
+                <p className={`text-xs text-gray-400 text-center ${collapsed ? 'transform rotate-90' : ''}`}>
+                    {collapsed ? 'v1' : 'v1.0.0'}
+                </p>
             </div>
         </aside>
     );
 }
+
+Sidebar.propTypes = {
+    collapsed: PropTypes.bool.isRequired,
+    onToggle: PropTypes.func.isRequired
+};
