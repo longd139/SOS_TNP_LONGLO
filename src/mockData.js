@@ -25,9 +25,44 @@ export const news = [
 ];
 
 export const procedures = [
-    { id: 'P-1', name: 'Đăng ký kinh doanh', field: 'Kinh tế', processingTime: '7 ngày', status: 'Cập nhật' },
-    { id: 'P-2', name: 'Cấp chứng minh', field: 'Hành chính', processingTime: '10 ngày', status: 'Cập nhật' }
+    { 
+        id: '#1', 
+        name: 'Đăng ký kinh doanh', 
+        field: 'Kinh tế', 
+        processingTime: '7 ngày', 
+        status: 'Cập nhật', 
+        fee: 'Miễn phí', 
+        contact: '028-1234-5678' 
+    },
+    { 
+        id: '#2', 
+        name: 'Cấp chứng minh', 
+        field: 'Hành chính', 
+        processingTime: '10 ngày', 
+        status: 'Cập nhật', 
+        fee: '100.000 VNĐ', 
+        contact: '028-1234-5678' 
+    },
+    { 
+        id: '#3', 
+        name: 'Đăng ký kết hôn', 
+        field: 'Xã hội', 
+        processingTime: '5 ngày', 
+        status: 'Cập nhật', 
+        fee: '50.000 VNĐ', 
+        contact: '028-1234-5679' 
+    },
+    { 
+        id: '#4', 
+        name: 'Cấp giấy phép xây dựng', 
+        field: 'Xây dựng', 
+        processingTime: '15 ngày', 
+        status: 'Cập nhật', 
+        fee: '200.000 VNĐ', 
+        contact: '028-1234-5680' 
+    }
 ];
+
 
 export const dashboardStats = {
     totalReports: 24,

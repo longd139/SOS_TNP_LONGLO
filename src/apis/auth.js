@@ -2,8 +2,8 @@ import apiClient from "../utils/apiClient";
 
 const loginApi = async (credentials) => {
     try {
-        const response = await apiClient.post('/api/auths/login', credentials);
-
+        const response = await apiClient.post('/api/auths/login', credentials)
+        
         if (response.data.success)  return response.data.data;
         else throw new Error("Đăng nhập thất bại");
 
@@ -19,7 +19,7 @@ const logoutApi = async () => {
         if (response.data.success) return response.data.data;
         else throw new Error("Đăng xuất thất bại");
     } catch (error) {
-        console.error("Lỗi khi đăng xuất:", error);
+        console.error("Lỗi khi đăng xuất:", error); 
         throw error;
     }
 }
@@ -50,7 +50,7 @@ const verify2FAApi = async (data) => {
     try {
         const response = await apiClient.post('/api/auths/verify-2fa', {
             otp: data.otp,
-            tenDangNhap: data.tenDangNhap
+            tenDangNhap: data.tenDangNhap,
         });
         if (response.data.success) return response.data.data;
         else throw new Error("Xác thực 2FA thất bại");
@@ -59,17 +59,27 @@ const verify2FAApi = async (data) => {
         throw error;
     }
 }
-
-const sendOtpApi = async (type, email) => {
+export const sendOtpApi = async ({ email, type = 'LOGIN' }) => {
     try {
-        const response = await apiClient.post(`/api/auths/send-otp?type=${type}`, email);
-        if (response.data.success) return response.data.data;
-        else throw new Error("Gửi OTP thất bại");
+        const response = await apiClient.post('/api/auths/send-otp', {
+            email,
+            type
+        });
+
+        if (response.data.success) {
+            console.log(" OTP sent successfully!");
+            return response.data.data;
+        } else {
+            throw new Error(response.data.message || "Gửi OTP thất bại");
+        }
     } catch (error) {
         console.error("Lỗi khi gửi OTP:", error);
         throw error;
     }
-}
+};
+
+
+
 
 const resetPasswordApi = async (data) => {
     try {
@@ -105,6 +115,8 @@ export const AUTH_API = {
     verify2FA: verify2FAApi,
     sendOtp: sendOtpApi,
     resetPassword: resetPasswordApi,
-    verifiedStatus2FA: verifiedStatus2FAApi
+    verifiedStatus2FA: verifiedStatus2FAApi,
+    
 }
+
 

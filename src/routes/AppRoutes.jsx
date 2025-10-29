@@ -19,6 +19,8 @@ import ContactInfo from "../pages/Contact/ContactInfo";
 import WorkSchedule from "../pages/Schedules/WorkSchedule";
 import AdminManager from "../pages/AdminAccounts/AdminManager";
 import NotFound from "../pages/NotFound";
+// import ForgotPasswordPage from './pages/ForgotPasswordPage';
+import OtpModal from "../pages/Auth/OtpModal";
 
 function AppRoutes() {
   return (
@@ -26,6 +28,8 @@ function AppRoutes() {
       <Routes>
         <Route element={<AuthLayout />}>
           <Route path="/" element={<Login />} />
+          <Route path="/OtpModal" element={<OtpModal />} /> 
+          {/* <Route path="/forgot-password" element={<ForgotPasswordPage />} /> */}
         </Route>
 
         <Route element={
