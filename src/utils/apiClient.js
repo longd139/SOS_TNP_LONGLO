@@ -1,4 +1,5 @@
 import axios from "axios";
+import { ROUTE_PATH } from "../constants/routes";
 
 const API_URL = process.env.REACT_APP_API_URL;
 
@@ -57,7 +58,7 @@ apiClient.interceptors.response.use(
             } catch (refreshError) {
                 console.error("Refresh token expired:", refreshError);
                 localStorage.clear();
-                window.location.replace("/");
+                window.location.replace(ROUTE_PATH.LOGIN);
                 return Promise.reject(refreshError);
             }
         }
