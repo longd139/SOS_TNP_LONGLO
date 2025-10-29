@@ -3,12 +3,16 @@ import dayjs from 'dayjs';
 import 'dayjs/locale/vi';
 import BaseTable from '../../components/BaseTable';
 import ProcedureForm from '../../components/procedures/ProcedureForm';
+import ProcedureDetailModal from '../../components/procedures/ProcedureDetailModal';
 import { useProcedures } from '../../hooks/useProcedures';
 import { getProcedureColumns } from '../../components/procedures/columns';
 dayjs.locale('vi');
 
 export default function ProceduresManager() {
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+    const [selectedProcedure, setSelectedProcedure] = useState(null);
 
     const {
         procedures,
@@ -22,7 +26,9 @@ export default function ProceduresManager() {
         resetFilters,
         updateFilters,
         createProcedure,
-        deleteProcedure
+        updateProcedure,
+        deleteProcedure,
+        getProcedureById
     } = useProcedures();
 
     const columns = getProcedureColumns(pagination);
@@ -34,26 +40,65 @@ export default function ProceduresManager() {
         setIsCreateModalOpen(false);
     };
 
+    const openEditModal = () => {
+        setIsEditModalOpen(true);
+    };
+
+    const closeEditModal = () => {
+        setIsEditModalOpen(false);
+        setSelectedProcedure(null);
+    };
+
+    const openDetailModal = () => {
+        setIsDetailModalOpen(true);
+    };
+
+    const closeDetailModal = () => {
+        setIsDetailModalOpen(false);
+        setSelectedProcedure(null);
+    };
+
     const handleSubmitNewProcedure = async (formData) => {
         const result = await createProcedure(formData);
         if (result.success) {
             closeCreateModal();
+            alert('Tạo thủ tục thành công!');
+        } else {
+            throw new Error(result.error?.message || 'Failed to create procedure');
         }
     };
 
-    const handleEdit = (procedure) => {
-        // TODO: Implement edit functionality
-        // Can reuse ProcedureForm with mode='edit' and initialData={procedure}
-        console.log('Edit procedure:', procedure);
+    const handleSubmitEditProcedure = async (formData) => {
+        if (!selectedProcedure) return;
+        
+        const result = await updateProcedure(selectedProcedure.id, formData);
+        if (result.success) {
+            closeEditModal();
+            alert('Cập nhật thủ tục thành công!');
+        } else {
+            throw new Error(result.error?.message || 'Failed to update procedure');
+        }
+    };
+
+    const handleEdit = async (procedure) => {
+        const result = await getProcedureById(procedure.id);
+        if (result.success) {
+            setSelectedProcedure(result.data);
+            openEditModal();
+        }
     };
 
 
     const handleDelete = async (procedure) => {
-        await deleteProcedure(procedure.id, procedure.ten_thu_tuc);
+        await deleteProcedure(procedure.id, procedure.ten_thu_tuc || procedure.tenThuTuc);
     };
 
-    const handleView = (procedure) => {
-        console.log('View procedure:', procedure);
+    const handleView = async (procedure) => {
+        const result = await getProcedureById(procedure.id);
+        if (result.success) {
+            setSelectedProcedure(result.data);
+            openDetailModal();
+        }
     };
 
 
@@ -180,6 +225,21 @@ export default function ProceduresManager() {
                 onSubmit={handleSubmitNewProcedure}
                 areas={areas}
                 mode="create"
+            />
+
+            <ProcedureForm
+                isOpen={isEditModalOpen}
+                onClose={closeEditModal}
+                onSubmit={handleSubmitEditProcedure}
+                areas={areas}
+                initialData={selectedProcedure}
+                mode="edit"
+            />
+
+            <ProcedureDetailModal
+                isOpen={isDetailModalOpen}
+                onClose={closeDetailModal}
+                procedure={selectedProcedure}
             />
         </div>
     );
