@@ -1,4 +1,5 @@
 import axios from "axios";
+import ROUTE_PATH from "../constants/routes";
 
 const API_URL = process.env.REACT_APP_API_URL;
 console.log("API_URL =", API_URL);
@@ -56,7 +57,7 @@ apiClient.interceptors.response.use(
             } catch (refreshError) {
                 console.error("Refresh token expired:", refreshError);
                 localStorage.clear();
-                window.location.replace("/login");
+                window.location.replace(ROUTE_PATH.LOGIN);
                 return Promise.reject(refreshError);
             }
         }
@@ -64,4 +65,15 @@ apiClient.interceptors.response.use(
     }
 )
 
+const apiFormClient = axios.create({
+    baseURL: API_URL,
+    timeout: 10000,
+    headers: {
+        "Authorization": `Bearer ${localStorage.getItem("accessToken")}`,
+        "Content-Type": "multipart/form-data",
+    }
+})
+
 export default apiClient;
+
+export { apiFormClient };

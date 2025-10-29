@@ -6,11 +6,14 @@ WORKDIR /app
 
 # Install dependencies
 COPY package*.json ./
-RUN npm ci
+# Use legacy peer deps to avoid strict peer conflicts (React 19 vs libs)
+RUN npm ci --legacy-peer-deps
 
 # Copy source and build
 COPY . .
-RUN npm run build
+# If a build.env (containing only REACT_APP_* vars) is present in context,
+# copy it to .env so react-scripts can pick it up at build time.
+RUN if [ -f build.env ]; then cp build.env .env; fi && npm run build
 
 # --- Run stage ---
 FROM nginx:alpine
