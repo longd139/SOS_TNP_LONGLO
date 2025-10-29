@@ -242,7 +242,7 @@ export default function ProceduresManager() {
                 pagination={pagination}
                 onPageChange={changePage}
                 onEdit={handleEdit}
-                onDelete={handleDelete}
+                onDelete={procedures?.is_removed ? handleDelete : null}
                 onView={handleView}
                 showActions={true}
                 emptyMessage="Không có thủ tục nào được tìm thấy"
