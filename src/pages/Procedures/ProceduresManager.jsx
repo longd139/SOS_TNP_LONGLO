@@ -124,87 +124,85 @@ export default function ProceduresManager() {
                 <p className="text-sm md:text-base text-gray-600">Quản lý các thủ tục được hiển thị trong ứng dụng</p>
             </div>
 
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3 md:p-4 mb-4 md:mb-6">
-                <div className="flex flex-col gap-3 md:gap-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
-                        <div className="md:col-span-2 lg:col-span-1">
-                            <label className="block text-xs md:text-sm font-medium text-gray-700 mb-1 md:mb-2">
-                                Tìm kiếm thủ tục
-                            </label>
-                            <input
-                                type="text"
-                                value={filters.searchKeyword}
-                                onChange={(e) => handleSearchKeywordChange(e.target.value)}
-                                placeholder="Nhập từ khóa tìm kiếm..."
-                                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                onKeyPress={handleSearchKeyPress}
-                            />
-                        </div>
-
-                        <div>
-                            <label className="block text-xs md:text-sm font-medium text-gray-700 mb-1 md:mb-2">
-                                Lĩnh vực
-                            </label>
-                            <select
-                                value={filters.selectedDomain}
-                                onChange={(e) => handleDomainChange(e.target.value)}
-                                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                            >
-                                <option value="">Tất cả lĩnh vực</option>
-                                {areas.map((area) => (
-                                    <option key={area.id} value={area.id}>
-                                        {area.ten_linh_vuc}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 md:p-6 mb-4 md:mb-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Tìm kiếm thủ tục
+                        </label>
+                        <input
+                            type="text"
+                            value={filters.searchKeyword}
+                            onChange={(e) => handleSearchKeywordChange(e.target.value)}
+                            placeholder="Nhập từ khóa tìm kiếm..."
+                            className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            onKeyPress={handleSearchKeyPress}
+                        />
                     </div>
 
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
-                        <div>
-                            <label className="block text-xs md:text-sm font-medium text-gray-700 mb-1 md:mb-2">
-                                Trạng thái
-                            </label>
-                            <select
-                                value={showRemoved ? 'removed' : 'active'}
-                                onChange={(e) => setShowRemoved(e.target.value === 'removed')}
-                                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                            >
-                                <option value="active">Hoạt động</option>
-                                <option value="removed">Đã xóa</option>
-                            </select>
-                        </div>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Lĩnh vực
+                        </label>
+                        <select
+                            value={filters.selectedDomain}
+                            onChange={(e) => handleDomainChange(e.target.value)}
+                            className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        >
+                            <option value="">Tất cả lĩnh vực</option>
+                            {areas.map((area) => (
+                                <option key={area.id} value={area.id}>
+                                    {area.ten_linh_vuc}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                </div>
 
-                        <div>
-                            <label className="block text-xs md:text-sm font-medium text-gray-700 mb-1 md:mb-2">
-                                Hiển thị
-                            </label>
-                            <select
-                                value={pagination.pageSize}
-                                onChange={(e) => changePageSize(Number(e.target.value))}
-                                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                            >
-                                <option value={5}>5</option>
-                                <option value={10}>10</option>
-                                <option value={20}>20</option>
-                                <option value={50}>50</option>
-                            </select>
-                        </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 items-end">
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Trạng thái
+                        </label>
+                        <select
+                            value={showRemoved ? 'removed' : 'active'}
+                            onChange={(e) => setShowRemoved(e.target.value === 'removed')}
+                            className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        >
+                            <option value="active">Hoạt động</option>
+                            <option value="removed">Đã xóa</option>
+                        </select>
+                    </div>
 
-                        <div className="col-span-2 flex gap-2 items-end">
-                            <button
-                                onClick={searchProcedures}
-                                className="flex-1 md:flex-none px-4 py-2 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-                            >
-                                Tìm kiếm
-                            </button>
-                            <button
-                                onClick={resetFilters}
-                                className="flex-1 md:flex-none px-4 py-2 text-sm bg-gray-500 text-white rounded-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
-                            >
-                                Đặt lại
-                            </button>
-                        </div>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Hiển thị
+                        </label>
+                        <select
+                            value={pagination.pageSize}
+                            onChange={(e) => changePageSize(Number(e.target.value))}
+                            className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        >
+                            <option value={5}>5</option>
+                            <option value={10}>10</option>
+                            <option value={20}>20</option>
+                            <option value={50}>50</option>
+                        </select>
+                    </div>
+
+                    <div className="sm:col-span-2 flex gap-3">
+                        <button
+                            onClick={searchProcedures}
+                            className="flex-1 px-6 py-2 text-sm font-medium bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
+                        >
+                            Tìm kiếm
+                        </button>
+                        <button
+                            onClick={resetFilters}
+                            className="flex-1 px-6 py-2 text-sm font-medium bg-gray-500 text-white rounded-lg hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors"
+                        >
+                            Đặt lại
+                        </button>
                     </div>
                 </div>
             </div>
