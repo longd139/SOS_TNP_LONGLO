@@ -26,6 +26,7 @@ export default function TemplateManager() {
         deleteTemplate
     } = useTemplates(showRemoved);
 
+    console.log('Templates:', templates);
 
     const handleView = (template) => {
         const baseUrl = process.env.REACT_APP_API_URL;
@@ -106,9 +107,9 @@ export default function TemplateManager() {
             dataIndex: 'id',
             key: 'id',
             width: '80px',
-            render: (value) => (
+            render: (value, record, index) => (
                 <span className="text-sm font-medium text-gray-900">
-                    {value.substring(0, 8)}...
+                    #{(index + 1).toString().padStart(2, '0')}
                 </span>
             )
         },
@@ -171,13 +172,15 @@ export default function TemplateManager() {
             >
                 <Pencil className="w-4 h-4" />
             </button>
-            <button
-                onClick={() => handleDelete(template)}
-                className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
-                title="Xóa"
-            >
-                <Trash2 className="w-4 h-4" />
-            </button>
+            {template.is_removed && (
+                <button
+                    onClick={() => handleDelete(template)}
+                    className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+                    title="Xóa"
+                >
+                    <Trash2 className="w-4 h-4" />
+                </button>
+            )}
         </div>
     );
 
@@ -264,12 +267,12 @@ export default function TemplateManager() {
                                     </td>
                                 </tr>
                             ) : (
-                                templates.map((template) => (
+                                templates.map((template, index) => (
                                     <tr key={template.id} className="hover:bg-gray-50 transition-colors">
                                         {columns.map((column) => (
                                             <td key={column.key} className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                                 {column.render
-                                                    ? column.render(template[column.dataIndex], template)
+                                                    ? column.render(template[column.dataIndex], template, index)
                                                     : template[column.dataIndex]
                                                 }
                                             </td>
