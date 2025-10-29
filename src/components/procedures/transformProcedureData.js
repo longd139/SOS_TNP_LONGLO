@@ -1,0 +1,77 @@
+export const INITIAL_FORM_STATE = {
+    idCoSoDichVuCong: '',
+    tenThuTuc: '',
+    maThuTuc: '',
+    doiTuongThucHien: '',
+    yeuCauDieuKienChung: '',
+    soQuyetDinh: '',
+    danhSachLinhVucIds: [],
+    danhSachMauDon: [],
+    cachThuThucHien: [],
+    trinhTuThucHien: []
+};
+
+export const transformInitialData = (initialData, mode) => {
+    if (!initialData) {
+        return INITIAL_FORM_STATE;
+    }
+
+    if (mode === 'edit') {
+        return {
+            idCoSoDichVuCong: initialData.id_co_so_dich_vu_cong || '',
+            tenThuTuc: initialData.ten_thu_tuc || '',
+            maThuTuc: initialData.ma_thu_tuc || '',
+            doiTuongThucHien: initialData.doi_tuong_thuc_hien || '',
+            yeuCauDieuKienChung: initialData.yeu_cau_dieu_kien_chung || '',
+            soQuyetDinh: initialData.so_quyet_dinh || '',
+            isRemoved: initialData.is_removed || false,
+
+            danhSachLinhVucIds: initialData.thu_tuc_hanh_chinh_linh_vuc?.map(
+                item => item.id_linh_vuc
+            ) || [],
+
+            danhSachMauDon: initialData.thu_tuc_hanh_chinh_mau_don?.map(item => ({
+                id: item.id,
+                so_luong_ban_chinh: item.so_luong_ban_chinh || 0,
+                so_luong_ban_sao: item.so_luong_ban_sao || 0,
+                ghi_chu: item.ghi_chu || ''
+            })) || [],
+
+            cachThuThucHien: initialData.cach_thuc_thuc_hien?.map(item => ({
+                id: item.id,
+                hinh_thuc_ap_dung: item.hinh_thuc_ap_dung || '',
+                mo_ta_chi_tiet: item.mo_ta_chi_tiet || '',
+                thoi_gian_giai_quyet: item.thoi_gian_giai_quyet || '',
+                le_phi: parseFloat(item.le_phi) || 0,
+                ghi_chu_le_phi: item.ghi_chu_le_phi || ''
+            })) || [],
+
+            trinhTuThucHien: initialData.trinh_tu_thuc_hien_thu_tuc?.map(item => ({
+                id: item.id,
+                ten_buoc: item.ten_buoc || '',
+                mo_ta_buoc: item.mo_ta_buoc || '',
+                thu_tu_buoc: item.thu_tu_buoc || 1
+            })) || []
+        };
+    }
+
+    return {
+        ...INITIAL_FORM_STATE,
+        ...initialData,
+        danhSachLinhVucIds: initialData.danhSachLinhVucIds || []
+    };
+};
+
+export const cleanFormData = (formData) => {
+    const cleaned = {
+        ...formData,
+        yeuCauDieuKienChung: formData.yeuCauDieuKienChung?.trim() || null,
+        soQuyetDinh: formData.soQuyetDinh?.trim() || null
+    };
+
+    if (!('isRemoved' in formData)) {
+        delete cleaned.isRemoved;
+    }
+
+    return cleaned;
+};
