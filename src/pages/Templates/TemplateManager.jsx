@@ -1,6 +1,5 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { FileText, Download, Pencil, Trash2, Plus } from 'lucide-react';
-import BaseTable from '../../components/BaseTable';
 import { ConfirmModal } from '../../components/BaseModal';
 import TemplateFormModal from '../../components/templates/TemplateFormModal';
 import { useTemplates } from '../../hooks/useTemplates';
@@ -184,43 +183,44 @@ export default function TemplateManager() {
 
     return (
         <div className="min-h-screen">
-            <div className="mb-6 flex items-center justify-between">
+            <div className="mb-4 md:mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-900">Quản lý biểu mẫu</h1>
-                    <p className="text-gray-600 mt-1">Quản lý các biểu mẫu tải xuống cho người dân</p>
+                    <h1 className="text-xl md:text-2xl font-bold text-gray-900">Quản lý biểu mẫu</h1>
+                    <p className="text-sm md:text-base text-gray-600 mt-1">Quản lý các biểu mẫu tải xuống cho người dân</p>
                 </div>
                 <button
                     onClick={handleCreateTemplate}
-                    className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                    className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm md:text-base"
                 >
                     <Plus className="w-4 h-4" />
-                    Thêm biểu mẫu mới
+                    <span className="hidden sm:inline">Thêm biểu mẫu mới</span>
+                    <span className="sm:hidden">Thêm mới</span>
                 </button>
             </div>
 
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-4 px-6 py-4">
-                <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                        <h3 className="font-semibold text-gray-900">
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-4 px-4 md:px-6 py-3 md:py-4">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                    <div className="flex items-center gap-2 md:gap-3">
+                        <h3 className="text-sm md:text-base font-semibold text-gray-900">
                             Danh sách biểu mẫu ({templates.length})
                         </h3>
                         {showRemoved && (
-                            <span className="px-3 py-1 bg-red-100 text-red-800 text-xs font-medium rounded-full">
+                            <span className="px-2 md:px-3 py-1 bg-red-100 text-red-800 text-xs font-medium rounded-full whitespace-nowrap">
                                 Đã xóa
                             </span>
                         )}
                         {!showRemoved && (
-                            <span className="px-3 py-1 bg-green-100 text-green-800 text-xs font-medium rounded-full">
+                            <span className="px-2 md:px-3 py-1 bg-green-100 text-green-800 text-xs font-medium rounded-full whitespace-nowrap">
                                 Đang hoạt động
                             </span>
                         )}
                     </div>
                     <div className="flex items-center gap-2">
-                        <label className="text-sm font-medium text-gray-700">Trạng thái:</label>
+                        <label className="text-xs md:text-sm font-medium text-gray-700 whitespace-nowrap">Trạng thái:</label>
                         <select
                             value={showRemoved ? 'removed' : 'active'}
                             onChange={(e) => setShowRemoved(e.target.value === 'removed')}
-                            className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            className="px-2 md:px-3 py-1.5 md:py-2 text-xs md:text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         >
                             <option value="active">Đang hoạt động</option>
                             <option value="removed">Đã xóa</option>
@@ -229,7 +229,7 @@ export default function TemplateManager() {
                 </div>
             </div>
 
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
                 <div className="overflow-x-auto">
                     <table className="min-w-full divide-y divide-gray-200">
                         <thead className="bg-gray-50">
@@ -237,13 +237,13 @@ export default function TemplateManager() {
                                 {columns.map((column) => (
                                     <th
                                         key={column.key}
-                                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                                        className="px-3 md:px-6 py-2 md:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                                         style={column.width ? { width: column.width } : {}}
                                     >
                                         {column.title}
                                     </th>
                                 ))}
-                                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider" style={{ width: '150px' }}>
+                                <th className="px-3 md:px-6 py-2 md:py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider" style={{ width: '150px' }}>
                                     Thao tác
                                 </th>
                             </tr>
@@ -300,7 +300,6 @@ export default function TemplateManager() {
                 mode="edit"
             />
 
-            {/* Delete Confirmation Modal */}
             <ConfirmModal
                 isOpen={deleteModal.isOpen}
                 onClose={() => setDeleteModal({ isOpen: false, template: null })}

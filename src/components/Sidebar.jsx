@@ -1,4 +1,4 @@
-import { BarChart3, Calendar, FileText, FolderOpen, LayoutDashboard, MessageSquare, Newspaper, Phone, UserCog, Menu, ChevronLeft } from 'lucide-react';
+import { BarChart3, Calendar, FileText, FolderOpen, LayoutDashboard, MessageSquare, Newspaper, Phone, UserCog, Menu, ChevronLeft, X } from 'lucide-react';
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import PropTypes from 'prop-types';
@@ -69,8 +69,14 @@ const menuItems = [
     }
 ];
 
-export default function Sidebar({ collapsed, onToggle }) {
+export default function Sidebar({ collapsed, onToggle, onMobileClose }) {
     const location = useLocation();
+
+    const handleLinkClick = () => {
+        if (window.innerWidth < 768 && onMobileClose) {
+            onMobileClose();
+        }
+    };
 
     return (
         <aside 
@@ -90,9 +96,11 @@ export default function Sidebar({ collapsed, onToggle }) {
                             <p className="text-sm text-gray-500">Cổng quản trị</p>
                         </div>
                     )}
+
                     <button
                         onClick={onToggle}
                         className={`
+                            hidden md:block
                             p-2 rounded-lg hover:bg-gray-100 transition-colors
                             ${collapsed ? 'mx-auto' : 'ml-auto'}
                         `}
@@ -103,6 +111,18 @@ export default function Sidebar({ collapsed, onToggle }) {
                         ) : (
                             <ChevronLeft className="w-5 h-5 text-gray-600" />
                         )}
+                    </button>
+
+                    <button
+                        onClick={onMobileClose}
+                        className={`
+                            md:hidden
+                            p-2 rounded-lg hover:bg-gray-100 transition-colors
+                            ${collapsed ? 'mx-auto' : 'ml-auto'}
+                        `}
+                        title="Đóng menu"
+                    >
+                        <X className="w-5 h-5 text-gray-600" />
                     </button>
                 </div>
             </div>
@@ -117,6 +137,7 @@ export default function Sidebar({ collapsed, onToggle }) {
                             <li key={item.id}>
                                 <Link
                                     to={item.path}
+                                    onClick={handleLinkClick}
                                     className={`
                                         flex items-center text-sm rounded-lg transition-all duration-200
                                         ${collapsed ? 'px-3 py-3 justify-center' : 'px-4 py-3'}
@@ -150,7 +171,6 @@ export default function Sidebar({ collapsed, onToggle }) {
                 </ul>
             </nav>
 
-            {/* Footer Version */}
             <div className={`border-t border-gray-200 bg-white transition-all duration-300 ${collapsed ? 'p-2' : 'p-4'}`}>
                 <p className={`text-xs text-gray-400 text-center ${collapsed ? 'transform rotate-90' : ''}`}>
                     {collapsed ? 'v1' : 'v1.0.0'}
@@ -162,5 +182,6 @@ export default function Sidebar({ collapsed, onToggle }) {
 
 Sidebar.propTypes = {
     collapsed: PropTypes.bool.isRequired,
-    onToggle: PropTypes.func.isRequired
+    onToggle: PropTypes.func.isRequired,
+    onMobileClose: PropTypes.func
 };
