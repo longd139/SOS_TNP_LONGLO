@@ -22,7 +22,31 @@ const updateForm = async (formId, formData) => {
     }
 }
 
+const getAllForms = async () => {
+    try {
+        const response = await apiFormClient.get('/api/mau-don');
+        if (response.data.success) return response.data.data;
+        else throw new Error("Lấy tất cả biểu mẫu thất bại");
+    } catch (error) {
+        console.error("Lỗi khi lấy tất cả biểu mẫu:", error);
+        throw error;
+    }
+}
+
+const deleteForm = async (formId) => {
+    try {
+        const response = await apiFormClient.delete(`/api/mau-don/${formId}`);
+        if (response.data.success) return response.data.data;
+        else throw new Error("Xóa biểu mẫu thất bại");
+    } catch (error) {
+        console.error("Lỗi khi xóa biểu mẫu:", error);
+        throw error;
+    }
+}
+
 export const FORM_API = {
     createForm,
-    updateForm
+    updateForm,
+    getAllForms,
+    deleteForm
 }

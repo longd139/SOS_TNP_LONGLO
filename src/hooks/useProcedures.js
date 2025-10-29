@@ -97,6 +97,19 @@ export const useProcedures = () => {
         }
     }, [pagination.current, pagination.pageSize, filters.searchKeyword, filters.selectedDomain, loadProcedures]);
 
+    const updateProcedure = useCallback(async (procedureId, formData) => {
+        try {
+            debugLogger.log('Updating procedure:', procedureId, formData);
+            await FORMALITY_API.updateFormality(procedureId, formData);
+            await loadProcedures(pagination.current, pagination.pageSize, filters.searchKeyword, filters.selectedDomain);
+            return { success: true };
+        } catch (error) {
+            debugLogger.error('Error updating procedure:', error);
+            alert('Có lỗi xảy ra khi cập nhật thủ tục!');
+            return { success: false, error };
+        }
+    }, [pagination.current, pagination.pageSize, filters.searchKeyword, filters.selectedDomain, loadProcedures]);
+
     const deleteProcedure = useCallback(async (procedureId, procedureName) => {
         const confirmed = window.confirm(`Bạn có chắc chắn muốn xóa thủ tục "${procedureName}"?`);
         if (!confirmed) return { success: false, cancelled: true };
@@ -111,6 +124,18 @@ export const useProcedures = () => {
             return { success: false, error };
         }
     }, [pagination.current, pagination.pageSize, filters.searchKeyword, filters.selectedDomain, loadProcedures]);
+
+    const getProcedureById = useCallback(async (procedureId) => {
+        try {
+            debugLogger.log('Getting procedure by ID:', procedureId);
+            const response = await FORMALITY_API.getFormalityById(procedureId);
+            return { success: true, data: response };
+        } catch (error) {
+            debugLogger.error('Error getting procedure:', error);
+            alert('Có lỗi xảy ra khi lấy thông tin thủ tục!');
+            return { success: false, error };
+        }
+    }, []);
 
     const searchProcedures = useCallback(() => {
         loadProcedures(1, pagination.pageSize, filters.searchKeyword, filters.selectedDomain);
@@ -149,7 +174,9 @@ export const useProcedures = () => {
         filters,
         loadProcedures,
         createProcedure,
+        updateProcedure,
         deleteProcedure,
+        getProcedureById,
         searchProcedures,
         changePage,
         changePageSize,
