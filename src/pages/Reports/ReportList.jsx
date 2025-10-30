@@ -114,14 +114,14 @@ export default function ReportList() {
 
     return (
         <div className="min-h-screen">
-            <div className="mb-6">
+            <div className="mb-4">
                 <h1 className="text-2xl font-bold text-gray-900">Quản lý phản ánh</h1>
                 <p className="text-gray-600 mt-1">Xem và xử lý phản ánh từ người dân</p>
             </div>
 
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
-                <h3 className="font-semibold text-gray-900 mb-4">Bộ lọc</h3>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-4">
+                <h3 className="font-semibold text-gray-900 mb-3">Bộ lọc</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
                             Trạng thái
@@ -184,7 +184,7 @@ export default function ReportList() {
                 </div>
             </div>
 
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-4 px-6 py-4">
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-4 px-4 py-3">
                 <h3 className="font-semibold text-gray-900">
                     Danh sách phản ánh ({feedbackList.length})
                 </h3>

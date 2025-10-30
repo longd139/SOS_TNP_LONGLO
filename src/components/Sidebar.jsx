@@ -86,14 +86,13 @@ export default function Sidebar({ collapsed, onToggle, onMobileClose }) {
                 ${collapsed ? 'w-20' : 'w-64'}
             `}
         >
-            <div className={`border-b border-gray-200 bg-white transition-all duration-300 ${collapsed ? 'p-4' : 'p-6'}`}>
+            <div className={`border-b border-gray-200 bg-white transition-all duration-300 ${collapsed ? 'p-3' : 'p-4'}`}>
                 <div className="flex items-center justify-between">
                     {!collapsed && (
                         <div className="flex-1">
                             <h3 className="text-lg font-bold text-gray-800 mb-1">
                                 Phường Tăng Nhơn Phú
                             </h3>
-                            <p className="text-sm text-gray-500">Cổng quản trị</p>
                         </div>
                     )}
 
@@ -127,7 +126,7 @@ export default function Sidebar({ collapsed, onToggle, onMobileClose }) {
                 </div>
             </div>
 
-            <nav className={`py-6 transition-all duration-300 ${collapsed ? 'px-2' : 'px-4'}`}>
+            <nav className={`py-4 transition-all duration-300 ${collapsed ? 'px-2' : 'px-3'}`}>
                 <ul className="space-y-2">
                     {menuItems.map((item) => {
                         const isActive = location.pathname === item.path;
@@ -171,7 +170,7 @@ export default function Sidebar({ collapsed, onToggle, onMobileClose }) {
                 </ul>
             </nav>
 
-            <div className={`border-t border-gray-200 bg-white transition-all duration-300 ${collapsed ? 'p-2' : 'p-4'}`}>
+            <div className={`border-t border-gray-200 bg-white transition-all duration-300 ${collapsed ? 'p-2' : 'p-3'}`}>
                 <p className={`text-xs text-gray-400 text-center ${collapsed ? 'transform rotate-90' : ''}`}>
                     {collapsed ? 'v1' : 'v1.0.0'}
                 </p>

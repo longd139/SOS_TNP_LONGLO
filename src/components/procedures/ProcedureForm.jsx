@@ -62,7 +62,7 @@ const ProcedureForm = ({
                 />
             }
         >
-            <div className="space-y-4 max-h-[70vh] overflow-y-auto px-1 -mx-1">
+            <div className="space-y-3 max-h-[70vh] overflow-y-auto px-1 -mx-1">
                 <ProcedureBasicInfo
                     formData={formData}
                     errors={errors}
@@ -76,7 +76,7 @@ const ProcedureForm = ({
                     />
                 )}
 
-                <div className="flex flex-col md:flex-row gap-4">
+                <div className="flex flex-col md:flex-row gap-3">
                     <div className="md:w-1/2 min-w-0">
                         <ProcedureAreasSelector
                             formData={formData}
@@ -101,7 +101,7 @@ const ProcedureForm = ({
                     errors={errors}
                 />
 
-                <div className="flex flex-col md:flex-row gap-4">
+                <div className="flex flex-col md:flex-row gap-3">
                     <div className="flex-1 min-w-0">
                         <ProcedureStepsSection
                             steps={formData.trinhTuThucHien}

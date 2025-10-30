@@ -48,7 +48,6 @@ export const useLogin = () => {
         exp: decoded.exp,
       };
     } catch (error) {
-      console.error("Error decoding token:", error);
       return null;
     }
   };
@@ -113,7 +112,6 @@ export const useLogin = () => {
         },
       };
     } catch (error) {
-      console.error("Login error:", error);
       setApiError(error.message || "Đăng nhập thất bại");
       setLoading(false);
       return { success: false, error: error.message };
@@ -147,7 +145,6 @@ export const useLogin = () => {
 
       return { success: true };
     } catch (error) {
-      console.error("OTP verification error:", error);
       setApiError(error.message || "Xác thực OTP thất bại");
       setLoading(false);
       return { success: false, error: error.message };

@@ -39,7 +39,6 @@ const GovernmentFormModal = ({ isOpen, onClose, onCreate }) => {
                 setCommittees([]);
             }
         } catch (error) {
-            console.error('Error fetching committees:', error);
             setCommittees([]);
         } finally {
             setLoadingCommittees(false);
@@ -76,7 +75,6 @@ const GovernmentFormModal = ({ isOpen, onClose, onCreate }) => {
             setForm(initialState);
             onClose();
         } catch (err) {
-            console.error('Error creating government:', err);
             alert('Có lỗi khi tạo cơ sở. Vui lòng thử lại.');
         } finally {
             setLoading(false);
@@ -100,7 +98,7 @@ const GovernmentFormModal = ({ isOpen, onClose, onCreate }) => {
                 />
             }
         >
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1.5">
                         Mã cơ quan/ủy ban <span className="text-red-500">*</span>

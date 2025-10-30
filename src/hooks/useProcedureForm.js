@@ -135,7 +135,6 @@ export const useProcedureForm = ({ initialData, mode, isOpen, onSubmit }) => {
             await onSubmit(cleanedData);
             resetForm();
         } catch (error) {
-            console.error('Error submitting form:', error);
             alert('Có lỗi xảy ra khi lưu thủ tục!');
         } finally {
             setIsSubmitting(false);

@@ -68,8 +68,8 @@ export default function WorkSchedule() {
     const weekDays = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'];
 
     return (
-        <div className="p-4 md:p-6">
-            <div className="mb-4 md:mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+        <div className="min-h-screen">
+            <div className="mb-3 md:mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3">
                 <div>
                     <h1 className="text-xl md:text-2xl font-bold text-gray-900 mb-1 md:mb-2">
                         Quản lý lịch tiếp dân
@@ -107,18 +107,18 @@ export default function WorkSchedule() {
                 </div>
             </div>
 
-            <div className="flex flex-col lg:flex-row gap-4 md:gap-6">
+            <div className="flex flex-col lg:flex-row gap-3 md:gap-4">
                 <div className="flex-1 order-2 lg:order-1">
-                    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 md:p-6">
-                        <h2 className="text-base md:text-lg font-semibold text-gray-900 mb-3 md:mb-4">
+                    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3 md:p-4">
+                        <h2 className="text-base md:text-lg font-semibold text-gray-900 mb-2 md:mb-3">
                             Lịch tiếp dân sắp tới
                         </h2>
 
-                        <div className="space-y-3 md:space-y-4">
+                        <div className="space-y-2 md:space-y-3">
                             {getSchedulesForDisplay().map((schedule) => (
                                 <div
                                     key={schedule.id}
-                                    className="bg-gray-50 rounded-lg p-3 md:p-4 border border-gray-200 hover:border-blue-300 transition-colors"
+                                    className="bg-gray-50 rounded-lg p-2 md:p-3 border border-gray-200 hover:border-blue-300 transition-colors"
                                 >
                                     <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 md:gap-3 mb-2 md:mb-3">
                                         <div className="flex flex-wrap items-center gap-2 md:gap-3">
@@ -169,7 +169,7 @@ export default function WorkSchedule() {
                 </div>
 
                 <div className="w-full lg:w-96 order-1 lg:order-2">
-                    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 md:p-6">
+                    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3 md:p-4">
                         <div className="flex items-center justify-between mb-3 md:mb-4">
                             <div className="flex items-center gap-2">
                                 <Calendar className="w-4 h-4 md:w-5 md:h-5 text-blue-600" />
@@ -179,7 +179,7 @@ export default function WorkSchedule() {
                             </div>
                         </div>
 
-                        <div className="grid grid-cols-7 gap-0.5 md:gap-1 mb-2">
+                        <div className="grid grid-cols-7 gap-0.5 md:gap-1 mb-1">
                             {weekDays.map((day) => (
                                 <div
                                     key={day}

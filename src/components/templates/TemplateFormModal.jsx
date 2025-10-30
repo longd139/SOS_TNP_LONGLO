@@ -91,7 +91,6 @@ const TemplateFormModal = ({
             await onSubmit(formDataToSubmit);
             resetForm();
         } catch (error) {
-            console.error('Error submitting form:', error);
             alert('Có lỗi xảy ra khi lưu biểu mẫu!');
         } finally {
             setIsSubmitting(false);
@@ -253,7 +252,7 @@ const TemplateFormModal = ({
                         </div>
                     )}
 
-                    <div className={`border-2 border-dashed rounded-lg p-6 text-center ${errors.file ? 'border-red-500' : 'border-gray-300'
+                    <div className={`border-2 border-dashed rounded-lg p-4 text-center ${errors.file ? 'border-red-500' : 'border-gray-300'
                         }`}>
                         <Upload className="w-12 h-12 mx-auto text-gray-400 mb-3" />
                         <div className="mb-2">
@@ -284,7 +283,7 @@ const TemplateFormModal = ({
                 </div>
 
                 {mode === 'edit' && (
-                    <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                    <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
                         <label className="flex items-center gap-3 cursor-pointer">
                             <div className="relative inline-block w-12 h-6">
                                 <input

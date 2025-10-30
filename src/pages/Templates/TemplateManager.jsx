@@ -186,7 +186,7 @@ export default function TemplateManager() {
 
     return (
         <div className="min-h-screen">
-            <div className="mb-4 md:mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+            <div className="mb-3 md:mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3">
                 <div>
                     <h1 className="text-xl md:text-2xl font-bold text-gray-900">Quản lý biểu mẫu</h1>
                     <p className="text-sm md:text-base text-gray-600 mt-1">Quản lý các biểu mẫu tải xuống cho người dân</p>
@@ -201,7 +201,7 @@ export default function TemplateManager() {
                 </button>
             </div>
 
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-4 px-4 md:px-6 py-3 md:py-4">
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-3 px-3 md:px-4 py-2 md:py-3">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                     <div className="flex items-center gap-2 md:gap-3">
                         <h3 className="text-sm md:text-base font-semibold text-gray-900">

@@ -30,10 +30,10 @@ const ProcedureDetailModal = ({ isOpen, onClose, procedure }) => {
                 </div>
             }
         >
-            <div className="space-y-6 max-h-[70vh] overflow-y-auto pr-2">
-                <div className="bg-gray-50 p-4 rounded-lg">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Thông tin cơ bản</h3>
-                    <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-4 max-h-[70vh] overflow-y-auto pr-2">
+                <div className="bg-gray-50 p-3 rounded-lg">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-3">Thông tin cơ bản</h3>
+                    <div className="grid grid-cols-2 gap-3">
                         <div>
                             <label className="block text-sm font-medium text-gray-600 mb-1">Mã thủ tục</label>
                             <p className="text-sm text-gray-900">{procedure.ma_thu_tuc}</p>
@@ -54,8 +54,8 @@ const ProcedureDetailModal = ({ isOpen, onClose, procedure }) => {
                 </div>
 
                 {procedure.co_so_dich_vu_cong && (
-                    <div className="bg-blue-50 p-4 rounded-lg">
-                        <h3 className="text-lg font-semibold text-gray-900 mb-4">Cơ sở dịch vụ công</h3>
+                    <div className="bg-blue-50 p-3 rounded-lg">
+                        <h3 className="text-lg font-semibold text-gray-900 mb-3">Cơ sở dịch vụ công</h3>
                         <div className="space-y-2">
                             <div>
                                 <label className="block text-sm font-medium text-gray-600 mb-1">Tên cơ sở</label>
@@ -87,14 +87,14 @@ const ProcedureDetailModal = ({ isOpen, onClose, procedure }) => {
                 )}
 
                 {procedure.yeu_cau_dieu_kien_chung && (
-                    <div className="bg-gray-50 p-4 rounded-lg">
+                    <div className="bg-gray-50 p-3 rounded-lg">
                         <h3 className="text-lg font-semibold text-gray-900 mb-2">Yêu cầu điều kiện chung</h3>
                         <p className="text-sm text-gray-900 whitespace-pre-wrap">{procedure.yeu_cau_dieu_kien_chung}</p>
                     </div>
                 )}
 
                 {procedure.thu_tuc_hanh_chinh_linh_vuc && procedure.thu_tuc_hanh_chinh_linh_vuc.length > 0 && (
-                    <div className="bg-green-50 p-4 rounded-lg">
+                    <div className="bg-green-50 p-3 rounded-lg">
                         <h3 className="text-lg font-semibold text-gray-900 mb-3">Lĩnh vực</h3>
                         <div className="flex flex-wrap gap-2">
                             {procedure.thu_tuc_hanh_chinh_linh_vuc.map((item) => (
@@ -110,14 +110,14 @@ const ProcedureDetailModal = ({ isOpen, onClose, procedure }) => {
                 )}
 
                 {procedure.trinh_tu_thuc_hien_thu_tuc && procedure.trinh_tu_thuc_hien_thu_tuc.length > 0 && (
-                    <div className="bg-gray-50 p-4 rounded-lg">
-                        <h3 className="text-lg font-semibold text-gray-900 mb-4">Trình tự thực hiện</h3>
-                        <div className="space-y-3">
+                    <div className="bg-gray-50 p-3 rounded-lg">
+                        <h3 className="text-lg font-semibold text-gray-900 mb-3">Trình tự thực hiện</h3>
+                        <div className="space-y-2">
                             {procedure.trinh_tu_thuc_hien_thu_tuc
                                 .sort((a, b) => a.thu_tu_buoc - b.thu_tu_buoc)
                                 .map((step) => (
-                                    <div key={step.id} className="bg-white p-3 rounded-lg border border-gray-200">
-                                        <div className="flex items-start gap-3">
+                                    <div key={step.id} className="bg-white p-2 rounded-lg border border-gray-200">
+                                        <div className="flex items-start gap-2">
                                             <span className="flex-shrink-0 w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-semibold text-sm">
                                                 {step.thu_tu_buoc}
                                             </span>
@@ -133,18 +133,18 @@ const ProcedureDetailModal = ({ isOpen, onClose, procedure }) => {
                 )}
 
                 {procedure.cach_thuc_thuc_hien && procedure.cach_thuc_thuc_hien.length > 0 && (
-                    <div className="bg-gray-50 p-4 rounded-lg">
-                        <h3 className="text-lg font-semibold text-gray-900 mb-4">Cách thức thực hiện</h3>
-                        <div className="space-y-4">
+                    <div className="bg-gray-50 p-3 rounded-lg">
+                        <h3 className="text-lg font-semibold text-gray-900 mb-3">Cách thức thực hiện</h3>
+                        <div className="space-y-3">
                             {procedure.cach_thuc_thuc_hien.map((cach, index) => (
-                                <div key={cach.id} className="bg-white p-4 rounded-lg border border-gray-200">
-                                    <h4 className="font-medium text-gray-900 mb-3">Cách thức {index + 1}: {cach.hinh_thuc_ap_dung}</h4>
+                                <div key={cach.id} className="bg-white p-3 rounded-lg border border-gray-200">
+                                    <h4 className="font-medium text-gray-900 mb-2">Cách thức {index + 1}: {cach.hinh_thuc_ap_dung}</h4>
                                     <div className="space-y-2">
                                         <div>
                                             <label className="block text-sm font-medium text-gray-600 mb-1">Mô tả chi tiết</label>
                                             <p className="text-sm text-gray-900">{cach.mo_ta_chi_tiet}</p>
                                         </div>
-                                        <div className="grid grid-cols-2 gap-4">
+                                        <div className="grid grid-cols-2 gap-3">
                                             <div>
                                                 <label className="block text-sm font-medium text-gray-600 mb-1">Thời gian giải quyết</label>
                                                 <p className="text-sm text-gray-900">{cach.thoi_gian_giai_quyet}</p>
@@ -170,7 +170,7 @@ const ProcedureDetailModal = ({ isOpen, onClose, procedure }) => {
                 )}
 
                 {procedure.thu_tuc_hanh_chinh_mau_don && procedure.thu_tuc_hanh_chinh_mau_don.length > 0 && (
-                    <div className="bg-gray-50 p-4 rounded-lg">
+                    <div className="bg-gray-50 p-3 rounded-lg">
                         <h3 className="text-lg font-semibold text-gray-900 mb-3">Mẫu đơn</h3>
                         <div className="space-y-2">
                             {procedure.thu_tuc_hanh_chinh_mau_don.map((mauDon, index) => (
@@ -185,9 +185,9 @@ const ProcedureDetailModal = ({ isOpen, onClose, procedure }) => {
                     </div>
                 )}
 
-                <div className="bg-gray-50 p-4 rounded-lg">
+                    <div className="bg-gray-50 p-3 rounded-lg">
                     <h3 className="text-lg font-semibold text-gray-900 mb-3">Thông tin khác</h3>
-                    <div className="grid grid-cols-2 gap-4 text-sm">
+                    <div className="grid grid-cols-2 gap-3 text-sm">
                         <div>
                             <label className="block text-sm font-medium text-gray-600 mb-1">Thời gian tạo</label>
                             <p className="text-sm text-gray-900">

@@ -34,17 +34,17 @@ const StatCard = ({
     const currentColor = colorClasses[color] || colorClasses.blue;
 
     return (
-        <div className={`bg-white rounded-xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow ${className}`}>
+        <div className={`bg-white rounded-xl p-4 shadow-sm border border-gray-100 hover:shadow-md transition-shadow ${className}`}>
             <div className="flex items-center justify-between">
                 <div className="flex-1">
-                    <p className="text-sm font-medium text-gray-600 mb-2">{title}</p>
+                    <p className="text-sm font-medium text-gray-600 mb-1">{title}</p>
                     <p className="text-3xl font-bold text-gray-900">{value}</p>
                     {trend && (
-                        <p className="text-sm text-gray-500 mt-2">{trend}</p>
+                        <p className="text-sm text-gray-500 mt-1">{trend}</p>
                     )}
                 </div>
 
-                <div className={`w-12 h-12 ${currentColor.bg} rounded-lg flex items-center justify-center`}>
+                <div className={`w-10 h-10 ${currentColor.bg} rounded-lg flex items-center justify-center`}>
                     <div className={`${currentColor.icon}`}>
                         {icon}
                     </div>

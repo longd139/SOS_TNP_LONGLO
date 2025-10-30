@@ -12,7 +12,6 @@ const getAreas = async (is_removed) => {
         }
         else throw new Error("Lấy danh sách lĩnh vực thất bại");    
     } catch (error) {
-        console.error('Error fetching areas data:', error);
         throw error;
     }
 }
