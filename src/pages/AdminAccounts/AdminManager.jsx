@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import BaseTable from '../../components/BaseTable';
 import UserModal from '../../components/users/UserModal';
 import { ConfirmModal } from '../../components/BaseModal';
-import { USER_API } from '../../apis/user';
 import UserService from '../../services/userService';
 import { ROLE_LABELS, ROLE_COLORS } from '../../constants/role';
 
@@ -43,7 +42,7 @@ export default function AdminManager() {
                 totalPages: response.totalPages || 0
             });
         } catch (error) {
-            console.error('Error loading users:', error);
+            throw error;
         } finally {
             setLoading(false);
         }
@@ -87,15 +86,17 @@ export default function AdminManager() {
                     ...userData,
                     id: userModal.user.id
                 });
+                alert('Cập nhật tài khoản thành công!');
             } else {
                 await UserService.createAccount(userData);
+                alert('Tạo tài khoản thành công!');
             }
 
             setUserModal({ isOpen: false, user: null });
             loadUsers(pagination.current, pagination.pageSize);
 
         } catch (error) {
-            console.error('Error saving user:', error);
+            throw error;
         } finally {
             setModalLoading(false);
         }
@@ -108,13 +109,13 @@ export default function AdminManager() {
     const handleDeleteConfirm = async () => {
         try {
             await UserService.deleteUser(deleteModal.user.id);
-
+            alert('Xóa tài khoản thành công.');
             setDeleteModal({ isOpen: false, user: null });
             loadUsers(pagination.current, pagination.pageSize);
 
-            console.log('User deleted successfully:', deleteModal.user.username);
         } catch (error) {
-            console.error('Error deleting user:', error);
+            alert('Có lỗi xảy ra khi xóa tài khoản!');
+            throw error;
         }
     };
 
@@ -188,7 +189,7 @@ export default function AdminManager() {
     ];
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-4">
             <div className="flex justify-between items-center">
                 <div>
                     <h1 className="text-2xl font-semibold text-gray-900">Quản lý tài khoản quản trị</h1>
@@ -207,9 +208,9 @@ export default function AdminManager() {
                 </button>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
                 <div className="bg-white overflow-hidden shadow rounded-lg">
-                    <div className="p-5">
+                    <div className="p-4">
                         <div className="flex items-center">
                             <div className="flex-shrink-0">
                                 <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
@@ -233,7 +234,7 @@ export default function AdminManager() {
                 </div>
 
                 <div className="bg-white overflow-hidden shadow rounded-lg">
-                    <div className="p-5">
+                    <div className="p-4">
                         <div className="flex items-center">
                             <div className="flex-shrink-0">
                                 <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
@@ -257,7 +258,7 @@ export default function AdminManager() {
                 </div>
 
                 <div className="bg-white overflow-hidden shadow rounded-lg">
-                    <div className="p-5">
+                    <div className="p-4">
                         <div className="flex items-center">
                             <div className="flex-shrink-0">
                                 <div className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center">
@@ -281,7 +282,7 @@ export default function AdminManager() {
                 </div>
 
                 <div className="bg-white overflow-hidden shadow rounded-lg">
-                    <div className="p-5">
+                    <div className="p-4">
                         <div className="flex items-center">
                             <div className="flex-shrink-0">
                                 <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">

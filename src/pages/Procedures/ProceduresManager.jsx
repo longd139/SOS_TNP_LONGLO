@@ -33,6 +33,7 @@ export default function ProceduresManager() {
         getProcedureById
     } = useProcedures(showRemoved);
 
+
     const columns = getProcedureColumns(pagination);
     const openCreateModal = () => {
         setIsCreateModalOpen(true);
@@ -119,14 +120,13 @@ export default function ProceduresManager() {
     };
 
     return (
-        <div className="p-4 md:p-6">
-            <div className="mb-4 md:mb-6">
+        <div className="min-h-screen">
+            <div className="mb-3 md:mb-4">
                 <h1 className="text-xl md:text-2xl font-bold text-gray-900 mb-2">Quản lý thủ tục hành chính</h1>
                 <p className="text-sm md:text-base text-gray-600">Quản lý các thủ tục được hiển thị trong ứng dụng</p>
             </div>
-
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 md:p-6 mb-4 md:mb-6">
-                <div className="flex flex-col md:flex-row gap-3 items-end">
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3 md:p-4 mb-3 md:mb-4">
+                <div className="flex flex-col md:flex-row gap-2 items-end">
                     <div className="flex-1 w-full md:w-auto">
                         <label className="block text-sm font-medium text-gray-700 mb-2">
                             Tìm kiếm thủ tục
@@ -208,7 +208,7 @@ export default function ProceduresManager() {
                 </div>
             </div>
 
-            <div className="mb-4 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+            <div className="mb-3 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 bg-white p-3 rounded-lg shadow-sm border border-gray-200">
                 <div className="flex items-center gap-3">
                     <div className="text-xs md:text-sm text-gray-600">
                         Danh sách thủ tục ({pagination.total})
@@ -242,7 +242,7 @@ export default function ProceduresManager() {
                 pagination={pagination}
                 onPageChange={changePage}
                 onEdit={handleEdit}
-                onDelete={procedures?.is_removed ? handleDelete : null}
+                onDelete={showRemoved ? handleDelete : null}
                 onView={handleView}
                 showActions={true}
                 emptyMessage="Không có thủ tục nào được tìm thấy"

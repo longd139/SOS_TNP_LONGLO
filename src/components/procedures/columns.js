@@ -1,5 +1,3 @@
-import dayjs from 'dayjs';
-
 export const getProcedureColumns = (pagination) => [
     {
         title: 'ID',
@@ -25,18 +23,6 @@ export const getProcedureColumns = (pagination) => [
                 return value.length > 0 ? value.join(', ') : 'N/A';
             }
             return value.ten_linh_vuc || value;
-        }
-    },
-    {
-        title: 'LIÊN HỆ',
-        dataIndex: 'lien_he',
-        key: 'lien_he',
-        width: '150px',
-        render: (value) => {
-            if (!value) {
-                return <span className="text-gray-400">028-1234-5678</span>;
-            }
-            return <span className="text-gray-600">{value}</span>;
         }
     }
 ];

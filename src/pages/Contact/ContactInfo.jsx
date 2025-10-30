@@ -27,8 +27,8 @@ export default function ContactInfo() {
     };
 
     return (
-        <div className="p-4 md:p-6">
-            <div className="mb-4 md:mb-6">
+        <div className="min-h-screen">
+            <div className="mb-3 md:mb-4">
                 <h1 className="text-xl md:text-2xl font-bold text-gray-900 mb-2">
                     Quản lý thông tin liên hệ
                 </h1>
@@ -37,9 +37,9 @@ export default function ContactInfo() {
                 </p>
             </div>
 
-            <div className="space-y-4 md:space-y-6">
-                <div className="flex flex-col lg:flex-row gap-4 md:gap-6 bg-transparent">
-                    <div className="flex-1 bg-white rounded-xl md:rounded-2xl shadow-md border border-gray-200 p-4 md:p-6">
+            <div className="space-y-3 md:space-y-4">
+                <div className="flex flex-col lg:flex-row gap-3 md:gap-4 bg-transparent">
+                    <div className="flex-1 bg-white rounded-xl md:rounded-2xl shadow-md border border-gray-200 p-3 md:p-4">
                         <div className="flex items-center gap-2 mb-3 md:mb-4">
                             <MapPin className="w-4 h-4 md:w-5 md:h-5 text-blue-600" />
                             <h2 className="text-base md:text-lg font-semibold text-gray-900">Địa chỉ văn phòng</h2>
@@ -103,7 +103,7 @@ export default function ContactInfo() {
                         </div>
                     </div>
 
-                    <div className="flex-1 bg-white rounded-xl md:rounded-2xl shadow-md border border-gray-200 p-4 md:p-6">
+                    <div className="flex-1 bg-white rounded-xl md:rounded-2xl shadow-md border border-gray-200 p-3 md:p-4">
                         <div className="flex items-center gap-2 mb-3 md:mb-4">
                             <Phone className="w-4 h-4 md:w-5 md:h-5 text-blue-600" />
                             <h2 className="text-base md:text-lg font-semibold text-gray-900">Thông tin liên lạc</h2>
@@ -178,7 +178,7 @@ export default function ContactInfo() {
                     </div>
                 </div>
 
-                <div className="bg-white rounded-xl md:rounded-lg shadow-sm border border-gray-200 p-4 md:p-6">
+                <div className="bg-white rounded-xl md:rounded-lg shadow-sm border border-gray-200 p-3 md:p-4">
                     <div className="flex items-center gap-2 mb-3 md:mb-4">
                         <Clock className="w-4 h-4 md:w-5 md:h-5 text-blue-600" />
                         <h2 className="text-base md:text-lg font-semibold text-gray-900">
@@ -267,7 +267,7 @@ export default function ContactInfo() {
                     </div>
                 </div>
 
-                <div className="bg-white rounded-xl md:rounded-lg shadow-sm border border-gray-200 p-4 md:p-6">
+                <div className="bg-white rounded-xl md:rounded-lg shadow-sm border border-gray-200 p-3 md:p-4">
                     <div className="flex items-center gap-2 mb-3 md:mb-4">
                         <Globe className="w-4 h-4 md:w-5 md:h-5 text-blue-600" />
                         <h2 className="text-base md:text-lg font-semibold text-gray-900">
@@ -320,7 +320,7 @@ export default function ContactInfo() {
                 <div className="flex justify-end">
                     <button
                         onClick={handleSave}
-                        className="w-full sm:w-auto px-6 py-2.5 bg-blue-600 text-white text-sm md:text-base rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center justify-center gap-2 shadow-sm"
+                        className="w-full sm:w-auto px-4 py-2 bg-blue-600 text-white text-sm md:text-base rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center justify-center gap-2 shadow-sm"
                     >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />

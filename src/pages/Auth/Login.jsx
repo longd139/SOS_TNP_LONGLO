@@ -2,48 +2,75 @@ import { useState, useEffect } from "react";
 import { ShieldCheck, AlertCircle, Loader2, Lock, User } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useLogin } from "../../hooks/useLogin";
-import { useAuth } from "../../contexts/AuthContext";
+import { useOtp } from "../../hooks/useOtp";
+import OtpModal from "../Auth/OtpModal";
 
 export default function Login() {
     const [tenDangNhap, setTenDangNhap] = useState("");
     const [matKhau, setMatKhau] = useState("");
+    const [showOtpModal, setShowOtpModal] = useState(false);
+    const [email, setEmail] = useState("");
+    const [twoFA, setTwoFA] = useState(true);
 
     const { login, loading, errors, apiError, clearErrors } = useLogin();
-    const { isAuthenticated, isAdmin } = useAuth();
+    const { sendOtp, verifyOtp, loading: otpLoading, message, error: otpError } = useOtp();
     const navigate = useNavigate();
-
-    useEffect(() => {
-        if (isAuthenticated && isAdmin()) {
-            navigate('/dashboard', { replace: true });
-        }
-    }, [isAuthenticated, isAdmin, navigate]);
 
     useEffect(() => {
         if (Object.keys(errors).length > 0 || apiError) {
             clearErrors();
         }
-    }, [tenDangNhap, matKhau]);
+    }, [tenDangNhap, matKhau, apiError, errors, clearErrors]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        const credentials = {
-            tenDangNhap,
-            matKhau
-        };
-
+        const credentials = { tenDangNhap, matKhau };
         const result = await login(credentials);
 
-        if (result.success) {
-            console.log('Login successful:', result.user);
+        const mail = result?.email || result?.user?.email || "";
+
+
+        if (result?.needOtp || !result?.success) {
+
+            if (mail) {
+                try {
+                    const otpRes = await sendOtp({ email: mail, type: "LOGIN" });
+                    if (otpRes.success) setEmail(mail);
+                } catch (err) {
+                    throw err;
+                }
+            }
+
+            navigate("/OtpModal", {
+                replace: true,
+                state: { tenDangNhap, email: mail },
+            });
+            return;
+        }
+        alert(result?.error || "Đăng nhập thất bại");
+    };
+
+
+
+
+    const handleVerifyOtp = async ({ otp }) => {
+        const res = await verifyOtp({ otp, tenDangNhap });
+
+        if (res.success) {
+            localStorage.setItem("accessToken", res.data.accessToken);
+            localStorage.setItem("refreshToken", res.data.refreshToken);
+
+            setShowOtpModal(false);
+            navigate("/dashboard", { replace: true });
         } else {
-            console.error('Login failed:', result.error);
+            alert("Mã OTP không đúng hoặc đã hết hạn!");
         }
     };
 
     return (
         <div className="flex items-center justify-center min-h-screen bg-gray-100">
-            <div className="bg-white shadow-lg rounded-2xl p-8 w-[450px] text-center">
+            <div className="bg-white shadow-lg rounded-2xl p-6 w-[450px] text-center">
                 <div className="flex justify-center mb-4">
                     <div className="bg-blue-100 p-3 rounded-full">
                         <ShieldCheck className="text-blue-600 w-8 h-8" />
@@ -51,7 +78,7 @@ export default function Login() {
                 </div>
 
                 <h1 className="text-lg font-semibold">Cổng quản trị viên</h1>
-                <p className="text-sm text-gray-500 mb-6">
+                <p className="text-sm text-gray-500 mb-4">
                     Ứng dụng công dân Phường Tăng Nhơn Phú
                 </p>
 
@@ -68,13 +95,16 @@ export default function Login() {
                             Tên đăng nhập
                         </label>
                         <div className="relative">
-                            <User className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                            <User
+                                className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                                size={18}
+                            />
                             <input
                                 type="text"
                                 value={tenDangNhap}
                                 onChange={(e) => setTenDangNhap(e.target.value)}
                                 placeholder="Nhập tên đăng nhập"
-                                className={`pl-10 w-full border rounded-lg py-2 ${errors.tenDangNhap ? 'border-red-400' : 'border-gray-300'
+                                className={`pl-10 w-full border rounded-lg py-2 ${errors.tenDangNhap ? "border-red-400" : "border-gray-300"
                                     }`}
                                 disabled={loading}
                             />
@@ -89,13 +119,16 @@ export default function Login() {
                             Mật khẩu
                         </label>
                         <div className="relative">
-                            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                            <Lock
+                                className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                                size={18}
+                            />
                             <input
                                 type="password"
                                 value={matKhau}
                                 onChange={(e) => setMatKhau(e.target.value)}
                                 placeholder="Nhập mật khẩu"
-                                className={`pl-10 pr-10 w-full border rounded-lg py-2 ${errors.matKhau ? 'border-red-400' : 'border-gray-300'
+                                className={`pl-10 pr-10 w-full border rounded-lg py-2 ${errors.matKhau ? "border-red-400" : "border-gray-300"
                                     }`}
                                 disabled={loading}
                             />
@@ -105,22 +138,56 @@ export default function Login() {
                         )}
                     </div>
 
+                    <div className="flex items-center justify-between mt-3 mb-5">
+                        <label htmlFor="twoFA" className="text-sm text-gray-700">
+                            Bật xác thực 2 yếu tố (2FA)
+                        </label>
+                        <input
+                            id="twoFA"
+                            type="checkbox"
+                            checked={twoFA}
+                            onChange={(e) => setTwoFA(e.target.checked)}
+                            className="appearance-none w-11 h-6 bg-gray-300 rounded-full relative cursor-pointer
+                         transition-colors duration-200 checked:bg-blue-600
+                         before:content-[''] before:absolute before:top-[2px] before:left-[2px]
+                         before:w-5 before:h-5 before:bg-white before:rounded-full
+                         before:transition-transform before:duration-200
+                         checked:before:translate-x-5"
+                        />
+                    </div>
+
                     <button
                         type="submit"
                         disabled={loading}
                         className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                     >
                         {loading && <Loader2 className="w-4 h-4 animate-spin" />}
-                        {loading ? 'Đang đăng nhập...' : 'Đăng nhập'}
+                        {loading ? "Đang đăng nhập..." : "Đăng nhập"}
                     </button>
 
                     <div className="text-center mt-2">
-                        <a href="#" className="text-sm text-blue-600 hover:underline">
+                        <button
+                            type="button"
+                            onClick={() => navigate("/forgot-password")}
+                            className="text-sm text-blue-600 hover:underline"
+                        >
                             Quên mật khẩu?
-                        </a>
+                        </button>
                     </div>
                 </form>
             </div>
+
+            {showOtpModal && (
+                <OtpModal
+                    email={email}
+                    tenDangNhap={tenDangNhap}
+                    onClose={() => setShowOtpModal(false)}
+                    onVerify={handleVerifyOtp}
+                    loading={otpLoading}
+                    error={otpError}
+                    message={message}
+                />
+            )}
         </div>
-    )
+    );
 }

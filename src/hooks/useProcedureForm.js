@@ -93,9 +93,32 @@ export const useProcedureForm = ({ initialData, mode, isOpen, onSubmit }) => {
         updateField('cachThuThucHien', newCachThucHien);
     };
 
+    const addMauDon = () => {
+        const newMauDon = [
+            ...formData.danhSachMauDon,
+            {
+                id: '',
+                so_luong_ban_chinh: 0,
+                so_luong_ban_sao: 0,
+                ghi_chu: ''
+            }
+        ];
+        updateField('danhSachMauDon', newMauDon);
+    };
+
+    const removeMauDon = (index) => {
+        const newMauDon = formData.danhSachMauDon.filter((_, i) => i !== index);
+        updateField('danhSachMauDon', newMauDon);
+    };
+
+    const updateMauDon = (index, field, value) => {
+        const newMauDon = [...formData.danhSachMauDon];
+        newMauDon[index] = { ...newMauDon[index], [field]: value };
+        updateField('danhSachMauDon', newMauDon);
+    };
+
     const handleSubmit = async () => {
-        const cleanedData = cleanFormData(formData);
-        const validation = await validateFormalityForm(cleanedData, mode === 'edit');
+        const validation = await validateFormalityForm(formData, mode === 'edit');
 
         if (!validation.isValid) {
             setErrors(validation.errors);
@@ -103,14 +126,15 @@ export const useProcedureForm = ({ initialData, mode, isOpen, onSubmit }) => {
             return;
         }
 
+        const cleanedData = cleanFormData(formData);
+
         setIsSubmitting(true);
         setErrors({});
 
         try {
-            await onSubmit(formData);
+            await onSubmit(cleanedData);
             resetForm();
         } catch (error) {
-            console.error('Error submitting form:', error);
             alert('Có lỗi xảy ra khi lưu thủ tục!');
         } finally {
             setIsSubmitting(false);
@@ -127,6 +151,9 @@ export const useProcedureForm = ({ initialData, mode, isOpen, onSubmit }) => {
         addStep,
         removeStep,
         updateStep,
+        addMauDon,
+        removeMauDon,
+        updateMauDon,
         addCachThucHien,
         removeCachThucHien,
         updateCachThucHien,

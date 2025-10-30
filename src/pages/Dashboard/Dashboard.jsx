@@ -15,8 +15,8 @@ export default function Dashboard() {
     };
 
     return (
-        <div className="space-y-4 md:space-y-6 min-h-full">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+        <div className="space-y-3 md:space-y-4 min-h-full">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
                 <StatCard
                     title="Tổng phản ánh hôm nay"
                     value={dashboardStats.totalReports}
@@ -43,7 +43,7 @@ export default function Dashboard() {
                 />
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 md:gap-4">
                 <Chart
                     type="line"
                     title="Xu hướng phản ánh"
@@ -56,14 +56,14 @@ export default function Dashboard() {
                 />
             </div>
 
-            <div className="bg-white rounded-xl p-4 md:p-6 shadow-sm">
-                <h3 className="text-base md:text-lg font-semibold text-gray-800 mb-4 md:mb-6">
+            <div className="bg-white rounded-xl p-3 md:p-4 shadow-sm">
+                <h3 className="text-base md:text-lg font-semibold text-gray-800 mb-3 md:mb-4">
                     Phản ánh gần đây
                 </h3>
 
-                <div className="space-y-4 md:space-y-6">
+                <div className="space-y-3 md:space-y-4">
                     {recentReports.map((report) => (
-                        <div key={report.id} className="pb-4 md:pb-6 border-b border-gray-100 last:border-b-0">
+                        <div key={report.id} className="pb-3 md:pb-4 border-b border-gray-100 last:border-b-0">
                             <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4">
                                 <div className="flex-1 min-w-0">
                                     <div className="flex items-center flex-wrap gap-2 mb-2 md:mb-3">
