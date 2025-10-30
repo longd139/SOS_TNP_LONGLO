@@ -31,7 +31,7 @@ export const transformInitialData = (initialData, mode) => {
             ) || [],
 
             danhSachMauDon: initialData.thu_tuc_hanh_chinh_mau_don?.map(item => ({
-                id: item.id,
+                id: item.id_mau_don || item.id,
                 so_luong_ban_chinh: item.so_luong_ban_chinh || 0,
                 so_luong_ban_sao: item.so_luong_ban_sao || 0,
                 ghi_chu: item.ghi_chu || ''
@@ -63,15 +63,53 @@ export const transformInitialData = (initialData, mode) => {
 };
 
 export const cleanFormData = (formData) => {
-    const cleaned = {
-        ...formData,
+    const payload = {
+        idCoSoDichVuCong: formData.idCoSoDichVuCong || null,
+        tenThuTuc: formData.tenThuTuc || null,
+        maThuTuc: formData.maThuTuc || null,
+        doiTuongThucHien: formData.doiTuongThucHien || null,
         yeuCauDieuKienChung: formData.yeuCauDieuKienChung?.trim() || null,
-        soQuyetDinh: formData.soQuyetDinh?.trim() || null
+        soQuyetDinh: formData.soQuyetDinh?.trim() || null,
+        
+        danhSachLinhVucIds: formData.danhSachLinhVucIds || [],
+        
+        danhSachMauDon: (formData.danhSachMauDon || []).map(item => ({
+            id: item.id,
+            so_luong_ban_chinh: Number(item.so_luong_ban_chinh) || 0,
+            so_luong_ban_sao: Number(item.so_luong_ban_sao) || 0,
+            ghi_chu: item.ghi_chu || ''
+        })),
+        
+        cachThuThucHien: (formData.cachThuThucHien || []).map(item => {
+            const mapped = {
+                hinh_thuc_ap_dung: item.hinh_thuc_ap_dung || '',
+                mo_ta_chi_tiet: item.mo_ta_chi_tiet || '',
+                thoi_gian_giai_quyet: item.thoi_gian_giai_quyet || '',
+                le_phi: Number(item.le_phi) || 0,
+                ghi_chu_le_phi: item.ghi_chu_le_phi || ''
+            };
+            if (item.id) {
+                mapped.id = item.id;
+            }
+            return mapped;
+        }),
+        
+        trinhTuThucHien: (formData.trinhTuThucHien || []).map((item, i) => {
+            const mapped = {
+                ten_buoc: item.ten_buoc || '',
+                mo_ta_buoc: item.mo_ta_buoc || '',
+                thu_tu_buoc: Number(item.thu_tu_buoc) || (i + 1)
+            };
+            if (item.id) {
+                mapped.id = item.id;
+            }
+            return mapped;
+        })
     };
 
-    if (!('isRemoved' in formData)) {
-        delete cleaned.isRemoved;
+    if ('isRemoved' in formData) {
+        payload.isRemoved = !!formData.isRemoved;
     }
 
-    return cleaned;
+    return payload;
 };
