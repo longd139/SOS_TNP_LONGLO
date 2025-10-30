@@ -36,7 +36,6 @@ export const AuthProvider = ({ children }) => {
             setAuth(prev => ({ ...prev, isLoading: false }));
           }
         } catch (error) {
-          console.error('Invalid token:', error);
           localStorage.removeItem('accessToken');
           localStorage.removeItem('refreshToken');
           setAuth(prev => ({ ...prev, isLoading: false }));

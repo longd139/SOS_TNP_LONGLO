@@ -26,7 +26,6 @@ const getGovernment = async ({ search = '', isRemoved = false, page, size } = {}
         const pagination = raw.pagination || raw.pagintation || response.data.pagintation || response.data.pagination || null;
         return { content, pagination };
     } catch (error) {
-        console.error('Error fetching government data:', error);
         throw error;
     }
 }
@@ -37,7 +36,6 @@ const createGovernment = async (governmentData) => {
         if (!response.data.success) throw new Error('Failed to create government data');
         return response.data.data;
     } catch (error) {
-        console.error('Error creating government data:', error);
         throw error;
     }
 }
@@ -48,7 +46,6 @@ const getGovernmentById = async (id) => {
         if (!response.data.success) throw new Error('Failed to fetch government data by ID');
         return response.data.data;
     } catch (error) {
-        console.error('Error fetching government data by ID:', error);
         throw error;
     }
 }
@@ -59,7 +56,6 @@ const updateGovernment = async (id, governmentData) => {
         if (!response.data.success) throw new Error('Failed to update government data');
         return response.data.data;
     } catch (error) {
-        console.error('Error updating government data:', error);
         throw error;
     }
 }
@@ -70,7 +66,6 @@ const deleteGovernment = async (id) => {
         if (!response.data.success) throw new Error('Failed to delete government data');
         return response.data.data;
     } catch (error) {
-        console.error('Error deleting government data:', error);
         throw error;
     }
 }

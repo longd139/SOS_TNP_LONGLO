@@ -128,7 +128,7 @@ export default function NewsManager() {
 
     return (
         <div className="min-h-screen">
-            <div className="mb-6 flex items-center justify-between">
+            <div className="mb-4 flex items-center justify-between">
                 <div>
                     <h1 className="text-2xl font-bold text-gray-900">Quản lý tin tức & thông báo</h1>
                     <p className="text-gray-600 mt-1">Đăng và quản lý tin tức cho người dân</p>
@@ -142,7 +142,7 @@ export default function NewsManager() {
                 </button>
             </div>
 
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-4 px-6 py-4">
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-4 px-4 py-3">
                 <h3 className="font-semibold text-gray-900">
                     Danh sách bài viết ({newsList.length})
                 </h3>
@@ -172,7 +172,7 @@ export default function NewsManager() {
                     />
                 }
             >
-                <div className="space-y-4">
+                <div className="space-y-3">
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
                             Tiêu đề <span className="text-red-500">*</span>
@@ -186,7 +186,7 @@ export default function NewsManager() {
                         />
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-2 gap-3">
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
                                 Loại <span className="text-red-500">*</span>

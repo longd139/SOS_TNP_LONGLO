@@ -44,7 +44,6 @@ const getFormalityApi = async ({
         }
         else throw new Error("Lấy danh sách thủ tục hành chính thất bại");
     } catch (error) {
-        console.error('Error fetching formality data:', error);
         throw error;
     }
 }
@@ -55,7 +54,6 @@ const createFormality = async (data) => {
         if (response.data.success) return response.data.data;
         else throw new Error("Tạo thủ tục hành chính thất bại");
     } catch (error) {
-        console.error("Lỗi khi tạo thủ tục hành chính:", error);
         throw error;
     }
 }
@@ -66,7 +64,6 @@ const getFormalityById = async (formalityId) => {
         if (response.data.success) return response.data.data;
         else throw new Error("Lấy thủ tục hành chính theo ID thất bại");
     } catch (error) {
-        console.error("Lỗi khi lấy thủ tục hành chính theo ID:", error);
         throw error;
     }
 }
@@ -77,7 +74,6 @@ const getFormByFormalityId = async (formalityId) => {
         if (response.data.success) return response.data.data;
         else throw new Error("Lấy biểu mẫu theo thủ tục hành chính thất bại");
     } catch (error) {
-        console.error("Lỗi khi lấy biểu mẫu theo thủ tục hành chính:", error);
         throw error;
     }
 }
@@ -88,7 +84,6 @@ const updateFormality = async (formalityId, data) => {
         if (response.data.success) return response.data.data;
         else throw new Error("Cập nhật thủ tục hành chính thất bại");
     } catch (error) {
-        console.error("Lỗi khi cập nhật thủ tục hành chính:", error);
         throw error;
     }
 }
@@ -99,7 +94,6 @@ const deleteFormality = async (formalityId) => {
         if (response.data.success) return response.data.data;
         else throw new Error("Xóa thủ tục hành chính thất bại");
     } catch (error) {
-        console.error("Lỗi khi xóa thủ tục hành chính:", error);
         throw error;
     }
 }

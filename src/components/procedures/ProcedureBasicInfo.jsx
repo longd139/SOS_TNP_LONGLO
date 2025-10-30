@@ -25,7 +25,6 @@ const ProcedureBasicInfo = ({ formData, errors, updateField }) => {
                 setResults(resp.content || []);
                 setShowDropdown(true);
             } catch (err) {
-                console.error('Error searching government:', err);
                 setResults([]);
             } finally {
                 setLoading(false);
@@ -59,7 +58,7 @@ const ProcedureBasicInfo = ({ formData, errors, updateField }) => {
 
     return (
         <>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div ref={containerRef} className="relative">
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                         Mã CSDVC <span className="text-red-500">*</span>
@@ -125,7 +124,7 @@ const ProcedureBasicInfo = ({ formData, errors, updateField }) => {
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3">
                 <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                         Tên thủ tục <span className="text-red-500">*</span>

@@ -6,7 +6,6 @@ const getMyProfile = async () => {
         if (response.data.success) return response.data.data;
         else throw new Error("Lấy thông tin cá nhân thất bại");
     } catch (error) {
-        console.error("Lỗi khi lấy thông tin cá nhân:", error);
         throw error;
     }
 }
@@ -20,8 +19,6 @@ const getAllUsersWithPagination = async ({
             page,
             size,
         });
-
-        console.log("Fetching users with params:", params.toString());
 
         const response = await apiClient.get("/api/users", { params });
 
@@ -40,7 +37,6 @@ const getAllUsersWithPagination = async ({
             }));
 
             const pagination = response.data.pagintation || response.data.pagination;
-            console.log("Pagination info:", pagination);
             return {
                 content: mappedData,
                 totalElements: pagination?.totalItems || 0,
@@ -53,7 +49,6 @@ const getAllUsersWithPagination = async ({
             throw new Error("Lấy danh sách người dùng thất bại");
         }
     } catch (error) {   
-        console.error("Lỗi khi lấy danh sách người dùng:", error);
         throw error;
     }
 }
@@ -64,7 +59,6 @@ const updateUserProfile = async (userData) => {
         if (response.data.success) return response.data.data;
         else throw new Error("Cập nhật thông tin cá nhân thất bại");
     } catch (error) {
-        console.error("Lỗi khi cập nhật thông tin cá nhân:", error);
         throw error;
     }
 }
@@ -82,7 +76,6 @@ const createAccount = async (accountData) => {
         if (response.data.success) return response.data.data;
         else throw new Error("Tạo tài khoản thất bại");
     } catch (error) {
-        console.error("Lỗi khi tạo tài khoản:", error);
         throw error;
     }
 }
@@ -101,7 +94,6 @@ const updateUserProfileByAdmin = async (userData) => {
         if (response.data.success) return response.data.data;
         else throw new Error("Cập nhật thông tin người dùng thất bại");
     } catch (error) {
-        console.error("Lỗi khi cập nhật thông tin người dùng:", error);
         throw error;
     }
 }
@@ -112,7 +104,6 @@ const deleteUser = async (userId) => {
         if (response.data.success) return response.data.data;
         else throw new Error("Xóa người dùng thất bại");
     } catch (error) {
-        console.error("Lỗi khi xóa người dùng:", error);
         throw error;
     }
 }

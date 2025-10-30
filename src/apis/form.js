@@ -6,7 +6,6 @@ const createForm = async (formData) => {
         if (response.data.success) return response.data.data;
         else throw new Error("Tạo biểu mẫu thất bại");
     } catch (error) {
-        console.error("Lỗi khi tạo biểu mẫu:", error);
         throw error;
     }
 }
@@ -17,7 +16,6 @@ const updateForm = async (formId, formData) => {
         if (response.data.success) return response.data.data;
         else throw new Error("Cập nhật biểu mẫu thất bại");
     } catch (error) {
-        console.error("Lỗi khi cập nhật biểu mẫu:", error);
         throw error;
     }
 }
@@ -30,7 +28,6 @@ const getAllForms = async (isRemoved = false) => {
         if (response.data.success) return response.data.data;
         else throw new Error("Lấy tất cả biểu mẫu thất bại");
     } catch (error) {
-        console.error("Lỗi khi lấy tất cả biểu mẫu:", error);
         throw error;
     }
 }
@@ -41,7 +38,6 @@ const deleteForm = async (formId) => {
         if (response.data.success) return response.data.data;
         else throw new Error("Xóa biểu mẫu thất bại");
     } catch (error) {
-        console.error("Lỗi khi xóa biểu mẫu:", error);
         throw error;
     }
 }
