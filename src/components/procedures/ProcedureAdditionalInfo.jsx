@@ -1,4 +1,3 @@
-import React from 'react';
 import PropTypes from 'prop-types';
 
 const ProcedureAdditionalInfo = ({ formData, updateField }) => {
@@ -13,7 +12,7 @@ const ProcedureAdditionalInfo = ({ formData, updateField }) => {
                     onChange={(e) => updateField('yeuCauDieuKienChung', e.target.value)}
                     placeholder="Nhập yêu cầu điều kiện chung..."
                     rows="3"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
             </div>
 
@@ -26,7 +25,7 @@ const ProcedureAdditionalInfo = ({ formData, updateField }) => {
                     value={formData.soQuyetDinh}
                     onChange={(e) => updateField('soQuyetDinh', e.target.value)}
                     placeholder="Nhập số quyết định..."
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
             </div>
         </>

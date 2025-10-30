@@ -15,7 +15,7 @@ const mauDonSchema = yup.object().shape({
         .min(0, "Số lượng bản sao phải lớn hơn hoặc bằng 0"),
     ghi_chu: yup
         .string()
-        .nullable()
+        .required("Ghi chú là bắt buộc")
 });
 
 const cachThucHienSchema = yup.object().shape({
@@ -95,7 +95,8 @@ export const createFormalitySchema = yup.object().shape({
     danhSachMauDon: yup
         .array()
         .of(mauDonSchema)
-        .nullable(),
+        .min(1, "Phải có ít nhất một mẫu đơn")
+        .required("Danh sách mẫu đơn là bắt buộc"),
     cachThuThucHien: yup
         .array()
         .of(cachThucHienSchema)
@@ -172,7 +173,8 @@ export const updateFormalitySchema = yup.object().shape({
     danhSachMauDon: yup
         .array()
         .of(mauDonUpdateSchema)
-        .nullable(),
+        .min(1, "Phải có ít nhất một mẫu đơn")
+        .required("Danh sách mẫu đơn là bắt buộc"),
     cachThuThucHien: yup
         .array()
         .of(cachThucHienUpdateSchema)

@@ -55,7 +55,7 @@ const BaseModal = ({
                 <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
 
                 <div className={`
-          inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all 
+          inline-block align-bottom bg-white rounded-lg text-left shadow-xl transform transition-all 
           sm:my-8 sm:align-middle sm:w-full ${sizeClasses[size]} ${className}
         `}>
                     {(title || showCloseButton) && (

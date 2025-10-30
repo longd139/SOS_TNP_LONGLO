@@ -33,6 +33,8 @@ export default function ProceduresManager() {
         getProcedureById
     } = useProcedures(showRemoved);
 
+
+    console.log('procedures', procedures);
     const columns = getProcedureColumns(pagination);
     const openCreateModal = () => {
         setIsCreateModalOpen(true);
@@ -242,7 +244,7 @@ export default function ProceduresManager() {
                 pagination={pagination}
                 onPageChange={changePage}
                 onEdit={handleEdit}
-                onDelete={procedures?.is_removed ? handleDelete : null}
+                onDelete={showRemoved ? handleDelete : null}
                 onView={handleView}
                 showActions={true}
                 emptyMessage="Không có thủ tục nào được tìm thấy"

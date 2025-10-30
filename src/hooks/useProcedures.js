@@ -90,8 +90,10 @@ export const useProcedures = (showRemoved = false) => {
             debugLogger.log('Creating procedure:', formData);
             await FORMALITY_API.createFormality(formData);
             await loadProcedures(pagination.current, pagination.pageSize, filters.searchKeyword, filters.selectedDomain, showRemoved);
+            alert('Tạo thủ tục thành công!');
             return { success: true };
         } catch (error) {
+            alert('Có lỗi xảy ra khi tạo thủ tục!');
             debugLogger.error('Error creating procedure:', error);
             return { success: false, error };
         }
@@ -102,6 +104,7 @@ export const useProcedures = (showRemoved = false) => {
             debugLogger.log('Updating procedure:', procedureId, formData);
             await FORMALITY_API.updateFormality(procedureId, formData);
             await loadProcedures(pagination.current, pagination.pageSize, filters.searchKeyword, filters.selectedDomain, showRemoved);
+            alert('Cập nhật thủ tục thành công!');
             return { success: true };
         } catch (error) {
             debugLogger.error('Error updating procedure:', error);
@@ -117,6 +120,7 @@ export const useProcedures = (showRemoved = false) => {
         try {
             await FORMALITY_API.deleteFormality(procedureId);
             await loadProcedures(pagination.current, pagination.pageSize, filters.searchKeyword, filters.selectedDomain, showRemoved);
+            alert(`Đã xóa thủ tục thành công.`);
             return { success: true };
         } catch (error) {
             debugLogger.error('Error deleting procedure:', error);
@@ -164,7 +168,6 @@ export const useProcedures = (showRemoved = false) => {
     useEffect(() => {
         loadProcedures(1, pagination.pageSize, filters.searchKeyword, filters.selectedDomain, showRemoved);
         loadAreas();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [showRemoved]);
 
     return {

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import BaseModal, { ModalFooter } from '../BaseModal';
-import { Upload } from 'lucide-react';
+import { Upload, Eye, Download } from 'lucide-react';
 import { validateTemplateForm } from '../../validator/templateValidator';
 
 const TemplateFormModal = ({
@@ -185,42 +185,41 @@ const TemplateFormModal = ({
                 <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                         File PDF {mode === 'create' && <span className="text-red-500">*</span>}
-                        {mode === 'edit' && <span className="text-gray-500 text-xs">(Tùy chọn - để trống nếu không muốn thay đổi)</span>}
                     </label>
 
                     {mode === 'edit' && initialData?.url_file_pdf && !fileName && (
-                        <div className="mb-3 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                            <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-3">
-                                    <div className="flex-shrink-0">
-                                        <svg className="w-10 h-10 text-red-500" fill="currentColor" viewBox="0 0 20 20">
-                                            <path fillRule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clipRule="evenodd" />
-                                        </svg>
-                                    </div>
-                                    <div className="flex-1 min-w-0">
-                                        <p className="text-sm font-medium text-gray-900 truncate">
-                                            {initialData.url_file_pdf.split('/').pop()}
-                                        </p>
-                                        <p className="text-xs text-gray-500">
-                                            Kích thước: {initialData.kich_thuoc_file_mb} MB
-                                        </p>
-                                    </div>
+                        <div className="mb-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                            <div className="flex items-center gap-2">
+                                <div className="flex-shrink-0">
+                                    <svg className="w-8 h-8 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fillRule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clipRule="evenodd" />
+                                    </svg>
                                 </div>
-                                <div className="flex items-center gap-2">
+                                <div className="flex-1 min-w-0 max-w-[50%]">
+                                    <p className="text-sm font-medium text-gray-900 truncate" title={initialData.url_file_pdf.split('/').pop()}>
+                                        {initialData.url_file_pdf.split('/').pop()}
+                                    </p>
+                                    <p className="text-xs text-gray-500">
+                                        {initialData.kich_thuoc_file_mb} MB
+                                    </p>
+                                </div>
+                                <div className="flex items-center gap-1 flex-shrink-0 ml-auto">
                                     <a
                                         href={`${baseUrl}${initialData.url_file_pdf}`}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="px-3 py-1 text-sm text-blue-600 hover:text-blue-700 hover:bg-blue-100 rounded transition-colors"
+                                        className="p-1.5 text-blue-600 hover:text-blue-700 hover:bg-blue-100 rounded transition-colors"
+                                        title="Xem file PDF"
                                     >
-                                        Xem
+                                        <Eye className="w-4 h-4" />
                                     </a>
                                     <a
                                         href={`${baseUrl}${initialData.url_file_pdf}`}
                                         download
-                                        className="px-3 py-1 text-sm text-blue-600 hover:text-blue-700 hover:bg-blue-100 rounded transition-colors"
+                                        className="p-1.5 text-blue-600 hover:text-blue-700 hover:bg-blue-100 rounded transition-colors"
+                                        title="Tải xuống file PDF"
                                     >
-                                        Tải xuống
+                                        <Download className="w-4 h-4" />
                                     </a>
                                 </div>
                             </div>
@@ -228,27 +227,25 @@ const TemplateFormModal = ({
                     )}
 
                     {fileName && (
-                        <div className="mb-3 p-4 bg-green-50 border border-green-200 rounded-lg">
-                            <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-3">
-                                    <div className="flex-shrink-0">
-                                        <svg className="w-10 h-10 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                                            <path fillRule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clipRule="evenodd" />
-                                        </svg>
-                                    </div>
-                                    <div className="flex-1 min-w-0">
-                                        <p className="text-sm font-medium text-gray-900 truncate">
-                                            {fileName}
-                                        </p>
-                                        <p className="text-xs text-green-600">
-                                            File mới sẽ được upload khi lưu
-                                        </p>
-                                    </div>
+                        <div className="mb-3 p-3 bg-green-50 border border-green-200 rounded-lg">
+                            <div className="flex items-center gap-2">
+                                <div className="flex-shrink-0">
+                                    <svg className="w-8 h-8 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fillRule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clipRule="evenodd" />
+                                    </svg>
+                                </div>
+                                <div className="flex-1 min-w-0 max-w-[50%]">
+                                    <p className="text-sm font-medium text-gray-900 truncate" title={fileName}>
+                                        {fileName}
+                                    </p>
+                                    <p className="text-xs text-green-600">
+                                        File mới sẽ được upload khi lưu
+                                    </p>
                                 </div>
                                 <button
                                     type="button"
                                     onClick={handleRemoveFile}
-                                    className="px-3 py-1 text-sm text-red-600 hover:text-red-700 hover:bg-red-100 rounded transition-colors"
+                                    className="px-2 py-1 text-xs text-red-600 hover:text-red-700 hover:bg-red-100 rounded transition-colors flex-shrink-0 ml-auto"
                                 >
                                     Xóa
                                 </button>

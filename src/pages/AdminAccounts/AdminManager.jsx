@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import BaseTable from '../../components/BaseTable';
 import UserModal from '../../components/users/UserModal';
 import { ConfirmModal } from '../../components/BaseModal';
-import { USER_API } from '../../apis/user';
 import UserService from '../../services/userService';
 import { ROLE_LABELS, ROLE_COLORS } from '../../constants/role';
 
@@ -87,8 +86,10 @@ export default function AdminManager() {
                     ...userData,
                     id: userModal.user.id
                 });
+                alert('Cập nhật tài khoản thành công!');
             } else {
                 await UserService.createAccount(userData);
+                alert('Tạo tài khoản thành công!');
             }
 
             setUserModal({ isOpen: false, user: null });
@@ -108,12 +109,13 @@ export default function AdminManager() {
     const handleDeleteConfirm = async () => {
         try {
             await UserService.deleteUser(deleteModal.user.id);
-
+            alert('Xóa tài khoản thành công.');
             setDeleteModal({ isOpen: false, user: null });
             loadUsers(pagination.current, pagination.pageSize);
 
             console.log('User deleted successfully:', deleteModal.user.username);
         } catch (error) {
+            alert('Có lỗi xảy ra khi xóa tài khoản!');
             console.error('Error deleting user:', error);
         }
     };
