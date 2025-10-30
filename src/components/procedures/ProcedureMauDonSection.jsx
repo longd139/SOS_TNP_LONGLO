@@ -14,7 +14,7 @@ const ProcedureMauDonSection = ({ items, addItem, removeItem, updateItem, errors
     return (
         <div>
             <div className="flex items-center justify-between mb-2">
-                <h3 className="text-sm font-medium text-gray-900">Danh sách mẫu đơn</h3>
+                <h3 className="text-sm font-medium text-gray-900 required-label">Danh sách mẫu đơn</h3>
             </div>
             <div className="space-y-3">
                 {items.map((item, idx) => (

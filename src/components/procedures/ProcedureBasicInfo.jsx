@@ -10,6 +10,7 @@ const ProcedureBasicInfo = ({ formData, errors, updateField }) => {
     const [loading, setLoading] = useState(false);
     const [openCreate, setOpenCreate] = useState(false);
     const [showDropdown, setShowDropdown] = useState(false);
+    const [highlightedIndex, setHighlightedIndex] = useState(-1);
     const containerRef = useRef(null);
 
     useEffect(() => {
@@ -44,10 +45,26 @@ const ProcedureBasicInfo = ({ formData, errors, updateField }) => {
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
+    useEffect(() => {
+        if (!formData.idCoSoDichVuCong) {
+            setSearch('');
+            setResults([]);
+            setShowDropdown(false);
+            if (formData.tenCoSoDichVuCong) {
+                updateField('tenCoSoDichVuCong', '');
+            }
+        }
+    }, [formData.idCoSoDichVuCong]);
+
+    // reset highlight when results list changes
+    useEffect(() => {
+        setHighlightedIndex(-1);
+    }, [results]);
+
     const handleSelect = (item) => {
-        updateField('idCoSoDichVuCong', item.id || item._id || item.maCoSo || item.uuid || item.idCoSoDichVuCong || item);
-        updateField('tenCoSoDichVuCong', item.tenCoSo || item.name || item.ten_co_so || '');
-        setSearch(item.tenCoSo || item.name || item.ten_co_so || '');
+        updateField('idCoSoDichVuCong', item.id || item);
+        updateField('tenCoSoDichVuCong', item.ten_co_so || '');
+        setSearch(item.ten_co_so || '');
         setShowDropdown(false);
     };
 
@@ -56,20 +73,51 @@ const ProcedureBasicInfo = ({ formData, errors, updateField }) => {
         handleSelect(created);
     };
 
+    const handleKeyDown = (e) => {
+        if (!results || results.length === 0) return;
+        if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            if (!showDropdown) setShowDropdown(true);
+            setHighlightedIndex((prev) => (prev === -1 ? 0 : Math.min(prev + 1, results.length - 1)));
+        } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            setHighlightedIndex((prev) => (prev <= 0 ? Math.max(results.length - 1, 0) : prev - 1));
+        } else if (e.key === 'Enter') {
+            if (showDropdown && highlightedIndex >= 0) {
+                e.preventDefault();
+                handleSelect(results[highlightedIndex]);
+            }
+        } else if (e.key === 'Escape') {
+            setShowDropdown(false);
+        }
+    };
+
     return (
         <>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div ref={containerRef} className="relative">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Mã CSDVC <span className="text-red-500">*</span>
+                    <label className="block text-sm font-medium text-gray-700 mb-2 required-label">
+                        Mã CSDVC
                     </label>
                     <div className="flex gap-2">
                         <div className="flex-1">
                             <input
                                 type="text"
                                 value={search || formData.tenCoSoDichVuCong || formData.idCoSoDichVuCong || ''}
-                                onChange={(e) => { setSearch(e.target.value); updateField('idCoSoDichVuCong', ''); }}
+                                onChange={(e) => {
+                                    const v = e.target.value;
+                                    setSearch(v);
+                                    if (!v) {
+                                        updateField('idCoSoDichVuCong', '');
+                                        updateField('tenCoSoDichVuCong', '');
+                                        setResults([]);
+                                        setShowDropdown(false);
+                                    } else {
+                                        updateField('idCoSoDichVuCong', '');
+                                    }
+                                }}
                                 onFocus={() => { if (results.length) setShowDropdown(true); }}
+                                onKeyDown={handleKeyDown}
                                 placeholder="Tìm hoặc chọn cơ sở..."
                                 className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.idCoSoDichVuCong ? 'border-red-500' : 'border-gray-300'}`}
                             />
@@ -85,10 +133,16 @@ const ProcedureBasicInfo = ({ formData, errors, updateField }) => {
                                     {!loading && results.length === 0 && (
                                         <div className="p-2 text-sm text-gray-500">Không tìm thấy kết quả</div>
                                     )}
-                                    {!loading && results.map((r) => (
-                                        <button key={r.id || r._id || r.maCoSo} type="button" onClick={() => handleSelect(r)} className="w-full text-left px-3 py-2 hover:bg-gray-100">
-                                            <div className="font-medium">{r.tenCoSo || r.name || r.ten_co_so}</div>
-                                            <div className="text-xs text-gray-500">{r.diaChi || r.address || r.dia_chi}</div>
+                                    {!loading && results.map((r, idx) => (
+                                        <button
+                                            key={r.id}
+                                            type="button"
+                                            onClick={() => handleSelect(r)}
+                                            onMouseEnter={() => setHighlightedIndex(idx)}
+                                            className={`w-full text-left px-3 py-2 hover:bg-gray-100 ${highlightedIndex === idx ? 'bg-blue-100' : ''}`}
+                                        >
+                                            <div className="font-medium">{r.ten_co_so}</div>
+                                            <div className="text-xs text-gray-500">{r.dia_chi}</div>
                                         </button>
                                     ))}
                                 </div>
@@ -107,8 +161,8 @@ const ProcedureBasicInfo = ({ formData, errors, updateField }) => {
                 </div>
 
                 <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Mã thủ tục <span className="text-red-500">*</span>
+                    <label className="block text-sm font-medium text-gray-700 mb-2 required-label">
+                        Mã thủ tục
                     </label>
                     <input
                         type="text"
@@ -126,8 +180,8 @@ const ProcedureBasicInfo = ({ formData, errors, updateField }) => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3">
                 <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Tên thủ tục <span className="text-red-500">*</span>
+                    <label className="block text-sm font-medium text-gray-700 mb-2 required-label">
+                        Tên thủ tục
                     </label>
                     <input
                         type="text"
@@ -143,8 +197,8 @@ const ProcedureBasicInfo = ({ formData, errors, updateField }) => {
                 </div>
 
                 <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Đối tượng thực hiện <span className="text-red-500">*</span>
+                    <label className="block text-sm font-medium text-gray-700 mb-2 required-label">
+                        Đối tượng thực hiện
                     </label>
                     <input
                         type="text"

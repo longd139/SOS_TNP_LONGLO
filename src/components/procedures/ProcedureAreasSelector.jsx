@@ -4,13 +4,11 @@ import PropTypes from 'prop-types';
 const ProcedureAreasSelector = ({ formData, errors, areas, toggleArea }) => {
     return (
         <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-                Lĩnh vực <span className="text-red-500">*</span>
+            <label className="block text-sm font-medium text-gray-700 mb-2 required-label">
+                Lĩnh vực
             </label>
             <div className={`bg-gray-50 p-3 rounded-lg border ${errors.danhSachLinhVucIds ? 'border-red-500' : 'border-gray-300'
                 }`}>
-                <p className="text-xs text-gray-500 mb-2">VD: Hộ tích - Cư trú</p>
-
                 <div className="space-y-2 max-h-40 overflow-y-auto">
                     {areas.map((area) => (
                         <label

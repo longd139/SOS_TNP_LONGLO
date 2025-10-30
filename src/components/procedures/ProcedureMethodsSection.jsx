@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 const ProcedureMethodsSection = ({ methods, addMethod, removeMethod, updateMethod }) => {
     return (
         <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 mb-2 required-label">
                 Cách thức thực hiện
             </label>
             <div className="space-y-3 bg-gray-50 p-3 rounded-lg">

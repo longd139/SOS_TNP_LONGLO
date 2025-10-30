@@ -4,7 +4,7 @@ const ProcedureAdditionalInfo = ({ formData, updateField }) => {
     return (
         <>
             <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2 required-label">
                     Yêu cầu điều kiện chung
                 </label>
                 <textarea
@@ -17,7 +17,7 @@ const ProcedureAdditionalInfo = ({ formData, updateField }) => {
             </div>
 
             <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2 required-label">
                     Số quyết định
                 </label>
                 <input
