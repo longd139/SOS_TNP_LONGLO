@@ -71,7 +71,6 @@ const ProcedureForm = ({
                     />
                 )}
 
-                {/* Areas Selector */}
                 <ProcedureAreasSelector
                     formData={formData}
                     errors={errors}
@@ -79,13 +78,11 @@ const ProcedureForm = ({
                     toggleArea={toggleArea}
                 />
 
-                {/* Additional Information */}
                 <ProcedureAdditionalInfo
                     formData={formData}
                     updateField={updateField}
                 />
 
-                {/* Steps Section */}
                 <ProcedureStepsSection
                     steps={formData.trinhTuThucHien}
                     addStep={addStep}
@@ -93,7 +90,6 @@ const ProcedureForm = ({
                     updateStep={updateStep}
                 />
 
-                {/* Methods Section */}
                 <ProcedureMethodsSection
                     methods={formData.cachThuThucHien}
                     addMethod={addCachThucHien}
