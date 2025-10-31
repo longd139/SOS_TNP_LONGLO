@@ -76,13 +76,14 @@ const ProcedureForm = ({
                     />
                 )}
 
-                <div className="flex flex-col md:flex-row gap-3">
+                <div className="flex flex-col md:flex-row gap-3 items-stretch">
                     <div className="md:w-1/2 min-w-0">
                         <ProcedureAreasSelector
                             formData={formData}
                             errors={errors}
                             areas={areas}
                             toggleArea={toggleArea}
+                            updateField={updateField}
                         />
                     </div>
                     <div className="md:w-1/2 min-w-0">

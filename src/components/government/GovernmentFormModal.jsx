@@ -4,6 +4,7 @@ import BaseModal, { ModalFooter } from '../BaseModal';
 import { GOVERNMENT_API } from '../../apis/government';
 import { COMMITTEE_API } from '../../apis/committee';
 import { validateGovernmentForm } from '../../validator/governmentValidator';
+import GoogleMapAutocomplete from '../googleMap/GoogleMapAutocomplete';
 
 const initialState = {
     idUyBan: '',
@@ -54,7 +55,7 @@ const GovernmentFormModal = ({ isOpen, onClose, onCreate }) => {
 
     const handleSubmit = async () => {
         const { isValid, errors: validationErrors } = await validateGovernmentForm(form);
-        
+
         if (!isValid) {
             setErrors(validationErrors);
             return;
@@ -100,8 +101,8 @@ const GovernmentFormModal = ({ isOpen, onClose, onCreate }) => {
         >
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                        Mã cơ quan/ủy ban <span className="text-red-500">*</span>
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5 required-label">
+                        Mã cơ quan/ủy ban
                     </label>
                     <select
                         value={form.idUyBan}
@@ -122,7 +123,7 @@ const GovernmentFormModal = ({ isOpen, onClose, onCreate }) => {
                 </div>
 
                 <div>
-                    <label className="block text-sm font-medium text-gray-700">Tên cơ sở</label>
+                    <label className="block text-sm font-medium text-gray-700 required-label">Tên cơ sở</label>
                     <input
                         type="text"
                         value={form.tenCoSo}
@@ -133,7 +134,7 @@ const GovernmentFormModal = ({ isOpen, onClose, onCreate }) => {
                 </div>
 
                 <div>
-                    <label className="block text-sm font-medium text-gray-700">Địa chỉ</label>
+                    <label className="block text-sm font-medium text-gray-700 required-label">Địa chỉ</label>
                     <input
                         type="text"
                         value={form.diaChi}
@@ -144,7 +145,7 @@ const GovernmentFormModal = ({ isOpen, onClose, onCreate }) => {
                 </div>
 
                 <div>
-                    <label className="block text-sm font-medium text-gray-700">Số điện thoại</label>
+                    <label className="block text-sm font-medium text-gray-700 required-label">Số điện thoại</label>
                     <input
                         type="text"
                         value={form.soDienThoai}
@@ -165,15 +166,34 @@ const GovernmentFormModal = ({ isOpen, onClose, onCreate }) => {
                 </div>
 
                 <div className="md:col-span-2">
-                    <label className="block text-sm font-medium text-gray-700">Link Google Map</label>
-                    <input
-                        type="text"
-                        value={form.linkGoogleMap}
-                        onChange={(e) => updateField('linkGoogleMap', e.target.value)}
-                        className={`w-full px-3 py-2 border rounded-lg ${errors.linkGoogleMap ? 'border-red-500' : 'border-gray-300'}`}
-                    />
-                    {errors.linkGoogleMap && <p className="mt-1 text-sm text-red-600">{errors.linkGoogleMap}</p>}
+                    <label className="block text-sm font-medium text-gray-700">
+                        Vị trí trên Google Maps
+                    </label>
+                    <div className="flex items-center gap-2 w-full">
+                        <div className="flex-1">
+                            <GoogleMapAutocomplete
+                                value={form.linkGoogleMap}
+                                onChange={(link, address) => {
+                                    updateField("linkGoogleMap", link);
+                                    if (address && !form.diaChi) updateField("diaChi", address);
+                                }}
+                                error={errors.linkGoogleMap}
+                            />
+                        </div>
+
+                        {form.linkGoogleMap && (
+                            <a
+                                href={form.linkGoogleMap}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-blue-600 text-sm underline hover:text-blue-800 flex-shrink-0"
+                            >
+                                Xem
+                            </a>
+                        )}
+                    </div>
                 </div>
+
             </div>
         </BaseModal>
     );

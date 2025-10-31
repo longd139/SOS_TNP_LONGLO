@@ -1,5 +1,5 @@
 import React from 'react';
-import { Bell, Menu } from 'lucide-react';
+import { Menu } from 'lucide-react';
 import PropTypes from 'prop-types';
 
 export default function Header({ title = "Hệ thống quản trị", onMobileMenuToggle, isMobileMenuOpen }) {

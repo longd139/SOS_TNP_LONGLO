@@ -1,10 +1,11 @@
 import { useState } from 'react';
-import { FileText, Download, Pencil, Trash2, Plus } from 'lucide-react';
+import { FileText, Download, Plus } from 'lucide-react';
 import { ConfirmModal } from '../../components/BaseModal';
 import TemplateFormModal from '../../components/templates/TemplateFormModal';
 import { useTemplates } from '../../hooks/useTemplates';
 import dayjs from 'dayjs';
 import 'dayjs/locale/vi';
+import BaseTable from '../../components/BaseTable';
 
 dayjs.locale('vi');
 
@@ -54,17 +55,6 @@ export default function TemplateManager() {
         setDeleteModal({ isOpen: false, template: null });
     };
 
-    const handleDownload = (template) => {
-        const baseUrl = process.env.REACT_APP_API_URL;
-        const fileUrl = `${baseUrl}${template.url_file_pdf}`;
-        const link = document.createElement('a');
-        link.href = fileUrl;
-        link.download = template.ten_mau_don;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-    };
-
     const handleCreateTemplate = () => {
         setIsCreateModalOpen(true);
     };
@@ -103,10 +93,10 @@ export default function TemplateManager() {
 
     const columns = [
         {
-            title: 'ID',
+            title: 'STT',
             dataIndex: 'id',
             key: 'id',
-            width: '80px',
+            width: '20px',
             render: (value, record, index) => (
                 <span className="text-sm font-medium text-gray-900">
                     #{(index + 1).toString().padStart(2, '0')}
@@ -117,11 +107,18 @@ export default function TemplateManager() {
             title: 'Tên biểu mẫu',
             dataIndex: 'ten_mau_don',
             key: 'ten_mau_don',
-            width: '300px',
+            width: '250px',
             render: (value) => (
                 <div className="flex items-center gap-2">
-                    <FileText className="w-4 h-4 text-red-500" />
-                    <span className="text-sm text-gray-900">{value}</span>
+                    <div className="flex-shrink-0 w-5 h-5 flex items-center justify-center">
+                        <FileText className="w-5 h-5 text-red-500" aria-hidden="true" />
+                    </div>
+                    <span 
+                        className="block max-w-[250px] truncate text-ellipsis overflow-hidden whitespace-nowrap text-sm text-gray-900"
+                        title={value}
+                    >
+                        {value}
+                    </span>
                 </div>
             )
         },
@@ -129,10 +126,18 @@ export default function TemplateManager() {
             title: 'Mô tả',
             dataIndex: 'mo_ta',
             key: 'mo_ta',
-            width: '250px',
-            render: (value) => (
-                <span className="text-sm text-gray-600">{value || '-'}</span>
-            )
+            width: '100px',
+            render: (value) => {
+                const displayValue = value || '-';
+                return (
+                    <span 
+                        className="block max-w-[180px] truncate text-ellipsis overflow-hidden whitespace-nowrap text-sm text-gray-600"
+                        title={displayValue}
+                    >
+                        {displayValue}
+                    </span>
+                );
+            }
         },
         {
             title: 'Kích thước',
@@ -155,34 +160,6 @@ export default function TemplateManager() {
             )
         }
     ];
-
-    const renderActions = (template) => (
-        <div className="flex justify-center items-center gap-2">
-            <button
-                onClick={() => handleDownload(template)}
-                className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
-                title="Tải xuống"
-            >
-                <Download className="w-4 h-4" />
-            </button>
-            <button
-                onClick={() => handleEdit(template)}
-                className="p-2 text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 rounded transition-colors"
-                title="Chỉnh sửa"
-            >
-                <Pencil className="w-4 h-4" />
-            </button>
-            {template.is_removed && (
-                <button
-                    onClick={() => handleDelete(template)}
-                    className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
-                    title="Xóa"
-                >
-                    <Trash2 className="w-4 h-4" />
-                </button>
-            )}
-        </div>
-    );
 
     return (
         <div className="min-h-screen">
@@ -234,57 +211,18 @@ export default function TemplateManager() {
 
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
                 <div className="overflow-x-auto">
-                    <table className="min-w-full divide-y divide-gray-200">
-                        <thead className="bg-gray-50">
-                            <tr>
-                                {columns.map((column) => (
-                                    <th
-                                        key={column.key}
-                                        className="px-3 md:px-6 py-2 md:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                        style={column.width ? { width: column.width } : {}}
-                                    >
-                                        {column.title}
-                                    </th>
-                                ))}
-                                <th className="px-3 md:px-6 py-2 md:py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider" style={{ width: '150px' }}>
-                                    Thao tác
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody className="bg-white divide-y divide-gray-200">
-                            {loading ? (
-                                <tr>
-                                    <td colSpan={columns.length + 1} className="px-6 py-8 text-center text-gray-500">
-                                        <div className="flex justify-center items-center">
-                                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-                                        </div>
-                                    </td>
-                                </tr>
-                            ) : templates.length === 0 ? (
-                                <tr>
-                                    <td colSpan={columns.length + 1} className="px-6 py-8 text-center text-gray-500">
-                                        Không có biểu mẫu nào
-                                    </td>
-                                </tr>
-                            ) : (
-                                templates.map((template, index) => (
-                                    <tr key={template.id} className="hover:bg-gray-50 transition-colors">
-                                        {columns.map((column) => (
-                                            <td key={column.key} className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                                {column.render
-                                                    ? column.render(template[column.dataIndex], template, index)
-                                                    : template[column.dataIndex]
-                                                }
-                                            </td>
-                                        ))}
-                                        <td className="px-6 py-4 whitespace-nowrap text-center">
-                                            {renderActions(template)}
-                                        </td>
-                                    </tr>
-                                ))
-                            )}
-                        </tbody>
-                    </table>
+                    <BaseTable
+                        data={templates}
+                        columns={columns}
+                        loading={loading}
+                        onView={handleView}
+                        onEdit={handleEdit}
+                        onDelete={ showRemoved ? handleDelete : null}
+                        viewIcon={<Download className="w-4 h-4" />}
+                        showActions={true}
+                        actionColumnWidth="150px"
+                        emptyMessage="Không có biểu mẫu nào"
+                    />
                 </div>
             </div>
 

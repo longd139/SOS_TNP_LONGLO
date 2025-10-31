@@ -90,3 +90,9 @@
     scrollbar-width: thin;
     scrollbar-color: #cbd5e1 #f1f5f9;
 }
+
+.required-label::after {
+    content: " *";
+    color: red;
+    font-weight: bold;
+}

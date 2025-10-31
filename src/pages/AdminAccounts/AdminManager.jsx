@@ -1,21 +1,23 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import BaseTable from '../../components/BaseTable';
 import UserModal from '../../components/users/UserModal';
 import { ConfirmModal } from '../../components/BaseModal';
-import UserService from '../../services/userService';
 import { ROLE_LABELS, ROLE_COLORS } from '../../constants/role';
+import { useUsers } from '../../hooks/useUsers';
 
 export default function AdminManager() {
-    const [users, setUsers] = useState([]);
-    const [loading, setLoading] = useState(false);
-    const [modalLoading, setModalLoading] = useState(false);
-    const [pagination, setPagination] = useState({
-        current: 1,
-        pageSize: 10,
-        total: 0,
-        totalPages: 0
-    });
+    const {
+        users,
+        loading,
+        pagination,
+        statistics,
+        handlePageChange,
+        createUser,
+        updateUser,
+        deleteUser: deleteUserAction
+    } = useUsers();
 
+    const [modalLoading, setModalLoading] = useState(false);
     const [userModal, setUserModal] = useState({
         isOpen: false,
         user: null
@@ -25,36 +27,6 @@ export default function AdminManager() {
         isOpen: false,
         user: null
     });
-
-    const loadUsers = async (page = 1, size = 10) => {
-        try {
-            setLoading(true);
-            const response = await UserService.getAllUsers({
-                page: page,
-                size
-            });
-
-            setUsers(response.content || []);
-            setPagination({
-                current: page,
-                pageSize: size,
-                total: response.totalElements || 0,
-                totalPages: response.totalPages || 0
-            });
-        } catch (error) {
-            throw error;
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    useEffect(() => {
-        loadUsers();
-    }, []);
-
-    const handlePageChange = (page) => {
-        loadUsers(page, pagination.pageSize);
-    };
 
     const handleCreateUser = () => {
         setUserModal({
@@ -82,21 +54,20 @@ export default function AdminManager() {
             setModalLoading(true);
 
             if (userModal.user) {
-                await UserService.updateUserByAdmin({
+                await updateUser({
                     ...userData,
                     id: userModal.user.id
                 });
                 alert('Cập nhật tài khoản thành công!');
             } else {
-                await UserService.createAccount(userData);
+                await createUser(userData);
                 alert('Tạo tài khoản thành công!');
             }
 
             setUserModal({ isOpen: false, user: null });
-            loadUsers(pagination.current, pagination.pageSize);
 
         } catch (error) {
-            throw error;
+            alert(error.message || 'Có lỗi xảy ra!');
         } finally {
             setModalLoading(false);
         }
@@ -108,14 +79,12 @@ export default function AdminManager() {
 
     const handleDeleteConfirm = async () => {
         try {
-            await UserService.deleteUser(deleteModal.user.id);
+            await deleteUserAction(deleteModal.user.id);
             alert('Xóa tài khoản thành công.');
             setDeleteModal({ isOpen: false, user: null });
-            loadUsers(pagination.current, pagination.pageSize);
 
         } catch (error) {
-            alert('Có lỗi xảy ra khi xóa tài khoản!');
-            throw error;
+            alert(error.message || 'Có lỗi xảy ra khi xóa tài khoản!');
         }
     };
 
@@ -134,17 +103,44 @@ export default function AdminManager() {
         {
             title: 'Tên đăng nhập',
             dataIndex: 'username',
-            key: 'username'
+            key: 'username',
+            width: '150px',
+            render: (value) => (
+                <span 
+                    className="block max-w-[150px] truncate text-ellipsis overflow-hidden whitespace-nowrap text-sm"
+                    title={value}
+                >
+                    {value}
+                </span>
+            )
         },
         {
             title: 'Họ tên',
             dataIndex: 'fullName',
-            key: 'fullName'
+            key: 'fullName',
+            width: '180px',
+            render: (value) => (
+                <span 
+                    className="block max-w-[180px] truncate text-ellipsis overflow-hidden whitespace-nowrap text-sm"
+                    title={value}
+                >
+                    {value}
+                </span>
+            )
         },
         {
             title: 'Email',
             dataIndex: 'email',
-            key: 'email'
+            key: 'email',
+            width: '200px',
+            render: (value) => (
+                <span 
+                    className="block max-w-[200px] truncate text-ellipsis overflow-hidden whitespace-nowrap text-sm"
+                    title={value}
+                >
+                    {value}
+                </span>
+            )
         },
         {
             title: 'Vai trò',
@@ -167,24 +163,6 @@ export default function AdminManager() {
                     {record.active !== false ? 'Hoạt động' : 'Đã khóa'}
                 </span>
             )
-        },
-        {
-            title: 'Đăng nhập cuối',
-            dataIndex: 'lastLogin',
-            key: 'lastLogin',
-            render: (lastLogin) => {
-                if (!lastLogin) return <span className="text-gray-400">Chưa đăng nhập</span>;
-
-                const date = new Date(lastLogin);
-                return (
-                    <span className="text-sm text-gray-600">
-                        {date.toLocaleDateString('vi-VN')} {date.toLocaleTimeString('vi-VN', {
-                            hour: '2-digit',
-                            minute: '2-digit'
-                        })}
-                    </span>
-                );
-            }
         }
     ];
 
@@ -249,7 +227,7 @@ export default function AdminManager() {
                                         Đang hoạt động
                                     </dt>
                                     <dd className="text-lg font-medium text-gray-900">
-                                        {users.filter(user => user.active !== false).length}
+                                        {statistics.active}
                                     </dd>
                                 </dl>
                             </div>
@@ -273,7 +251,7 @@ export default function AdminManager() {
                                         Đã khóa
                                     </dt>
                                     <dd className="text-lg font-medium text-gray-900">
-                                        {users.filter(user => user.active === false).length}
+                                        {statistics.inactive}
                                     </dd>
                                 </dl>
                             </div>
@@ -297,7 +275,7 @@ export default function AdminManager() {
                                         Quản trị viên
                                     </dt>
                                     <dd className="text-lg font-medium text-gray-900">
-                                        {users.filter(user => user.role === 'ADMIN').length}
+                                        {statistics.admins}
                                     </dd>
                                 </dl>
                             </div>
