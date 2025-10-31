@@ -1,5 +1,6 @@
 export const INITIAL_FORM_STATE = {
     idCoSoDichVuCong: '',
+    tenCoSoDichVuCong: '',
     tenThuTuc: '',
     maThuTuc: '',
     doiTuongThucHien: '',
@@ -19,6 +20,7 @@ export const transformInitialData = (initialData, mode) => {
     if (mode === 'edit') {
         return {
             idCoSoDichVuCong: initialData.id_co_so_dich_vu_cong || '',
+            tenCoSoDichVuCong: initialData.co_so_dich_vu_cong?.ten_co_so || '',
             tenThuTuc: initialData.ten_thu_tuc || '',
             maThuTuc: initialData.ma_thu_tuc || '',
             doiTuongThucHien: initialData.doi_tuong_thuc_hien || '',
