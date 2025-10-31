@@ -1,6 +1,6 @@
 export const getProcedureColumns = (pagination) => [
     {
-        title: 'ID',
+        title: 'STT',
         dataIndex: 'ma_thu_tuc',
         key: 'ma_thu_tuc',
         width: '80px',

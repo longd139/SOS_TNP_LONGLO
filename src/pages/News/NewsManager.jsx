@@ -61,7 +61,7 @@ export default function NewsManager() {
 
     const columns = [
         {
-            title: 'ID',
+            title: 'STT',
             dataIndex: 'id',
             key: 'id',
             render: (value) => (
