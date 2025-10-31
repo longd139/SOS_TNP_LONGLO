@@ -46,5 +46,6 @@ export const useLogin = () => {
         email,
         user,
         clearAllErrors,
+        clearErrors: clearAllErrors,
     };
 };
