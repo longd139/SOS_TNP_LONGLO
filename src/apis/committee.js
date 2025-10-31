@@ -6,7 +6,6 @@ const createCommittee = async (data) => {
         if (response.data.success) return response.data.data;
         else throw new Error("Tạo ủy ban thất bại");
     } catch (error) {
-        console.error("Lỗi khi tạo ủy ban:", error);
         throw error;
     }
 }
@@ -17,7 +16,6 @@ const getCommittees = async () => {
         if (response.data.success) return response.data.data;
         else throw new Error("Lấy danh sách ủy ban thất bại");
     } catch (error) {
-        console.error("Lỗi khi lấy danh sách ủy ban:", error);
         throw error;
     }
 }
@@ -28,7 +26,6 @@ const updateCommittee = async (committeeId, data) => {
         if (response.data.success) return response.data.data;
         else throw new Error("Cập nhật ủy ban thất bại");
     } catch (error) {
-        console.error("Lỗi khi cập nhật ủy ban:", error);
         throw error;
     }
 }

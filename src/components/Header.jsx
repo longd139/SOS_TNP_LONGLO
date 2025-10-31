@@ -1,10 +1,10 @@
 import React from 'react';
-import { Bell, Menu } from 'lucide-react';
+import { Menu } from 'lucide-react';
 import PropTypes from 'prop-types';
 
 export default function Header({ title = "Hệ thống quản trị", onMobileMenuToggle, isMobileMenuOpen }) {
     return (
-        <header className="sticky top-0 bg-white shadow-sm border-b border-gray-200 px-4 md:px-6 py-4 z-50">
+        <header className="sticky top-0 bg-white shadow-sm border-b border-gray-200 px-3 md:px-4 py-3 z-50">
             <div className="flex justify-between items-center">
                 <div className="flex items-center gap-3">
                     <button
@@ -19,14 +19,6 @@ export default function Header({ title = "Hệ thống quản trị", onMobileMe
                 </div>
 
                 <div className="flex items-center space-x-2 md:space-x-4">
-                    <div className="relative">
-                        <button className="p-2 text-gray-400 hover:text-gray-600 relative hover:bg-gray-100 rounded-lg transition-colors">
-                            <Bell className="w-5 h-5 md:w-6 md:h-6" />
-                            <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                                3
-                            </span>
-                        </button>
-                    </div>
 
                     <div className="flex items-center space-x-2 md:space-x-3">
                         <div className="w-8 h-8 md:w-9 md:h-9 bg-blue-500 rounded-full flex items-center justify-center">

@@ -1,3 +1,5 @@
 const ROUTE_PATH = {
-    LOGIN: '/'
+    LOGIN: '/',
+    DASHBOARD: '/dashboard'
 }
+export default ROUTE_PATH;

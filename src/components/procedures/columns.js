@@ -1,18 +1,33 @@
-import dayjs from 'dayjs';
+import dayjs from "dayjs";
 
 export const getProcedureColumns = (pagination) => [
     {
-        title: 'ID',
+        title: 'STT',
         dataIndex: 'ma_thu_tuc',
         key: 'ma_thu_tuc',
-        width: '80px',
+        width: '20px',
         render: (value, record, index) => `#${index + 1 + (pagination.current - 1) * pagination.pageSize}`
     },
     {
         title: 'TÊN THỦ TỤC',
         dataIndex: 'ten_thu_tuc',
         key: 'ten_thu_tuc',
-        width: '250px'
+        width: '200px',
+        render: (value) => (
+            <span 
+                className="block max-w-[200px] truncate text-ellipsis overflow-hidden whitespace-nowrap text-sm text-gray-900"
+                title={value}
+            >
+                {value}
+            </span>
+        )
+    },
+    {
+        title: 'LIÊN HỆ',
+        dataIndex: 'so_dien_thoai_co_so',
+        key: 'so_dien_thoai_co_so',
+        width: '30px',
+        render: (value) => value || 'N/A'
     },
     {
         title: 'LĨNH VỰC',
@@ -21,22 +36,44 @@ export const getProcedureColumns = (pagination) => [
         width: '150px',
         render: (value) => {
             if (!value) return 'N/A';
+            let displayValue;
             if (Array.isArray(value)) {
-                return value.length > 0 ? value.join(', ') : 'N/A';
+                displayValue = value.length > 0 ? value.join(', ') : 'N/A';
+            } else {
+                displayValue = value.ten_linh_vuc || value;
             }
-            return value.ten_linh_vuc || value;
+            return (
+                <span 
+                    className="block max-w-[150px] truncate text-ellipsis overflow-hidden whitespace-nowrap text-sm"
+                    title={displayValue}
+                >
+                    {displayValue}
+                </span>
+            );
         }
     },
     {
-        title: 'LIÊN HỆ',
-        dataIndex: 'lien_he',
-        key: 'lien_he',
-        width: '150px',
+        title: 'CƠ SỞ DỊCH VỤ CÔNG',
+        dataIndex: 'co_so_dich_vu_cong',
+        key: 'co_so_dich_vu_cong',
+        width: '180px',
         render: (value) => {
-            if (!value) {
-                return <span className="text-gray-400">028-1234-5678</span>;
-            }
-            return <span className="text-gray-600">{value}</span>;
+            const displayValue = value || 'N/A';
+            return (
+                <span 
+                    className="block max-w-[180px] truncate text-ellipsis overflow-hidden whitespace-nowrap text-sm"
+                    title={displayValue}
+                >
+                    {displayValue}
+                </span>
+            );
         }
+    },
+    {
+        title: 'THOI GIAN TẠO',
+        dataIndex: 'thoi_gian_tao',
+        key: 'thoi_gian_tao',
+        width: '100px',
+        render: (value) => value ? dayjs(value).format('HH:mm:ss DD/MM/YYYY') : 'N/A'
     }
 ];

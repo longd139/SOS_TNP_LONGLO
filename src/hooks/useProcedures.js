@@ -1,179 +1,216 @@
-import { useState, useEffect, useCallback } from 'react';
-import { FORMALITY_API } from '../apis/formality';
-import { AREAS_API } from '../apis/areas';
+import { useCallback, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import {
+    fetchProcedures,
+    fetchAreas,
+    createProcedure as createProcedureThunk,
+    updateProcedure as updateProcedureThunk,
+    deleteProcedure as deleteProcedureThunk,
+    fetchProcedureById
+} from '../features/procedures/proceduresThunks';
+import {
+    setFilters,
+    resetFilters as resetFiltersAction,
+    setShowRemoved,
+    clearCurrentProcedure,
+    clearError
+} from '../features/procedures/proceduresSlice';
+import {
+    selectProcedures,
+    selectAreas,
+    selectCurrentProcedure,
+    selectLoading,
+    selectAreasLoading,
+    selectError,
+    selectPagination,
+    selectFilters,
+    selectShowRemoved,
+    selectProceduresWithAreas
+} from '../features/procedures/proceduresSelectors';
 
-const DEFAULT_PAGE_SIZE = 10;
-const INITIAL_PAGINATION = {
-    current: 1,
-    pageSize: DEFAULT_PAGE_SIZE,
-    total: 0,
-    totalPages: 0
-};
+export const useProcedure = () => {
+    const dispatch = useDispatch();
 
-const debugLogger = {
-    log: (...args) => {
-        if (process.env.NODE_ENV === 'development') {
-            console.log(...args);
-        }
-    },
-    error: (...args) => {
-        if (process.env.NODE_ENV === 'development') {
-            console.error(...args);
-        }
-    }
-};
+    const procedures = useSelector(selectProcedures);
+    const areas = useSelector(selectAreas);
+    const currentProcedure = useSelector(selectCurrentProcedure);
+    const loading = useSelector(selectLoading);
+    const areasLoading = useSelector(selectAreasLoading);
+    const error = useSelector(selectError);
+    const pagination = useSelector(selectPagination);
+    const filters = useSelector(selectFilters);
+    const showRemoved = useSelector(selectShowRemoved);
+    const proceduresWithAreas = useSelector(selectProceduresWithAreas);
 
-export const useProcedures = (showRemoved = false) => {
-    const [procedures, setProcedures] = useState([]);
-    const [areas, setAreas] = useState([]);
-    const [loading, setLoading] = useState(false);
-    const [pagination, setPagination] = useState(INITIAL_PAGINATION);
-    const [filters, setFilters] = useState({
-        searchKeyword: '',
-        selectedDomain: ''
-    });
+    const loadProcedures = useCallback((
+        page = 1,
+        size = 10,
+        search = '',
+        id_linh_vuc = '',
+        is_removed = false
+    ) => {
+        dispatch(fetchProcedures({
+            page,
+            size,
+            search,
+            id_linh_vuc,
+            is_removed
+        }));
+    }, [dispatch]);
 
-    const loadProcedures = useCallback(async (page = 1, size = DEFAULT_PAGE_SIZE, search = '', id_linh_vuc = '', is_removed = false) => {
-        setLoading(true);
-        try {
-            const params = {
-                page,
-                size,
-                search,
-                is_removed
-            };
-
-            if (id_linh_vuc) {
-                params.id_linh_vuc = id_linh_vuc;
-            }
-
-            const response = await FORMALITY_API.getFormalityApi(params);
-
-            debugLogger.log('Procedures API response:', response.content);
-
-            const procedures = response.content || [];
-            setProcedures(procedures);
-            setPagination({
-                current: page,
-                pageSize: size,
-                total: response.totalElements || 0,
-                totalPages: response.totalPages || 0
-            });
-
-            debugLogger.log('Fetched procedures:', procedures.length, 'items');
-        } catch (error) {
-            debugLogger.error('Error fetching procedures:', error);
-            setProcedures([]);
-            setPagination(prev => ({
-                ...prev,
-                total: 0,
-                totalPages: 0
-            }));
-        } finally {
-            setLoading(false);
-        }
-    }, []);
-
-    const loadAreas = useCallback(async () => {
-        try {
-            const response = await AREAS_API.getAreas(false);
-            setAreas(response || []);
-            debugLogger.log('Fetched areas:', response?.length, 'items');
-        } catch (error) {
-            debugLogger.error('Error fetching areas:', error);
-            setAreas([]);
-        }
-    }, []);
+    const loadAreas = useCallback(() => {
+        dispatch(fetchAreas());
+    }, [dispatch]);
 
     const createProcedure = useCallback(async (formData) => {
         try {
-            debugLogger.log('Creating procedure:', formData);
-            await FORMALITY_API.createFormality(formData);
-            await loadProcedures(pagination.current, pagination.pageSize, filters.searchKeyword, filters.selectedDomain, showRemoved);
+            const result = await dispatch(createProcedureThunk(formData)).unwrap();
+
+            dispatch(fetchProcedures({
+                page: pagination.current,
+                size: pagination.pageSize,
+                search: filters.searchKeyword,
+                id_linh_vuc: filters.selectedDomain,
+                is_removed: showRemoved
+            }));
+
+            alert('Tạo thủ tục thành công!');
             return { success: true };
         } catch (error) {
-            debugLogger.error('Error creating procedure:', error);
+            alert('Có lỗi xảy ra khi tạo thủ tục!');
             return { success: false, error };
         }
-    }, [pagination.current, pagination.pageSize, filters.searchKeyword, filters.selectedDomain, showRemoved, loadProcedures]);
+    }, [dispatch, pagination, filters, showRemoved]);
 
     const updateProcedure = useCallback(async (procedureId, formData) => {
         try {
-            debugLogger.log('Updating procedure:', procedureId, formData);
-            await FORMALITY_API.updateFormality(procedureId, formData);
-            await loadProcedures(pagination.current, pagination.pageSize, filters.searchKeyword, filters.selectedDomain, showRemoved);
+            const result = await dispatch(updateProcedureThunk({ procedureId, formData })).unwrap();
+
+            dispatch(fetchProcedures({
+                page: pagination.current,
+                size: pagination.pageSize,
+                search: filters.searchKeyword,
+                id_linh_vuc: filters.selectedDomain,
+                is_removed: showRemoved
+            }));
+
+            alert('Cập nhật thủ tục thành công!');
             return { success: true };
         } catch (error) {
-            debugLogger.error('Error updating procedure:', error);
             alert('Có lỗi xảy ra khi cập nhật thủ tục!');
             return { success: false, error };
         }
-    }, [pagination.current, pagination.pageSize, filters.searchKeyword, filters.selectedDomain, showRemoved, loadProcedures]);
+    }, [dispatch, pagination, filters, showRemoved]);
 
     const deleteProcedure = useCallback(async (procedureId, procedureName) => {
-        const confirmed = window.confirm(`Bạn có chắc chắn muốn xóa thủ tục "${procedureName}"?`);
-        if (!confirmed) return { success: false, cancelled: true };
-
         try {
-            await FORMALITY_API.deleteFormality(procedureId);
-            await loadProcedures(pagination.current, pagination.pageSize, filters.searchKeyword, filters.selectedDomain, showRemoved);
+            const result = await dispatch(deleteProcedureThunk({ procedureId, procedureName })).unwrap();
+
+            dispatch(fetchProcedures({
+                page: pagination.current,
+                size: pagination.pageSize,
+                search: filters.searchKeyword,
+                id_linh_vuc: filters.selectedDomain,
+                is_removed: showRemoved
+            }));
+
+            alert('Đã xóa thủ tục thành công.');
             return { success: true };
         } catch (error) {
-            debugLogger.error('Error deleting procedure:', error);
+            if (error === 'User cancelled') {
+                return { success: false, cancelled: true };
+            }
             alert('Có lỗi xảy ra khi xóa thủ tục!');
             return { success: false, error };
         }
-    }, [pagination.current, pagination.pageSize, filters.searchKeyword, filters.selectedDomain, showRemoved, loadProcedures]);
+    }, [dispatch, pagination, filters, showRemoved]);
 
     const getProcedureById = useCallback(async (procedureId) => {
         try {
-            debugLogger.log('Getting procedure by ID:', procedureId);
-            const response = await FORMALITY_API.getFormalityById(procedureId);
-            return { success: true, data: response };
+            const result = await dispatch(fetchProcedureById(procedureId)).unwrap();
+            return { success: true, data: result };
         } catch (error) {
-            debugLogger.error('Error getting procedure:', error);
             alert('Có lỗi xảy ra khi lấy thông tin thủ tục!');
             return { success: false, error };
         }
-    }, []);
+    }, [dispatch]);
 
     const searchProcedures = useCallback(() => {
-        loadProcedures(1, pagination.pageSize, filters.searchKeyword, filters.selectedDomain, showRemoved);
-    }, [pagination.pageSize, filters.searchKeyword, filters.selectedDomain, showRemoved, loadProcedures]);
+        dispatch(fetchProcedures({
+            page: 1,
+            size: pagination.pageSize,
+            search: filters.searchKeyword,
+            id_linh_vuc: filters.selectedDomain,
+            is_removed: showRemoved
+        }));
+    }, [dispatch, pagination.pageSize, filters, showRemoved]);
 
     const changePage = useCallback((page) => {
-        loadProcedures(page, pagination.pageSize, filters.searchKeyword, filters.selectedDomain, showRemoved);
-    }, [pagination.pageSize, filters.searchKeyword, filters.selectedDomain, showRemoved, loadProcedures]);
+        dispatch(fetchProcedures({
+            page,
+            size: pagination.pageSize,
+            search: filters.searchKeyword,
+            id_linh_vuc: filters.selectedDomain,
+            is_removed: showRemoved
+        }));
+    }, [dispatch, pagination.pageSize, filters, showRemoved]);
 
     const changePageSize = useCallback((size) => {
-        loadProcedures(1, size, filters.searchKeyword, filters.selectedDomain, showRemoved);
-    }, [filters.searchKeyword, filters.selectedDomain, showRemoved, loadProcedures]);
-
-    const resetFilters = useCallback(() => {
-        setFilters({
-            searchKeyword: '',
-            selectedDomain: ''
-        });
-        loadProcedures(1, pagination.pageSize, '', '', showRemoved);
-    }, [pagination.pageSize, showRemoved, loadProcedures]);
+        dispatch(fetchProcedures({
+            page: 1,
+            size,
+            search: filters.searchKeyword,
+            id_linh_vuc: filters.selectedDomain,
+            is_removed: showRemoved
+        }));
+    }, [dispatch, filters, showRemoved]);
 
     const updateFilters = useCallback((newFilters) => {
-        setFilters(prev => ({ ...prev, ...newFilters }));
-    }, []);
+        dispatch(setFilters(newFilters));
+    }, [dispatch]);
+
+    const resetFilters = useCallback(() => {
+        dispatch(resetFiltersAction());
+        dispatch(fetchProcedures({
+            page: 1,
+            size: pagination.pageSize,
+            search: '',
+            id_linh_vuc: '',
+            is_removed: showRemoved
+        }));
+    }, [dispatch, pagination.pageSize, showRemoved]);
+
+    const toggleShowRemoved = useCallback((value) => {
+        dispatch(setShowRemoved(value));
+    }, [dispatch]);
+
+    const clearCurrent = useCallback(() => {
+        dispatch(clearCurrentProcedure());
+    }, [dispatch]);
+
+    const clearErrorMessage = useCallback(() => {
+        dispatch(clearError());
+    }, [dispatch]);
 
     useEffect(() => {
         loadProcedures(1, pagination.pageSize, filters.searchKeyword, filters.selectedDomain, showRemoved);
         loadAreas();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [showRemoved]);
+    }, [showRemoved]); 
 
     return {
         procedures,
         areas,
+        currentProcedure,
         loading,
+        areasLoading,
+        error,
         pagination,
         filters,
+        showRemoved,
+        proceduresWithAreas,
+
         loadProcedures,
+        loadAreas,
         createProcedure,
         updateProcedure,
         deleteProcedure,
@@ -181,7 +218,10 @@ export const useProcedures = (showRemoved = false) => {
         searchProcedures,
         changePage,
         changePageSize,
+        updateFilters,
         resetFilters,
-        updateFilters
+        toggleShowRemoved,
+        clearCurrent,
+        clearErrorMessage
     };
 };

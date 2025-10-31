@@ -7,6 +7,7 @@ const BaseTable = ({
     onEdit,
     onDelete,
     onView,
+    viewIcon = null,
     pagination = null,
     onPageChange,
     showActions = true,
@@ -64,11 +65,28 @@ const BaseTable = ({
                         ) : (
                             data.map((item, rowIndex) => (
                                 <tr key={item.id || rowIndex} className="hover:bg-gray-50">
-                                    {columns.map((column, colIndex) => (
-                                        <td key={column.key || colIndex} className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                            {column.render ? column.render(item[column.dataIndex], item, rowIndex) : item[column.dataIndex]}
-                                        </td>
-                                    ))}
+                                    {columns.map((column, colIndex) => {
+                                        const tdClassList = [
+                                            'px-6',
+                                            'py-4',
+                                            column.noWrap
+                                                ? 'whitespace-nowrap truncate'
+                                                : 'truncate sm:whitespace-normal sm:break-words sm:leading-relaxed',
+                                            'text-sm',
+                                            'text-gray-900'
+                                        ];
+                                        if (column.className) tdClassList.push(column.className);
+
+                                        return (
+                                            <td
+                                                key={column.key || colIndex}
+                                                className={tdClassList.join(' ')}
+                                                style={column.width ? { width: column.width } : {}}
+                                            >
+                                                {column.render ? column.render(item[column.dataIndex], item, rowIndex) : item[column.dataIndex]}
+                                            </td>
+                                        );
+                                    })}
                                     {showActions && (
                                         <td className="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
                                             <div className="flex justify-center space-x-2">
@@ -78,10 +96,12 @@ const BaseTable = ({
                                                         className="text-blue-600 hover:text-blue-900 p-1 rounded hover:bg-blue-100"
                                                         title="Xem chi tiết"
                                                     >
-                                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                                        </svg>
+                                                        {viewIcon ? viewIcon : (
+                                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                                            </svg>
+                                                        )}
                                                     </button>
                                                 )}
                                                 {onEdit && (

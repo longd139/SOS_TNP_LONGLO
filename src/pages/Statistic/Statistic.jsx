@@ -24,8 +24,8 @@ export default function Statistic() {
     };
 
     return (
-        <div className="p-4 md:p-6">
-            <div className="mb-4 md:mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+        <div className="min-h-screen">
+            <div className="mb-3 md:mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3">
                 <div>
                     <h1 className="text-xl md:text-2xl font-bold text-gray-900 mb-1 md:mb-2">
                         Báo cáo & Thống kê
@@ -55,7 +55,7 @@ export default function Statistic() {
                 </div>
             </div>
 
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3 md:p-4 mb-4 md:mb-6">
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3 md:p-4 mb-3 md:mb-4">
                 <div className="text-base md:text-lg font-semibold text-gray-900 mb-3 md:mb-4">Bộ lọc báo cáo</div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
                     <div>
@@ -98,7 +98,7 @@ export default function Statistic() {
                 </div>
             </div>
 
-            <div className="mb-4 md:mb-6">
+            <div className="mb-3 md:mb-4">
                 <div className="flex gap-2 overflow-x-auto">
                     <button
                         onClick={() => setActiveTab('reports')}
@@ -124,9 +124,9 @@ export default function Statistic() {
             </div>
 
             {activeTab === 'reports' ? (
-                <div className="space-y-4 md:space-y-6">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
-                        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 md:p-6">
+                <div className="space-y-3 md:space-y-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
+                        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3 md:p-4">
                             <div className="flex items-start justify-between">
                                 <div>
                                     <div className="text-gray-600 text-xs md:text-sm mb-1">Tổng lượt truy cập</div>
@@ -140,7 +140,7 @@ export default function Statistic() {
                             </div>
                         </div>
 
-                        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 md:p-6">
+                        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3 md:p-4">
                             <div className="flex items-start justify-between">
                                 <div>
                                     <div className="text-gray-600 text-xs md:text-sm mb-1">Người dùng hoạt động</div>
@@ -154,7 +154,7 @@ export default function Statistic() {
                             </div>
                         </div>
 
-                        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 md:p-6">
+                        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3 md:p-4">
                             <div className="flex items-start justify-between">
                                 <div>
                                     <div className="text-gray-600 text-xs md:text-sm mb-1">Tính năng phổ biến</div>
@@ -168,7 +168,7 @@ export default function Statistic() {
                             </div>
                         </div>
 
-                        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 md:p-6">
+                        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3 md:p-4">
                             <div className="flex items-start justify-between">
                                 <div>
                                     <div className="text-gray-600 text-xs md:text-sm mb-1">TG phiên trung bình</div>
@@ -183,8 +183,8 @@ export default function Statistic() {
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
-                        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 md:p-6">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 md:gap-4">
+                        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3 md:p-4">
                             <h3 className="text-base md:text-lg font-semibold text-gray-900 mb-3 md:mb-4">Phản ánh theo lĩnh vực</h3>
                             <ResponsiveContainer width="100%" height={250}>
                                 <PieChart>
@@ -218,7 +218,7 @@ export default function Statistic() {
                             </div>
                         </div>
 
-                        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 md:p-6">
+                        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3 md:p-4">
                             <h3 className="text-base md:text-lg font-semibold text-gray-900 mb-3 md:mb-4">Phản ánh theo trạng thái</h3>
                             <ResponsiveContainer width="100%" height={250}>
                                 <BarChart data={statisticsData.reportsByStatus}>
@@ -232,7 +232,7 @@ export default function Statistic() {
                         </div>
                     </div>
 
-                    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 md:p-6">
+                    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3 md:p-4">
                         <h3 className="text-base md:text-lg font-semibold text-gray-900 mb-3 md:mb-4">Xu hướng phản ánh theo tháng</h3>
                         <ResponsiveContainer width="100%" height={250}>
                             <LineChart data={statisticsData.feedbackTrend}>
@@ -253,7 +253,7 @@ export default function Statistic() {
                         </ResponsiveContainer>
                     </div>
 
-                    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 md:p-6">
+                    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3 md:p-4">
                         <h3 className="text-base md:text-lg font-semibold text-gray-900 mb-4 md:mb-6">Top 5 vấn đề thường gặp</h3>
                         <div className="space-y-3 md:space-y-4">
                             {statisticsData.topIssues.map((issue, index) => {
@@ -283,9 +283,9 @@ export default function Statistic() {
                     </div>
                 </div>
             ) : (
-                <div className="space-y-4 md:space-y-6">
+                <div className="space-y-3 md:space-y-4">
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
-                        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 md:p-6">
+                        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3 md:p-4">
                             <div className="flex items-start justify-between">
                                 <div>
                                     <div className="text-gray-600 text-xs md:text-sm mb-1">Tổng lượt truy cập</div>
@@ -299,7 +299,7 @@ export default function Statistic() {
                             </div>
                         </div>
 
-                        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 md:p-6">
+                        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3 md:p-4">
                             <div className="flex items-start justify-between">
                                 <div>
                                     <div className="text-gray-600 text-xs md:text-sm mb-1">Người dùng hoạt động</div>
@@ -313,7 +313,7 @@ export default function Statistic() {
                             </div>
                         </div>
 
-                        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 md:p-6">
+                        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3 md:p-4">
                             <div className="flex items-start justify-between">
                                 <div>
                                     <div className="text-gray-600 text-xs md:text-sm mb-1">Tính năng phổ biến</div>
@@ -342,7 +342,7 @@ export default function Statistic() {
                         </div>
                     </div>
 
-                    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 md:p-6">
+                    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3 md:p-4">
                         <h3 className="text-base md:text-lg font-semibold text-gray-900 mb-3 md:mb-4">Hoạt động người dùng theo ngày</h3>
                         <ResponsiveContainer width="100%" height={300}>
                             <BarChart data={statisticsData.userActivityByDay}>
@@ -358,7 +358,7 @@ export default function Statistic() {
                     </div>
 
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
-                        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 md:p-6">
+                        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3 md:p-4">
                             <h3 className="text-base md:text-lg font-semibold text-gray-900 mb-4 md:mb-6">Tỷ lệ phản ánh</h3>
                             <div className="space-y-3 md:space-y-4">
                                 <div>
@@ -392,7 +392,7 @@ export default function Statistic() {
                             </div>
                         </div>
 
-                        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 md:p-6">
+                        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3 md:p-4">
                             <h3 className="text-base md:text-lg font-semibold text-gray-900 mb-4 md:mb-6">Thiết bị truy cập</h3>
                             <div className="space-y-3 md:space-y-4">
                                 <div>

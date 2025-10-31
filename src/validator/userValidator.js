@@ -55,12 +55,6 @@ export const updateUserSchema = yup.object().shape({
         .max(100, "Họ và tên không được vượt quá 100 ký tự")
         .test('trim', 'Họ và tên là bắt buộc', value => value && value.trim().length > 0),
 
-    email: yup
-        .string()
-        .required("Email là bắt buộc")
-        .email("Email không hợp lệ")
-        .max(100, "Email không được vượt quá 100 ký tự"),
-
     role: yup
         .string()
         .required("Vai trò là bắt buộc")

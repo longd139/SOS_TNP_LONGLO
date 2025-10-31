@@ -8,6 +8,7 @@ import ProcedureAreasSelector from './ProcedureAreasSelector';
 import ProcedureAdditionalInfo from './ProcedureAdditionalInfo';
 import ProcedureStepsSection from './ProcedureStepsSection';
 import ProcedureMethodsSection from './ProcedureMethodsSection';
+import ProcedureMauDonSection from './ProcedureMauDonSection';
 
 const ProcedureForm = ({
     isOpen,
@@ -26,6 +27,9 @@ const ProcedureForm = ({
         addStep,
         removeStep,
         updateStep,
+        addMauDon,
+        removeMauDon,
+        updateMauDon,
         addCachThucHien,
         removeCachThucHien,
         updateCachThucHien,
@@ -46,7 +50,8 @@ const ProcedureForm = ({
             isOpen={isOpen}
             onClose={handleClose}
             title={modalTitle}
-            size="2xl"
+            size="3xl"
+            className="max-w-5xl"
             footer={
                 <ModalFooter
                     onCancel={handleClose}
@@ -57,7 +62,7 @@ const ProcedureForm = ({
                 />
             }
         >
-            <div className="space-y-4 max-h-[70vh] overflow-y-auto pr-2">
+            <div className="space-y-3 max-h-[70vh] overflow-y-auto px-1 -mx-1">
                 <ProcedureBasicInfo
                     formData={formData}
                     errors={errors}
@@ -71,35 +76,51 @@ const ProcedureForm = ({
                     />
                 )}
 
-                {/* Areas Selector */}
-                <ProcedureAreasSelector
-                    formData={formData}
+                <div className="flex flex-col md:flex-row gap-3 items-stretch">
+                    <div className="md:w-1/2 min-w-0">
+                        <ProcedureAreasSelector
+                            formData={formData}
+                            errors={errors}
+                            areas={areas}
+                            toggleArea={toggleArea}
+                            updateField={updateField}
+                        />
+                    </div>
+                    <div className="md:w-1/2 min-w-0">
+                        <ProcedureAdditionalInfo
+                            formData={formData}
+                            updateField={updateField}
+                        />
+                    </div>
+                </div>
+
+                <ProcedureMauDonSection
+                    items={formData.danhSachMauDon}
+                    addItem={addMauDon}
+                    removeItem={removeMauDon}
+                    updateItem={updateMauDon}
                     errors={errors}
-                    areas={areas}
-                    toggleArea={toggleArea}
                 />
 
-                {/* Additional Information */}
-                <ProcedureAdditionalInfo
-                    formData={formData}
-                    updateField={updateField}
-                />
+                <div className="flex flex-col md:flex-row gap-3">
+                    <div className="flex-1 min-w-0">
+                        <ProcedureStepsSection
+                            steps={formData.trinhTuThucHien}
+                            addStep={addStep}
+                            removeStep={removeStep}
+                            updateStep={updateStep}
+                        />
+                    </div>
 
-                {/* Steps Section */}
-                <ProcedureStepsSection
-                    steps={formData.trinhTuThucHien}
-                    addStep={addStep}
-                    removeStep={removeStep}
-                    updateStep={updateStep}
-                />
-
-                {/* Methods Section */}
-                <ProcedureMethodsSection
-                    methods={formData.cachThuThucHien}
-                    addMethod={addCachThucHien}
-                    removeMethod={removeCachThucHien}
-                    updateMethod={updateCachThucHien}
-                />
+                    <div className="flex-1 min-w-0">
+                        <ProcedureMethodsSection
+                            methods={formData.cachThuThucHien}
+                            addMethod={addCachThucHien}
+                            removeMethod={removeCachThucHien}
+                            updateMethod={updateCachThucHien}
+                        />
+                    </div>
+                </div>
             </div>
         </BaseModal>
     );
