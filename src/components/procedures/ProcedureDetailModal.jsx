@@ -1,8 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import BaseModal from '../BaseModal';
+import { Download, FileText } from 'lucide-react';
 import dayjs from 'dayjs';
-
+import { downloadUtils } from '../../utils/downLoadUtils';
 const ProcedureDetailModal = ({ isOpen, onClose, procedure }) => {
     if (!procedure) return null;
 
@@ -113,7 +114,7 @@ const ProcedureDetailModal = ({ isOpen, onClose, procedure }) => {
                     <div className="bg-gray-50 p-3 rounded-lg">
                         <h3 className="text-lg font-semibold text-gray-900 mb-3">Trình tự thực hiện</h3>
                         <div className="space-y-2">
-                            {procedure.trinh_tu_thuc_hien_thu_tuc
+                            {[...procedure.trinh_tu_thuc_hien_thu_tuc]
                                 .sort((a, b) => a.thu_tu_buoc - b.thu_tu_buoc)
                                 .map((step) => (
                                     <div key={step.id} className="bg-white p-2 rounded-lg border border-gray-200">
@@ -173,31 +174,46 @@ const ProcedureDetailModal = ({ isOpen, onClose, procedure }) => {
                     <div className="bg-gray-50 p-3 rounded-lg">
                         <h3 className="text-lg font-semibold text-gray-900 mb-3">Mẫu đơn</h3>
                         <div className="space-y-2">
-                            {procedure.thu_tuc_hanh_chinh_mau_don.map((mauDon, index) => (
-                                <div key={index} className="flex items-center gap-2">
-                                    <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                    </svg>
-                                    <span className="text-sm text-gray-900">Mẫu đơn {index + 1}</span>
-                                </div>
-                            ))}
+                            {procedure.thu_tuc_hanh_chinh_mau_don.map((mauDon, index) => {
+                                return (
+                                    <div key={mauDon.id || index} className="flex items-start gap-3 w-full">
+                                        <div className="flex-shrink-0 flex items-center">
+                                            <FileText className="w-5 h-5 text-gray-600" />
+                                        </div>
+
+                                        <div className="flex-1 text-sm text-gray-900 break-words">
+                                            {mauDon?.mau_don.ten_mau_don || '-'}
+                                        </div>
+
+                                        <div className="flex-shrink-0">
+                                            <button
+                                                onClick={() => downloadUtils.handleDownload(mauDon?.mau_don)}
+                                                className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
+                                                title="Tải xuống"
+                                            >
+                                                <Download className="w-4 h-4" />
+                                            </button>
+                                        </div>
+                                    </div>
+                                );
+                            })}
                         </div>
                     </div>
                 )}
 
-                    <div className="bg-gray-50 p-3 rounded-lg">
+                <div className="bg-gray-50 p-3 rounded-lg">
                     <h3 className="text-lg font-semibold text-gray-900 mb-3">Thông tin khác</h3>
                     <div className="grid grid-cols-2 gap-3 text-sm">
                         <div>
                             <label className="block text-sm font-medium text-gray-600 mb-1">Thời gian tạo</label>
                             <p className="text-sm text-gray-900">
-                                {dayjs(procedure.thoi_gian_tao).format('DD/MM/YYYY HH:mm:ss')}
+                                {dayjs(procedure.thoi_gian_tao).format('HH:mm:ss DD/MM/YYYY')}
                             </p>
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-gray-600 mb-1">Thời gian cập nhật</label>
                             <p className="text-sm text-gray-900">
-                                {dayjs(procedure.thoi_gian_cap_nhap).format('DD/MM/YYYY HH:mm:ss')}
+                                {dayjs(procedure.thoi_gian_cap_nhap).format('HH:mm:ss DD/MM/YYYY')}
                             </p>
                         </div>
                     </div>

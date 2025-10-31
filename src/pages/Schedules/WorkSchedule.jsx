@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Calendar, Clock, MapPin, User, FileText, Pencil, Trash2, Download, Upload, Plus } from 'lucide-react';
 import { scheduleList } from '../../mockData';
 

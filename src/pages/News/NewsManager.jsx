@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Eye, Pencil, Trash2, Plus } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { newsList } from '../../mockData';
 import BaseTable from '../../components/BaseTable';
 import BaseModal, { ModalFooter, ConfirmModal } from '../../components/BaseModal';
@@ -72,8 +72,14 @@ export default function NewsManager() {
             title: 'Tiêu đề',
             dataIndex: 'title',
             key: 'title',
+            width: '200px',
             render: (value) => (
-                <div className="text-sm text-gray-900 max-w-md">{value}</div>
+                <div 
+                    className="text-sm text-gray-900 max-w-[200px] truncate text-ellipsis overflow-hidden whitespace-nowrap"
+                    title={value}
+                >
+                    {value}
+                </div>
             )
         },
         {

@@ -3,7 +3,9 @@ import { ShieldCheck, AlertCircle, Loader2, Lock, User } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useLogin } from "../../hooks/useLogin";
 import { useOtp } from "../../hooks/useOtp";
+import { useAuthRedirect } from "../../hooks/useAuthRedirect";
 import OtpModal from "../Auth/OtpModal";
+import ROUTE_PATH from "../../constants/routes";
 
 export default function Login() {
     const [tenDangNhap, setTenDangNhap] = useState("");
@@ -15,6 +17,8 @@ export default function Login() {
     const { login, loading, errors, apiError, clearErrors } = useLogin();
     const { sendOtp, verifyOtp, loading: otpLoading, message, error: otpError } = useOtp();
     const navigate = useNavigate();
+
+    useAuthRedirect();
 
     useEffect(() => {
         if (Object.keys(errors).length > 0 || apiError) {
@@ -59,7 +63,7 @@ export default function Login() {
             localStorage.setItem("refreshToken", res.data.refreshToken);
 
             setShowOtpModal(false);
-            navigate("/dashboard", { replace: true });
+            navigate(ROUTE_PATH.DASHBOARD, { replace: true });
         } else {
             alert("Mã OTP không đúng hoặc đã hết hạn!");
         }

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { AlertTriangle, Eye } from 'lucide-react';
+import { AlertTriangle } from 'lucide-react';
 import { feedbackList } from '../../mockData';
 import BaseTable from '../../components/BaseTable';
 
@@ -34,8 +34,14 @@ export default function ReportList() {
             title: 'Tiêu đề',
             dataIndex: 'title',
             key: 'title',
+            width: '200px',
             render: (value) => (
-                <div className="text-sm text-gray-900 max-w-md">{value}</div>
+                <div 
+                    className="text-sm text-gray-900 max-w-[200px] truncate text-ellipsis overflow-hidden whitespace-nowrap"
+                    title={value}
+                >
+                    {value}
+                </div>
             )
         },
         {
@@ -99,16 +105,23 @@ export default function ReportList() {
             title: 'Thông tin liên hệ',
             dataIndex: 'contact',
             key: 'contact',
-            render: (value) => (
-                <div className="text-sm">
-                    <div className="text-gray-900">
-                        {value.name || 'Ẩn danh'}
+            width: '180px',
+            render: (value) => {
+                const name = value.name || 'Ẩn danh';
+                const fullText = value.phone ? `${name}\n${value.phone}` : name;
+                return (
+                    <div className="text-sm max-w-[180px]" title={fullText}>
+                        <div className="text-gray-900 truncate text-ellipsis overflow-hidden whitespace-nowrap">
+                            {name}
+                        </div>
+                        {value.phone && (
+                            <div className="text-gray-500 truncate text-ellipsis overflow-hidden whitespace-nowrap">
+                                {value.phone}
+                            </div>
+                        )}
                     </div>
-                    {value.phone && (
-                        <div className="text-gray-500">{value.phone}</div>
-                    )}
-                </div>
-            )
+                );
+            }
         }
     ];
 

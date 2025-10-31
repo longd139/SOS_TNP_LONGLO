@@ -1,86 +1,36 @@
-import { createContext, useContext, useState, useEffect } from 'react';
-import { jwtDecode } from 'jwt-decode';
+import { createContext, useContext } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { logout } from '../features/auth/authSlice';
+import { selectAuthState } from '../features/auth/authSelectors';
 import { ROLE } from '../constants/role';
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-    const [auth, setAuth] = useState({
-        userId: null,
-        role: null,
-        accessToken: null,
-        isAuthenticated: false,
-        isLoading: true
-    });
-
-    useEffect(() => {
-        const initializeAuth = () => {
-            const token = localStorage.getItem('accessToken');
-
-            if (token) {
-                try {
-                    const decoded = jwtDecode(token);
-                    const currentTime = Date.now() / 1000;
-
-                    if (decoded.exp > currentTime) {
-                        setAuth({
-                            userId: decoded.userId,
-                            role: decoded.role,
-                            accessToken: token,
-                            isAuthenticated: true,
-                            isLoading: false
-                        });
-                    } else {
-                        localStorage.removeItem('accessToken');
-                        localStorage.removeItem('refreshToken');
-                        setAuth(prev => ({ ...prev, isLoading: false }));
-                    }
-                } catch (error) {
-                    localStorage.removeItem('accessToken');
-                    localStorage.removeItem('refreshToken');
-                    setAuth(prev => ({ ...prev, isLoading: false }));
-                }
-            } else {
-                setAuth(prev => ({ ...prev, isLoading: false }));
-            }
-        };
-
-        initializeAuth();
-    }, []);
-
-    const login = (userData) => {
-        setAuth({
-            userId: userData.userId,
-            role: userData.role,
-            accessToken: userData.accessToken,
-            isAuthenticated: true,
-            isLoading: false
-        });
-    };
-
-    const logout = () => {
-        localStorage.removeItem('accessToken');
-        localStorage.removeItem('refreshToken');
-        setAuth({
-            userId: null,
-            role: null,
-            accessToken: null,
-            isAuthenticated: false,
-            isLoading: false
-        });
-    };
+    const dispatch = useDispatch();
+    const authState = useSelector(selectAuthState);
 
     const isAdmin = () => {
-        return auth.role === ROLE.ADMIN;
+        return authState.user?.role === ROLE.ADMIN;
+    };
+
+    const handleLogout = () => {
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
+        dispatch(logout());
     };
 
     const value = {
-        auth,
-        setAuth: login,
-        logout,
+        auth: {
+            ...authState,
+            isAuthenticated: !!authState.user,
+            role: authState.user?.role
+        },
+        setAuth: () => { },
+        logout: handleLogout,
         isAdmin,
-        isAuthenticated: auth.isAuthenticated,
-        isLoading: auth.isLoading
+        isAuthenticated: !!authState.user,
+        isLoading: authState.loading
     };
 
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
@@ -93,5 +43,3 @@ export const useAuth = () => {
     }
     return context;
 };
-
-export default AuthContext;

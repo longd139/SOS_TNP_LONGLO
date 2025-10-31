@@ -5,7 +5,7 @@ import { Search, RotateCcw } from 'lucide-react';
 import BaseTable from '../../components/BaseTable';
 import ProcedureForm from '../../components/procedures/ProcedureForm';
 import ProcedureDetailModal from '../../components/procedures/ProcedureDetailModal';
-import { useProcedures } from '../../hooks/useProcedures';
+import { useProcedure } from '../../hooks/useProcedures';
 import { getProcedureColumns } from '../../components/procedures/columns';
 dayjs.locale('vi');
 
@@ -13,15 +13,15 @@ export default function ProceduresManager() {
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
-    const [selectedProcedure, setSelectedProcedure] = useState(null);
-    const [showRemoved, setShowRemoved] = useState(false);
 
     const {
         procedures,
         areas,
+        currentProcedure,
         loading,
         pagination,
         filters,
+        showRemoved,
         searchProcedures,
         changePage,
         changePageSize,
@@ -30,8 +30,10 @@ export default function ProceduresManager() {
         createProcedure,
         updateProcedure,
         deleteProcedure,
-        getProcedureById
-    } = useProcedures(showRemoved);
+        getProcedureById,
+        toggleShowRemoved,
+        clearCurrent
+    } = useProcedure();
 
 
     const columns = getProcedureColumns(pagination);
@@ -49,7 +51,7 @@ export default function ProceduresManager() {
 
     const closeEditModal = () => {
         setIsEditModalOpen(false);
-        setSelectedProcedure(null);
+        clearCurrent();
     };
 
     const openDetailModal = () => {
@@ -58,7 +60,7 @@ export default function ProceduresManager() {
 
     const closeDetailModal = () => {
         setIsDetailModalOpen(false);
-        setSelectedProcedure(null);
+        clearCurrent();
     };
 
     const handleSubmitNewProcedure = async (formData) => {
@@ -72,12 +74,11 @@ export default function ProceduresManager() {
     };
 
     const handleSubmitEditProcedure = async (formData) => {
-        if (!selectedProcedure) return;
+        if (!currentProcedure) return;
 
-        const result = await updateProcedure(selectedProcedure.id, formData);
+        const result = await updateProcedure(currentProcedure.id, formData);
         if (result.success) {
             closeEditModal();
-            alert('Cập nhật thủ tục thành công!');
         } else {
             throw new Error(result.error?.message || 'Failed to update procedure');
         }
@@ -86,7 +87,6 @@ export default function ProceduresManager() {
     const handleEdit = async (procedure) => {
         const result = await getProcedureById(procedure.id);
         if (result.success) {
-            setSelectedProcedure(result.data);
             openEditModal();
         }
     };
@@ -99,7 +99,6 @@ export default function ProceduresManager() {
     const handleView = async (procedure) => {
         const result = await getProcedureById(procedure.id);
         if (result.success) {
-            setSelectedProcedure(result.data);
             openDetailModal();
         }
     };
@@ -165,7 +164,7 @@ export default function ProceduresManager() {
                         </label>
                         <select
                             value={showRemoved ? 'removed' : 'active'}
-                            onChange={(e) => setShowRemoved(e.target.value === 'removed')}
+                            onChange={(e) => toggleShowRemoved(e.target.value === 'removed')}
                             className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         >
                             <option value="active">Hoạt động</option>
@@ -262,14 +261,14 @@ export default function ProceduresManager() {
                 onClose={closeEditModal}
                 onSubmit={handleSubmitEditProcedure}
                 areas={areas}
-                initialData={selectedProcedure}
+                initialData={currentProcedure}
                 mode="edit"
             />
 
             <ProcedureDetailModal
                 isOpen={isDetailModalOpen}
                 onClose={closeDetailModal}
-                procedure={selectedProcedure}
+                procedure={currentProcedure}
             />
         </div>
     );

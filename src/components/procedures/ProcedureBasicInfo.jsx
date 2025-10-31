@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { GOVERNMENT_API } from '../../apis/government';
 import GovernmentFormModal from '../government/GovernmentFormModal';
 import { PlusCircle } from 'lucide-react';
+import { handleSearchDropdownKeyDown } from '../../utils/keyboardNavigation';
 
 const ProcedureBasicInfo = ({ formData, errors, updateField }) => {
     const [search, setSearch] = useState('');
@@ -56,7 +57,6 @@ const ProcedureBasicInfo = ({ formData, errors, updateField }) => {
         }
     }, [formData.idCoSoDichVuCong]);
 
-    // reset highlight when results list changes
     useEffect(() => {
         setHighlightedIndex(-1);
     }, [results]);
@@ -74,22 +74,14 @@ const ProcedureBasicInfo = ({ formData, errors, updateField }) => {
     };
 
     const handleKeyDown = (e) => {
-        if (!results || results.length === 0) return;
-        if (e.key === 'ArrowDown') {
-            e.preventDefault();
-            if (!showDropdown) setShowDropdown(true);
-            setHighlightedIndex((prev) => (prev === -1 ? 0 : Math.min(prev + 1, results.length - 1)));
-        } else if (e.key === 'ArrowUp') {
-            e.preventDefault();
-            setHighlightedIndex((prev) => (prev <= 0 ? Math.max(results.length - 1, 0) : prev - 1));
-        } else if (e.key === 'Enter') {
-            if (showDropdown && highlightedIndex >= 0) {
-                e.preventDefault();
-                handleSelect(results[highlightedIndex]);
-            }
-        } else if (e.key === 'Escape') {
-            setShowDropdown(false);
-        }
+        handleSearchDropdownKeyDown(e, {
+            items: results,
+            highlightedIndex,
+            showDropdown,
+            setHighlightedIndex,
+            setShowDropdown,
+            onSelect: handleSelect
+        });
     };
 
     return (
