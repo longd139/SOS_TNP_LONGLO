@@ -1,9 +1,5 @@
-import React from 'react'
+import BaseTable from './BaseTable';
 
-export default function Table() {
-  return (
-    <div>
-      <h2>Bảng dữ liệu</h2>
-    </div>
-  )
+export default function Table(props) {
+  return <BaseTable {...props} />;
 }

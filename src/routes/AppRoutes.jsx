@@ -1,7 +1,8 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import AdminLayout from "../layouts/AdminLayout";
 import AuthLayout from "../layouts/AuthLayout";
-
+import ProtectedRoute from "../components/ProtectedRoute";
+import { ROLE } from "../constants/role";
 import Login from "../pages/Auth/Login";
 import Dashboard from "../pages/Dashboard/Dashboard";
 import ReportList from "../pages/Reports/ReportList";
@@ -17,38 +18,43 @@ import ContactInfo from "../pages/Contact/ContactInfo";
 import WorkSchedule from "../pages/Schedules/WorkSchedule";
 import AdminManager from "../pages/AdminAccounts/AdminManager";
 import NotFound from "../pages/NotFound";
+import OtpModal from "../pages/Auth/OtpModal";
+import Statistics from "../pages/Statistic/Statistic";
 
 function AppRoutes() {
-  return (
-    <Router>
-      <Routes>
-        {/* Auth Layout */}
-        <Route element={<AuthLayout />}>
-          <Route path="/" element={<Login />} />
-        </Route>
+    return (
+        <Routes>
+            <Route element={<AuthLayout />}>
+                <Route path="/" element={<Login />} />
+                <Route path="/OtpModal" element={<OtpModal />} />
+                {/* <Route path="/forgot-password" element={<ForgotPasswordPage />} /> */}
+            </Route>
 
-        {/* Admin Layout */}
-        <Route element={<AdminLayout />}>
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/reports" element={<ReportList />} />
-          <Route path="/reports/:id" element={<ReportDetail />} />
-          <Route path="/reports/update" element={<UpdateStatus />} />
-          <Route path="/reports/statistics" element={<ReportsStatistic />} />
-          <Route path="/reports/users" element={<ReportsUserStat />} />
-          <Route path="/reports/export" element={<ExportReport />} />
-          <Route path="/news" element={<NewsManager />} />
-          <Route path="/procedures" element={<ProceduresManager />} />
-          <Route path="/templates" element={<TemplateManager />} />
-          <Route path="/contact" element={<ContactInfo />} />
-          <Route path="/schedules" element={<WorkSchedule />} />
-          <Route path="/admins" element={<AdminManager />} />
-        </Route>
+            <Route element={
+                <ProtectedRoute requiredRole={ROLE.ADMIN}>
+                    <AdminLayout />
+                </ProtectedRoute>
+            }>
+                <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/reports" element={<ReportList />} />
+                <Route path="/reports/:id" element={<ReportDetail />} />
+                <Route path="/reports/update" element={<UpdateStatus />} />
+                <Route path="/reports/statistics" element={<ReportsStatistic />} />
+                <Route path="/reports/users" element={<ReportsUserStat />} />
+                <Route path="/reports/export" element={<ExportReport />} />
+                <Route path="/news" element={<NewsManager />} />
+                <Route path="/procedures" element={<ProceduresManager />} />
+                <Route path="/templates" element={<TemplateManager />} />
+                <Route path="/contact" element={<ContactInfo />} />
+                <Route path="/schedules" element={<WorkSchedule />} />
+                <Route path="/statistics" element={<Statistics />} />
+                <Route path="/accounts" element={<AdminManager />} />
+            </Route>
 
-        {/* 404 */}
-        <Route path="*" element={<NotFound />} />
-      </Routes>
-    </Router>
-  );
+            {/* 404 */}
+            <Route path="*" element={<NotFound />} />
+        </Routes>
+    );
 }
 
 export default AppRoutes;
