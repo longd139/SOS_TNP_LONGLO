@@ -4,6 +4,7 @@ import UserModal from '../../components/users/UserModal';
 import { ConfirmModal } from '../../components/BaseModal';
 import { ROLE_LABELS, ROLE_COLORS } from '../../constants/role';
 import { useUsers } from '../../hooks/useUsers';
+import { showToast } from '../../utils/toastNotification';
 
 export default function AdminManager() {
     const {
@@ -58,16 +59,16 @@ export default function AdminManager() {
                     ...userData,
                     id: userModal.user.id
                 });
-                alert('Cập nhật tài khoản thành công!');
+                showToast.success('Cập nhật tài khoản thành công!');
             } else {
                 await createUser(userData);
-                alert('Tạo tài khoản thành công!');
+                showToast.success('Tạo tài khoản thành công!');
             }
 
             setUserModal({ isOpen: false, user: null });
 
         } catch (error) {
-            alert(error.message || 'Có lỗi xảy ra!');
+            showToast.error(error.message || 'Có lỗi xảy ra!');
         } finally {
             setModalLoading(false);
         }
@@ -80,11 +81,11 @@ export default function AdminManager() {
     const handleDeleteConfirm = async () => {
         try {
             await deleteUserAction(deleteModal.user.id);
-            alert('Xóa tài khoản thành công.');
+            showToast.success('Xóa tài khoản thành công.');
             setDeleteModal({ isOpen: false, user: null });
 
         } catch (error) {
-            alert(error.message || 'Có lỗi xảy ra khi xóa tài khoản!');
+            showToast.error(error.message || 'Có lỗi xảy ra khi xóa tài khoản!');
         }
     };
 

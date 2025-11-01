@@ -1,5 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { FORM_API } from '../apis/form';
+import { showToast } from '../utils/toastNotification';
+import { showConfirm } from '../utils/confirmUtils';
 
 const debugLogger = {
     log: (...args) => {
@@ -37,12 +39,10 @@ export const useTemplates = (showRemoved = false) => {
             debugLogger.log('Creating template:', formData);
             await FORM_API.createForm(formData);
             await loadTemplates(showRemoved);
-            alert('Tạo biểu mẫu thành công!');
             return { success: true };
         } catch (error) {
-            alert('Có lỗi xảy ra khi tạo biểu mẫu!');
             debugLogger.error('Error creating template:', error);
-            return { success: false, error };
+            throw error;
         }
     }, [showRemoved, loadTemplates]);
 
@@ -51,27 +51,26 @@ export const useTemplates = (showRemoved = false) => {
             debugLogger.log('Updating template:', templateId, formData);
             await FORM_API.updateForm(templateId, formData);
             await loadTemplates(showRemoved);
-            alert('Cập nhật biểu mẫu thành công!');
             return { success: true };
         } catch (error) {
-            alert('Có lỗi xảy ra khi cập nhật biểu mẫu!');
             debugLogger.error('Error updating template:', error);
-            return { success: false, error };
+            // Re-throw error to be handled by the component
+            throw error;
         }
     }, [showRemoved, loadTemplates]);
 
     const deleteTemplate = useCallback(async (templateId, templateName) => {
-        const confirmed = window.confirm(`Bạn có chắc chắn muốn xóa biểu mẫu "${templateName}"?`);
+        const confirmed = showConfirm(`Bạn có chắc chắn muốn xóa biểu mẫu "${templateName}"?`);
         if (!confirmed) return { success: false, cancelled: true };
 
         try {
             await FORM_API.deleteForm(templateId);
             await loadTemplates(showRemoved);
-            alert(`Đã xóa biểu mẫu thành công.`);
+            showToast.success(`Đã xóa biểu mẫu thành công.`);
             return { success: true };
         } catch (error) {
             debugLogger.error('Error deleting template:', error);
-            alert('Có lỗi xảy ra khi xóa biểu mẫu!');
+            showToast.error('Có lỗi xảy ra khi xóa biểu mẫu!');
             return { success: false, error };
         }
     }, [showRemoved, loadTemplates]);

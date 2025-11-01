@@ -3,6 +3,7 @@ import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import ROUTE_PATH from '../constants/routes';
+import { isPathDisabled } from '../utils/routeRedirectUtils';
 
 const menuItems = [
     {
@@ -132,39 +133,68 @@ export default function Sidebar({ collapsed, onToggle, onMobileClose }) {
                     {menuItems.map((item) => {
                         const isActive = location.pathname === item.path;
                         const Icon = item.icon;
+                        const isDisabled = isPathDisabled(item.path);
                         
                         return (
                             <li key={item.id}>
-                                <Link
-                                    to={item.path}
-                                    onClick={handleLinkClick}
-                                    className={`
-                                        flex items-center text-sm rounded-lg transition-all duration-200
-                                        ${collapsed ? 'px-3 py-3 justify-center' : 'px-4 py-3'}
-                                        ${isActive
-                                            ? 'bg-blue-50 text-blue-600 border-r-2 border-blue-600'
-                                            : 'text-gray-700 hover:bg-gray-50'
-                                        }
-                                    `}
-                                    title={collapsed ? item.label : ''}
-                                >
-                                    <Icon 
+                                {isDisabled ? (
+                                    <div
                                         className={`
-                                            w-5 h-5 flex-shrink-0
-                                            ${isActive ? 'text-blue-600' : 'text-gray-500'}
-                                            ${collapsed ? '' : 'mr-3'}
+                                            flex items-center text-sm rounded-lg transition-all duration-200 cursor-not-allowed
+                                            ${collapsed ? 'px-3 py-3 justify-center' : 'px-4 py-3'}
+                                            opacity-50 bg-gray-50 text-gray-400
+                                            hover:opacity-60
                                         `}
-                                    />
-                                    
-                                    {!collapsed && (
-                                        <>
-                                            <span className="font-medium flex-1">{item.label}</span>
-                                            {item.hasSubmenu && (
-                                                <span className="ml-auto text-gray-400">▶</span>
-                                            )}
-                                        </>
-                                    )}
-                                </Link>
+                                        title={`${item.label} (Chức năng chưa khả dụng)`}
+                                    >
+                                        <Icon 
+                                            className={`
+                                                w-5 h-5 flex-shrink-0 text-gray-400
+                                                ${collapsed ? '' : 'mr-3'}
+                                            `}
+                                        />
+                                        
+                                        {!collapsed && (
+                                            <>
+                                                <span className="font-medium flex-1">{item.label}</span>
+                                                {item.hasSubmenu && (
+                                                    <span className="ml-auto text-gray-300">▶</span>
+                                                )}
+                                            </>
+                                        )}
+                                    </div>
+                                ) : (
+                                    <Link
+                                        to={item.path}
+                                        onClick={handleLinkClick}
+                                        className={`
+                                            flex items-center text-sm rounded-lg transition-all duration-200
+                                            ${collapsed ? 'px-3 py-3 justify-center' : 'px-4 py-3'}
+                                            ${isActive
+                                                ? 'bg-blue-50 text-blue-600 border-r-2 border-blue-600'
+                                                : 'text-gray-700 hover:bg-gray-50'
+                                            }
+                                        `}
+                                        title={collapsed ? item.label : ''}
+                                    >
+                                        <Icon 
+                                            className={`
+                                                w-5 h-5 flex-shrink-0
+                                                ${isActive ? 'text-blue-600' : 'text-gray-500'}
+                                                ${collapsed ? '' : 'mr-3'}
+                                            `}
+                                        />
+                                        
+                                        {!collapsed && (
+                                            <>
+                                                <span className="font-medium flex-1">{item.label}</span>
+                                                {item.hasSubmenu && (
+                                                    <span className="ml-auto text-gray-400">▶</span>
+                                                )}
+                                            </>
+                                        )}
+                                    </Link>
+                                )}
                             </li>
                         );
                     })}

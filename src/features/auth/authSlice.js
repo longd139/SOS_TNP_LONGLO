@@ -33,7 +33,9 @@ const initialState = {
     errors: {},
     apiError: '',
     otpRequired: false,
+    requiresTwoFactorAuth: false,
     email: '',
+    tenDangNhap: '',
     user: getUserFromToken(),
 };
 
@@ -49,6 +51,8 @@ const authSlice = createSlice({
             localStorage.removeItem('accessToken');
             localStorage.removeItem('refreshToken');
             state.user = null;
+            state.requiresTwoFactorAuth = false;
+            state.tenDangNhap = '';
         },
         restoreUser: (state) => {
             state.user = getUserFromToken();
@@ -65,7 +69,9 @@ const authSlice = createSlice({
                 state.loading = false;
                 state.user = action.payload.user || null;
                 state.otpRequired = action.payload.otpRequired || false;
+                state.requiresTwoFactorAuth = action.payload.requiresTwoFactorAuth || false;
                 state.email = action.payload.email || '';
+                state.tenDangNhap = action.payload.tenDangNhap || '';
             })
             .addCase(loginUser.rejected, (state, action) => {
                 state.loading = false;

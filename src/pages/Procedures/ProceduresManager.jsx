@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import dayjs from 'dayjs';
 import 'dayjs/locale/vi';
-import { Search, RotateCcw } from 'lucide-react';
 import BaseTable from '../../components/BaseTable';
 import ProcedureForm from '../../components/procedures/ProcedureForm';
 import ProcedureDetailModal from '../../components/procedures/ProcedureDetailModal';
+import ProceduresFilter from '../../components/procedures/ProceduresFilter';
 import { useProcedure } from '../../hooks/useProcedures';
 import { getProcedureColumns } from '../../components/procedures/columns';
+import { showToast } from '../../utils/toastNotification';
+import { showConfirm } from '../../utils/confirmUtils';
 dayjs.locale('vi');
 
 export default function ProceduresManager() {
@@ -67,7 +69,7 @@ export default function ProceduresManager() {
         const result = await createProcedure(formData);
         if (result.success) {
             closeCreateModal();
-            alert('Tạo thủ tục thành công!');
+            showToast.success('Tạo thủ tục thành công!');
         } else {
             throw new Error(result.error?.message || 'Failed to create procedure');
         }
@@ -79,7 +81,9 @@ export default function ProceduresManager() {
         const result = await updateProcedure(currentProcedure.id, formData);
         if (result.success) {
             closeEditModal();
+            showToast.success('Cập nhật thủ tục thành công!');
         } else {
+            showToast.error('Có lỗi xảy ra khi cập nhật thủ tục!');
             throw new Error(result.error?.message || 'Failed to update procedure');
         }
     };
@@ -93,7 +97,17 @@ export default function ProceduresManager() {
 
 
     const handleDelete = async (procedure) => {
-        await deleteProcedure(procedure.id, procedure.ten_thu_tuc || procedure.tenThuTuc);
+        const confirmed = showConfirm(`Bạn có chắc chắn muốn xóa thủ tục "${procedure.ten_thu_tuc || procedure.tenThuTuc}"?`);
+        if (!confirmed) return;
+
+        const result = await deleteProcedure(procedure.id, procedure.ten_thu_tuc || procedure.tenThuTuc);
+        if (result.success) {
+            showToast.success('Đã xóa thủ tục thành công.');
+        } else if (result.cancelled) {
+            // no-op
+        } else {
+            showToast.error('Có lỗi xảy ra khi xóa thủ tục!');
+        }
     };
 
     const handleView = async (procedure) => {
@@ -103,19 +117,8 @@ export default function ProceduresManager() {
         }
     };
 
-
-    const handleSearchKeywordChange = (value) => {
-        updateFilters({ searchKeyword: value });
-    };
-
-    const handleDomainChange = (value) => {
-        updateFilters({ selectedDomain: value });
-    };
-
-    const handleSearchKeyPress = (e) => {
-        if (e.key === 'Enter') {
-            searchProcedures();
-        }
+    const handleFilterChange = (key, value) => {
+        updateFilters({ [key]: value });
     };
 
     return (
@@ -124,88 +127,18 @@ export default function ProceduresManager() {
                 <h1 className="text-xl md:text-2xl font-bold text-gray-900 mb-2">Quản lý thủ tục hành chính</h1>
                 <p className="text-sm md:text-base text-gray-600">Quản lý các thủ tục được hiển thị trong ứng dụng</p>
             </div>
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3 md:p-4 mb-3 md:mb-4">
-                <div className="flex flex-col md:flex-row gap-2 items-end">
-                    <div className="flex-1 w-full md:w-auto">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Tìm kiếm thủ tục
-                        </label>
-                        <input
-                            type="text"
-                            value={filters.searchKeyword}
-                            onChange={(e) => handleSearchKeywordChange(e.target.value)}
-                            placeholder="Nhập từ khóa tìm kiếm..."
-                            className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                            onKeyPress={handleSearchKeyPress}
-                        />
-                    </div>
 
-                    <div className="flex-1 w-full md:w-auto">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Lĩnh vực
-                        </label>
-                        <select
-                            value={filters.selectedDomain}
-                            onChange={(e) => handleDomainChange(e.target.value)}
-                            className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        >
-                            <option value="">Tất cả lĩnh vực</option>
-                            {areas.map((area) => (
-                                <option key={area.id} value={area.id}>
-                                    {area.ten_linh_vuc}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
-
-                    <div className="w-full md:w-48">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Trạng thái
-                        </label>
-                        <select
-                            value={showRemoved ? 'removed' : 'active'}
-                            onChange={(e) => toggleShowRemoved(e.target.value === 'removed')}
-                            className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        >
-                            <option value="active">Hoạt động</option>
-                            <option value="removed">Đã xóa</option>
-                        </select>
-                    </div>
-
-                    <div className="w-full md:w-32">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Hiển thị
-                        </label>
-                        <select
-                            value={pagination.pageSize}
-                            onChange={(e) => changePageSize(Number(e.target.value))}
-                            className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        >
-                            <option value={5}>5</option>
-                            <option value={10}>10</option>
-                            <option value={20}>20</option>
-                            <option value={50}>50</option>
-                        </select>
-                    </div>
-
-                    <div className="flex gap-2 w-full md:w-auto">
-                        <button
-                            onClick={searchProcedures}
-                            className="flex-1 md:flex-none p-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
-                            title="Tìm kiếm"
-                        >
-                            <Search className="w-5 h-5" />
-                        </button>
-                        <button
-                            onClick={resetFilters}
-                            className="flex-1 md:flex-none p-2.5 bg-gray-500 text-white rounded-lg hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors"
-                            title="Đặt lại"
-                        >
-                            <RotateCcw className="w-5 h-5" />
-                        </button>
-                    </div>
-                </div>
-            </div>
+            <ProceduresFilter
+                areas={areas}
+                filters={filters}
+                pagination={pagination}
+                showRemoved={showRemoved}
+                onFilterChange={handleFilterChange}
+                onSearch={searchProcedures}
+                onReset={resetFilters}
+                onToggleRemoved={toggleShowRemoved}
+                onPageSizeChange={changePageSize}
+            />
 
             <div className="mb-3 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 bg-white p-3 rounded-lg shadow-sm border border-gray-200">
                 <div className="flex items-center gap-3">
