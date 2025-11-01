@@ -1,172 +1,164 @@
 pipeline {
   agent any
-
-  environment {
-    IMAGE_NAME = 'ubnd-fe'
-    IMAGE_TAG = "${env.BUILD_NUMBER}"
-    IMAGE_LATEST = "${IMAGE_NAME}:latest"
-    IMAGE_VERSIONED = "${IMAGE_NAME}:${IMAGE_TAG}"
-    CONTAINER_NAME = 'ubnd-fe'
-    HOST_PORT = '8881'
-    CONTAINER_PORT = '8881' //aaa
-  }
-
   options {
     timestamps()
-    ansiColor('xterm')
-    skipDefaultCheckout()
+    disableConcurrentBuilds()
   }
-
+  environment {
+    DOCKER_CLIENT_TIMEOUT = '300'
+    DOCKER_BUILDKIT = '1'
+  }
   stages {
+    stage('Init Config') {
+      steps {
+        script {
+          def b = (env.BRANCH_NAME ?: env.GIT_BRANCH ?: '').replaceFirst(/^origin\//,'')
+          // Map branch -> host port and Jenkins file credential ID
+          def branchMap = [
+            'longt2': [port: '8881', credId: 'ubnd_fe_env_file_longt2'],
+            'staging': [port: '8883', credId: 'ubnd_fe_env_file_staging']
+          ]
+
+          if (branchMap.containsKey(b)) {
+            env.DEPLOY = 'true'
+            env.DEPLOY_BRANCH = b
+            env.DEPLOY_PORT = branchMap[b].port
+            env.ENV_CRED_ID = branchMap[b].credId
+            env.IMAGE_NAME = 'ubnd-fe'
+            env.CONTAINER_NAME = ("ubnd_fe_" + b).replaceAll('[^A-Za-z0-9_]','_')
+            // Container listens on 8881 (nginx); map host ${DEPLOY_PORT} -> 8881
+            env.CONTAINER_PORT = '8881'
+          } else {
+            env.DEPLOY = 'false'
+          }
+        }
+      }
+    }
+
+    stage('Debug Info') {
+      steps {
+        sh 'echo BRANCH_NAME=$BRANCH_NAME && echo GIT_BRANCH=$GIT_BRANCH && hostname && docker --version && docker info >/dev/null || true'
+      }
+    }
+
     stage('Checkout') {
+      when {
+        expression { return env.DEPLOY == 'true' || env.CHANGE_ID }
+      }
       steps {
         checkout scm
       }
     }
 
-    stage('Detect Branch') {
+    stage('Prepare .env from Jenkins Secret') {
+      when {
+        expression { return env.DEPLOY == 'true' }
+      }
       steps {
         script {
-          // Prefer Jenkins-provided variables first
-          def b = env.BRANCH_NAME ?: env.GIT_BRANCH
-
-          // Fallback: parse refs from the commit when in detached HEAD
-          if (!b || b.trim() == '') {
-            b = sh(
-              script: "git show -s --pretty=%D HEAD | sed 's/,/ /g'",
-              returnStdout: true
-            ).trim()
+          if (!env.ENV_CRED_ID) {
+            error 'ENV_CRED_ID is not set for this branch; check branchMap.'
           }
-
-          env.CURRENT_BRANCH = b
-
-          def isTarget = false
-          if (b) {
-            isTarget = (
-              b == 'longt2' ||
-              b.endsWith('/longt2') ||
-              b.contains('refs/heads/longt2') ||
-              b.contains('origin/longt2')
-            )
+          withCredentials([file(credentialsId: env.ENV_CRED_ID, variable: 'ENV_FILE')]) {
+            sh '''
+              set -e
+              cp "$ENV_FILE" ./.env
+              # Mirror into src/.env as some setups read from src/.env
+              mkdir -p src
+              cp "$ENV_FILE" ./src/.env || true
+            '''
           }
-
-          env.IS_TARGET = isTarget.toString()
-          echo "Detected branch: ${b} | IS_TARGET=${env.IS_TARGET}"
         }
       }
     }
 
-    stage('Prepare .env') {
-      when { expression { return env.IS_TARGET == 'true' } }
+    stage('Build Image') {
+      when {
+        expression { return env.DEPLOY == 'true' || env.CHANGE_ID }
+      }
       steps {
-        withCredentials([file(credentialsId: 'env-file-credential-id', variable: 'ENV_FILE')]) {
+        retry(3) {
           sh '''
-            set -eux
-            # Create .env in workspace from Jenkins secret file
-            cp "$ENV_FILE" .env
-            # Optionally mirror into src/.env for compatibility with current project layout
-            mkdir -p src
-            cp "$ENV_FILE" src/.env || true
+            set -e
+            IMAGE_NAME=${IMAGE_NAME:-ubnd-fe}
+            IMAGE_TAG=$(echo ${GIT_COMMIT:-latest} | cut -c1-7)
+            echo "Pulling base images (best-effort)"
+            docker pull node:20-alpine || true
+            docker pull nginx:alpine || true
+            echo "Building ${IMAGE_NAME}:${IMAGE_TAG}"
+            docker build --pull -t ${IMAGE_NAME}:${IMAGE_TAG} .
+            echo ${IMAGE_TAG} > .image_tag
           '''
         }
       }
     }
 
-    stage('Build Docker Image') {
-      when { expression { return env.IS_TARGET == 'true' } }
-      steps {
-        sh '''
-          set -eux
-          # Prepare build.env containing only REACT_APP_* for build-time injection
-          if [ -f .env ]; then
-            grep -E '^REACT_APP_' .env > build.env || true
-            echo "Generated build.env with REACT_APP_* keys:" || true
-            cat build.env || true
-          else
-            echo ".env not found; skipping build.env generation"
-          fi
-          docker build -t ${IMAGE_VERSIONED} -t ${IMAGE_LATEST} .
-        '''
+    stage('Deploy') {
+      when {
+        expression { return env.DEPLOY == 'true' }
       }
-    }
-
-    stage('Deploy Container') {
-      when { expression { return env.IS_TARGET == 'true' } }
       steps {
         sh '''
-          set -eux
-
-          # Stop and remove any existing container with the same name
-          if [ "$(docker ps -aq -f name=^${CONTAINER_NAME}$)" ]; then
-            docker rm -f ${CONTAINER_NAME} || true
-          fi
-
-          # Run the container mapping host port to container port
+          set -e
+          IMAGE_NAME=${IMAGE_NAME:-ubnd-fe}
+          IMAGE_TAG=$(cat .image_tag)
+          CONTAINER_NAME=${CONTAINER_NAME}
+          HOST_PORT=${DEPLOY_PORT}
+          CONTAINER_PORT=${CONTAINER_PORT:-8881}
+          # Stop/remove old container if exists
+          docker rm -f ${CONTAINER_NAME} 2>/dev/null || true
+          # Run new container, mapping host port -> container 8881
           docker run -d \
             --name ${CONTAINER_NAME} \
-            -p ${HOST_PORT}:${CONTAINER_PORT} \
             --restart unless-stopped \
-            ${IMAGE_LATEST}
-        '''
-      }
-    }
-
-    stage('Log Env (sanitized)') {
-      when { expression { return env.IS_TARGET == 'true' } }
-      steps {
-        sh '''
-          set -eu
-
-          echo "===== .env (sanitized) ====="
-          if [ -f .env ]; then
-            # Show only key=value for non-sensitive keys; mask likely secrets
-            # Handles simple KEY=VALUE lines; ignores comments/blank lines
-            grep -E '^[A-Za-z_][A-Za-z0-9_]*=' .env | \
-              awk -F= 'BEGIN{IGNORECASE=1} {
-                key=$1; val=substr($0, index($0,$2));
-                if (key ~ /(SECRET|TOKEN|KEY|PASS|PASSWORD|PRIVATE|API|ACCESS)/) {
-                  print key"=****";
-                } else {
-                  print key"="val;
-                }
-              }'
-          else
-            echo ".env not found in workspace"
-          fi
-
-          echo "===== Container env (docker inspect) ====="
-          docker inspect ${CONTAINER_NAME} --format '{{range .Config.Env}}{{println .}}{{end}}' || true
-
-          echo "===== Container env (printenv inside) ====="
-          docker exec -i ${CONTAINER_NAME} sh -lc 'printenv | sort' || true
+            -p ${HOST_PORT}:${CONTAINER_PORT} \
+            ${IMAGE_NAME}:${IMAGE_TAG}
         '''
       }
     }
 
     stage('Cleanup Old Images') {
-      when { expression { return env.IS_TARGET == 'true' } }
+      when {
+        expression { return env.DEPLOY == 'true' }
+      }
       steps {
         sh '''
-          set -eux
-
-          # Keep only the 3 most recent unique images for this repo
-          # List image IDs in creation order (newest first), unique by ID
-          ids=$(docker images --format '{{.ID}}' ${IMAGE_NAME} | awk '!seen[$0]++')
-          echo "All image IDs for ${IMAGE_NAME}:\n$ids" || true
-
-          # Select IDs beyond the first 3 and remove them
-          echo "$ids" | awk 'NR>3' | xargs -r docker rmi -f || true
+          set -e
+          IMAGE_NAME=${IMAGE_NAME:-ubnd-fe}
+          KEEP=3
+          # Get unique image IDs for the repository, newest first
+          IDS=$(docker images --format '{{.Repository}} {{.ID}} {{.CreatedAt}}' | awk -v name="$IMAGE_NAME" '$1==name{print $2}' | awk '!seen[$0]++')
+          COUNT=0
+          DELETE_IDS=""
+          for id in $IDS; do
+            COUNT=$((COUNT+1))
+            if [ $COUNT -gt $KEEP ]; then
+              DELETE_IDS="$DELETE_IDS $id"
+            fi
+          done
+          if [ -n "$DELETE_IDS" ]; then
+            echo "Removing old images (keeping $KEEP): $DELETE_IDS"
+            docker rmi -f $DELETE_IDS || true
+          else
+            echo "No old images to remove for $IMAGE_NAME"
+          fi
+          docker image prune -f || true
         '''
       }
     }
   }
-
   post {
-    success {
-      script { if (env.IS_TARGET == 'true') { echo "Deployment successful: http://103.48.193.165:${HOST_PORT}/" } }
+    failure {
+      echo 'Build failed. Check logs.'
     }
-    always {
-      script { if (env.IS_TARGET == 'true') { sh 'docker ps --filter name=${CONTAINER_NAME} --format "table {{.Names}}\t{{.Image}}\t{{.Status}}" || true' } }
+    success {
+      script {
+        if (env.DEPLOY == 'true') {
+          echo "Build completed. Deployed ${env.DEPLOY_BRANCH} at port ${env.DEPLOY_PORT}."
+        } else {
+          echo 'Build completed. Deploy runs on branches: longt2, staging.'
+        }
+      }
     }
   }
 }

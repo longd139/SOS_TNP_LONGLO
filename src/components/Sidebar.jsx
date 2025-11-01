@@ -42,7 +42,7 @@ const menuItems = [
     },
     {
         id: 'contact',
-        label: 'Thông tin liên hệ',
+        label: 'Ủy ban Phường',
         icon: Phone,
         path: '/contact',
         hasSubmenu: false
