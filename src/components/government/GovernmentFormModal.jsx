@@ -54,6 +54,7 @@ const GovernmentFormModal = ({ isOpen, onClose, onCreate }) => {
     };
 
     const handleSubmit = async () => {
+        
         const { isValid, errors: validationErrors } = await validateGovernmentForm(form);
 
         if (!isValid) {
@@ -170,7 +171,7 @@ const GovernmentFormModal = ({ isOpen, onClose, onCreate }) => {
                         Vị trí trên Google Maps
                     </label>
                     <div className="flex items-center gap-2 w-full">
-                        <div className="flex-1">
+                        {/* <div className="flex-1">
                             <GoogleMapAutocomplete
                                 value={form.linkGoogleMap}
                                 onChange={(link, address) => {
@@ -190,7 +191,13 @@ const GovernmentFormModal = ({ isOpen, onClose, onCreate }) => {
                             >
                                 Xem
                             </a>
-                        )}
+                        )} */}
+                        <input
+                            type="text"
+                            value={form.linkGoogleMap}
+                            onChange={(e) => updateField('linkGoogleMap', e.target.value)}
+                            className={`w-full px-3 py-2 border rounded-lg ${errors.linkGoogleMap ? 'border-red-500' : 'border-gray-300'}`}
+                        />
                     </div>
                 </div>
 

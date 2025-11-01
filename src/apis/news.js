@@ -10,13 +10,27 @@ const createNews = async (newsData) => {
     }
 }
 
-const getAllNews = async (page, size, isRemoved, isDanhMuc) => {
+const getAllNews = async (page, size, isRemoved, idDanhMuc) => {
     try {
-        const response = await apiFormClient.get("/api/tin-tuc", {
-            params: { page, size, isRemoved, isDanhMuc }
-        });
-        if (response.data.success) return response.data.data;
-        else throw new Error("Lấy danh sách tin tức thất bại");
+        const params = { page, size };
+        if (isRemoved !== undefined && isRemoved !== null) params.isRemoved = isRemoved;
+        if (idDanhMuc) params.idDanhMuc = idDanhMuc;
+        
+        const response = await apiFormClient.get("/api/tin-tuc", { params });
+        
+        if (response.data.success) {
+            return {
+                content: response.data.data || [],
+                pagination: response.data.pagination || {
+                    currentPage: page,
+                    pageSize: size,
+                    totalPages: 1,
+                    totalItems: response.data.data?.length || 0
+                }
+            };
+        } else {
+            throw new Error(response.data.message || "Lấy danh sách tin tức thất bại");
+        }
     } catch (error) {
         throw error;
     }
