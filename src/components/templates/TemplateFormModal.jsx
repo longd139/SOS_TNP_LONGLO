@@ -13,6 +13,7 @@ const TemplateFormModal = ({
 }) => {
     const [formData, setFormData] = useState({
         tenMauDon: '',
+        maMauDon: '',
         moTa: '',
         file: null,
         isRemoved: false
@@ -27,6 +28,7 @@ const TemplateFormModal = ({
         if (initialData && mode === 'edit') {
             setFormData({
                 tenMauDon: initialData.ten_mau_don || '',
+                maMauDon: initialData.ma_mau_don || '',
                 moTa: initialData.mo_ta || '',
                 file: null,
                 isRemoved: initialData.is_removed || false
@@ -35,6 +37,7 @@ const TemplateFormModal = ({
         } else {
             setFormData({
                 tenMauDon: '',
+                maMauDon: '',
                 moTa: '',
                 file: null,
                 isRemoved: false
@@ -47,6 +50,7 @@ const TemplateFormModal = ({
     const resetForm = () => {
         setFormData({
             tenMauDon: '',
+            maMauDon: '',
             moTa: '',
             file: null,
             isRemoved: false
@@ -71,10 +75,11 @@ const TemplateFormModal = ({
         }
 
         setIsSubmitting(true);
-
         try {
             const formDataToSubmit = new FormData();
             formDataToSubmit.append('tenMauDon', formData.tenMauDon.trim());
+            
+            formDataToSubmit.append('maMauDon', formData.maMauDon.trim().toUpperCase());
 
             if (formData.moTa.trim()) {
                 formDataToSubmit.append('moTa', formData.moTa.trim());
@@ -91,7 +96,11 @@ const TemplateFormModal = ({
             await onSubmit(formDataToSubmit);
             resetForm();
         } catch (error) {
-            alert('Có lỗi xảy ra khi lưu biểu mẫu!');
+            if (error.response?.data?.message) {
+                alert(error.response.data.message);
+            } else {
+                alert('Có lỗi xảy ra khi lưu biểu mẫu!');
+            }
         } finally {
             setIsSubmitting(false);
         }
@@ -165,6 +174,28 @@ const TemplateFormModal = ({
                     />
                     {errors.tenMauDon && (
                         <p className="mt-1 text-sm text-red-600">{errors.tenMauDon}</p>
+                    )}
+                </div>
+
+                <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Mã biểu mẫu <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                        type="text"
+                        value={formData.maMauDon}
+                        onChange={(e) => updateField('maMauDon', e.target.value)}
+                        placeholder="Nhập mã biểu mẫu"
+                        className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.maMauDon ? 'border-red-500' : 'border-gray-300'
+                            }`}
+                    />
+                    {errors.maMauDon && (
+                        <p className="mt-1 text-sm text-red-600">{errors.maMauDon}</p>
+                    )}
+                    {formData.maMauDon && (
+                        <p className="mt-1 text-xs text-gray-500">
+                            Sẽ được lưu là: <span className="font-semibold">{formData.maMauDon.toUpperCase()}</span>
+                        </p>
                     )}
                 </div>
 

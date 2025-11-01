@@ -37,12 +37,10 @@ export const useTemplates = (showRemoved = false) => {
             debugLogger.log('Creating template:', formData);
             await FORM_API.createForm(formData);
             await loadTemplates(showRemoved);
-            alert('Tạo biểu mẫu thành công!');
             return { success: true };
         } catch (error) {
-            alert('Có lỗi xảy ra khi tạo biểu mẫu!');
             debugLogger.error('Error creating template:', error);
-            return { success: false, error };
+            throw error;
         }
     }, [showRemoved, loadTemplates]);
 
@@ -51,12 +49,11 @@ export const useTemplates = (showRemoved = false) => {
             debugLogger.log('Updating template:', templateId, formData);
             await FORM_API.updateForm(templateId, formData);
             await loadTemplates(showRemoved);
-            alert('Cập nhật biểu mẫu thành công!');
             return { success: true };
         } catch (error) {
-            alert('Có lỗi xảy ra khi cập nhật biểu mẫu!');
             debugLogger.error('Error updating template:', error);
-            return { success: false, error };
+            // Re-throw error to be handled by the component
+            throw error;
         }
     }, [showRemoved, loadTemplates]);
 

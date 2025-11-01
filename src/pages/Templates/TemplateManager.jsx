@@ -60,25 +60,31 @@ export default function TemplateManager() {
     };
 
     const handleSubmitCreate = async (formData) => {
-        const result = await createTemplate(formData);
-        if (result.success) {
-            setIsCreateModalOpen(false);
-            alert('Tạo biểu mẫu thành công!');
-        } else {
-            throw new Error(result.error?.message || 'Failed to create template');
+        try {
+            const result = await createTemplate(formData);
+            if (result.success) {
+                setIsCreateModalOpen(false);
+                alert('Tạo biểu mẫu thành công!');
+            }
+        } catch (error) {
+            // Error will be handled in the modal component
+            throw error;
         }
     };
 
     const handleSubmitEdit = async (formData) => {
         if (!selectedTemplate) return;
         
-        const result = await updateTemplate(selectedTemplate.id, formData);
-        if (result.success) {
-            setIsEditModalOpen(false);
-            setSelectedTemplate(null);
-            alert('Cập nhật biểu mẫu thành công!');
-        } else {
-            throw new Error(result.error?.message || 'Failed to update template');
+        try {
+            const result = await updateTemplate(selectedTemplate.id, formData);
+            if (result.success) {
+                setIsEditModalOpen(false);
+                setSelectedTemplate(null);
+                alert('Cập nhật biểu mẫu thành công!');
+            }
+        } catch (error) {
+            // Error will be handled in the modal component
+            throw error;
         }
     };
 
@@ -107,14 +113,14 @@ export default function TemplateManager() {
             title: 'Tên biểu mẫu',
             dataIndex: 'ten_mau_don',
             key: 'ten_mau_don',
-            width: '250px',
+            width: '200px',
             render: (value) => (
                 <div className="flex items-center gap-2">
                     <div className="flex-shrink-0 w-5 h-5 flex items-center justify-center">
                         <FileText className="w-5 h-5 text-red-500" aria-hidden="true" />
                     </div>
                     <span 
-                        className="block max-w-[250px] truncate text-ellipsis overflow-hidden whitespace-nowrap text-sm text-gray-900"
+                        className="block max-w-[200px] truncate text-ellipsis overflow-hidden whitespace-nowrap text-sm text-gray-900"
                         title={value}
                     >
                         {value}
@@ -123,10 +129,21 @@ export default function TemplateManager() {
             )
         },
         {
+            title: 'Mã biểu mẫu',
+            dataIndex: 'ma_mau_don',
+            key: 'ma_mau_don',
+            width: '120px',
+            render: (value) => (
+                <span className="block max-w-[120px] truncate text-ellipsis overflow-hidden whitespace-nowrap text-sm font-semibold text-blue-600">
+                    {value || '-'}
+                </span>
+            )
+        },
+        {
             title: 'Mô tả',
             dataIndex: 'mo_ta',
             key: 'mo_ta',
-            width: '100px',
+            width: '150px',
             render: (value) => {
                 const displayValue = value || '-';
                 return (
