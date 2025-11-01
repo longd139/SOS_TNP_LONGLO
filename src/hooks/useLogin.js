@@ -9,7 +9,7 @@ import ROUTE_PATH from '../constants/routes';
 export const useLogin = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const { loading, errors, apiError, otpRequired, email, user } = useSelector(selectAuthState);
+    const { loading, errors, apiError, otpRequired, requiresTwoFactorAuth, email, tenDangNhap, user } = useSelector(selectAuthState);
 
     const handleRedirect = (role) => {
         if (role === ROLE.ADMIN) navigate(ROUTE_PATH.DASHBOARD, { replace: true });
@@ -43,7 +43,9 @@ export const useLogin = () => {
         errors,
         apiError,
         otpRequired,
+        requiresTwoFactorAuth,
         email,
+        tenDangNhap,
         user,
         clearAllErrors,
         clearErrors: clearAllErrors,

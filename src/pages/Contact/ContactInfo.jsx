@@ -10,6 +10,7 @@ import {
     selectError,
     selectUpdateSuccess,
 } from "../../features/contact/contactSelectors";
+import { showToast } from "../../utils/toastNotification";
 
 export default function ContactInfo() {
     const dispatch = useDispatch();
@@ -52,7 +53,7 @@ export default function ContactInfo() {
 
     useEffect(() => {
         if (updateSuccess) {
-            alert("Cập nhật thông tin thành công!");
+            showToast.success("Cập nhật thông tin thành công!");
             dispatch(clearUpdateSuccess());
             setIsEditing(false);
         }
@@ -60,7 +61,7 @@ export default function ContactInfo() {
 
     useEffect(() => {
         if (error) {
-            alert("Lỗi: " + error);
+            showToast.error("Lỗi: " + error);
             dispatch(clearError());
         }
     }, [error, dispatch]);
@@ -81,7 +82,7 @@ export default function ContactInfo() {
 
     const handleSave = () => {
         if (!formData.id) {
-            alert("ID ủy ban không hợp lệ");
+            showToast.error("ID ủy ban không hợp lệ");
             return;
         }
 

@@ -5,6 +5,7 @@ import { GOVERNMENT_API } from '../../apis/government';
 import { COMMITTEE_API } from '../../apis/committee';
 import { validateGovernmentForm } from '../../validator/governmentValidator';
 import GoogleMapAutocomplete from '../googleMap/GoogleMapAutocomplete';
+import { showToast } from '../../utils/toastNotification';
 
 const initialState = {
     idUyBan: '',
@@ -72,12 +73,12 @@ const GovernmentFormModal = ({ isOpen, onClose, onCreate }) => {
                 linkGoogleMap: form.linkGoogleMap
             };
             const created = await GOVERNMENT_API.createGovernment(payload);
-            alert('Tạo cơ sở dịch vụ công thành công!');
+            showToast.success('Tạo cơ sở dịch vụ công thành công!');
             onCreate && onCreate(created);
             setForm(initialState);
             onClose();
         } catch (err) {
-            alert('Có lỗi khi tạo cơ sở. Vui lòng thử lại.');
+            showToast.error('Có lỗi khi tạo cơ sở. Vui lòng thử lại.');
         } finally {
             setLoading(false);
         }

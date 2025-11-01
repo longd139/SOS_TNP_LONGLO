@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { FORM_API } from '../apis/form';
+import { showToast } from '../utils/toastNotification';
 
 const debugLogger = {
     log: (...args) => {
@@ -64,11 +65,11 @@ export const useTemplates = (showRemoved = false) => {
         try {
             await FORM_API.deleteForm(templateId);
             await loadTemplates(showRemoved);
-            alert(`Đã xóa biểu mẫu thành công.`);
+            showToast.success(`Đã xóa biểu mẫu thành công.`);
             return { success: true };
         } catch (error) {
             debugLogger.error('Error deleting template:', error);
-            alert('Có lỗi xảy ra khi xóa biểu mẫu!');
+            showToast.error('Có lỗi xảy ra khi xóa biểu mẫu!');
             return { success: false, error };
         }
     }, [showRemoved, loadTemplates]);

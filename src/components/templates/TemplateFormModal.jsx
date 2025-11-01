@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import BaseModal, { ModalFooter } from '../BaseModal';
 import { Upload, Eye, Download } from 'lucide-react';
 import { validateTemplateForm } from '../../validator/templateValidator';
+import { showToast } from '../../utils/toastNotification';
 
 const TemplateFormModal = ({
     isOpen,
@@ -70,7 +71,7 @@ const TemplateFormModal = ({
         const isValid = await validateForm();
         
         if (!isValid) {
-            alert('Vui lòng kiểm tra lại các trường bắt buộc!');
+            showToast.error('Vui lòng kiểm tra lại các trường bắt buộc!');
             return;
         }
 
@@ -97,9 +98,9 @@ const TemplateFormModal = ({
             resetForm();
         } catch (error) {
             if (error.response?.data?.message) {
-                alert(error.response.data.message);
+                showToast.error(error.response.data.message);
             } else {
-                alert('Có lỗi xảy ra khi lưu biểu mẫu!');
+                showToast.error('Có lỗi xảy ra khi lưu biểu mẫu!');
             }
         } finally {
             setIsSubmitting(false);
@@ -126,7 +127,7 @@ const TemplateFormModal = ({
         const file = e.target.files[0];
         if (file) {
             if (file.type !== 'application/pdf') {
-                alert('Chỉ chấp nhận file PDF!');
+                showToast.error('Chỉ chấp nhận file PDF!');
                 e.target.value = '';
                 return;
             }

@@ -6,6 +6,7 @@ import { useTemplates } from '../../hooks/useTemplates';
 import dayjs from 'dayjs';
 import 'dayjs/locale/vi';
 import BaseTable from '../../components/BaseTable';
+import { showToast } from '../../utils/toastNotification';
 
 dayjs.locale('vi');
 
@@ -50,7 +51,7 @@ export default function TemplateManager() {
     const handleConfirmDelete = async () => {
         const result = await deleteTemplate(deleteModal.template.id, deleteModal.template.ten_mau_don);
         if (result.success) {
-            alert('Xóa biểu mẫu thành công!');
+            showToast.success('Xóa biểu mẫu thành công!');
         }
         setDeleteModal({ isOpen: false, template: null });
     };
@@ -64,7 +65,7 @@ export default function TemplateManager() {
             const result = await createTemplate(formData);
             if (result.success) {
                 setIsCreateModalOpen(false);
-                alert('Tạo biểu mẫu thành công!');
+                showToast.success('Tạo biểu mẫu thành công!');
             }
         } catch (error) {
             // Error will be handled in the modal component
@@ -80,7 +81,7 @@ export default function TemplateManager() {
             if (result.success) {
                 setIsEditModalOpen(false);
                 setSelectedTemplate(null);
-                alert('Cập nhật biểu mẫu thành công!');
+                showToast.success('Cập nhật biểu mẫu thành công!');
             }
         } catch (error) {
             // Error will be handled in the modal component

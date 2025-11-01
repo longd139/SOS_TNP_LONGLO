@@ -7,6 +7,7 @@ import ProcedureDetailModal from '../../components/procedures/ProcedureDetailMod
 import ProceduresFilter from '../../components/procedures/ProceduresFilter';
 import { useProcedure } from '../../hooks/useProcedures';
 import { getProcedureColumns } from '../../components/procedures/columns';
+import { showToast } from '../../utils/toastNotification';
 dayjs.locale('vi');
 
 export default function ProceduresManager() {
@@ -67,7 +68,7 @@ export default function ProceduresManager() {
         const result = await createProcedure(formData);
         if (result.success) {
             closeCreateModal();
-            alert('Tạo thủ tục thành công!');
+            showToast.success('Tạo thủ tục thành công!');
         } else {
             throw new Error(result.error?.message || 'Failed to create procedure');
         }

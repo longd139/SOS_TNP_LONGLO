@@ -8,6 +8,7 @@ import NewsPreviewModal from '../../components/news/NewsPreviewModal';
 import { useNews } from '../../hooks/useNews';
 import { formatDate } from '../../utils/formatDate';
 import { STATUS_NEWS, STATUS_NEWS_LABELS } from '../../constants/status';
+import { showToast } from '../../utils/toastNotification';
 
 export default function NewsManager() {
     const { news, loading, error, pagination, loadNews, createNews, updateNews, deleteNews, clearError } = useNews();
@@ -37,10 +38,10 @@ export default function NewsManager() {
     const handleConfirmDelete = async () => {
         const result = await deleteNews(selectedNews.id);
         if (result.success) {
-            alert('Xóa tin tức thành công!');
+            showToast.success('Xóa tin tức thành công!');
             loadNews(currentFilters);
         } else {
-            alert(result.error || 'Xóa tin tức thất bại!');
+            showToast.error(result.error || 'Xóa tin tức thất bại!');
         }
         setIsDeleteModalOpen(false);
         setSelectedNews(null);
@@ -51,14 +52,14 @@ export default function NewsManager() {
         try {
             const result = await createNews(formData);
             if (result.success) {
-                alert('Tạo tin tức thành công!');
+                showToast.success('Tạo tin tức thành công!');
                 setIsCreateModalOpen(false);
                 loadNews(currentFilters);
             } else {
-                alert(result.error || 'Tạo tin tức thất bại!');
+                showToast.error(result.error || 'Tạo tin tức thất bại!');
             }
         } catch (error) {
-            alert('Có lỗi xảy ra khi tạo tin tức!');
+            showToast.error('Có lỗi xảy ra khi tạo tin tức!');
         } finally {
             setIsSubmitting(false);
         }
@@ -69,15 +70,15 @@ export default function NewsManager() {
         try {
             const result = await updateNews(selectedNews.id, formData);
             if (result.success) {
-                alert('Cập nhật tin tức thành công!');
+                showToast.success('Cập nhật tin tức thành công!');
                 setIsEditModalOpen(false);
                 setSelectedNews(null);
                 loadNews(currentFilters);
             } else {
-                alert(result.error || 'Cập nhật tin tức thất bại!');
+                showToast.error(result.error || 'Cập nhật tin tức thất bại!');
             }
         } catch (error) {
-            alert('Có lỗi xảy ra khi cập nhật tin tức!');
+            showToast.error('Có lỗi xảy ra khi cập nhật tin tức!');
         } finally {
             setIsSubmitting(false);
         }

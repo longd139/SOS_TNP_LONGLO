@@ -27,6 +27,13 @@ export const loginUser = createAsyncThunk(
             const res = await AUTH_API.login(credentials);
             const response = res?.data || res;
 
+            if (response.requiresTwoFactorAuth) {
+                return {
+                    requiresTwoFactorAuth: true,
+                    tenDangNhap: credentials.tenDangNhap,
+                };
+            }
+
             if (response.requireOtp) {
                 return {
                     otpRequired: true,
@@ -58,15 +65,20 @@ export const verifyOtpUser = createAsyncThunk(
     'auth/verifyOtpUser',
     async ({ otp, tenDangNhap }, { rejectWithValue }) => {
         try {
-            const result = await AUTH_API.verify2FA({ otp, tenDangNhap });
+            const response = await AUTH_API.verify2FA({ otp, tenDangNhap });
 
-            if (!result.success) throw new Error(result.message || 'OTP sai');
-            if (!result.accessToken) throw new Error('Không nhận được token');
+            if (!response.success) throw new Error(response.message || 'OTP sai');
+            
+            const tokenData = response.data;
+            const accessToken = tokenData.accessToken;
+            const refreshToken = tokenData.refreshToken;
 
-            const decoded = decodeToken(result.accessToken);
+            if (!accessToken) throw new Error('Không nhận được token');
+
+            const decoded = decodeToken(accessToken);
             if (!decoded) throw new Error('Không thể giải mã token');
 
-            storeTokens(result.accessToken, result.refreshToken);
+            storeTokens(accessToken, refreshToken);
 
             return {
                 user: {

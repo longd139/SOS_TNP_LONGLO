@@ -4,6 +4,50 @@
 
 @import 'react-quill/dist/quill.snow.css';
 
+/* Global font size reduction */
+@layer base {
+  html {
+    font-size: 14px;
+  }
+  
+  body {
+    font-size: 12px;
+    line-height: 1.5;
+  }
+  
+  h1 {
+    font-size: 18px;
+    font-weight: 700;
+  }
+  
+  h2 {
+    font-size: 16px;
+    font-weight: 600;
+  }
+  
+  h3 {
+    font-size: 14px;
+    font-weight: 600;
+  }
+  
+  h4 {
+    font-size: 13px;
+    font-weight: 600;
+  }
+  
+  label {
+    font-size: 11px;
+  }
+  
+  input, textarea, select {
+    font-size: 12px;
+  }
+  
+  button {
+    font-size: 12px;
+  }
+}
+
 ::-webkit-scrollbar {
     width: 4px;
     height: 4px;
@@ -116,11 +160,12 @@
 
 @layer components {
     select {
-        @apply border-gray-300;
+        border-color: #d1d5db;
     }
     
     select:focus {
-        @apply border-blue-500 ring-2 ring-blue-200;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 2px rgb(191, 219, 254);
     }
 }
 

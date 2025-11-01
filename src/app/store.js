@@ -5,6 +5,7 @@ import usersReducer from '../features/users/usersSlice';
 import newsReducer from '../features/news/newsSlice';
 import categoriesReducer from '../features/categories/categoriesSlice';
 import contactReducer from '../features/contact/contactSlice';
+import userProfileReducer from '../features/userProfile/userProfileSlice';
 
 export const store = configureStore({
     reducer: {
@@ -14,5 +15,6 @@ export const store = configureStore({
         news: newsReducer,
         categories: categoriesReducer,
         contact: contactReducer,
+        userProfile: userProfileReducer,
     },
 });

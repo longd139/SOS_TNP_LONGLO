@@ -27,6 +27,7 @@ import {
     selectShowRemoved,
     selectProceduresWithAreas
 } from '../features/procedures/proceduresSelectors';
+import { showToast } from '../utils/toastNotification';
 
 export const useProcedure = () => {
     const dispatch = useDispatch();
@@ -74,10 +75,10 @@ export const useProcedure = () => {
                 is_removed: showRemoved
             }));
 
-            alert('Tạo thủ tục thành công!');
+            showToast.success('Tạo thủ tục thành công!');
             return { success: true };
         } catch (error) {
-            alert('Có lỗi xảy ra khi tạo thủ tục!');
+            showToast.error('Có lỗi xảy ra khi tạo thủ tục!');
             return { success: false, error };
         }
     }, [dispatch, pagination, filters, showRemoved]);
@@ -94,10 +95,10 @@ export const useProcedure = () => {
                 is_removed: showRemoved
             }));
 
-            alert('Cập nhật thủ tục thành công!');
+            showToast.success('Cập nhật thủ tục thành công!');
             return { success: true };
         } catch (error) {
-            alert('Có lỗi xảy ra khi cập nhật thủ tục!');
+            showToast.error('Có lỗi xảy ra khi cập nhật thủ tục!');
             return { success: false, error };
         }
     }, [dispatch, pagination, filters, showRemoved]);
@@ -114,13 +115,13 @@ export const useProcedure = () => {
                 is_removed: showRemoved
             }));
 
-            alert('Đã xóa thủ tục thành công.');
+            showToast.success('Đã xóa thủ tục thành công.');
             return { success: true };
         } catch (error) {
             if (error === 'User cancelled') {
                 return { success: false, cancelled: true };
             }
-            alert('Có lỗi xảy ra khi xóa thủ tục!');
+            showToast.error('Có lỗi xảy ra khi xóa thủ tục!');
             return { success: false, error };
         }
     }, [dispatch, pagination, filters, showRemoved]);
@@ -130,7 +131,7 @@ export const useProcedure = () => {
             const result = await dispatch(fetchProcedureById(procedureId)).unwrap();
             return { success: true, data: result };
         } catch (error) {
-            alert('Có lỗi xảy ra khi lấy thông tin thủ tục!');
+            showToast.error('Có lỗi xảy ra khi lấy thông tin thủ tục!');
             return { success: false, error };
         }
     }, [dispatch]);
