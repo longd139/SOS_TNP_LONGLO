@@ -1,3 +1,4 @@
+// apis/committee.js
 import apiClient from "../utils/apiClient";
 
 const createCommittee = async (data) => {
@@ -13,8 +14,11 @@ const createCommittee = async (data) => {
 const getCommittees = async () => {
     try {
         const response = await apiClient.get("/api/uy-ban");
-        if (response.data.success) return response.data.data;
-        else throw new Error("Lấy danh sách ủy ban thất bại");
+        if (response.data.success) {
+            return response.data.data;
+        } else {
+            throw new Error("Lấy danh sách ủy ban thất bại");
+        }
     } catch (error) {
         throw error;
     }
@@ -23,8 +27,12 @@ const getCommittees = async () => {
 const updateCommittee = async (committeeId, data) => {
     try {
         const response = await apiClient.put(`/api/uy-ban/${committeeId}`, data);
-        if (response.data.success) return response.data.data;
-        else throw new Error("Cập nhật ủy ban thất bại");
+        
+        if (response.data.success) {
+            return response.data.data;
+        } else {
+            throw new Error("Cập nhật ủy ban thất bại");
+        }
     } catch (error) {
         throw error;
     }
