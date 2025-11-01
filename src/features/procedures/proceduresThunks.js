@@ -72,11 +72,6 @@ export const deleteProcedure = createAsyncThunk(
     'procedures/deleteProcedure',
     async ({ procedureId, procedureName }, { rejectWithValue }) => {
         try {
-            const confirmed = window.confirm(`Bạn có chắc chắn muốn xóa thủ tục "${procedureName}"?`);
-            if (!confirmed) {
-                return rejectWithValue('User cancelled');
-            }
-
             await FORMALITY_API.deleteFormality(procedureId);
             return { success: true };
         } catch (error) {

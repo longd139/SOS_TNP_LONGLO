@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { FORM_API } from '../apis/form';
 import { showToast } from '../utils/toastNotification';
+import { showConfirm } from '../utils/confirmUtils';
 
 const debugLogger = {
     log: (...args) => {
@@ -59,7 +60,7 @@ export const useTemplates = (showRemoved = false) => {
     }, [showRemoved, loadTemplates]);
 
     const deleteTemplate = useCallback(async (templateId, templateName) => {
-        const confirmed = window.confirm(`Bạn có chắc chắn muốn xóa biểu mẫu "${templateName}"?`);
+        const confirmed = showConfirm(`Bạn có chắc chắn muốn xóa biểu mẫu "${templateName}"?`);
         if (!confirmed) return { success: false, cancelled: true };
 
         try {

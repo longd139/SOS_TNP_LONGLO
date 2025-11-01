@@ -28,8 +28,6 @@ export default function TemplateManager() {
         deleteTemplate
     } = useTemplates(showRemoved);
 
-    console.log('Templates:', templates);
-
     const handleView = (template) => {
         const baseUrl = process.env.REACT_APP_API_URL;
         const fileUrl = `${baseUrl}${template.url_file_pdf}`;
@@ -196,29 +194,29 @@ export default function TemplateManager() {
                 </button>
             </div>
 
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-3 px-3 md:px-4 py-2 md:py-3">
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-3 p-3">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                    <div className="flex items-center gap-2 md:gap-3 flex-wrap">
-                        <h3 className="text-sm md:text-base font-semibold text-gray-900 whitespace-nowrap">
+                    <div className="flex items-center gap-3">
+                        <div className="text-sm text-gray-600">
                             Danh sách biểu mẫu ({templates.length})
-                        </h3>
+                        </div>
                         {showRemoved && (
-                            <span className="px-2 md:px-3 py-1 bg-red-100 text-red-800 text-xs font-medium rounded-full whitespace-nowrap">
+                            <span className="px-3 py-1 bg-red-100 text-red-800 text-xs font-medium rounded-full">
                                 Đã xóa
                             </span>
                         )}
                         {!showRemoved && (
-                            <span className="px-2 md:px-3 py-1 bg-green-100 text-green-800 text-xs font-medium rounded-full whitespace-nowrap">
+                            <span className="px-3 py-1 bg-green-100 text-green-800 text-xs font-medium rounded-full">
                                 Đang hoạt động
                             </span>
                         )}
                     </div>
-                    <div className="flex items-center gap-2 w-full sm:w-auto">
-                        <label className="text-xs md:text-sm font-medium text-gray-700 whitespace-nowrap">Trạng thái:</label>
+                    <div className="flex items-center gap-2">
+                        <label className="text-sm font-medium text-gray-700">Trạng thái:</label>
                         <select
                             value={showRemoved ? 'removed' : 'active'}
                             onChange={(e) => setShowRemoved(e.target.value === 'removed')}
-                            className="flex-1 sm:flex-none min-w-0 px-2 md:px-3 py-1.5 md:py-2 text-xs md:text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            className="min-w-[160px] px-3 py-2 text-sm border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
                         >
                             <option value="active">Đang hoạt động</option>
                             <option value="removed">Đã xóa</option>

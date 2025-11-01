@@ -107,27 +107,27 @@ export default function ContactInfo() {
 
     return (
         <div className="min-h-screen">
-            <div className="max-w-7xl mx-auto px-3 py-2 md:py-3">
-                <div className="mb-2 md:mb-3">
-                    <h1 className="text-lg md:text-xl font-bold text-gray-900 mb-0.5">
+            <div className="max-w-7xl mx-auto px-2 py-1 md:py-2">
+                <div className="mb-3 md:mb-4">
+                    <h1 className="text-xl md:text-2xl font-bold text-gray-900">
                         Ủy ban Phường
                     </h1>
-                    <p className="text-xs md:text-sm text-gray-600">
+                    <p className="text-sm md:text-base text-gray-600 mt-1">
                         Cập nhật thông tin Ủy ban Phường
                     </p>
                 </div>
 
-                <div className="space-y-2 md:space-y-3">
-                    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-2 md:p-3">
-                        <div className="flex items-center gap-1.5 mb-2 md:mb-3">
+                <div className="space-y-3">
+                    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3">
+                        <div className="flex items-center gap-2 mb-3">
                             <MapPin className="w-4 h-4 text-blue-600" />
-                            <h2 className="text-sm md:text-base font-semibold text-gray-900">
+                            <h2 className="text-base font-semibold text-gray-900">
                                 Thông tin đơn vị
                             </h2>
                         </div>
 
                         <div>
-                            <label className="block text-xs md:text-sm font-medium text-gray-700 mb-1">
+                            <label className="block text-sm font-medium text-gray-600 mb-1">
                                 Tên đơn vị <span className="text-red-500">*</span>
                             </label>
                             <input
@@ -135,21 +135,21 @@ export default function ContactInfo() {
                                 value={formData.tenDonVi}
                                 onChange={(e) => handleChange("tenDonVi", e.target.value)}
                                 disabled={!isEditing}
-                                className="w-full px-2.5 py-1.5 text-sm border border-gray-300 rounded-lg bg-gray-50 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50"
+                                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg bg-gray-50 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50"
                             />
                         </div>
                     </div>                    
-                    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-2 md:p-3">
-                        <div className="flex items-center gap-1.5 mb-2 md:mb-3">
+                    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3">
+                        <div className="flex items-center gap-2 mb-3">
                             <MapPin className="w-4 h-4 text-blue-600" />
-                            <h2 className="text-sm md:text-base font-semibold text-gray-900">
+                            <h2 className="text-base font-semibold text-gray-900">
                                 Địa chỉ văn phòng
                             </h2>
                         </div>
 
-                        <div className="space-y-2">
+                        <div className="space-y-3">
                             <div>
-                                <label className="block text-xs md:text-sm font-medium text-gray-700 mb-1">
+                                <label className="block text-sm font-medium text-gray-600 mb-1">
                                     Địa chỉ đầy đủ <span className="text-red-500">*</span>
                                 </label>
                                 <input
@@ -157,12 +157,12 @@ export default function ContactInfo() {
                                     value={formData.diaChi}
                                     onChange={(e) => handleChange("diaChi", e.target.value)}
                                     disabled={!isEditing}
-                                    className="w-full px-2.5 py-1.5 text-sm border border-gray-300 rounded-lg bg-gray-50 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50"
+                                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg bg-gray-50 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50"
                                 />
                             </div>
 
                             <div>
-                                <label className="block text-xs md:text-sm font-medium text-gray-700 mb-1">
+                                <label className="block text-sm font-medium text-gray-600 mb-1">
                                     Link Google Map <span className="text-red-500">*</span>
                                 </label>
                                 <input
@@ -170,24 +170,24 @@ export default function ContactInfo() {
                                     value={formData.linkGoogleMap}
                                     onChange={(e) => handleChange("linkGoogleMap", e.target.value)}
                                     disabled={!isEditing}
-                                    className="w-full px-2.5 py-1.5 text-sm border border-gray-300 rounded-lg bg-gray-50 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50"
+                                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg bg-gray-50 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50"
                                     placeholder="https://maps.google.com/?q=10.8231,106.6297"
                                 />
                             </div>
                         </div>
                     </div>
 
-                    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-2 md:p-3">
-                        <div className="flex items-center gap-1.5 mb-2 md:mb-3">
+                    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3">
+                        <div className="flex items-center gap-2 mb-3">
                             <Phone className="w-4 h-4 text-blue-600" />
-                            <h2 className="text-sm md:text-base font-semibold text-gray-900">
+                            <h2 className="text-base font-semibold text-gray-900">
                                 Thông tin liên lạc
                             </h2>
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                             <div>
-                                <label className="block text-xs md:text-sm font-medium text-gray-700 mb-1">
+                                <label className="block text-sm font-medium text-gray-600 mb-1">
                                     Số điện thoại <span className="text-red-500">*</span>
                                 </label>
                                 <input
@@ -195,13 +195,13 @@ export default function ContactInfo() {
                                     value={formData.soDienThoai}
                                     onChange={(e) => handleChange("soDienThoai", e.target.value)}
                                     disabled={!isEditing}
-                                    className="w-full px-2.5 py-1.5 text-sm border border-gray-300 rounded-lg bg-gray-50 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50"
+                                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg bg-gray-50 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50"
                                     placeholder="0813241516540"
                                 />
                             </div>
 
                             <div>
-                                <label className="block text-xs md:text-sm font-medium text-gray-700 mb-1">
+                                <label className="block text-sm font-medium text-gray-600 mb-1">
                                     Email liên hệ <span className="text-red-500">*</span>
                                 </label>
                                 <input
@@ -209,26 +209,26 @@ export default function ContactInfo() {
                                     value={formData.email}
                                     onChange={(e) => handleChange("email", e.target.value)}
                                     disabled={!isEditing}
-                                    className="w-full px-2.5 py-1.5 text-sm border border-gray-300 rounded-lg bg-gray-50 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50"
+                                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg bg-gray-50 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50"
                                     placeholder="user@example.com"
                                 />
                             </div>
                         </div>
-                    </div>                    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-2 md:p-3">
-                        <div className="flex items-center gap-1.5 mb-2 md:mb-3">
+                    </div>                    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3">
+                        <div className="flex items-center gap-2 mb-3">
                             <Clock className="w-4 h-4 text-blue-600" />
-                            <h2 className="text-sm md:text-base font-semibold text-gray-900">
+                            <h2 className="text-base font-semibold text-gray-900">
                                 Giờ làm việc
                             </h2>
                         </div>
 
-                        <div className="space-y-2">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                        <div className="space-y-3">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                 <div>
-                                    <label className="block text-xs md:text-sm font-medium text-gray-700 mb-1">
+                                    <label className="block text-sm font-medium text-gray-600 mb-1">
                                         Buổi sáng <span className="text-red-500">*</span>
                                     </label>
-                                    <div className="flex items-center gap-1.5">
+                                    <div className="flex items-center gap-2">
                                         <div className="flex-1">
                                             <input
                                                 type="text"
@@ -237,11 +237,11 @@ export default function ContactInfo() {
                                                     handleChange("gioLamViec.buoi_sang.tu", e.target.value)
                                                 }
                                                 disabled={!isEditing}
-                                                className="w-full px-2.5 py-1.5 text-sm border border-gray-300 rounded-lg bg-gray-50 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50"
+                                                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg bg-gray-50 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50"
                                                 placeholder="07:30"
                                             />
                                         </div>
-                                        <span className="text-gray-500 font-medium text-xs">-</span>
+                                        <span className="text-gray-500 font-medium text-sm">-</span>
                                         <div className="flex-1">
                                             <input
                                                 type="text"
@@ -250,7 +250,7 @@ export default function ContactInfo() {
                                                     handleChange("gioLamViec.buoi_sang.den", e.target.value)
                                                 }
                                                 disabled={!isEditing}
-                                                className="w-full px-2.5 py-1.5 text-sm border border-gray-300 rounded-lg bg-gray-50 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50"
+                                                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg bg-gray-50 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50"
                                                 placeholder="11:30"
                                             />
                                         </div>
@@ -258,10 +258,10 @@ export default function ContactInfo() {
                                 </div>
 
                                 <div>
-                                    <label className="block text-xs md:text-sm font-medium text-gray-700 mb-1">
+                                    <label className="block text-sm font-medium text-gray-600 mb-1">
                                         Buổi chiều <span className="text-red-500">*</span>
                                     </label>
-                                    <div className="flex items-center gap-1.5">
+                                    <div className="flex items-center gap-2">
                                         <div className="flex-1">
                                             <input
                                                 type="text"
@@ -270,11 +270,11 @@ export default function ContactInfo() {
                                                     handleChange("gioLamViec.buoi_chieu.tu", e.target.value)
                                                 }
                                                 disabled={!isEditing}
-                                                className="w-full px-2.5 py-1.5 text-sm border border-gray-300 rounded-lg bg-gray-50 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50"
+                                                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg bg-gray-50 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50"
                                                 placeholder="13:00"
                                             />
                                         </div>
-                                        <span className="text-gray-500 font-medium text-xs">-</span>
+                                        <span className="text-gray-500 font-medium text-sm">-</span>
                                         <div className="flex-1">
                                             <input
                                                 type="text"
@@ -283,7 +283,7 @@ export default function ContactInfo() {
                                                     handleChange("gioLamViec.buoi_chieu.den", e.target.value)
                                                 }
                                                 disabled={!isEditing}
-                                                className="w-full px-2.5 py-1.5 text-sm border border-gray-300 rounded-lg bg-gray-50 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50"
+                                                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg bg-gray-50 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50"
                                                 placeholder="17:00"
                                             />
                                         </div>
@@ -292,7 +292,7 @@ export default function ContactInfo() {
                             </div>
 
                             <div>
-                                <label className="block text-xs md:text-sm font-medium text-gray-700 mb-1">
+                                <label className="block text-sm font-medium text-gray-600 mb-1">
                                     Ghi chú
                                 </label>
                                 <input
@@ -302,17 +302,17 @@ export default function ContactInfo() {
                                         handleChange("gioLamViec.ghi_chu", e.target.value)
                                     }
                                     disabled={!isEditing}
-                                    className="w-full px-2.5 py-1.5 text-sm border border-gray-300 rounded-lg bg-gray-50 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50"
+                                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg bg-gray-50 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50"
                                 />
                             </div>
                         </div>
                     </div>
 
-                    <div className="flex justify-end mt-2 md:mt-3">
+                    <div className="flex justify-end mt-3">
                         <button
                             onClick={handleSave}
                             disabled={loading}
-                            className="px-3 md:px-4 py-1.5 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center gap-1.5 shadow-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center gap-2 shadow-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             <svg
                                 className="w-4 h-4"

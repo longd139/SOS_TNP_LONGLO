@@ -27,7 +27,6 @@ import {
     selectShowRemoved,
     selectProceduresWithAreas
 } from '../features/procedures/proceduresSelectors';
-import { showToast } from '../utils/toastNotification';
 
 export const useProcedure = () => {
     const dispatch = useDispatch();
@@ -75,10 +74,8 @@ export const useProcedure = () => {
                 is_removed: showRemoved
             }));
 
-            showToast.success('Tạo thủ tục thành công!');
             return { success: true };
         } catch (error) {
-            showToast.error('Có lỗi xảy ra khi tạo thủ tục!');
             return { success: false, error };
         }
     }, [dispatch, pagination, filters, showRemoved]);
@@ -95,10 +92,8 @@ export const useProcedure = () => {
                 is_removed: showRemoved
             }));
 
-            showToast.success('Cập nhật thủ tục thành công!');
             return { success: true };
         } catch (error) {
-            showToast.error('Có lỗi xảy ra khi cập nhật thủ tục!');
             return { success: false, error };
         }
     }, [dispatch, pagination, filters, showRemoved]);
@@ -115,13 +110,11 @@ export const useProcedure = () => {
                 is_removed: showRemoved
             }));
 
-            showToast.success('Đã xóa thủ tục thành công.');
             return { success: true };
         } catch (error) {
             if (error === 'User cancelled') {
                 return { success: false, cancelled: true };
             }
-            showToast.error('Có lỗi xảy ra khi xóa thủ tục!');
             return { success: false, error };
         }
     }, [dispatch, pagination, filters, showRemoved]);
@@ -131,7 +124,6 @@ export const useProcedure = () => {
             const result = await dispatch(fetchProcedureById(procedureId)).unwrap();
             return { success: true, data: result };
         } catch (error) {
-            showToast.error('Có lỗi xảy ra khi lấy thông tin thủ tục!');
             return { success: false, error };
         }
     }, [dispatch]);

@@ -8,6 +8,7 @@ import ProceduresFilter from '../../components/procedures/ProceduresFilter';
 import { useProcedure } from '../../hooks/useProcedures';
 import { getProcedureColumns } from '../../components/procedures/columns';
 import { showToast } from '../../utils/toastNotification';
+import { showConfirm } from '../../utils/confirmUtils';
 dayjs.locale('vi');
 
 export default function ProceduresManager() {
@@ -80,7 +81,9 @@ export default function ProceduresManager() {
         const result = await updateProcedure(currentProcedure.id, formData);
         if (result.success) {
             closeEditModal();
+            showToast.success('Cập nhật thủ tục thành công!');
         } else {
+            showToast.error('Có lỗi xảy ra khi cập nhật thủ tục!');
             throw new Error(result.error?.message || 'Failed to update procedure');
         }
     };
@@ -94,7 +97,17 @@ export default function ProceduresManager() {
 
 
     const handleDelete = async (procedure) => {
-        await deleteProcedure(procedure.id, procedure.ten_thu_tuc || procedure.tenThuTuc);
+        const confirmed = showConfirm(`Bạn có chắc chắn muốn xóa thủ tục "${procedure.ten_thu_tuc || procedure.tenThuTuc}"?`);
+        if (!confirmed) return;
+
+        const result = await deleteProcedure(procedure.id, procedure.ten_thu_tuc || procedure.tenThuTuc);
+        if (result.success) {
+            showToast.success('Đã xóa thủ tục thành công.');
+        } else if (result.cancelled) {
+            // no-op
+        } else {
+            showToast.error('Có lỗi xảy ra khi xóa thủ tục!');
+        }
     };
 
     const handleView = async (procedure) => {

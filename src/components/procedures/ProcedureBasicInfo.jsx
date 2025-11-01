@@ -144,7 +144,7 @@ const ProcedureBasicInfo = ({ formData, errors, updateField }) => {
                         <button
                             type="button"
                             onClick={() => setOpenCreate(true)}
-                            className="flex-shrink-0 h-[42px] px-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors flex items-center justify-center"
+                            className="flex-shrink-0 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors flex items-center justify-center"
                             title="Tạo mới cơ sở dịch vụ công"
                         >
                             <PlusCircle className="w-5 h-5" />
