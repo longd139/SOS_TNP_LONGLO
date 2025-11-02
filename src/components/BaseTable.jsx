@@ -28,24 +28,24 @@ const BaseTable = ({
 
     return (
         <div className={`bg-white rounded-lg shadow-sm border border-gray-200 ${className}`}>
-            <div className="table-scroll-container">
+            <div className="overflow-x-auto">
                 <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gray-50">
                         <tr>
                             {columns.map((column, index) => (
                                 <th
                                     key={column.key || index}
-                                    className={`px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider ${column.width ? `w-${column.width}` : ''
+                                    className={`px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap ${column.width ? `w-${column.width}` : ''
                                         }`}
-                                    style={column.width ? { width: column.width } : {}}
+                                    style={column.width ? { width: column.width, maxWidth: column.width } : {}}
                                 >
                                     {column.title}
                                 </th>
                             ))}
                             {showActions && (
                                 <th
-                                    className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                    style={{ width: actionColumnWidth }}
+                                    className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap"
+                                    style={{ width: actionColumnWidth, maxWidth: actionColumnWidth }}
                                 >
                                     Thao tác
                                 </th>
@@ -69,9 +69,7 @@ const BaseTable = ({
                                         const tdClassList = [
                                             'px-6',
                                             'py-4',
-                                            column.noWrap
-                                                ? 'whitespace-nowrap truncate'
-                                                : 'truncate sm:whitespace-normal sm:break-words sm:leading-relaxed',
+                                            'whitespace-nowrap',
                                             'text-sm',
                                             'text-gray-900'
                                         ];
@@ -81,7 +79,7 @@ const BaseTable = ({
                                             <td
                                                 key={column.key || colIndex}
                                                 className={tdClassList.join(' ')}
-                                                style={column.width ? { width: column.width } : {}}
+                                                style={column.width ? { width: column.width, maxWidth: column.width } : {}}
                                             >
                                                 {column.render ? column.render(item[column.dataIndex], item, rowIndex) : item[column.dataIndex]}
                                             </td>

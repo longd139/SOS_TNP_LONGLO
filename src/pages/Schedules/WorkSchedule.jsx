@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { Calendar, Clock, MapPin, User, FileText, Pencil, Trash2, Download, Upload, Plus } from 'lucide-react';
+import { showConfirm } from '../../utils/confirmUtils';
+import { showToast } from '../../utils/toastNotification';
 import { scheduleList } from '../../mockData';
 
 export default function WorkSchedule() {
@@ -39,9 +41,11 @@ export default function WorkSchedule() {
     };
 
     const handleDelete = (schedule) => {
-        if (window.confirm(`Bạn có chắc chắn muốn xóa lịch tiếp dân ngày ${schedule.date}?`)) {
-            setSchedules(schedules.filter(s => s.id !== schedule.id));
-        }
+        const confirmed = showConfirm(`Bạn có chắc chắn muốn xóa lịch tiếp dân ngày ${schedule.date}?`);
+        if (!confirmed) return;
+
+        setSchedules(schedules.filter(s => s.id !== schedule.id));
+        showToast.success('Đã xóa lịch tiếp dân thành công.');
     };
 
     const handleExport = () => {

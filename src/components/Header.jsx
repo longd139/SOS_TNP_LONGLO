@@ -1,6 +1,7 @@
 import React from 'react';
 import { Menu } from 'lucide-react';
 import PropTypes from 'prop-types';
+import UserProfileDropdown from './UserProfileDropdown';
 
 export default function Header({ title = "Hệ thống quản trị", onMobileMenuToggle, isMobileMenuOpen }) {
     return (
@@ -19,16 +20,7 @@ export default function Header({ title = "Hệ thống quản trị", onMobileMe
                 </div>
 
                 <div className="flex items-center space-x-2 md:space-x-4">
-
-                    <div className="flex items-center space-x-2 md:space-x-3">
-                        <div className="w-8 h-8 md:w-9 md:h-9 bg-blue-500 rounded-full flex items-center justify-center">
-                            <span className="text-white text-sm font-medium">TV</span>
-                        </div>
-                        <div className="text-right hidden sm:block">
-                            <p className="text-sm font-medium text-gray-700">Quản trị viên</p>
-                            <p className="text-xs text-gray-500">Administrator</p>
-                        </div>
-                    </div>
+                    <UserProfileDropdown />
                 </div>
             </div>
         </header>

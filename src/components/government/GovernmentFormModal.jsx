@@ -5,6 +5,7 @@ import { GOVERNMENT_API } from '../../apis/government';
 import { COMMITTEE_API } from '../../apis/committee';
 import { validateGovernmentForm } from '../../validator/governmentValidator';
 import GoogleMapAutocomplete from '../googleMap/GoogleMapAutocomplete';
+import { showToast } from '../../utils/toastNotification';
 
 const initialState = {
     idUyBan: '',
@@ -54,6 +55,7 @@ const GovernmentFormModal = ({ isOpen, onClose, onCreate }) => {
     };
 
     const handleSubmit = async () => {
+        
         const { isValid, errors: validationErrors } = await validateGovernmentForm(form);
 
         if (!isValid) {
@@ -71,12 +73,12 @@ const GovernmentFormModal = ({ isOpen, onClose, onCreate }) => {
                 linkGoogleMap: form.linkGoogleMap
             };
             const created = await GOVERNMENT_API.createGovernment(payload);
-            alert('Tạo cơ sở dịch vụ công thành công!');
+            showToast.success('Tạo cơ sở dịch vụ công thành công!');
             onCreate && onCreate(created);
             setForm(initialState);
             onClose();
         } catch (err) {
-            alert('Có lỗi khi tạo cơ sở. Vui lòng thử lại.');
+            showToast.error('Có lỗi khi tạo cơ sở. Vui lòng thử lại.');
         } finally {
             setLoading(false);
         }
@@ -170,7 +172,7 @@ const GovernmentFormModal = ({ isOpen, onClose, onCreate }) => {
                         Vị trí trên Google Maps
                     </label>
                     <div className="flex items-center gap-2 w-full">
-                        <div className="flex-1">
+                        {/* <div className="flex-1">
                             <GoogleMapAutocomplete
                                 value={form.linkGoogleMap}
                                 onChange={(link, address) => {
@@ -190,7 +192,13 @@ const GovernmentFormModal = ({ isOpen, onClose, onCreate }) => {
                             >
                                 Xem
                             </a>
-                        )}
+                        )} */}
+                        <input
+                            type="text"
+                            value={form.linkGoogleMap}
+                            onChange={(e) => updateField('linkGoogleMap', e.target.value)}
+                            className={`w-full px-3 py-2 border rounded-lg ${errors.linkGoogleMap ? 'border-red-500' : 'border-gray-300'}`}
+                        />
                     </div>
                 </div>
 

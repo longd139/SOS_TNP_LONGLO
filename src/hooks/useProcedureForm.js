@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { validateFormalityForm } from '../validator/formalityValidator';
 import { INITIAL_FORM_STATE, transformInitialData, cleanFormData } from '../components/procedures/transformProcedureData';
+import { showToast } from '../utils/toastNotification';
 
 export const useProcedureForm = ({ initialData, mode, isOpen, onSubmit }) => {
     const [formData, setFormData] = useState(INITIAL_FORM_STATE);
@@ -122,7 +123,7 @@ export const useProcedureForm = ({ initialData, mode, isOpen, onSubmit }) => {
 
         if (!validation.isValid) {
             setErrors(validation.errors);
-            alert('Vui lòng kiểm tra lại các trường bắt buộc!');
+            showToast.error('Vui lòng kiểm tra lại các trường bắt buộc!');
             return;
         }
 
@@ -135,7 +136,7 @@ export const useProcedureForm = ({ initialData, mode, isOpen, onSubmit }) => {
             await onSubmit(cleanedData);
             resetForm();
         } catch (error) {
-            alert('Có lỗi xảy ra khi lưu thủ tục!');
+            showToast.error('Có lỗi xảy ra khi lưu thủ tục!');
         } finally {
             setIsSubmitting(false);
         }

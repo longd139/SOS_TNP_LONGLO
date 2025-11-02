@@ -6,6 +6,7 @@ import { useTemplates } from '../../hooks/useTemplates';
 import dayjs from 'dayjs';
 import 'dayjs/locale/vi';
 import BaseTable from '../../components/BaseTable';
+import { showToast } from '../../utils/toastNotification';
 
 dayjs.locale('vi');
 
@@ -26,8 +27,6 @@ export default function TemplateManager() {
         updateTemplate,
         deleteTemplate
     } = useTemplates(showRemoved);
-
-    console.log('Templates:', templates);
 
     const handleView = (template) => {
         const baseUrl = process.env.REACT_APP_API_URL;
@@ -50,7 +49,7 @@ export default function TemplateManager() {
     const handleConfirmDelete = async () => {
         const result = await deleteTemplate(deleteModal.template.id, deleteModal.template.ten_mau_don);
         if (result.success) {
-            alert('Xóa biểu mẫu thành công!');
+            showToast.success('Xóa biểu mẫu thành công!');
         }
         setDeleteModal({ isOpen: false, template: null });
     };
@@ -60,25 +59,31 @@ export default function TemplateManager() {
     };
 
     const handleSubmitCreate = async (formData) => {
-        const result = await createTemplate(formData);
-        if (result.success) {
-            setIsCreateModalOpen(false);
-            alert('Tạo biểu mẫu thành công!');
-        } else {
-            throw new Error(result.error?.message || 'Failed to create template');
+        try {
+            const result = await createTemplate(formData);
+            if (result.success) {
+                setIsCreateModalOpen(false);
+                showToast.success('Tạo biểu mẫu thành công!');
+            }
+        } catch (error) {
+            // Error will be handled in the modal component
+            throw error;
         }
     };
 
     const handleSubmitEdit = async (formData) => {
         if (!selectedTemplate) return;
         
-        const result = await updateTemplate(selectedTemplate.id, formData);
-        if (result.success) {
-            setIsEditModalOpen(false);
-            setSelectedTemplate(null);
-            alert('Cập nhật biểu mẫu thành công!');
-        } else {
-            throw new Error(result.error?.message || 'Failed to update template');
+        try {
+            const result = await updateTemplate(selectedTemplate.id, formData);
+            if (result.success) {
+                setIsEditModalOpen(false);
+                setSelectedTemplate(null);
+                showToast.success('Cập nhật biểu mẫu thành công!');
+            }
+        } catch (error) {
+            // Error will be handled in the modal component
+            throw error;
         }
     };
 
@@ -107,14 +112,14 @@ export default function TemplateManager() {
             title: 'Tên biểu mẫu',
             dataIndex: 'ten_mau_don',
             key: 'ten_mau_don',
-            width: '250px',
+            width: '200px',
             render: (value) => (
                 <div className="flex items-center gap-2">
                     <div className="flex-shrink-0 w-5 h-5 flex items-center justify-center">
                         <FileText className="w-5 h-5 text-red-500" aria-hidden="true" />
                     </div>
                     <span 
-                        className="block max-w-[250px] truncate text-ellipsis overflow-hidden whitespace-nowrap text-sm text-gray-900"
+                        className="block max-w-[200px] truncate text-ellipsis overflow-hidden whitespace-nowrap text-sm text-gray-900"
                         title={value}
                     >
                         {value}
@@ -123,10 +128,21 @@ export default function TemplateManager() {
             )
         },
         {
+            title: 'Mã biểu mẫu',
+            dataIndex: 'ma_mau_don',
+            key: 'ma_mau_don',
+            width: '120px',
+            render: (value) => (
+                <span className="block max-w-[120px] truncate text-ellipsis overflow-hidden whitespace-nowrap text-sm font-semibold text-blue-600">
+                    {value || '-'}
+                </span>
+            )
+        },
+        {
             title: 'Mô tả',
             dataIndex: 'mo_ta',
             key: 'mo_ta',
-            width: '100px',
+            width: '150px',
             render: (value) => {
                 const displayValue = value || '-';
                 return (
@@ -178,29 +194,29 @@ export default function TemplateManager() {
                 </button>
             </div>
 
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-3 px-3 md:px-4 py-2 md:py-3">
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-3 p-3">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                    <div className="flex items-center gap-2 md:gap-3">
-                        <h3 className="text-sm md:text-base font-semibold text-gray-900">
+                    <div className="flex items-center gap-3">
+                        <div className="text-sm text-gray-600">
                             Danh sách biểu mẫu ({templates.length})
-                        </h3>
+                        </div>
                         {showRemoved && (
-                            <span className="px-2 md:px-3 py-1 bg-red-100 text-red-800 text-xs font-medium rounded-full whitespace-nowrap">
+                            <span className="px-3 py-1 bg-red-100 text-red-800 text-xs font-medium rounded-full">
                                 Đã xóa
                             </span>
                         )}
                         {!showRemoved && (
-                            <span className="px-2 md:px-3 py-1 bg-green-100 text-green-800 text-xs font-medium rounded-full whitespace-nowrap">
+                            <span className="px-3 py-1 bg-green-100 text-green-800 text-xs font-medium rounded-full">
                                 Đang hoạt động
                             </span>
                         )}
                     </div>
                     <div className="flex items-center gap-2">
-                        <label className="text-xs md:text-sm font-medium text-gray-700 whitespace-nowrap">Trạng thái:</label>
+                        <label className="text-sm font-medium text-gray-700">Trạng thái:</label>
                         <select
                             value={showRemoved ? 'removed' : 'active'}
                             onChange={(e) => setShowRemoved(e.target.value === 'removed')}
-                            className="px-2 md:px-3 py-1.5 md:py-2 text-xs md:text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            className="min-w-[160px] px-3 py-2 text-sm border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
                         >
                             <option value="active">Đang hoạt động</option>
                             <option value="removed">Đã xóa</option>

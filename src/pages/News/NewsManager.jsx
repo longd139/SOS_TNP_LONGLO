@@ -1,33 +1,32 @@
 import React, { useState } from 'react';
-import { Plus } from 'lucide-react';
-import { newsList } from '../../mockData';
+import { Plus, Loader2 } from 'lucide-react';
 import BaseTable from '../../components/BaseTable';
-import BaseModal, { ModalFooter, ConfirmModal } from '../../components/BaseModal';
+import { ConfirmModal } from '../../components/BaseModal';
+import NewsFormModal from '../../components/news/NewsFormModal';
+import NewsFilter from '../../components/news/NewsFilter';
+import NewsPreviewModal from '../../components/news/NewsPreviewModal';
+import { useNews } from '../../hooks/useNews';
+import { formatDate } from '../../utils/formatDate';
+import { STATUS_NEWS, STATUS_NEWS_LABELS } from '../../constants/status';
+import { showToast } from '../../utils/toastNotification';
 
 export default function NewsManager() {
+    const { news, loading, error, pagination, loadNews, createNews, updateNews, deleteNews, clearError } = useNews();
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
     const [selectedNews, setSelectedNews] = useState(null);
-    const [formData, setFormData] = useState({
-        title: '',
-        category: 'Tin tức',
-        content: '',
-        status: 'Bản nháp'
-    });
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [currentFilters, setCurrentFilters] = useState({});
 
     const handleView = (item) => {
-        console.log('View news:', item);
+        setSelectedNews(item);
+        setIsPreviewModalOpen(true);
     };
 
     const handleEdit = (item) => {
         setSelectedNews(item);
-        setFormData({
-            title: item.title,
-            category: item.category,
-            content: '',
-            status: item.status
-        });
         setIsEditModalOpen(true);
     };
 
@@ -36,46 +35,92 @@ export default function NewsManager() {
         setIsDeleteModalOpen(true);
     };
 
-    const handleConfirmDelete = () => {
-        console.log('Delete news:', selectedNews);
+    const handleConfirmDelete = async () => {
+        const result = await deleteNews(selectedNews.id);
+        if (result.success) {
+            showToast.success('Xóa tin tức thành công!');
+            loadNews(currentFilters);
+        } else {
+            showToast.error(result.error || 'Xóa tin tức thất bại!');
+        }
         setIsDeleteModalOpen(false);
         setSelectedNews(null);
     };
 
-    const handleCreateSubmit = () => {
-        console.log('Create news:', formData);
-        setIsCreateModalOpen(false);
-        setFormData({
-            title: '',
-            category: 'Tin tức',
-            content: '',
-            status: 'Bản nháp'
-        });
+    const handleCreateSubmit = async (formData) => {
+        setIsSubmitting(true);
+        try {
+            const result = await createNews(formData);
+            if (result.success) {
+                showToast.success('Tạo tin tức thành công!');
+                setIsCreateModalOpen(false);
+                loadNews(currentFilters);
+            } else {
+                showToast.error(result.error || 'Tạo tin tức thất bại!');
+            }
+        } catch (error) {
+            showToast.error('Có lỗi xảy ra khi tạo tin tức!');
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
-    const handleEditSubmit = () => {
-        console.log('Update news:', selectedNews.id, formData);
-        setIsEditModalOpen(false);
-        setSelectedNews(null);
+    const handleEditSubmit = async (formData) => {
+        setIsSubmitting(true);
+        try {
+            const result = await updateNews(selectedNews.id, formData);
+            if (result.success) {
+                showToast.success('Cập nhật tin tức thành công!');
+                setIsEditModalOpen(false);
+                setSelectedNews(null);
+                loadNews(currentFilters);
+            } else {
+                showToast.error(result.error || 'Cập nhật tin tức thất bại!');
+            }
+        } catch (error) {
+            showToast.error('Có lỗi xảy ra khi cập nhật tin tức!');
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
+    const handleFilter = (filters) => {
+        setCurrentFilters(filters);
+        loadNews(filters);
+    };
+
+    const handleResetFilter = () => {
+        const defaultFilters = { page: 1, size: 10 };
+        setCurrentFilters(defaultFilters);
+        loadNews(defaultFilters);
+    };
+
+    const getStatusDisplay = (trangThai) => {
+        const statusMap = {
+            [STATUS_NEWS.DRAFT]: { label: STATUS_NEWS_LABELS[STATUS_NEWS.DRAFT], bg: '#FEF3C7', color: '#92400E' },
+            [STATUS_NEWS.PUBLISHED]: { label: STATUS_NEWS_LABELS[STATUS_NEWS.PUBLISHED], bg: '#D1FAE5', color: '#065F46' }
+        };
+        return statusMap[trangThai] || { label: trangThai, bg: '#E5E7EB', color: '#374151' };
     };
 
     const columns = [
         {
             title: 'STT',
-            dataIndex: 'id',
-            key: 'id',
-            render: (value) => (
-                <span className="text-sm font-medium text-gray-900">{value}</span>
+            key: 'stt',
+            render: (value, record, index) => (
+                <span className="text-sm font-medium text-gray-900">
+                    #{(pagination.currentPage - 1) * pagination.pageSize + index + 1}
+                </span>
             )
         },
         {
             title: 'Tiêu đề',
-            dataIndex: 'title',
-            key: 'title',
-            width: '200px',
+            dataIndex: 'tieu_de',
+            key: 'tieu_de',
+            width: '300px',
             render: (value) => (
                 <div 
-                    className="text-sm text-gray-900 max-w-[200px] truncate text-ellipsis overflow-hidden whitespace-nowrap"
+                    className="text-sm text-gray-900 max-w-[300px] truncate text-ellipsis overflow-hidden whitespace-nowrap"
                     title={value}
                 >
                     {value}
@@ -83,51 +128,50 @@ export default function NewsManager() {
             )
         },
         {
-            title: 'Loại',
-            dataIndex: 'category',
-            key: 'category',
-            render: (value, record) => (
-                <span
-                    className="inline-flex px-3 py-1 text-xs font-medium rounded-full"
-                    style={{
-                        backgroundColor: record.categoryBg,
-                        color: record.categoryColor
-                    }}
-                >
-                    {value}
+            title: 'Danh mục',
+            dataIndex: 'danh_muc_tin_tuc',
+            key: 'danh_muc',
+            render: (danhMuc) => (
+                <span className="text-sm text-gray-600">
+                    {danhMuc?.ten_danh_muc || 'Chưa phân loại'}
                 </span>
             )
         },
         {
             title: 'Trạng thái',
-            dataIndex: 'status',
-            key: 'status',
-            render: (value, record) => (
-                <span
-                    className="inline-flex px-3 py-1 text-xs font-medium rounded-full"
-                    style={{
-                        backgroundColor: record.statusBg,
-                        color: record.statusColor
-                    }}
-                >
-                    {value}
+            dataIndex: 'trang_thai',
+            key: 'trang_thai',
+            render: (value) => {
+                const status = getStatusDisplay(value);
+                return (
+                    <span
+                        className="inline-flex px-3 py-1 text-xs font-medium rounded-full"
+                        style={{
+                            backgroundColor: status.bg,
+                            color: status.color
+                        }}
+                    >
+                        {status.label}
+                    </span>
+                );
+            }
+        },
+        {
+            title: 'Tác giả',
+            dataIndex: 'tac_gia',
+            key: 'tac_gia',
+            render: (value) => (
+                <span className="text-sm text-gray-600">{value || 'N/A'}</span>
+            )
+        },
+        {
+            title: 'Ngày tạo',
+            dataIndex: 'thoi_gian_tao',
+            key: 'thoi_gian_tao',
+            render: (value) => (
+                <span className="text-sm text-gray-600">
+                    {value ? formatDate(value) : 'N/A'}
                 </span>
-            )
-        },
-        {
-            title: 'Ngày đăng',
-            dataIndex: 'publishedDate',
-            key: 'publishedDate',
-            render: (value) => (
-                <span className="text-sm text-gray-600">{value}</span>
-            )
-        },
-        {
-            title: 'Lượt xem',
-            dataIndex: 'views',
-            key: 'views',
-            render: (value) => (
-                <span className="text-sm text-gray-600">{value}</span>
             )
         }
     ];
@@ -148,179 +192,77 @@ export default function NewsManager() {
                 </button>
             </div>
 
+            {error && (
+                <div className="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
+                    {error}
+                    <button onClick={clearError} className="ml-4 underline">Đóng</button>
+                </div>
+            )}
+
+            <NewsFilter onFilter={handleFilter} onReset={handleResetFilter} />
+
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-4 px-4 py-3">
-                <h3 className="font-semibold text-gray-900">
-                    Danh sách bài viết ({newsList.length})
-                </h3>
+                <div className="flex items-center justify-between">
+                    <h3 className="font-semibold text-gray-900">
+                        Danh sách bài viết ({pagination.totalItems || 0})
+                    </h3>
+                    {loading && (
+                        <div className="flex items-center gap-2 text-sm text-gray-600">
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                            <span>Đang tải...</span>
+                        </div>
+                    )}
+                </div>
             </div>
 
             <BaseTable
-                data={newsList}
+                data={news}
                 columns={columns}
                 onView={handleView}
                 onEdit={handleEdit}
-                onDelete={handleDelete}
+                onDelete={news.is_removed ? handleDelete : undefined }
                 showActions={true}
-                emptyMessage="Không có bài viết nào"
+                emptyMessage={loading ? "Đang tải dữ liệu..." : "Không có bài viết nào"}
             />
 
-            <BaseModal
+            <NewsFormModal
                 isOpen={isCreateModalOpen}
                 onClose={() => setIsCreateModalOpen(false)}
-                title="Tạo bài viết mới"
-                size="2xl"
-                footer={
-                    <ModalFooter
-                        onCancel={() => setIsCreateModalOpen(false)}
-                        onSubmit={handleCreateSubmit}
-                        cancelText="Hủy"
-                        submitText="Tạo bài viết"
-                    />
-                }
-            >
-                <div className="space-y-3">
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Tiêu đề <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                            type="text"
-                            value={formData.title}
-                            onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                            placeholder="Nhập tiêu đề bài viết"
-                        />
-                    </div>
+                onSubmit={handleCreateSubmit}
+                initialData={null}
+                isLoading={isSubmitting}
+            />
 
-                    <div className="grid grid-cols-2 gap-3">
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                                Loại <span className="text-red-500">*</span>
-                            </label>
-                            <select
-                                value={formData.category}
-                                onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                            >
-                                <option value="Tin tức">Tin tức</option>
-                                <option value="Quan trọng">Quan trọng</option>
-                                <option value="Sự kiện">Sự kiện</option>
-                            </select>
-                        </div>
-
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                                Trạng thái <span className="text-red-500">*</span>
-                            </label>
-                            <select
-                                value={formData.status}
-                                onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                            >
-                                <option value="Bản nháp">Bản nháp</option>
-                                <option value="Đã xuất bản">Đã xuất bản</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Nội dung <span className="text-red-500">*</span>
-                        </label>
-                        <textarea
-                            value={formData.content}
-                            onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-                            rows={8}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                            placeholder="Nhập nội dung bài viết"
-                        />
-                    </div>
-                </div>
-            </BaseModal>
-
-            <BaseModal
+            <NewsFormModal
                 isOpen={isEditModalOpen}
-                onClose={() => setIsEditModalOpen(false)}
-                title="Chỉnh sửa bài viết"
-                size="2xl"
-                footer={
-                    <ModalFooter
-                        onCancel={() => setIsEditModalOpen(false)}
-                        onSubmit={handleEditSubmit}
-                        cancelText="Hủy"
-                        submitText="Cập nhật"
-                    />
-                }
-            >
-                <div className="space-y-4">
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Tiêu đề <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                            type="text"
-                            value={formData.title}
-                            onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                            placeholder="Nhập tiêu đề bài viết"
-                        />
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4">
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                                Loại <span className="text-red-500">*</span>
-                            </label>
-                            <select
-                                value={formData.category}
-                                onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                            >
-                                <option value="Tin tức">Tin tức</option>
-                                <option value="Quan trọng">Quan trọng</option>
-                                <option value="Sự kiện">Sự kiện</option>
-                            </select>
-                        </div>
-
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                                Trạng thái <span className="text-red-500">*</span>
-                            </label>
-                            <select
-                                value={formData.status}
-                                onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                            >
-                                <option value="Bản nháp">Bản nháp</option>
-                                <option value="Đã xuất bản">Đã xuất bản</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Nội dung <span className="text-red-500">*</span>
-                        </label>
-                        <textarea
-                            value={formData.content}
-                            onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-                            rows={8}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                            placeholder="Nhập nội dung bài viết"
-                        />
-                    </div>
-                </div>
-            </BaseModal>
+                onClose={() => {
+                    setIsEditModalOpen(false);
+                    setSelectedNews(null);
+                }}
+                onSubmit={handleEditSubmit}
+                initialData={selectedNews}
+                isLoading={isSubmitting}
+            />
 
             <ConfirmModal
                 isOpen={isDeleteModalOpen}
                 onClose={() => setIsDeleteModalOpen(false)}
                 onConfirm={handleConfirmDelete}
                 title="Xác nhận xóa"
-                message={`Bạn có chắc chắn muốn xóa bài viết "${selectedNews?.title}"?`}
+                message={`Bạn có chắc chắn muốn xóa bài viết "${selectedNews?.tieu_de}"?`}
                 confirmText="Xóa"
                 cancelText="Hủy"
                 type="danger"
+            />
+
+            <NewsPreviewModal
+                isOpen={isPreviewModalOpen}
+                onClose={() => {
+                    setIsPreviewModalOpen(false);
+                    setSelectedNews(null);
+                }}
+                newsData={selectedNews}
+                isPreview={false}
             />
         </div>
     );

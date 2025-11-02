@@ -74,10 +74,8 @@ export const useProcedure = () => {
                 is_removed: showRemoved
             }));
 
-            alert('Tạo thủ tục thành công!');
             return { success: true };
         } catch (error) {
-            alert('Có lỗi xảy ra khi tạo thủ tục!');
             return { success: false, error };
         }
     }, [dispatch, pagination, filters, showRemoved]);
@@ -94,10 +92,8 @@ export const useProcedure = () => {
                 is_removed: showRemoved
             }));
 
-            alert('Cập nhật thủ tục thành công!');
             return { success: true };
         } catch (error) {
-            alert('Có lỗi xảy ra khi cập nhật thủ tục!');
             return { success: false, error };
         }
     }, [dispatch, pagination, filters, showRemoved]);
@@ -114,13 +110,11 @@ export const useProcedure = () => {
                 is_removed: showRemoved
             }));
 
-            alert('Đã xóa thủ tục thành công.');
             return { success: true };
         } catch (error) {
             if (error === 'User cancelled') {
                 return { success: false, cancelled: true };
             }
-            alert('Có lỗi xảy ra khi xóa thủ tục!');
             return { success: false, error };
         }
     }, [dispatch, pagination, filters, showRemoved]);
@@ -130,7 +124,6 @@ export const useProcedure = () => {
             const result = await dispatch(fetchProcedureById(procedureId)).unwrap();
             return { success: true, data: result };
         } catch (error) {
-            alert('Có lỗi xảy ra khi lấy thông tin thủ tục!');
             return { success: false, error };
         }
     }, [dispatch]);

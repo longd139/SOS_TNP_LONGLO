@@ -1,21 +1,22 @@
 import { useState, useEffect } from "react";
 import { ShieldCheck, AlertCircle, Loader2, Lock, User } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
 import { useLogin } from "../../hooks/useLogin";
-import { useOtp } from "../../hooks/useOtp";
 import { useAuthRedirect } from "../../hooks/useAuthRedirect";
-import OtpModal from "../Auth/OtpModal";
+import { restoreUser } from "../../features/auth/authSlice";
+import { fetchMyProfile } from "../../features/userProfile/userProfileThunks";
+import TwoFALoginModal from "../../components/TwoFALoginModal";
 import ROUTE_PATH from "../../constants/routes";
+import { getRedirectPathIfDisabled } from "../../utils/routeRedirectUtils";
 
 export default function Login() {
     const [tenDangNhap, setTenDangNhap] = useState("");
     const [matKhau, setMatKhau] = useState("");
-    const [showOtpModal, setShowOtpModal] = useState(false);
-    const [email, setEmail] = useState("");
-    const [twoFA, setTwoFA] = useState(true);
+    const [show2FAModal, setShow2FAModal] = useState(false);
 
-    const { login, loading, errors, apiError, clearErrors } = useLogin();
-    const { sendOtp, verifyOtp, loading: otpLoading, message, error: otpError } = useOtp();
+    const { login, loading, errors, apiError, requiresTwoFactorAuth, clearErrors } = useLogin();
+    const dispatch = useDispatch();
     const navigate = useNavigate();
 
     useAuthRedirect();
@@ -32,41 +33,22 @@ export default function Login() {
         const credentials = { tenDangNhap, matKhau };
         const result = await login(credentials);
     
-        console.log("Login result:", result);
-        const mail = result?.email || result?.user?.email || "";
-
-
-        if (result?.needOtp || !result?.success) {
-
-            if (mail) {
-                try {
-                    const otpRes = await sendOtp({ email: mail, type: "LOGIN" });
-                    if (otpRes.success) setEmail(mail);
-                } catch (err) {
-                    throw err;
-                }
-            }
-
-            navigate("/OtpModal", {
-                replace: true,
-                state: { tenDangNhap, email: mail },
-            });
+        if (result?.requiresTwoFactorAuth) {
+            setShow2FAModal(true);
             return;
         }
     };
 
-    const handleVerifyOtp = async ({ otp }) => {
-        const res = await verifyOtp({ otp, tenDangNhap });
+    const handle2FASuccess = (result) => {
+        setShow2FAModal(false);
+        dispatch(restoreUser());
+        dispatch(fetchMyProfile());
+        const redirectPath = getRedirectPathIfDisabled(ROUTE_PATH.DASHBOARD);
+        navigate(redirectPath, { replace: true });
+    };
 
-        if (res.success) {
-            localStorage.setItem("accessToken", res.data.accessToken);
-            localStorage.setItem("refreshToken", res.data.refreshToken);
-
-            setShowOtpModal(false);
-            navigate(ROUTE_PATH.DASHBOARD, { replace: true });
-        } else {
-            alert("Mã OTP không đúng hoặc đã hết hạn!");
-        }
+    const handle2FAError = (error) => {
+        console.error('2FA login error:', error);
     };
 
     return (
@@ -139,24 +121,6 @@ export default function Login() {
                         )}
                     </div>
 
-                    <div className="flex items-center justify-between mt-3 mb-5">
-                        <label htmlFor="twoFA" className="text-sm text-gray-700">
-                            Bật xác thực 2 yếu tố (2FA)
-                        </label>
-                        <input
-                            id="twoFA"
-                            type="checkbox"
-                            checked={twoFA}
-                            onChange={(e) => setTwoFA(e.target.checked)}
-                            className="appearance-none w-11 h-6 bg-gray-300 rounded-full relative cursor-pointer
-                         transition-colors duration-200 checked:bg-blue-600
-                         before:content-[''] before:absolute before:top-[2px] before:left-[2px]
-                         before:w-5 before:h-5 before:bg-white before:rounded-full
-                         before:transition-transform before:duration-200
-                         checked:before:translate-x-5"
-                        />
-                    </div>
-
                     <button
                         type="submit"
                         disabled={loading}
@@ -178,17 +142,13 @@ export default function Login() {
                 </form>
             </div>
 
-            {showOtpModal && (
-                <OtpModal
-                    email={email}
-                    tenDangNhap={tenDangNhap}
-                    onClose={() => setShowOtpModal(false)}
-                    onVerify={handleVerifyOtp}
-                    loading={otpLoading}
-                    error={otpError}
-                    message={message}
-                />
-            )}
+            <TwoFALoginModal
+                isOpen={show2FAModal}
+                onClose={() => setShow2FAModal(false)}
+                tenDangNhap={tenDangNhap}
+                onSuccess={handle2FASuccess}
+                onError={handle2FAError}
+            />
         </div>
     );
 }
