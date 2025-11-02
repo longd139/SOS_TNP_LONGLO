@@ -63,15 +63,21 @@ pipeline {
           withCredentials([file(credentialsId: env.ENV_CRED_ID, variable: 'ENV_FILE')]) {
             sh '''
               set -e
+              echo "🔐 Using credential ID: ${ENV_CRED_ID}"
+              echo "📁 Jenkins provided env file path: $ENV_FILE"
+              echo "Copying environment file to project..."
               cp "$ENV_FILE" ./.env
               # Mirror into src/.env as some setups read from src/.env
               mkdir -p src
               cp "$ENV_FILE" ./src/.env || true
+              ls -l "$ENV_FILE" ./.env ./src/.env || true
+              echo "✅ .env prepared successfully from Jenkins secret."
             '''
           }
         }
       }
     }
+
 
     stage('Build Image') {
       when {
