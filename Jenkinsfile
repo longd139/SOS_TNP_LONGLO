@@ -85,7 +85,7 @@ pipeline {
             echo "Pulling base images (best-effort)"
             docker pull node:20-alpine || true
             docker pull nginx:alpine || true
-            echo "Building ${IMAGE_NAME}:${IMAGE_TAG}"
+            echo "Building ${IMAGE_NAME}:${IMAGE_TAG} ..."
             docker build --pull -t ${IMAGE_NAME}:${IMAGE_TAG} .
             echo ${IMAGE_TAG} > .image_tag
           '''
