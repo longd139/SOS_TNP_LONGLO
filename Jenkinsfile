@@ -89,14 +89,19 @@ pipeline {
             set -e
             IMAGE_NAME=${IMAGE_NAME:-ubnd-fe}
             IMAGE_TAG=$(echo ${GIT_COMMIT:-latest} | cut -c1-7)
-            echo "Pulling base images (best-effort)"
+
+            echo "📦 Pulling base images..."
             docker pull node:20-alpine || true
             docker pull nginx:alpine || true
-            echo "Building ${IMAGE_NAME}:${IMAGE_TAG}"
+
+            echo "🧱 Building image ${IMAGE_NAME}:${IMAGE_TAG} with build-time .env..."
+            # Nếu có .env (chuẩn bị ở stage trước), copy vào image tại build time
             docker build --pull \
-              --build-arg ENV_FILE=.env \
+              --build-arg BUILD_ENV_FILE=.env \
               -t ${IMAGE_NAME}:${IMAGE_TAG} .
+
             echo ${IMAGE_TAG} > .image_tag
+            echo "✅ Build completed: ${IMAGE_NAME}:${IMAGE_TAG}"
           '''
         }
       }
