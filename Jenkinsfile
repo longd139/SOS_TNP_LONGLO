@@ -6,7 +6,6 @@ pipeline {
   }
   environment {
     DOCKER_CLIENT_TIMEOUT = '300'
-    // Disable BuildKit to avoid requiring docker buildx on agents where it's missing
     DOCKER_BUILDKIT = '0'
   }
   stages {
@@ -63,21 +62,15 @@ pipeline {
           withCredentials([file(credentialsId: env.ENV_CRED_ID, variable: 'ENV_FILE')]) {
             sh '''
               set -e
-              echo "🔐 Using credential ID: ${ENV_CRED_ID}"
-              echo "📁 Jenkins provided env file path: $ENV_FILE"
-              echo "Copying environment file to project..."
               cp "$ENV_FILE" ./.env
               # Mirror into src/.env as some setups read from src/.env
               mkdir -p src
               cp "$ENV_FILE" ./src/.env || true
-              ls -l "$ENV_FILE" ./.env ./src/.env || true
-              echo "✅ .env prepared successfully from Jenkins secret."
             '''
           }
         }
       }
     }
-
 
     stage('Build Image') {
       when {
@@ -89,24 +82,16 @@ pipeline {
             set -e
             IMAGE_NAME=${IMAGE_NAME:-ubnd-fe}
             IMAGE_TAG=$(echo ${GIT_COMMIT:-latest} | cut -c1-7)
-
-            echo "📦 Pulling base images..."
+            echo "Pulling base images (best-effort)"
             docker pull node:20-alpine || true
             docker pull nginx:alpine || true
-
-            echo "🧱 Building image ${IMAGE_NAME}:${IMAGE_TAG} with build-time .env..."
-            # Nếu có .env (chuẩn bị ở stage trước), copy vào image tại build time
-            docker build --pull \
-              --build-arg BUILD_ENV_FILE=.env \
-              -t ${IMAGE_NAME}:${IMAGE_TAG} .
-
+            echo "Building ${IMAGE_NAME}:${IMAGE_TAG} ..."
+            docker build --pull -t ${IMAGE_NAME}:${IMAGE_TAG} .
             echo ${IMAGE_TAG} > .image_tag
-            echo "✅ Build completed: ${IMAGE_NAME}:${IMAGE_TAG}"
           '''
         }
       }
     }
-
 
     stage('Deploy') {
       when {
@@ -120,36 +105,17 @@ pipeline {
           CONTAINER_NAME=${CONTAINER_NAME}
           HOST_PORT=${DEPLOY_PORT}
           CONTAINER_PORT=${CONTAINER_PORT:-8881}
-
-          # Free the host port if any container is currently using it
-          echo "Ensuring port ${HOST_PORT} is free..."
-          INUSE_IDS=$(docker ps -q --filter "publish=${HOST_PORT}" || true)
-          if [ -z "$INUSE_IDS" ]; then
-            # Fallback detection by parsing Ports column
-            INUSE_IDS=$(docker ps --format '{{.ID}} {{.Ports}}' | awk -v p=":${HOST_PORT}->" '$0 ~ p {print $1}')
-          fi
-          if [ -n "$INUSE_IDS" ]; then
-            echo "Port ${HOST_PORT} in use by: $INUSE_IDS. Removing..."
-            docker rm -f $INUSE_IDS || true
-          fi
-
           # Stop/remove old container if exists
           docker rm -f ${CONTAINER_NAME} 2>/dev/null || true
-
           # Run new container, mapping host port -> container 8881
-          echo "Running container ${CONTAINER_NAME} with env file mounted..."
           docker run -d \
             --name ${CONTAINER_NAME} \
             --restart unless-stopped \
             -p ${HOST_PORT}:${CONTAINER_PORT} \
-            --env-file .env \
             ${IMAGE_NAME}:${IMAGE_TAG}
-
-          echo "✅ Container ${CONTAINER_NAME} deployed and running on port ${HOST_PORT}"
         '''
       }
     }
-
 
     stage('Cleanup Old Images') {
       when {
