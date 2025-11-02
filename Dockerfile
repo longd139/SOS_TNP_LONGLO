@@ -20,7 +20,7 @@ RUN if [ -f "$BUILD_ENV_FILE" ]; then \
     fi
 
 # ✅ React build (đọc biến REACT_APP_* từ .env)
-RUN npm run Build
+RUN npm run build
 
 # --- Run stage ---
 FROM nginx:alpine
