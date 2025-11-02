@@ -127,15 +127,21 @@ pipeline {
 
           # Stop/remove old container if exists
           docker rm -f ${CONTAINER_NAME} 2>/dev/null || true
+
           # Run new container, mapping host port -> container 8881
+          echo "Running container ${CONTAINER_NAME} with env file mounted..."
           docker run -d \
             --name ${CONTAINER_NAME} \
             --restart unless-stopped \
             -p ${HOST_PORT}:${CONTAINER_PORT} \
+            --env-file .env \
             ${IMAGE_NAME}:${IMAGE_TAG}
+
+          echo "✅ Container ${CONTAINER_NAME} deployed and running on port ${HOST_PORT}"
         '''
       }
     }
+
 
     stage('Cleanup Old Images') {
       when {
