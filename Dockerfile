@@ -11,6 +11,10 @@ RUN npm ci --legacy-peer-deps
 
 # Copy source and build
 COPY . .
+
+ARG ENV_FILE
+RUN if [ -f "$ENV_FILE" ]; then cp "$ENV_FILE" .env; fi
+
 # If a build.env (containing only REACT_APP_* vars) is present in context,
 # copy it to .env so react-scripts can pick it up at build time.
 RUN if [ -f build.env ]; then cp build.env .env; fi && npm run build

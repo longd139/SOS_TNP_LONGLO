@@ -93,12 +93,15 @@ pipeline {
             docker pull node:20-alpine || true
             docker pull nginx:alpine || true
             echo "Building ${IMAGE_NAME}:${IMAGE_TAG}"
-            docker build --pull -t ${IMAGE_NAME}:${IMAGE_TAG} .
+            docker build --pull \
+              --build-arg ENV_FILE=.env \
+              -t ${IMAGE_NAME}:${IMAGE_TAG} .
             echo ${IMAGE_TAG} > .image_tag
           '''
         }
       }
     }
+
 
     stage('Deploy') {
       when {
