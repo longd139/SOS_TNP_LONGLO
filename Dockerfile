@@ -1,19 +1,26 @@
-# Multi-stage build: build React app, then serve with Nginx
-
 # --- Build stage ---
 FROM node:20-alpine AS builder
 WORKDIR /app
 
-# Install dependencies
 COPY package*.json ./
-# Use legacy peer deps to avoid strict peer conflicts (React 19 vs libs)
 RUN npm ci --legacy-peer-deps
 
-# Copy source and build
 COPY . .
-# If a build.env (containing only REACT_APP_* vars) is present in context,
-# copy it to .env so react-scripts can pick it up at build time.
-RUN if [ -f build.env ]; then cp build.env .env; fi && npm run build
+
+# ✅ Build ARG: Jenkins sẽ truyền file .env vào đây
+ARG BUILD_ENV_FILE
+RUN if [ -f "$BUILD_ENV_FILE" ]; then \
+      echo "📄 Using build env from $BUILD_ENV_FILE"; \
+      cp "$BUILD_ENV_FILE" .env; \
+    elif [ -f build.env ]; then \
+      echo "⚠️ No Jenkins env, fallback to local build.env"; \
+      cp build.env .env; \
+    else \
+      echo "⚠️ No env file found at build time, using default"; \
+    fi
+
+# ✅ React build (đọc biến REACT_APP_* từ .env)
+RUN npm run build
 
 # --- Run stage ---
 FROM nginx:alpine

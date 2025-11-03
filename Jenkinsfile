@@ -6,7 +6,6 @@ pipeline {
   }
   environment {
     DOCKER_CLIENT_TIMEOUT = '300'
-    // Disable BuildKit to avoid requiring docker buildx on agents where it's missing
     DOCKER_BUILDKIT = '0'
   }
   stages {
@@ -86,7 +85,7 @@ pipeline {
             echo "Pulling base images (best-effort)"
             docker pull node:20-alpine || true
             docker pull nginx:alpine || true
-            echo "Building ${IMAGE_NAME}:${IMAGE_TAG}"
+            echo "Building ${IMAGE_NAME}:${IMAGE_TAG} ..."
             docker build --pull -t ${IMAGE_NAME}:${IMAGE_TAG} .
             echo ${IMAGE_TAG} > .image_tag
           '''
@@ -106,19 +105,6 @@ pipeline {
           CONTAINER_NAME=${CONTAINER_NAME}
           HOST_PORT=${DEPLOY_PORT}
           CONTAINER_PORT=${CONTAINER_PORT:-8881}
-
-          # Free the host port if any container is currently using it
-          echo "Ensuring port ${HOST_PORT} is free..."
-          INUSE_IDS=$(docker ps -q --filter "publish=${HOST_PORT}" || true)
-          if [ -z "$INUSE_IDS" ]; then
-            # Fallback detection by parsing Ports column
-            INUSE_IDS=$(docker ps --format '{{.ID}} {{.Ports}}' | awk -v p=":${HOST_PORT}->" '$0 ~ p {print $1}')
-          fi
-          if [ -n "$INUSE_IDS" ]; then
-            echo "Port ${HOST_PORT} in use by: $INUSE_IDS. Removing..."
-            docker rm -f $INUSE_IDS || true
-          fi
-
           # Stop/remove old container if exists
           docker rm -f ${CONTAINER_NAME} 2>/dev/null || true
           # Run new container, mapping host port -> container 8881
