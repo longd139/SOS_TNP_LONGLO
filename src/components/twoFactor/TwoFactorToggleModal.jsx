@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import BaseModal from './BaseModal';
+import BaseModal from '../base/BaseModal';
 import { AlertCircle } from 'lucide-react';
 
 const TwoFactorToggleModal = ({ isOpen, onClose, currentStatus, onToggle, isLoading }) => {

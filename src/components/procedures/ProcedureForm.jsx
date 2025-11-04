@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import BaseModal, { ModalFooter } from '../BaseModal';
+import BaseModal, { ModalFooter } from '../base/BaseModal';
 import { useProcedureForm } from '../../hooks/useProcedureForm';
 import ProcedureBasicInfo from './ProcedureBasicInfo';
 import ProcedureRemoveToggle from './ProcedureRemoveToggle';
@@ -27,6 +27,8 @@ const ProcedureForm = ({
         addStep,
         removeStep,
         updateStep,
+        moveStep,
+        reorderSteps,
         addMauDon,
         removeMauDon,
         updateMauDon,
@@ -102,13 +104,14 @@ const ProcedureForm = ({
                     errors={errors}
                 />
 
-                <div className="flex flex-col md:flex-row gap-3">
+                <div className="flex flex-col md:flex-row gap-3 md:items-start">
                     <div className="flex-1 min-w-0">
                         <ProcedureStepsSection
                             steps={formData.trinhTuThucHien}
                             addStep={addStep}
                             removeStep={removeStep}
                             updateStep={updateStep}
+                            reorderSteps={reorderSteps}
                         />
                     </div>
 

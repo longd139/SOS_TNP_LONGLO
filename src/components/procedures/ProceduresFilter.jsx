@@ -1,5 +1,5 @@
 import React from 'react';
-import BaseFilter from '../BaseFilter';
+import BaseFilter from '../base/BaseFilter';
 
 export default function ProceduresFilter({ 
     areas = [], 
@@ -10,7 +10,8 @@ export default function ProceduresFilter({
     onSearch,
     onReset,
     onToggleRemoved,
-    onPageSizeChange
+    onPageSizeChange,
+    onSearchWithFilters
 }) {
     const initialFilters = {
         searchKeyword: filters.searchKeyword || '',
@@ -67,14 +68,24 @@ export default function ProceduresFilter({
         if (newFilters.selectedDomain !== filters.selectedDomain) {
             onFilterChange?.('selectedDomain', newFilters.selectedDomain);
         }
+
         if (newFilters.showRemoved !== showRemoved) {
             onToggleRemoved?.(newFilters.showRemoved);
         }
-        if (newFilters.pageSize !== pagination.pageSize) {
-            onPageSizeChange?.(Number(newFilters.pageSize));
-        }
 
-        onSearch?.();
+        if (onSearchWithFilters) {
+            onSearchWithFilters({
+                searchKeyword: newFilters.searchKeyword,
+                selectedDomain: newFilters.selectedDomain,
+                showRemoved: newFilters.showRemoved,
+                pageSize: Number(newFilters.pageSize)
+            });
+        } else {
+            if (newFilters.pageSize !== pagination.pageSize) {
+                onPageSizeChange?.(Number(newFilters.pageSize));
+            }
+            onSearch?.();
+        }
     };
 
     const handleReset = () => {

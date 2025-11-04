@@ -1,21 +1,31 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { useTemplates } from '../../hooks/useTemplates';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchTemplates } from '../../features/templates/templatesThunks';
+import { selectTemplates, selectTemplatesLoading } from '../../features/templates/templatesSelectors';
 import TemplateSelector from './TemplateSelector';
 
 const ProcedureMauDonSection = ({ items, addItem, removeItem, updateItem, errors }) => {
+    const dispatch = useDispatch();
+    const templates = useSelector(selectTemplates);
+    const loading = useSelector(selectTemplatesLoading);
+
+    useEffect(() => {
+        if (templates.length === 0) {
+            dispatch(fetchTemplates(false));
+        }
+    }, [dispatch, templates.length]);
+
     const getError = (index, field) => {
         const bracketKey = `danhSachMauDon[${index}].${field}`;
         const dotKey = `danhSachMauDon.${index}.${field}`;
         return errors?.[bracketKey] || errors?.[dotKey];
     };
 
-    const { templates = [], loading } = useTemplates(false);
-
     return (
         <div>
             <div className="flex items-center justify-between mb-2">
-                <h3 className="text-sm font-medium text-gray-900 required-label">Danh sách mẫu đơn</h3>
+                <h3 className="text-sm font-medium text-gray-900">Danh sách mẫu đơn</h3>
             </div>
             <div className="space-y-3 bg-gray-50 p-3 rounded-lg">
                 {items.map((item, idx) => {

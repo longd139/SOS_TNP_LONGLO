@@ -1,5 +1,5 @@
 import React from 'react';
-import BaseModal, { ModalFooter } from '../BaseModal';
+import BaseModal, { ModalFooter } from '../base/BaseModal';
 import { ROLE_LABELS } from '../../constants/role';
 import { useUserForm } from '../../hooks/useUserForm';
 

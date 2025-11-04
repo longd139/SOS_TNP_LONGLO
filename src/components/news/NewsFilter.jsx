@@ -1,5 +1,5 @@
 import React from 'react';
-import BaseFilter from '../BaseFilter';
+import BaseFilter from '../base/BaseFilter';
 import { useCategories } from '../../hooks/useCategories';
 import { STATUS_NEWS, STATUS_NEWS_LABELS } from '../../constants/status';
 

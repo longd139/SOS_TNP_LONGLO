@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import BaseModal, { ModalFooter } from '../BaseModal';
+import BaseModal, { ModalFooter } from '../base/BaseModal';
 import { Upload, Eye, Download } from 'lucide-react';
 import { validateTemplateForm } from '../../validator/templateValidator';
 import { showToast } from '../../utils/toastNotification';
@@ -192,11 +192,6 @@ const TemplateFormModal = ({
                     />
                     {errors.maMauDon && (
                         <p className="mt-1 text-sm text-red-600">{errors.maMauDon}</p>
-                    )}
-                    {formData.maMauDon && (
-                        <p className="mt-1 text-xs text-gray-500">
-                            Sẽ được lưu là: <span className="font-semibold">{formData.maMauDon.toUpperCase()}</span>
-                        </p>
                     )}
                 </div>
 

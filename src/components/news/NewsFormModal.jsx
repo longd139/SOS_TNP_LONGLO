@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import BaseModal, { ModalFooter } from '../BaseModal';
+import BaseModal, { ModalFooter } from '../base/BaseModal';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import { useCategories } from '../../hooks/useCategories';

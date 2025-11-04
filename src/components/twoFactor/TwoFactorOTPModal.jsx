@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import BaseModal from './BaseModal';
+import BaseModal from '../base/BaseModal';
 
 const TwoFactorOTPModal = ({ isOpen, onClose, onVerify, isLoading, action = 'bật' }) => {
     const [otp, setOtp] = useState('');

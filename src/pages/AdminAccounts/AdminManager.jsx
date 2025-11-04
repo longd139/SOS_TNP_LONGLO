@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import BaseTable from '../../components/BaseTable';
+import BaseTable from '../../components/base/BaseTable';
 import UserModal from '../../components/users/UserModal';
-import { ConfirmModal } from '../../components/BaseModal';
+import { ConfirmModal } from '../../components/base/BaseModal';
 import { ROLE_LABELS, ROLE_COLORS } from '../../constants/role';
 import { useUsers } from '../../hooks/useUsers';
 import { showToast } from '../../utils/toastNotification';

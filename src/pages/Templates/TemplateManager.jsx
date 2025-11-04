@@ -1,17 +1,33 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { FileText, Download, Plus } from 'lucide-react';
-import { ConfirmModal } from '../../components/BaseModal';
+import { ConfirmModal } from '../../components/base/BaseModal';
 import TemplateFormModal from '../../components/templates/TemplateFormModal';
-import { useTemplates } from '../../hooks/useTemplates';
 import dayjs from 'dayjs';
 import 'dayjs/locale/vi';
-import BaseTable from '../../components/BaseTable';
+import BaseTable from '../../components/base/BaseTable';
 import { showToast } from '../../utils/toastNotification';
+import {
+    fetchTemplates,
+    createTemplate as createTemplateThunk,
+    updateTemplate as updateTemplateThunk,
+    deleteTemplate as deleteTemplateThunk
+} from '../../features/templates/templatesThunks';
+import {
+    selectTemplates,
+    selectTemplatesLoading,
+    selectShowRemoved
+} from '../../features/templates/templatesSelectors';
+import { setShowRemoved } from '../../features/templates/templatesSlice';
 
 dayjs.locale('vi');
 
 export default function TemplateManager() {
-    const [showRemoved, setShowRemoved] = useState(false);
+    const dispatch = useDispatch();
+    const templates = useSelector(selectTemplates);
+    const loading = useSelector(selectTemplatesLoading);
+    const showRemoved = useSelector(selectShowRemoved);
+
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [selectedTemplate, setSelectedTemplate] = useState(null);
@@ -20,13 +36,9 @@ export default function TemplateManager() {
         template: null
     });
 
-    const {
-        templates,
-        loading,
-        createTemplate,
-        updateTemplate,
-        deleteTemplate
-    } = useTemplates(showRemoved);
+    useEffect(() => {
+        dispatch(fetchTemplates(showRemoved));
+    }, [dispatch, showRemoved]);
 
     const handleView = (template) => {
         const baseUrl = process.env.REACT_APP_API_URL;
@@ -46,12 +58,14 @@ export default function TemplateManager() {
         });
     };
 
-    const handleConfirmDelete = async () => {
-        const result = await deleteTemplate(deleteModal.template.id, deleteModal.template.ten_mau_don);
-        if (result.success) {
+    const handleDeleteConfirm = async () => {
+        try {
+            const result = await dispatch(deleteTemplateThunk(deleteModal.template.id)).unwrap();
             showToast.success('Xóa biểu mẫu thành công!');
+            setDeleteModal({ isOpen: false, template: null });
+        } catch (error) {
+            showToast.error(error.message || 'Có lỗi xảy ra khi xóa biểu mẫu!');
         }
-        setDeleteModal({ isOpen: false, template: null });
     };
 
     const handleCreateTemplate = () => {
@@ -60,13 +74,12 @@ export default function TemplateManager() {
 
     const handleSubmitCreate = async (formData) => {
         try {
-            const result = await createTemplate(formData);
-            if (result.success) {
-                setIsCreateModalOpen(false);
-                showToast.success('Tạo biểu mẫu thành công!');
-            }
+            await dispatch(createTemplateThunk(formData)).unwrap();
+            setIsCreateModalOpen(false);
+            showToast.success('Tạo biểu mẫu thành công!');
+            dispatch(fetchTemplates(showRemoved));
         } catch (error) {
-            // Error will be handled in the modal component
+            showToast.error(error.message || 'Tạo biểu mẫu thất bại!');
             throw error;
         }
     };
@@ -75,14 +88,16 @@ export default function TemplateManager() {
         if (!selectedTemplate) return;
         
         try {
-            const result = await updateTemplate(selectedTemplate.id, formData);
-            if (result.success) {
-                setIsEditModalOpen(false);
-                setSelectedTemplate(null);
-                showToast.success('Cập nhật biểu mẫu thành công!');
-            }
+            await dispatch(updateTemplateThunk({ 
+                templateId: selectedTemplate.id, 
+                formData 
+            })).unwrap();
+            setIsEditModalOpen(false);
+            setSelectedTemplate(null);
+            showToast.success('Cập nhật biểu mẫu thành công!');
+            dispatch(fetchTemplates(showRemoved));
         } catch (error) {
-            // Error will be handled in the modal component
+            showToast.error(error.message || 'Cập nhật biểu mẫu thất bại!');
             throw error;
         }
     };
@@ -215,7 +230,7 @@ export default function TemplateManager() {
                         <label className="text-sm font-medium text-gray-700">Trạng thái:</label>
                         <select
                             value={showRemoved ? 'removed' : 'active'}
-                            onChange={(e) => setShowRemoved(e.target.value === 'removed')}
+                            onChange={(e) => dispatch(setShowRemoved(e.target.value === 'removed'))}
                             className="min-w-[160px] px-3 py-2 text-sm border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
                         >
                             <option value="active">Đang hoạt động</option>
@@ -260,7 +275,7 @@ export default function TemplateManager() {
             <ConfirmModal
                 isOpen={deleteModal.isOpen}
                 onClose={() => setDeleteModal({ isOpen: false, template: null })}
-                onConfirm={handleConfirmDelete}
+                onConfirm={handleDeleteConfirm}
                 title="Xác nhận xóa"
                 message={`Bạn có chắc chắn muốn xóa biểu mẫu "${deleteModal.template?.ten_mau_don}"?`}
                 confirmText="Xóa"

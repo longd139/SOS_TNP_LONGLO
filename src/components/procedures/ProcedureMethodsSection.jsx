@@ -4,10 +4,11 @@ import PropTypes from 'prop-types';
 const ProcedureMethodsSection = ({ methods, addMethod, removeMethod, updateMethod }) => {
     return (
         <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2 required-label">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
                 Cách thức thực hiện
             </label>
             <div className="space-y-3 bg-gray-50 p-3 rounded-lg">
+                <div className="space-y-3">
                 {methods.map((method, index) => (
                     <div
                         key={method.id || `method-${index}`}
@@ -57,9 +58,14 @@ const ProcedureMethodsSection = ({ methods, addMethod, removeMethod, updateMetho
                                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
                                 />
                                 <input
-                                    type="number"
-                                    value={method.le_phi}
-                                    onChange={(e) => updateMethod(index, 'le_phi', parseFloat(e.target.value) || 0)}
+                                    type="text"
+                                    value={method.le_phi === 0 || method.le_phi === '0' ? '' : method.le_phi}
+                                    onChange={(e) => {
+                                        const value = e.target.value;
+                                        if (value === '' || /^[0-9.,]*$/.test(value)) {
+                                            updateMethod(index, 'le_phi', value);
+                                        }
+                                    }}
                                     placeholder="Lệ phí (VND)..."
                                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
                                 />
@@ -75,6 +81,7 @@ const ProcedureMethodsSection = ({ methods, addMethod, removeMethod, updateMetho
                         </div>
                     </div>
                 ))}
+                </div>
 
                 <button
                     type="button"

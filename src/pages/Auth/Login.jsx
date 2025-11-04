@@ -6,7 +6,7 @@ import { useLogin } from "../../hooks/useLogin";
 import { useAuthRedirect } from "../../hooks/useAuthRedirect";
 import { restoreUser } from "../../features/auth/authSlice";
 import { fetchMyProfile } from "../../features/userProfile/userProfileThunks";
-import TwoFALoginModal from "../../components/TwoFALoginModal";
+import TwoFALoginModal from "../../components/twoFactor/TwoFALoginModal";
 import ROUTE_PATH from "../../constants/routes";
 import { getRedirectPathIfDisabled } from "../../utils/routeRedirectUtils";
 

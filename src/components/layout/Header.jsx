@@ -1,7 +1,7 @@
 import React from 'react';
 import { Menu } from 'lucide-react';
 import PropTypes from 'prop-types';
-import UserProfileDropdown from './UserProfileDropdown';
+import UserProfileDropdown from '../admin/UserProfileDropdown';
 
 export default function Header({ title = "Hệ thống quản trị", onMobileMenuToggle, isMobileMenuOpen }) {
     return (

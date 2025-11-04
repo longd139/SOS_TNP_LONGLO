@@ -1,6 +1,6 @@
 import React from 'react';
-import StatCard from '../../components/StatCard';
-import Chart from '../../components/Chart';
+import StatCard from '../../components/dashboard/StatCard';
+import Chart from '../../components/dashboard/Chart';
 import { dashboardStats, chartData, recentReports } from '../../mockData';
 import { AlertTriangle, CheckCircle, Clock, MessageSquare } from 'lucide-react';
 

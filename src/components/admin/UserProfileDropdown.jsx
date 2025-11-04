@@ -1,13 +1,13 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { LogOut, User, Lock, ChevronDown } from 'lucide-react';
-import { logout } from '../features/auth/authSlice';
-import { fetchMyProfile } from '../features/userProfile/userProfileThunks';
-import { selectProfile, selectLoading } from '../features/userProfile/userProfileSelectors';
-import { AUTH_API } from '../apis/auth';
+import { logout } from '../../features/auth/authSlice';
+import { fetchMyProfile } from '../../features/userProfile/userProfileThunks';
+import { selectProfile, selectLoading } from '../../features/userProfile/userProfileSelectors';
+import { AUTH_API } from '../../apis/auth';
 import UserProfileModal from './UserProfileModal';
-import TwoFactorToggleModal from './TwoFactorToggleModal';
-import TwoFactorOTPModal from './TwoFactorOTPModal';
+import TwoFactorToggleModal from '../twoFactor/TwoFactorToggleModal';
+import TwoFactorOTPModal from '../twoFactor/TwoFactorOTPModal';
 
 const UserProfileDropdown = () => {
     const [isOpen, setIsOpen] = useState(false);

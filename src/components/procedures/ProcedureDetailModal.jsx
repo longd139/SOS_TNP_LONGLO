@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import BaseModal from '../BaseModal';
+import BaseModal from '../base/BaseModal';
 import { Download, FileText } from 'lucide-react';
 import dayjs from 'dayjs';
 import { downloadUtils } from '../../utils/downLoadUtils';

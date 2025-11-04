@@ -19,8 +19,21 @@ const getAreas = async (is_removed, search) => {
     }
 }
 
+const createAreas = async (areaData) => {
+    try {
+        const response = await apiClient.post("/api/linh-vuc", areaData);
+        if (response.data.success) {
+            return response.data.data;
+        }
+        else throw new Error("Tạo lĩnh vực thất bại");    
+    }
+    catch (error) {
+        throw error;
+    }   
+}
 export const AREAS_API = {
-    getAreas
+    getAreas,
+    createAreas
 };
 
 export default AREAS_API;

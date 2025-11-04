@@ -1,20 +1,24 @@
 import React, { useState } from 'react';
+import { useDispatch } from 'react-redux';
 import dayjs from 'dayjs';
 import 'dayjs/locale/vi';
-import BaseTable from '../../components/BaseTable';
+import BaseTable from '../../components/base/BaseTable';
 import ProcedureForm from '../../components/procedures/ProcedureForm';
 import ProcedureDetailModal from '../../components/procedures/ProcedureDetailModal';
 import ProceduresFilter from '../../components/procedures/ProceduresFilter';
 import { useProcedure } from '../../hooks/useProcedures';
 import { getProcedureColumns } from '../../components/procedures/columns';
 import { showToast } from '../../utils/toastNotification';
-import { showConfirm } from '../../utils/confirmUtils';
+import { ConfirmModal } from '../../components/base/BaseModal';
+import { fetchProcedures } from '../../features/procedures/proceduresThunks';
 dayjs.locale('vi');
 
 export default function ProceduresManager() {
+    const dispatch = useDispatch();
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+    const [deleteConfirm, setDeleteConfirm] = useState({ isOpen: false, procedure: null });
 
     const {
         procedures,
@@ -96,18 +100,26 @@ export default function ProceduresManager() {
     };
 
 
-    const handleDelete = async (procedure) => {
-        const confirmed = showConfirm(`Bạn có chắc chắn muốn xóa thủ tục "${procedure.ten_thu_tuc || procedure.tenThuTuc}"?`);
-        if (!confirmed) return;
+    const handleDelete = (procedure) => {
+        setDeleteConfirm({ isOpen: true, procedure });
+    };
 
-        const result = await deleteProcedure(procedure.id, procedure.ten_thu_tuc || procedure.tenThuTuc);
+    const handleDeleteConfirm = async () => {
+        if (!deleteConfirm.procedure) return;
+
+        const result = await deleteProcedure(
+            deleteConfirm.procedure.id,
+            deleteConfirm.procedure.ten_thu_tuc || deleteConfirm.procedure.tenThuTuc
+        );
+        
         if (result.success) {
             showToast.success('Đã xóa thủ tục thành công.');
         } else if (result.cancelled) {
-            // no-op
         } else {
             showToast.error('Có lỗi xảy ra khi xóa thủ tục!');
         }
+        
+        setDeleteConfirm({ isOpen: false, procedure: null });
     };
 
     const handleView = async (procedure) => {
@@ -119,6 +131,29 @@ export default function ProceduresManager() {
 
     const handleFilterChange = (key, value) => {
         updateFilters({ [key]: value });
+    };
+
+    const handleSearchWithFilters = (newFilters) => {
+        updateFilters({
+            searchKeyword: newFilters.searchKeyword,
+            selectedDomain: newFilters.selectedDomain
+        });
+
+        if (newFilters.showRemoved !== showRemoved) {
+            toggleShowRemoved(newFilters.showRemoved);
+        }
+
+        if (newFilters.pageSize !== pagination.pageSize) {
+            changePageSize(newFilters.pageSize);
+        }
+
+        dispatch(fetchProcedures({
+            page: 1,
+            size: newFilters.pageSize,
+            search: newFilters.searchKeyword,
+            id_linh_vuc: newFilters.selectedDomain,
+            is_removed: newFilters.showRemoved
+        }));
     };
 
     return (
@@ -138,6 +173,7 @@ export default function ProceduresManager() {
                 onReset={resetFilters}
                 onToggleRemoved={toggleShowRemoved}
                 onPageSizeChange={changePageSize}
+                onSearchWithFilters={handleSearchWithFilters}
             />
 
             <div className="mb-3 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 bg-white p-3 rounded-lg shadow-sm border border-gray-200">
@@ -202,6 +238,17 @@ export default function ProceduresManager() {
                 isOpen={isDetailModalOpen}
                 onClose={closeDetailModal}
                 procedure={currentProcedure}
+            />
+
+            <ConfirmModal
+                isOpen={deleteConfirm.isOpen}
+                onClose={() => setDeleteConfirm({ isOpen: false, procedure: null })}
+                onConfirm={handleDeleteConfirm}
+                title="Xác nhận xóa"
+                message={`Bạn có chắc chắn muốn xóa thủ tục "${deleteConfirm.procedure?.ten_thu_tuc || deleteConfirm.procedure?.tenThuTuc}"?`}
+                confirmText="Xóa"
+                cancelText="Hủy"
+                type="danger"
             />
         </div>
     );

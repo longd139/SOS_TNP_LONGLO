@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 const ProcedureAdditionalInfo = ({ formData, updateField }) => {
     return (
         <div className="h-full flex flex-col">
-            <label className="block text-sm font-medium text-gray-700 mb-2 required-label">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
                 Yêu cầu điều kiện chung
             </label>
             <textarea

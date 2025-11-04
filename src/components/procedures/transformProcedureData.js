@@ -83,11 +83,17 @@ export const cleanFormData = (formData) => {
         })),
         
         cachThuThucHien: (formData.cachThuThucHien || []).map(item => {
+            let lePhi = 0;
+            if (item.le_phi) {
+                const cleanedValue = String(item.le_phi).replace(/,/g, '.').replace(/\s/g, '');
+                lePhi = parseFloat(cleanedValue) || 0;
+            }
+            
             const mapped = {
                 hinh_thuc_ap_dung: item.hinh_thuc_ap_dung || '',
                 mo_ta_chi_tiet: item.mo_ta_chi_tiet || '',
                 thoi_gian_giai_quyet: item.thoi_gian_giai_quyet || '',
-                le_phi: Number(item.le_phi) || 0,
+                le_phi: lePhi,
                 ghi_chu_le_phi: item.ghi_chu_le_phi || ''
             };
             if (item.id) {

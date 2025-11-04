@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { X } from 'lucide-react';
-import BaseModal from './BaseModal';
-import { updateProfileData } from '../features/userProfile/userProfileThunks';
-import { selectUpdating, selectUpdateError } from '../features/userProfile/userProfileSelectors';
+import BaseModal from '../base/BaseModal';
+import { updateProfileData } from '../../features/userProfile/userProfileThunks';
+import { selectUpdating, selectUpdateError } from '../../features/userProfile/userProfileSelectors';
 
 const UserProfileModal = ({ isOpen, onClose, profile, loading }) => {
     const [formData, setFormData] = useState({

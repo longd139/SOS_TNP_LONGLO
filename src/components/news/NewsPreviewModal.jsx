@@ -1,6 +1,6 @@
 import React from 'react';
 import { Calendar, FolderOpen, User } from 'lucide-react';
-import BaseModal from '../BaseModal';
+import BaseModal from '../base/BaseModal';
 import { downloadUtils } from '../../utils/downLoadUtils';
 import { STATUS_NEWS_LABELS } from '../../constants/status';
 import { formatDate } from '../../utils/formatDate';

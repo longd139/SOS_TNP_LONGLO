@@ -1,7 +1,7 @@
 import { Routes, Route } from "react-router-dom";
 import AdminLayout from "../layouts/AdminLayout";
 import AuthLayout from "../layouts/AuthLayout";
-import ProtectedRoute from "../components/ProtectedRoute";
+import ProtectedRoute from "../components/routes/ProtectedRoute";
 import { ROLE } from "../constants/role";
 import Login from "../pages/Auth/Login";
 import Dashboard from "../pages/Dashboard/Dashboard";
@@ -25,7 +25,6 @@ function AppRoutes() {
         <Routes>
             <Route element={<AuthLayout />}>
                 <Route path="/" element={<Login />} />
-                {/* <Route path="/forgot-password" element={<ForgotPasswordPage />} /> */}
             </Route>
 
             <Route element={

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Plus, Loader2 } from 'lucide-react';
-import BaseTable from '../../components/BaseTable';
-import { ConfirmModal } from '../../components/BaseModal';
+import BaseTable from '../../components/base/BaseTable';
+import { ConfirmModal } from '../../components/base/BaseModal';
 import NewsFormModal from '../../components/news/NewsFormModal';
 import NewsFilter from '../../components/news/NewsFilter';
 import NewsPreviewModal from '../../components/news/NewsPreviewModal';

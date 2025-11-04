@@ -1,8 +1,8 @@
 import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
-import { ROLE } from '../constants/role';
-import { isPathDisabled, getDefaultEnabledRoute } from '../utils/routeRedirectUtils';
+import { useAuth } from '../../contexts/AuthContext';
+import { ROLE } from '../../constants/role';
+import { isPathDisabled, getDefaultEnabledRoute } from '../../utils/routeRedirectUtils';
 
 const ProtectedRoute = ({ children, requiredRole = null }) => {
     const { auth, isLoading } = useAuth();

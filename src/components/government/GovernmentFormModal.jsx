@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import BaseModal, { ModalFooter } from '../BaseModal';
+import BaseModal, { ModalFooter } from '../base/BaseModal';
 import { GOVERNMENT_API } from '../../apis/government';
 import { COMMITTEE_API } from '../../apis/committee';
 import { validateGovernmentForm } from '../../validator/governmentValidator';

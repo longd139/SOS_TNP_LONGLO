@@ -1,13 +1,14 @@
 import { useState } from 'react';
 import { Calendar, Clock, MapPin, User, FileText, Pencil, Trash2, Download, Upload, Plus } from 'lucide-react';
-import { showConfirm } from '../../utils/confirmUtils';
 import { showToast } from '../../utils/toastNotification';
+import { ConfirmModal } from '../../components/base/BaseModal';
 import { scheduleList } from '../../mockData';
 
 export default function WorkSchedule() {
     const [schedules, setSchedules] = useState(scheduleList);
     const [selectedMonth, setSelectedMonth] = useState(10); // October
     const [selectedYear, setSelectedYear] = useState(2025);
+    const [deleteConfirm, setDeleteConfirm] = useState({ isOpen: false, schedule: null });
 
     const getDaysInMonth = (month, year) => {
         const firstDay = new Date(year, month - 1, 1);
@@ -41,11 +42,15 @@ export default function WorkSchedule() {
     };
 
     const handleDelete = (schedule) => {
-        const confirmed = showConfirm(`Bạn có chắc chắn muốn xóa lịch tiếp dân ngày ${schedule.date}?`);
-        if (!confirmed) return;
+        setDeleteConfirm({ isOpen: true, schedule });
+    };
 
-        setSchedules(schedules.filter(s => s.id !== schedule.id));
+    const handleDeleteConfirm = () => {
+        if (!deleteConfirm.schedule) return;
+
+        setSchedules(schedules.filter(s => s.id !== deleteConfirm.schedule.id));
         showToast.success('Đã xóa lịch tiếp dân thành công.');
+        setDeleteConfirm({ isOpen: false, schedule: null });
     };
 
     const handleExport = () => {
@@ -222,6 +227,17 @@ export default function WorkSchedule() {
                     </div>
                 </div>
             </div>
+
+            <ConfirmModal
+                isOpen={deleteConfirm.isOpen}
+                onClose={() => setDeleteConfirm({ isOpen: false, schedule: null })}
+                onConfirm={handleDeleteConfirm}
+                title="Xác nhận xóa"
+                message={`Bạn có chắc chắn muốn xóa lịch tiếp dân ngày ${deleteConfirm.schedule?.date}?`}
+                confirmText="Xóa"
+                cancelText="Hủy"
+                type="danger"
+            />
         </div>
     );
 }

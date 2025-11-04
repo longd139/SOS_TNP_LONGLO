@@ -2,8 +2,8 @@ import { BarChart3, Calendar, FileText, FolderOpen, LayoutDashboard, MessageSqua
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import PropTypes from 'prop-types';
-import ROUTE_PATH from '../constants/routes';
-import { isPathDisabled } from '../utils/routeRedirectUtils';
+import ROUTE_PATH from '../../constants/routes';
+import { isPathDisabled } from '../../utils/routeRedirectUtils';
 
 const menuItems = [
     {

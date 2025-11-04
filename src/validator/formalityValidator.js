@@ -29,9 +29,14 @@ const cachThucHienSchema = yup.object().shape({
         .string()
         .required("Thời gian giải quyết là bắt buộc"),
     le_phi: yup
-        .number()
+        .mixed()
         .required("Lệ phí là bắt buộc")
-        .min(0, "Lệ phí phải lớn hơn hoặc bằng 0"),
+        .test('is-valid-number', 'Lệ phí phải là số hợp lệ', function(value) {
+            if (!value && value !== 0) return false;
+            const cleanedValue = String(value).replace(/,/g, '.').replace(/\s/g, '');
+            const numValue = parseFloat(cleanedValue);
+            return !isNaN(numValue) && numValue >= 0;
+        }),
     ghi_chu_le_phi: yup
         .string()
         .nullable()
@@ -95,8 +100,7 @@ export const createFormalitySchema = yup.object().shape({
     danhSachMauDon: yup
         .array()
         .of(mauDonSchema)
-        .min(1, "Phải có ít nhất một mẫu đơn")
-        .required("Danh sách mẫu đơn là bắt buộc"),
+        .nullable(),
     cachThuThucHien: yup
         .array()
         .of(cachThucHienSchema)
@@ -173,8 +177,7 @@ export const updateFormalitySchema = yup.object().shape({
     danhSachMauDon: yup
         .array()
         .of(mauDonUpdateSchema)
-        .min(1, "Phải có ít nhất một mẫu đơn")
-        .required("Danh sách mẫu đơn là bắt buộc"),
+        .nullable(),
     cachThuThucHien: yup
         .array()
         .of(cachThucHienUpdateSchema)
