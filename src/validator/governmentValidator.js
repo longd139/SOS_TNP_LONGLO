@@ -13,10 +13,16 @@ const governmentSchema = yup.object().shape({
         .required("Địa chỉ là bắt buộc"),
     soDienThoai: yup
         .string()
-        .required("Số điện thoại là bắt buộc"),
+        .required("Số điện thoại là bắt buộc")
+        .matches(/^[0-9]{10,11}$/, "Số điện thoại phải có 10-11 chữ số")
+        .test('starts-with-zero', 'Số điện thoại phải bắt đầu bằng số 0', function(value) {
+            if (!value) return true;
+            return value.startsWith('0');
+        }),
     moTa: yup
         .string()
-        .nullable(),
+        .nullable()
+        .transform((value) => value === '' ? null : value),
     linkGoogleMap: yup
         .string()
         .required("Link Google Map là bắt buộc")

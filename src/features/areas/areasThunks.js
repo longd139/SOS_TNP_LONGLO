@@ -3,9 +3,9 @@ import { AREAS_API } from '../../apis/areas';
 
 export const fetchAreas = createAsyncThunk(
     'areas/fetchAreas',
-    async ({ isRemoved = false, search = '' } = {}, { rejectWithValue }) => {
+    async ({ isActive = true, search = '' } = {}, { rejectWithValue }) => {
         try {
-            const response = await AREAS_API.getAreas(isRemoved, search);
+            const response = await AREAS_API.getAreas(isActive, search);
             return response || [];
         } catch (error) {
             return rejectWithValue({

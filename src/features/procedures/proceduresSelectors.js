@@ -9,7 +9,7 @@ export const selectAreasLoading = (state) => state.procedures.areasLoading;
 export const selectError = (state) => state.procedures.error;
 export const selectPagination = (state) => state.procedures.pagination;
 export const selectFilters = (state) => state.procedures.filters;
-export const selectShowRemoved = (state) => state.procedures.showRemoved;
+export const selectShowActive = (state) => state.procedures.showActive;
 
 export const selectProceduresWithAreas = createSelector(
     [selectProcedures, selectAreas],

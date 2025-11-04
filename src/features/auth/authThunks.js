@@ -41,12 +41,12 @@ export const loginUser = createAsyncThunk(
                 };
             }
 
-            if (!response.accessToken) throw new Error('Phản hồi không hợp lệ');
+            if (!response.access_token) throw new Error('Phản hồi không hợp lệ');
 
-            const decoded = decodeToken(response.accessToken);
+            const decoded = decodeToken(response.access_token);
             if (!decoded) throw new Error('Token không hợp lệ');
 
-            storeTokens(response.accessToken, response.refreshToken);
+            storeTokens(response.access_token, response.refresh_token);
 
             return {
                 user: {
@@ -70,8 +70,8 @@ export const verifyOtpUser = createAsyncThunk(
             if (!response.success) throw new Error(response.message || 'OTP sai');
             
             const tokenData = response.data;
-            const accessToken = tokenData.accessToken;
-            const refreshToken = tokenData.refreshToken;
+            const accessToken = tokenData.access_token;
+            const refreshToken = tokenData.refresh_token;
 
             if (!accessToken) throw new Error('Không nhận được token');
 

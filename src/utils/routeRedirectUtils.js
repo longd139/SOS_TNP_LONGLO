@@ -1,13 +1,13 @@
 const menuItems = [
-    { id: 'overview', path: '/dashboard', disabled: true },
-    { id: 'reports', path: '/reports', disabled: true },
-    { id: 'news', path: '/news', disabled: true },
+    { id: 'overview', path: '/dashboard', disabled: false },
+    { id: 'reports', path: '/reports', disabled: false },
+    { id: 'news', path: '/news', disabled: false },
     { id: 'procedures', path: '/procedures', disabled: false },
     { id: 'templates', path: '/templates', disabled: false },
     { id: 'contact', path: '/contact', disabled: false },
-    { id: 'schedule', path: '/schedules', disabled: true },
-    { id: 'statistics', path: '/statistics', disabled: true },
-    { id: 'accounts', path: '/accounts', disabled: true }
+    { id: 'schedule', path: '/schedules', disabled: false },
+    { id: 'statistics', path: '/statistics', disabled: false },
+    { id: 'accounts', path: '/accounts', disabled: false }
 ];
 
 export const getDefaultEnabledRoute = () => {

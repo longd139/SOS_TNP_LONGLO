@@ -119,7 +119,7 @@ export default function NewsManager() {
             key: 'tieu_de',
             width: '300px',
             render: (value) => (
-                <div 
+                <div
                     className="text-sm text-gray-900 max-w-[300px] truncate text-ellipsis overflow-hidden whitespace-nowrap"
                     title={value}
                 >
@@ -173,6 +173,20 @@ export default function NewsManager() {
                     {value ? formatDate(value) : 'N/A'}
                 </span>
             )
+        },
+        {
+            title: 'TRẠNG THÁI',
+            dataIndex: 'is_active',
+            key: 'is_active',
+            width: '120px',
+            render: (value) => (
+                <span
+                    className="block max-w-[120px] truncate text-ellipsis overflow-hidden whitespace-nowrap text-sm text-gray-900"
+                    title={value ? 'Hoạt động' : 'Không hoạt động'}
+                >
+                    {value ? 'Hoạt động' : 'Không hoạt động'}
+                </span>
+            )
         }
     ];
 
@@ -220,7 +234,7 @@ export default function NewsManager() {
                 columns={columns}
                 onView={handleView}
                 onEdit={handleEdit}
-                onDelete={news.is_removed ? handleDelete : undefined }
+                onDelete={news.is_removed ? handleDelete : undefined}
                 showActions={true}
                 emptyMessage={loading ? "Đang tải dữ liệu..." : "Không có bài viết nào"}
             />

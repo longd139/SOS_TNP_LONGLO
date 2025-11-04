@@ -1,10 +1,10 @@
 import apiClient from '../utils/apiClient';
 
-const getAreas = async (is_removed, search) => {
+const getAreas = async (isActive, search) => {
     try {
         const params = new URLSearchParams();
-        if (typeof is_removed === 'boolean') {
-            params.append('is_removed', is_removed);
+        if (typeof isActive === 'boolean') {
+            params.append('isActive', isActive);
         }
         if (typeof search === 'string') {
             params.append('search', search);

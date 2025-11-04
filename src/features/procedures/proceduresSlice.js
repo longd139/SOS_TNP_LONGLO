@@ -27,7 +27,7 @@ const initialState = {
         searchKeyword: '',
         selectedDomain: ''
     },
-    showRemoved: false
+    showActive: true
 };
 
 const proceduresSlice = createSlice({
@@ -43,8 +43,8 @@ const proceduresSlice = createSlice({
                 selectedDomain: ''
             };
         },
-        setShowRemoved: (state, action) => {
-            state.showRemoved = action.payload;
+        setShowActive: (state, action) => {
+            state.showActive = action.payload;
         },
         clearCurrentProcedure: (state) => {
             state.currentProcedure = null;
@@ -142,7 +142,7 @@ const proceduresSlice = createSlice({
 export const {
     setFilters,
     resetFilters,
-    setShowRemoved,
+    setShowActive,
     clearCurrentProcedure,
     clearError
 } = proceduresSlice.actions;

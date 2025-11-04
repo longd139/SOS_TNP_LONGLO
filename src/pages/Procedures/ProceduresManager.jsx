@@ -27,7 +27,7 @@ export default function ProceduresManager() {
         loading,
         pagination,
         filters,
-        showRemoved,
+        showActive,
         searchProcedures,
         changePage,
         changePageSize,
@@ -37,11 +37,11 @@ export default function ProceduresManager() {
         updateProcedure,
         deleteProcedure,
         getProcedureById,
-        toggleShowRemoved,
+        toggleShowActive,
         clearCurrent
     } = useProcedure();
 
-
+    console.log('procedures render', procedures);
     const columns = getProcedureColumns(pagination);
     const openCreateModal = () => {
         setIsCreateModalOpen(true);
@@ -139,8 +139,8 @@ export default function ProceduresManager() {
             selectedDomain: newFilters.selectedDomain
         });
 
-        if (newFilters.showRemoved !== showRemoved) {
-            toggleShowRemoved(newFilters.showRemoved);
+        if (newFilters.showActive !== showActive) {
+            toggleShowActive(newFilters.showActive);
         }
 
         if (newFilters.pageSize !== pagination.pageSize) {
@@ -152,7 +152,7 @@ export default function ProceduresManager() {
             size: newFilters.pageSize,
             search: newFilters.searchKeyword,
             id_linh_vuc: newFilters.selectedDomain,
-            is_removed: newFilters.showRemoved
+            isActive: newFilters.showActive
         }));
     };
 
@@ -167,11 +167,11 @@ export default function ProceduresManager() {
                 areas={areas}
                 filters={filters}
                 pagination={pagination}
-                showRemoved={showRemoved}
+                showActive={showActive}
                 onFilterChange={handleFilterChange}
                 onSearch={searchProcedures}
                 onReset={resetFilters}
-                onToggleRemoved={toggleShowRemoved}
+                onToggleActive={toggleShowActive}
                 onPageSizeChange={changePageSize}
                 onSearchWithFilters={handleSearchWithFilters}
             />
@@ -181,12 +181,12 @@ export default function ProceduresManager() {
                     <div className="text-xs md:text-sm text-gray-600">
                         Danh sách thủ tục ({pagination.total})
                     </div>
-                    {showRemoved && (
+                    {!showActive && (
                         <span className="px-2 md:px-3 py-1 bg-red-100 text-red-800 text-xs font-medium rounded-full">
                             Đã xóa
                         </span>
                     )}
-                    {!showRemoved && (
+                    {showActive && (
                         <span className="px-3 py-1 bg-green-100 text-green-800 text-xs font-medium rounded-full">
                             Đang hoạt động
                         </span>
@@ -210,7 +210,7 @@ export default function ProceduresManager() {
                 pagination={pagination}
                 onPageChange={changePage}
                 onEdit={handleEdit}
-                onDelete={showRemoved ? handleDelete : null}
+                onDelete={!showActive ? handleDelete : null}
                 onView={handleView}
                 showActions={true}
                 emptyMessage="Không có thủ tục nào được tìm thấy"

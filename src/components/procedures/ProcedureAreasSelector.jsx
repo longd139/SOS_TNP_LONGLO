@@ -28,7 +28,7 @@ const ProcedureAreasSelector = ({ formData, errors, areas: propAreas, toggleArea
 
     useEffect(() => {
         if (reduxAreas.length === 0) {
-            dispatch(fetchAreas({ isRemoved: false }));
+            dispatch(fetchAreas({ isActive: true }));
         }
     }, [dispatch, reduxAreas.length]);
 
@@ -41,7 +41,7 @@ const ProcedureAreasSelector = ({ formData, errors, areas: propAreas, toggleArea
         const timer = setTimeout(async () => {
             setLoading(true);
             try {
-                const results = await AREAS_API.getAreas(false, search);
+                const results = await AREAS_API.getAreas(true, search);
                 const filtered = results.filter(
                     area => !formData.danhSachLinhVucIds.includes(area.id)
                 );
@@ -99,7 +99,7 @@ const ProcedureAreasSelector = ({ formData, errors, areas: propAreas, toggleArea
             const result = await dispatch(createArea(areaData)).unwrap();
             showToast.success('Tạo lĩnh vực thành công!');
             
-            await dispatch(fetchAreas({ isRemoved: false }));
+            await dispatch(fetchAreas({ isActive: true }));
             
             if (result && result.id) {
                 toggleArea(result.id);
@@ -212,8 +212,13 @@ const ProcedureAreasSelector = ({ formData, errors, areas: propAreas, toggleArea
                     value={formData.soQuyetDinh}
                     onChange={(e) => updateField('soQuyetDinh', e.target.value)}
                     placeholder="Nhập số quyết định..."
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                        errors.soQuyetDinh ? 'border-red-500' : 'border-gray-300'
+                    }`}
                 />
+                {errors.soQuyetDinh && (
+                    <p className="mt-1 text-sm text-red-600">{errors.soQuyetDinh}</p>
+                )}
             </div>
 
             <AreaFormModal

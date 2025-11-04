@@ -5,14 +5,14 @@ const getFormalityApi = async ({
     size = 10,
     search = '',
     id_linh_vuc,
-    is_removed = false
+    isActive = true
 }) => {
     try {
         const params = new URLSearchParams({
             page,
             size,
             search,
-            is_removed
+            isActive
         });
 
         if (id_linh_vuc) {
@@ -32,7 +32,7 @@ const getFormalityApi = async ({
                 content = [];
             }
 
-            const paginationObj = response.data.pagintation || (topData && (topData.pagination || topData.pagintation)) || null;
+            const paginationObj = response.data.pagination || response.data.pagintation || (topData && (topData.pagination || topData.pagintation)) || null;
 
             return {
                 content: content,

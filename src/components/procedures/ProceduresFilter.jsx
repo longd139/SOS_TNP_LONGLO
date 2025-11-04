@@ -5,18 +5,18 @@ export default function ProceduresFilter({
     areas = [], 
     filters = {},
     pagination = {},
-    showRemoved = false,
+    showActive = true,
     onFilterChange,
     onSearch,
     onReset,
-    onToggleRemoved,
+    onToggleActive,
     onPageSizeChange,
     onSearchWithFilters
 }) {
     const initialFilters = {
         searchKeyword: filters.searchKeyword || '',
         selectedDomain: filters.selectedDomain || '',
-        showRemoved: showRemoved,
+        showActive: showActive,
         pageSize: pagination.pageSize || 10
     };
 
@@ -40,12 +40,12 @@ export default function ProceduresFilter({
             ]
         },
         {
-            name: 'showRemoved',
+            name: 'showActive',
             label: 'Trạng thái',
             type: 'select',
             options: [
-                { value: false, label: 'Hoạt động' },
-                { value: true, label: 'Đã xóa' }
+                { value: true, label: 'Hoạt động' },
+                { value: false, label: 'Đã xóa' }
             ]
         },
         {
@@ -69,15 +69,15 @@ export default function ProceduresFilter({
             onFilterChange?.('selectedDomain', newFilters.selectedDomain);
         }
 
-        if (newFilters.showRemoved !== showRemoved) {
-            onToggleRemoved?.(newFilters.showRemoved);
+        if (newFilters.showActive !== showActive) {
+            onToggleActive?.(newFilters.showActive);
         }
 
         if (onSearchWithFilters) {
             onSearchWithFilters({
                 searchKeyword: newFilters.searchKeyword,
                 selectedDomain: newFilters.selectedDomain,
-                showRemoved: newFilters.showRemoved,
+                showActive: newFilters.showActive,
                 pageSize: Number(newFilters.pageSize)
             });
         } else {

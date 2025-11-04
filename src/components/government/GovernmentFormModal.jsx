@@ -69,7 +69,7 @@ const GovernmentFormModal = ({ isOpen, onClose, onCreate }) => {
                 tenCoSo: form.tenCoSo,
                 diaChi: form.diaChi,
                 soDienThoai: form.soDienThoai,
-                moTa: form.moTa,
+                moTa: form.moTa?.trim() || null,
                 linkGoogleMap: form.linkGoogleMap
             };
             const created = await GOVERNMENT_API.createGovernment(payload);
@@ -151,7 +151,14 @@ const GovernmentFormModal = ({ isOpen, onClose, onCreate }) => {
                     <input
                         type="text"
                         value={form.soDienThoai}
-                        onChange={(e) => updateField('soDienThoai', e.target.value)}
+                        onChange={(e) => {
+                            const value = e.target.value;
+                            if (value === '' || /^[0-9]*$/.test(value)) {
+                                updateField('soDienThoai', value);
+                            }
+                        }}
+                        placeholder="Ví dụ: 0123456789"
+                        maxLength="11"
                         className={`w-full px-3 py-2 border rounded-lg ${errors.soDienThoai ? 'border-red-500' : 'border-gray-300'}`}
                     />
                     {errors.soDienThoai && <p className="mt-1 text-sm text-red-600">{errors.soDienThoai}</p>}

@@ -11,7 +11,7 @@ import {
 import {
     setFilters,
     resetFilters as resetFiltersAction,
-    setShowRemoved,
+    setShowActive,
     clearCurrentProcedure,
     clearError
 } from '../features/procedures/proceduresSlice';
@@ -24,7 +24,7 @@ import {
     selectError,
     selectPagination,
     selectFilters,
-    selectShowRemoved,
+    selectShowActive,
     selectProceduresWithAreas
 } from '../features/procedures/proceduresSelectors';
 
@@ -39,7 +39,7 @@ export const useProcedure = () => {
     const error = useSelector(selectError);
     const pagination = useSelector(selectPagination);
     const filters = useSelector(selectFilters);
-    const showRemoved = useSelector(selectShowRemoved);
+    const showActive = useSelector(selectShowActive);
     const proceduresWithAreas = useSelector(selectProceduresWithAreas);
 
     const loadProcedures = useCallback((
@@ -47,14 +47,14 @@ export const useProcedure = () => {
         size = 10,
         search = '',
         id_linh_vuc = '',
-        is_removed = false
+        isActive = true
     ) => {
         dispatch(fetchProcedures({
             page,
             size,
             search,
             id_linh_vuc,
-            is_removed
+            isActive
         }));
     }, [dispatch]);
 
@@ -71,14 +71,14 @@ export const useProcedure = () => {
                 size: pagination.pageSize,
                 search: filters.searchKeyword,
                 id_linh_vuc: filters.selectedDomain,
-                is_removed: showRemoved
+                isActive: showActive
             }));
 
             return { success: true };
         } catch (error) {
             return { success: false, error };
         }
-    }, [dispatch, pagination, filters, showRemoved]);
+    }, [dispatch, pagination, filters, showActive]);
 
     const updateProcedure = useCallback(async (procedureId, formData) => {
         try {
@@ -89,14 +89,14 @@ export const useProcedure = () => {
                 size: pagination.pageSize,
                 search: filters.searchKeyword,
                 id_linh_vuc: filters.selectedDomain,
-                is_removed: showRemoved
+                isActive: showActive
             }));
 
             return { success: true };
         } catch (error) {
             return { success: false, error };
         }
-    }, [dispatch, pagination, filters, showRemoved]);
+    }, [dispatch, pagination, filters, showActive]);
 
     const deleteProcedure = useCallback(async (procedureId, procedureName) => {
         try {
@@ -107,7 +107,7 @@ export const useProcedure = () => {
                 size: pagination.pageSize,
                 search: filters.searchKeyword,
                 id_linh_vuc: filters.selectedDomain,
-                is_removed: showRemoved
+                isActive: showActive
             }));
 
             return { success: true };
@@ -117,7 +117,7 @@ export const useProcedure = () => {
             }
             return { success: false, error };
         }
-    }, [dispatch, pagination, filters, showRemoved]);
+    }, [dispatch, pagination, filters, showActive]);
 
     const getProcedureById = useCallback(async (procedureId) => {
         try {
@@ -134,9 +134,9 @@ export const useProcedure = () => {
             size: pagination.pageSize,
             search: filters.searchKeyword,
             id_linh_vuc: filters.selectedDomain,
-            is_removed: showRemoved
+            isActive: showActive
         }));
-    }, [dispatch, pagination.pageSize, filters, showRemoved]);
+    }, [dispatch, pagination.pageSize, filters, showActive]);
 
     const changePage = useCallback((page) => {
         dispatch(fetchProcedures({
@@ -144,9 +144,9 @@ export const useProcedure = () => {
             size: pagination.pageSize,
             search: filters.searchKeyword,
             id_linh_vuc: filters.selectedDomain,
-            is_removed: showRemoved
+            isActive: showActive
         }));
-    }, [dispatch, pagination.pageSize, filters, showRemoved]);
+    }, [dispatch, pagination.pageSize, filters, showActive]);
 
     const changePageSize = useCallback((size) => {
         dispatch(fetchProcedures({
@@ -154,9 +154,9 @@ export const useProcedure = () => {
             size,
             search: filters.searchKeyword,
             id_linh_vuc: filters.selectedDomain,
-            is_removed: showRemoved
+            isActive: showActive
         }));
-    }, [dispatch, filters, showRemoved]);
+    }, [dispatch, filters, showActive]);
 
     const updateFilters = useCallback((newFilters) => {
         dispatch(setFilters(newFilters));
@@ -169,12 +169,12 @@ export const useProcedure = () => {
             size: pagination.pageSize,
             search: '',
             id_linh_vuc: '',
-            is_removed: showRemoved
+            isActive: showActive
         }));
-    }, [dispatch, pagination.pageSize, showRemoved]);
+    }, [dispatch, pagination.pageSize, showActive]);
 
-    const toggleShowRemoved = useCallback((value) => {
-        dispatch(setShowRemoved(value));
+    const toggleShowActive = useCallback((value) => {
+        dispatch(setShowActive(value));
     }, [dispatch]);
 
     const clearCurrent = useCallback(() => {
@@ -186,9 +186,9 @@ export const useProcedure = () => {
     }, [dispatch]);
 
     useEffect(() => {
-        loadProcedures(1, pagination.pageSize, filters.searchKeyword, filters.selectedDomain, showRemoved);
+        loadProcedures(1, pagination.pageSize, filters.searchKeyword, filters.selectedDomain, showActive);
         loadAreas();
-    }, [showRemoved]); 
+    }, [showActive]); 
 
     return {
         procedures,
@@ -199,7 +199,7 @@ export const useProcedure = () => {
         error,
         pagination,
         filters,
-        showRemoved,
+        showActive,
         proceduresWithAreas,
 
         loadProcedures,
@@ -213,7 +213,7 @@ export const useProcedure = () => {
         changePageSize,
         updateFilters,
         resetFilters,
-        toggleShowRemoved,
+        toggleShowActive,
         clearCurrent,
         clearErrorMessage
     };

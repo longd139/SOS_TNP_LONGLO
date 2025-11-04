@@ -107,7 +107,7 @@ export default function AdminManager() {
             key: 'username',
             width: '150px',
             render: (value) => (
-                <span 
+                <span
                     className="block max-w-[150px] truncate text-ellipsis overflow-hidden whitespace-nowrap text-sm"
                     title={value}
                 >
@@ -121,7 +121,7 @@ export default function AdminManager() {
             key: 'fullName',
             width: '180px',
             render: (value) => (
-                <span 
+                <span
                     className="block max-w-[180px] truncate text-ellipsis overflow-hidden whitespace-nowrap text-sm"
                     title={value}
                 >
@@ -135,7 +135,7 @@ export default function AdminManager() {
             key: 'email',
             width: '200px',
             render: (value) => (
-                <span 
+                <span
                     className="block max-w-[200px] truncate text-ellipsis overflow-hidden whitespace-nowrap text-sm"
                     title={value}
                 >
@@ -162,6 +162,20 @@ export default function AdminManager() {
                 <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${record.active !== false ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
                     }`}>
                     {record.active !== false ? 'Hoạt động' : 'Đã khóa'}
+                </span>
+            )
+        },
+        {
+            title: 'TRẠNG THÁI',
+            dataIndex: 'is_active',
+            key: 'is_active',
+            width: '120px',
+            render: (value) => (
+                <span
+                    className="block max-w-[120px] truncate text-ellipsis overflow-hidden whitespace-nowrap text-sm text-gray-900"
+                    title={value ? 'Hoạt động' : 'Không hoạt động'}
+                >
+                    {value ? 'Hoạt động' : 'Không hoạt động'}
                 </span>
             )
         }

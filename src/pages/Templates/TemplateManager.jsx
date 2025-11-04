@@ -86,11 +86,11 @@ export default function TemplateManager() {
 
     const handleSubmitEdit = async (formData) => {
         if (!selectedTemplate) return;
-        
+
         try {
-            await dispatch(updateTemplateThunk({ 
-                templateId: selectedTemplate.id, 
-                formData 
+            await dispatch(updateTemplateThunk({
+                templateId: selectedTemplate.id,
+                formData
             })).unwrap();
             setIsEditModalOpen(false);
             setSelectedTemplate(null);
@@ -133,7 +133,7 @@ export default function TemplateManager() {
                     <div className="flex-shrink-0 w-5 h-5 flex items-center justify-center">
                         <FileText className="w-5 h-5 text-red-500" aria-hidden="true" />
                     </div>
-                    <span 
+                    <span
                         className="block max-w-[200px] truncate text-ellipsis overflow-hidden whitespace-nowrap text-sm text-gray-900"
                         title={value}
                     >
@@ -161,7 +161,7 @@ export default function TemplateManager() {
             render: (value) => {
                 const displayValue = value || '-';
                 return (
-                    <span 
+                    <span
                         className="block max-w-[180px] truncate text-ellipsis overflow-hidden whitespace-nowrap text-sm text-gray-600"
                         title={displayValue}
                     >
@@ -187,6 +187,20 @@ export default function TemplateManager() {
             render: (value) => (
                 <span className="text-sm text-gray-600">
                     {dayjs(value).format('DD/MM/YYYY HH:mm')}
+                </span>
+            )
+        },
+        {
+            title: 'TRẠNG THÁI',
+            dataIndex: 'is_active',
+            key: 'is_active',
+            width: '120px',
+            render: (value) => (
+                <span
+                    className="block max-w-[120px] truncate text-ellipsis overflow-hidden whitespace-nowrap text-sm text-gray-900"
+                    title={value ? 'Hoạt động' : 'Không hoạt động'}
+                >
+                    {value ? 'Hoạt động' : 'Không hoạt động'}
                 </span>
             )
         }
@@ -248,7 +262,7 @@ export default function TemplateManager() {
                         loading={loading}
                         onView={handleView}
                         onEdit={handleEdit}
-                        onDelete={ showRemoved ? handleDelete : null}
+                        onDelete={showRemoved ? handleDelete : null}
                         viewIcon={<Download className="w-4 h-4" />}
                         showActions={true}
                         actionColumnWidth="150px"

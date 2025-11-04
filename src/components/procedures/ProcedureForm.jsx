@@ -92,6 +92,7 @@ const ProcedureForm = ({
                         <ProcedureAdditionalInfo
                             formData={formData}
                             updateField={updateField}
+                            errors={errors}
                         />
                     </div>
                 </div>
