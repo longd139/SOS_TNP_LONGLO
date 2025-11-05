@@ -98,11 +98,22 @@ const deleteFormality = async (formalityId) => {
     }
 }
 
+const updateStatus = async (userProcedureId, isActive) => {
+    try {
+        const response = await apiClient.put(`/api/thu-tuc/update-status/${userProcedureId}`, { isActive });
+        if (response.data.success) return response.data.data;
+        else throw new Error("Cập nhật trạng thái thủ tục thất bại");
+    } catch (error) {
+        throw error;
+    }
+}
+
 export const FORMALITY_API = {
     getFormalityApi,
     createFormality,
     getFormalityById,
     getFormByFormalityId,
     updateFormality,
-    deleteFormality
+    deleteFormality,
+    updateStatus
 }

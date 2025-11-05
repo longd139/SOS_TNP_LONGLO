@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import BaseModal, { ModalFooter } from '../base/BaseModal';
 import { useProcedureForm } from '../../hooks/useProcedureForm';
 import ProcedureBasicInfo from './ProcedureBasicInfo';
-import ProcedureRemoveToggle from './ProcedureRemoveToggle';
 import ProcedureAreasSelector from './ProcedureAreasSelector';
 import ProcedureAdditionalInfo from './ProcedureAdditionalInfo';
 import ProcedureStepsSection from './ProcedureStepsSection';
@@ -70,13 +69,6 @@ const ProcedureForm = ({
                     errors={errors}
                     updateField={updateField}
                 />
-
-                {mode === 'edit' && (
-                    <ProcedureRemoveToggle
-                        isRemoved={formData.isRemoved}
-                        updateField={updateField}
-                    />
-                )}
 
                 <div className="flex flex-col md:flex-row gap-3 items-stretch">
                     <div className="md:w-1/2 min-w-0">

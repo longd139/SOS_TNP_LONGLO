@@ -91,3 +91,15 @@ export const fetchProcedureById = createAsyncThunk(
         }
     }
 );
+
+export const updateProcedureStatus = createAsyncThunk(
+    'procedures/updateProcedureStatus',
+    async ({ procedureId, isActive }, { rejectWithValue }) => {
+        try {
+            const result = await FORMALITY_API.updateStatus(procedureId, isActive);
+            return { procedureId, isActive };
+        } catch (error) {
+            return rejectWithValue(error.message || 'Không thể cập nhật trạng thái thủ tục');
+        }
+    }
+);
