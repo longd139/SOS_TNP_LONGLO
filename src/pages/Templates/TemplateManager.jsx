@@ -37,12 +37,17 @@ export default function TemplateManager() {
     });
 
     useEffect(() => {
+        // Log when we trigger the fetch so you can correlate with Network tab
+        console.log('[TemplateManager] dispatching fetchTemplates, showRemoved =', showRemoved);
         dispatch(fetchTemplates(showRemoved));
     }, [dispatch, showRemoved]);
 
     const handleView = (template) => {
-        const baseUrl = process.env.REACT_APP_API_URL;
-        const fileUrl = `${baseUrl}${template.url_file_pdf}`;
+        const baseUrl = process.env.REACT_APP_API_URL || '';
+        const filePath = template?.urlFilePdf ?? template?.url_file_pdf ?? '';
+        const fileUrl = `${baseUrl}${filePath}`;
+        // Log the full URL opened
+        console.log('[TemplateManager] Viewing template file URL:', fileUrl, 'template:', template);
         window.open(fileUrl, '_blank');
     };
 
@@ -60,10 +65,16 @@ export default function TemplateManager() {
 
     const handleDeleteConfirm = async () => {
         try {
+            console.log('[TemplateManager] Deleting template id:', deleteModal.template?.id);
             const result = await dispatch(deleteTemplateThunk(deleteModal.template.id)).unwrap();
+            console.log('[TemplateManager] Delete result (thunk returned):', result);
             showToast.success('Xóa biểu mẫu thành công!');
             setDeleteModal({ isOpen: false, template: null });
+            // refresh
+            dispatch(fetchTemplates(showRemoved));
         } catch (error) {
+            console.error('[TemplateManager] Delete failed:', error);
+            console.error('Full error object:', error);
             showToast.error(error.message || 'Có lỗi xảy ra khi xóa biểu mẫu!');
         }
     };
@@ -72,31 +83,45 @@ export default function TemplateManager() {
         setIsCreateModalOpen(true);
     };
 
-    const handleSubmitCreate = async (formData) => {
+    const handleSubmitCreate = async (formData, options = {}) => {
         try {
-            await dispatch(createTemplateThunk(formData)).unwrap();
+            // Log payload to see what fields are being sent
+            console.log('[TemplateManager] Creating template - payload:', formData);
+
+            const result = await dispatch(createTemplateThunk({ formData, options })).unwrap();
+            console.log('[TemplateManager] Create result:', result);
+
             setIsCreateModalOpen(false);
             showToast.success('Tạo biểu mẫu thành công!');
             dispatch(fetchTemplates(showRemoved));
         } catch (error) {
+            console.error('[TemplateManager] Create failed:', error);
             showToast.error(error.message || 'Tạo biểu mẫu thất bại!');
             throw error;
         }
     };
 
-    const handleSubmitEdit = async (formData) => {
+    const handleSubmitEdit = async (formData, options = {}) => {
         if (!selectedTemplate) return;
 
         try {
-            await dispatch(updateTemplateThunk({
+            // Log payload and target id
+            console.log('[TemplateManager] Updating template id:', selectedTemplate.id, 'payload:', formData);
+
+            const result = await dispatch(updateTemplateThunk({
                 templateId: selectedTemplate.id,
-                formData
+                formData,
+                options
             })).unwrap();
+
+            console.log('[TemplateManager] Update result:', result);
+
             setIsEditModalOpen(false);
             setSelectedTemplate(null);
             showToast.success('Cập nhật biểu mẫu thành công!');
             dispatch(fetchTemplates(showRemoved));
         } catch (error) {
+            console.error('[TemplateManager] Update failed:', error);
             showToast.error(error.message || 'Cập nhật biểu mẫu thất bại!');
             throw error;
         }
@@ -125,8 +150,8 @@ export default function TemplateManager() {
         },
         {
             title: 'Tên biểu mẫu',
-            dataIndex: 'ten_mau_don',
-            key: 'ten_mau_don',
+            dataIndex: 'tenMauDon',
+            key: 'tenMauDon',
             width: '200px',
             render: (value) => (
                 <div className="flex items-center gap-2">
@@ -144,8 +169,8 @@ export default function TemplateManager() {
         },
         {
             title: 'Mã biểu mẫu',
-            dataIndex: 'ma_mau_don',
-            key: 'ma_mau_don',
+            dataIndex: 'maMauDon',
+            key: 'maMauDon',
             width: '120px',
             render: (value) => (
                 <span className="block max-w-[120px] truncate text-ellipsis overflow-hidden whitespace-nowrap text-sm font-semibold text-blue-600">
@@ -155,8 +180,8 @@ export default function TemplateManager() {
         },
         {
             title: 'Mô tả',
-            dataIndex: 'mo_ta',
-            key: 'mo_ta',
+            dataIndex: 'moTa',
+            key: 'moTa',
             width: '150px',
             render: (value) => {
                 const displayValue = value || '-';
@@ -172,39 +197,51 @@ export default function TemplateManager() {
         },
         {
             title: 'Kích thước',
-            dataIndex: 'kich_thuoc_file_mb',
-            key: 'kich_thuoc_file_mb',
+            dataIndex: 'kichThuocFileMb',
+            key: 'kichThuocFileMb',
             width: '100px',
-            render: (value) => (
-                <span className="text-sm text-gray-600">{value} MB</span>
-            )
+            render: (value, record) => {
+                // accept camelCase or snake_case from API
+                const v = value ?? record?.kich_thuoc_file_mb ?? record?.kichThuocFileMb;
+                return <span className="text-sm text-gray-600">{v} MB</span>;
+            }
         },
         {
             title: 'Cập nhật',
-            dataIndex: 'thoi_gian_cap_nhap',
-            key: 'thoi_gian_cap_nhap',
+            dataIndex: 'thoiGianCapNhat',
+            key: 'thoiGianCapNhat',
             width: '150px',
-            render: (value) => (
-                <span className="text-sm text-gray-600">
-                    {dayjs(value).format('DD/MM/YYYY HH:mm')}
-                </span>
-            )
+            render: (value, record) => {
+                const v = value ?? record?.thoi_gian_cap_nhap ?? record?.thoiGianCapNhat;
+                return (
+                    <span className="text-sm text-gray-600">
+                        {dayjs(v).format('DD/MM/YYYY HH:mm')}
+                    </span>
+                );
+            }
         },
         {
             title: 'TRẠNG THÁI',
-            dataIndex: 'is_active',
-            key: 'is_active',
+            dataIndex: 'isActive',
+            key: 'isActive',
             width: '120px',
-            render: (value) => (
-                <span
-                    className="block max-w-[120px] truncate text-ellipsis overflow-hidden whitespace-nowrap text-sm text-gray-900"
-                    title={value ? 'Hoạt động' : 'Không hoạt động'}
-                >
-                    {value ? 'Hoạt động' : 'Không hoạt động'}
-                </span>
-            )
+            render: (value, record) => {
+                const v = typeof value !== 'undefined' ? value : (record?.is_active ?? record?.isActive);
+                return (
+                    <span
+                        className="block max-w-[120px] truncate text-ellipsis overflow-hidden whitespace-nowrap text-sm text-gray-900"
+                        title={v ? 'Hoạt động' : 'Không hoạt động'}
+                    >
+                        {v ? 'Hoạt động' : 'Không hoạt động'}
+                    </span>
+                );
+            }
         }
     ];
+
+    // A lightweight render-time log to show list size (optional)
+    // You can remove this if it becomes too noisy.
+    console.log('[TemplateManager] render - templates count =', templates?.length);
 
     return (
         <div className="min-h-screen">
@@ -291,7 +328,7 @@ export default function TemplateManager() {
                 onClose={() => setDeleteModal({ isOpen: false, template: null })}
                 onConfirm={handleDeleteConfirm}
                 title="Xác nhận xóa"
-                message={`Bạn có chắc chắn muốn xóa biểu mẫu "${deleteModal.template?.ten_mau_don}"?`}
+                message={`Bạn có chắc chắn muốn xóa biểu mẫu "${deleteModal.template?.tenMauDon ?? deleteModal.template?.ten_mau_don}"?`}
                 confirmText="Xóa"
                 cancelText="Hủy"
                 type="danger"
