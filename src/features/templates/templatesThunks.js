@@ -17,9 +17,11 @@ export const fetchTemplates = createAsyncThunk(
 
 export const createTemplate = createAsyncThunk(
     'templates/createTemplate',
-    async (formData, { rejectWithValue }) => {
+    // payload: { formData, options }
+    async (payload, { rejectWithValue }) => {
+        const { formData, options } = payload || {};
         try {
-            const response = await FORM_API.createForm(formData);
+            const response = await FORM_API.createForm(formData, options);
             return response;
         } catch (error) {
             return rejectWithValue({
@@ -31,9 +33,10 @@ export const createTemplate = createAsyncThunk(
 
 export const updateTemplate = createAsyncThunk(
     'templates/updateTemplate',
-    async ({ templateId, formData }, { rejectWithValue }) => {
+    // payload: { templateId, formData, options }
+    async ({ templateId, formData, options }, { rejectWithValue }) => {
         try {
-            const response = await FORM_API.updateForm(templateId, formData);
+            const response = await FORM_API.updateForm(templateId, formData, options);
             return response;
         } catch (error) {
             return rejectWithValue({
@@ -47,7 +50,9 @@ export const deleteTemplate = createAsyncThunk(
     'templates/deleteTemplate',
     async (templateId, { rejectWithValue }) => {
         try {
-            await FORM_API.deleteForm(templateId);
+            console.log('[templatesThunks] calling FORM_API.deleteForm with id:', templateId);
+            const resp = await FORM_API.deleteForm(templateId);
+            console.log('[templatesThunks] deleteForm response:', resp);
             return templateId;
         } catch (error) {
             return rejectWithValue({
