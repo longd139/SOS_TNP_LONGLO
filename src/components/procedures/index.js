@@ -1,6 +1,5 @@
 export { default as ProcedureForm } from './ProcedureForm.refactored';
 export { default as ProcedureBasicInfo } from './ProcedureBasicInfo';
-export { default as ProcedureRemoveToggle } from './ProcedureRemoveToggle';
 export { default as ProcedureAreasSelector } from './ProcedureAreasSelector';
 export { default as ProcedureAdditionalInfo } from './ProcedureAdditionalInfo';
 export { default as ProcedureStepsSection } from './ProcedureStepsSection';

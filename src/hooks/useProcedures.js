@@ -6,7 +6,8 @@ import {
     createProcedure as createProcedureThunk,
     updateProcedure as updateProcedureThunk,
     deleteProcedure as deleteProcedureThunk,
-    fetchProcedureById
+    fetchProcedureById,
+    updateProcedureStatus
 } from '../features/procedures/proceduresThunks';
 import {
     setFilters,
@@ -185,6 +186,25 @@ export const useProcedure = () => {
         dispatch(clearError());
     }, [dispatch]);
 
+    const handleUpdateStatus = useCallback(
+        async (procedureId, isActive) => {
+            const result = await dispatch(updateProcedureStatus({ procedureId, isActive }));
+            if (updateProcedureStatus.fulfilled.match(result)) {
+                await dispatch(fetchProcedures({ 
+                    page: pagination.current,
+                    size: pagination.pageSize,
+                    search: filters.searchKeyword,
+                    id_linh_vuc: filters.selectedDomain,
+                    isActive: showActive
+                }));
+                return { success: true };
+            } else {
+                throw new Error(result.payload || 'Không thể cập nhật trạng thái thủ tục');
+            }
+        },
+        [dispatch, pagination]
+    );
+
     useEffect(() => {
         loadProcedures(1, pagination.pageSize, filters.searchKeyword, filters.selectedDomain, showActive);
         loadAreas();
@@ -215,6 +235,7 @@ export const useProcedure = () => {
         resetFilters,
         toggleShowActive,
         clearCurrent,
-        clearErrorMessage
+        clearErrorMessage,
+        handleUpdateStatus
     };
 };

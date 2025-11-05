@@ -26,7 +26,7 @@ export const transformInitialData = (initialData, mode) => {
             doiTuongThucHien: initialData.doi_tuong_thuc_hien || '',
             yeuCauDieuKienChung: initialData.yeu_cau_dieu_kien_chung || '',
             soQuyetDinh: initialData.so_quyet_dinh || '',
-            isRemoved: initialData.is_removed || false,
+
 
             danhSachLinhVucIds: initialData.thu_tuc_hanh_chinh_linh_vuc?.map(
                 item => item.id_linh_vuc
@@ -114,10 +114,6 @@ export const cleanFormData = (formData) => {
             return mapped;
         })
     };
-
-    if ('isRemoved' in formData) {
-        payload.isRemoved = !!formData.isRemoved;
-    }
 
     return payload;
 };
