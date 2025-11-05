@@ -68,7 +68,6 @@ export const useUserForm = ({ initialUser = null, isOpen = false }) => {
             setErrors(result.errors || {});
             return result.isValid;
         } catch (error) {
-            console.error('Validation error:', error);
             return false;
         }
     }, [formData, isEditMode]);
@@ -80,25 +79,21 @@ export const useUserForm = ({ initialUser = null, isOpen = false }) => {
     }, []);
 
     const prepareSubmitData = useCallback(() => {
-        const submitData = { ...formData };
-
         if (isEditMode) {
-            delete submitData.username;
-            delete submitData.email;
-            delete submitData.password;
-            delete submitData.confirmPassword;
+            return {
+                fullName: formData.fullName?.trim() || '',
+                phone: formData.phone?.trim() || '',
+                role: formData.role,
+                active: formData.active
+            };
         } else {
-            delete submitData.fullName;
-            delete submitData.phone;
-            delete submitData.active;
-            delete submitData.confirmPassword;
+            return {
+                username: formData.username?.trim() || '',
+                email: formData.email?.trim() || '',
+                password: formData.password,
+                role: formData.role
+            };
         }
-
-        if (submitData.phone) {
-            submitData.phone = submitData.phone.trim();
-        }
-
-        return submitData;
     }, [formData, isEditMode]);
 
     return {

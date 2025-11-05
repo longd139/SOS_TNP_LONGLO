@@ -21,20 +21,21 @@ const getAllUsersWithPagination = async ({
         });
 
         const response = await apiClient.get("/api/users", { params });
-
         if (response.data.success) {
-            const mappedData = response.data.data.map(user => ({
-                id: user.id,
-                username: user.tenDangNhap,
-                fullName: user.hoVaTen,
-                email: user.email,
-                phone: user.soDienThoai,
-                role: user.vaiTro,
-                twoFactorAuth: user.xacThucHaiYeuTo,
-                active: user.trangThai,
-                createdAt: user.ngayTao,
-                updatedAt: user.ngayCapNhap
-            }));
+            const mappedData = response.data.data.map(user => {
+                return {
+                    id: user.id,
+                    username: user.ten_dang_nhap,
+                    fullName: user.ho_va_ten,
+                    email: user.email,
+                    phone: user.so_dien_thoai,
+                    role: user.vai_tro,
+                    twoFactorAuth: user.xac_thuc_hai_yeu_to,
+                    active: user.is_active,
+                    createdAt: user.thoi_gian_tao,
+                    updatedAt: user.thoi_gian_cap_nhat
+                };
+            });
 
             const pagination = response.data.pagintation || response.data.pagination;
             return {
@@ -86,8 +87,7 @@ const updateUserProfileByAdmin = async (userData) => {
             userId: userData.id,
             hoVaTen: userData.fullName,
             soDienThoai: userData.phone || "",
-            vaiTro: userData.role,
-            trangThai: userData.active !== false 
+            vaiTro: userData.role
         };
 
         const response = await apiClient.put("/api/users/update-by-admin", requestData);
@@ -108,6 +108,16 @@ const deleteUser = async (userId) => {
     }
 }
 
+const updateStatus = async (userId, isActive) => {
+    try {
+        const response = await apiClient.put(`/api/users/update-status/${userId}`, { isActive });
+        if (response.data.success) return response.data.data;
+        else throw new Error("Cập nhật trạng thái người dùng thất bại");
+    } catch (error) {
+        throw error;
+    }
+}
+
 export const USER_API = {
     getMyProfile,
     getAllUsersWithPagination,
@@ -115,4 +125,5 @@ export const USER_API = {
     createAccount,
     updateUserProfileByAdmin,
     deleteUser,
+    updateStatus
 }

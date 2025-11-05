@@ -2,9 +2,6 @@ import * as yup from 'yup';
 import { validateSchema } from "../utils/validationUtils";
 
 const governmentSchema = yup.object().shape({
-    idUyBan: yup
-        .string()
-        .required("Mã cơ quan/ủy ban là bắt buộc"),
     tenCoSo: yup
         .string()
         .required("Tên cơ sở là bắt buộc"),

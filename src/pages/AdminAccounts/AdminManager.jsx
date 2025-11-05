@@ -15,6 +15,7 @@ export default function AdminManager() {
         handlePageChange,
         createUser,
         updateUser,
+        updateStatus,
         deleteUser: deleteUserAction
     } = useUsers();
 
@@ -93,6 +94,15 @@ export default function AdminManager() {
         setDeleteModal({ isOpen: false, user: null });
     };
 
+    const handleUpdateStatus = async (user) => {
+        try {
+            await updateStatus(user.id, !user.active);
+            showToast.success(`Tài khoản đã được ${!user.active ? 'kích hoạt' : 'vô hiệu hóa'} thành công!`);
+        } catch (error) {
+            showToast.error(error.message || 'Có lỗi xảy ra khi cập nhật trạng thái tài khoản!');
+        }
+    };
+
     const columns = [
         {
             title: 'ID',
@@ -155,27 +165,33 @@ export default function AdminManager() {
             )
         },
         {
-            title: 'Trạng thái',
-            dataIndex: 'status',
-            key: 'status',
-            render: (status, record) => (
-                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${record.active !== false ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                    }`}>
-                    {record.active !== false ? 'Hoạt động' : 'Đã khóa'}
+            title: 'SỐ ĐIỆN THOẠI',
+            dataIndex: 'phone',
+            key: 'phone',
+            width: '150px',
+            render: (value) => (
+                <span
+                    className="block max-w-[150px] truncate text-ellipsis overflow-hidden whitespace-nowrap text-sm text-gray-900"
+                    title={value}
+                >
+                    {value}
                 </span>
             )
         },
         {
             title: 'TRẠNG THÁI',
-            dataIndex: 'is_active',
-            key: 'is_active',
-            width: '120px',
+            dataIndex: 'active',
+            key: 'active',
+            width: '150px',
             render: (value) => (
                 <span
-                    className="block max-w-[120px] truncate text-ellipsis overflow-hidden whitespace-nowrap text-sm text-gray-900"
-                    title={value ? 'Hoạt động' : 'Không hoạt động'}
+                    className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
+                        value 
+                            ? 'bg-green-100 text-green-800' 
+                            : 'bg-red-100 text-red-800'
+                    }`}
                 >
-                    {value ? 'Hoạt động' : 'Không hoạt động'}
+                    {value ? 'Hoạt động' : 'Đã khóa'}
                 </span>
             )
         }
@@ -307,6 +323,7 @@ export default function AdminManager() {
                 onPageChange={handlePageChange}
                 onEdit={handleEditUser}
                 onDelete={handleDeleteUser}
+                onUpdateStatus={handleUpdateStatus}
                 emptyMessage="Không có tài khoản nào"
             />
 

@@ -51,11 +51,6 @@ const UserModal = ({
                 />
             }
         >
-            <div className="mb-4">
-                <p className="text-sm text-gray-600">
-                    {isEditMode ? 'Nhập thông tin tài khoản quản trị viên' : 'Nhập thông tin tài khoản quản trị viên'}
-                </p>
-            </div>
             <div className="space-y-4">
                 {!isEditMode && (
                     <>
@@ -168,27 +163,6 @@ const UserModal = ({
                         <p className="mt-1 text-sm text-red-600">{errors.role}</p>
                     )}
                 </div>
-
-                {isEditMode && (
-                    <div>
-                        <label htmlFor="active" className="flex items-center cursor-pointer">
-                            <input
-                                type="checkbox"
-                                id="active"
-                                name="active"
-                                checked={formData.active}
-                                onChange={handleInputChange}
-                                className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                            />
-                            <span className="ml-2 text-sm font-medium text-gray-700">
-                                Tài khoản đang hoạt động
-                            </span>
-                        </label>
-                        <p className="mt-1 text-xs text-gray-500">
-                            Bỏ chọn để khóa tài khoản này
-                        </p>
-                    </div>
-                )}
 
                 {!isEditMode && (
                     <>

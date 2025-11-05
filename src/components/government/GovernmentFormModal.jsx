@@ -8,7 +8,6 @@ import GoogleMapAutocomplete from '../googleMap/GoogleMapAutocomplete';
 import { showToast } from '../../utils/toastNotification';
 
 const initialState = {
-    idUyBan: '',
     tenCoSo: '',
     diaChi: '',
     soDienThoai: '',
@@ -65,7 +64,6 @@ const GovernmentFormModal = ({ isOpen, onClose, onCreate }) => {
         setLoading(true);
         try {
             const payload = {
-                idUyBan: form.idUyBan,
                 tenCoSo: form.tenCoSo,
                 diaChi: form.diaChi,
                 soDienThoai: form.soDienThoai,
@@ -102,28 +100,6 @@ const GovernmentFormModal = ({ isOpen, onClose, onCreate }) => {
             }
         >
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5 required-label">
-                        Mã cơ quan/ủy ban
-                    </label>
-                    <select
-                        value={form.idUyBan}
-                        onChange={(e) => updateField('idUyBan', e.target.value)}
-                        disabled={loadingCommittees}
-                        className={`w-full px-3 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.idUyBan ? 'border-red-500' : 'border-gray-300'} ${loadingCommittees ? 'bg-gray-100 cursor-not-allowed' : ''}`}
-                    >
-                        <option value="">
-                            {loadingCommittees ? 'Đang tải...' : 'Chọn ủy ban'}
-                        </option>
-                        {committees.map((committee) => (
-                            <option key={committee.id} value={committee.id}>
-                                {committee.ten_don_vi || committee.tenDonVi || `Ủy ban ${committee.id}`}
-                            </option>
-                        ))}
-                    </select>
-                    {errors.idUyBan && <p className="mt-1 text-xs text-red-600">{errors.idUyBan}</p>}
-                </div>
-
                 <div>
                     <label className="block text-sm font-medium text-gray-700 required-label">Tên cơ sở</label>
                     <input

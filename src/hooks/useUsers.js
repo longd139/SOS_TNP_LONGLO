@@ -12,7 +12,8 @@ import {
     fetchUsers,
     createUser,
     updateUser,
-    deleteUser
+    deleteUser,
+    updateUserStatus
 } from '../features/users/usersThunks';
 import {
     clearCurrentUser,
@@ -103,6 +104,22 @@ export const useUsers = () => {
         [dispatch, pagination.pageSize]
     );
 
+    const handleUpdateStatus = useCallback(
+        async (userId, isActive) => {
+            const result = await dispatch(updateUserStatus({ userId, isActive }));
+            if (updateUserStatus.fulfilled.match(result)) {
+                await dispatch(fetchUsers({ 
+                    page: pagination.current, 
+                    pageSize: pagination.pageSize 
+                }));
+                return { success: true };
+            } else {
+                throw new Error(result.payload || 'Không thể cập nhật trạng thái tài khoản');
+            }
+        },
+        [dispatch, pagination]
+    );
+
     const selectUser = useCallback(
         (user) => {
             dispatch(setCurrentUser(user));
@@ -129,6 +146,7 @@ export const useUsers = () => {
         loadUsers,
         createUser: handleCreateUser,
         updateUser: handleUpdateUser,
+        updateStatus: handleUpdateStatus,
         deleteUser: handleDeleteUser,
         handlePageChange,
         selectUser,

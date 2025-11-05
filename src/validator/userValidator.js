@@ -13,13 +13,6 @@ export const createUserSchema = yup.object().shape({
         .max(50, "Tên đăng nhập không được vượt quá 50 ký tự")
         .matches(usernameRegex, "Tên đăng nhập chỉ được chứa chữ cái, số, dấu gạch dưới và dấu chấm"),
 
-    fullName: yup
-        .string()
-        .required("Họ và tên là bắt buộc")
-        .min(2, "Họ và tên phải có ít nhất 2 ký tự")
-        .max(100, "Họ và tên không được vượt quá 100 ký tự")
-        .test('trim', 'Họ và tên là bắt buộc', value => value && value.trim().length > 0),
-
     email: yup
         .string()
         .required("Email là bắt buộc")
