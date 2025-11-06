@@ -32,7 +32,7 @@ apiClient.interceptors.response.use(
     async (error) => {
         const originalRequest = error.config;
 
-        if (error.response?.status === 401 && !originalRequest._retry) {
+        if ((error.response?.status === 401 || error.response?.status === 500) && !originalRequest._retry) {
             originalRequest._retry = true;
 
             const refreshToken = localStorage.getItem("refreshToken");
@@ -65,10 +65,6 @@ apiClient.interceptors.response.use(
 
 const apiFormClient = axios.create({
     baseURL: API_URL,
-    // Do NOT set Content-Type here for multipart/form-data.
-    // Let the browser set the Content-Type header including the multipart boundary
-    // when sending a FormData instance. Setting it manually can omit the boundary
-    // and cause the server to hang or reject the request.
     headers: {}
 })
 

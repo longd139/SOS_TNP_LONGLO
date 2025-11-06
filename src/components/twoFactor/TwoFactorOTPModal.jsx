@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import BaseModal from '../base/BaseModal';
+import { validateOtp } from '../../validator/otpValidator';
 
 const TwoFactorOTPModal = ({ isOpen, onClose, onVerify, isLoading, action = 'bật' }) => {
     const [otp, setOtp] = useState('');
@@ -9,13 +10,9 @@ const TwoFactorOTPModal = ({ isOpen, onClose, onVerify, isLoading, action = 'b�
         e.preventDefault();
         setError('');
 
-        if (!otp.trim()) {
-            setError('Vui lòng nhập mã OTP');
-            return;
-        }
-
-        if (otp.length !== 6 || !/^\d+$/.test(otp)) {
-            setError('Mã OTP phải là 6 chữ số');
+        const validation = await validateOtp({ otp });
+        if (!validation.isValid) {
+            setError(validation.errors.otp);
             return;
         }
 
@@ -40,19 +37,16 @@ const TwoFactorOTPModal = ({ isOpen, onClose, onVerify, isLoading, action = 'b�
             title="Xác thực OTP"
         >
             <form onSubmit={handleSubmit} className="space-y-4">
-                {/* Instructions */}
                 <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg text-sm text-blue-800">
                     Mã OTP đã được gửi. Vui lòng nhập 6 chữ số để xác nhận {action} xác thực 2 yếu tố.
                 </div>
 
-                {/* Error Message */}
                 {error && (
                     <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-800 text-sm">
                         {error}
                     </div>
                 )}
 
-                {/* OTP Input */}
                 <div>
                     <label className="block text-xs md:text-sm font-medium text-gray-700 mb-1.5">
                         Mã OTP (6 chữ số)
@@ -68,7 +62,6 @@ const TwoFactorOTPModal = ({ isOpen, onClose, onVerify, isLoading, action = 'b�
                     />
                 </div>
 
-                {/* Buttons */}
                 <div className="flex gap-3 justify-end pt-4">
                     <button
                         type="button"

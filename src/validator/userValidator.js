@@ -83,21 +83,21 @@ export const updateUserWithPhoneSchema = updateUserSchema.shape({
 });
 
 export const changePasswordSchema = yup.object().shape({
-    currentPassword: yup
+    matKhauHienTai: yup
         .string()
         .required("Mật khẩu hiện tại là bắt buộc"),
 
-    newPassword: yup
+    matKhauMoi: yup
         .string()
         .required("Mật khẩu mới là bắt buộc")
         .min(8, "Mật khẩu phải có ít nhất 8 ký tự")
         .max(100, "Mật khẩu không được vượt quá 100 ký tự")
-        .notOneOf([yup.ref('currentPassword')], "Mật khẩu mới phải khác mật khẩu hiện tại"),
+        .notOneOf([yup.ref('matKhauHienTai')], "Mật khẩu mới phải khác mật khẩu hiện tại"),
 
-    confirmNewPassword: yup
+    confirmMatKhauMoi: yup
         .string()
         .required("Xác nhận mật khẩu mới là bắt buộc")
-        .oneOf([yup.ref('newPassword')], "Xác nhận mật khẩu không khớp")
+        .oneOf([yup.ref('matKhauMoi')], "Xác nhận mật khẩu không khớp")
 });
 
 export async function validateCreateUser(data) {

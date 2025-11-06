@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { loginUser, verifyOtpUser } from './authThunks';
+import { loginUser, verifyOtpUser, changePassword } from './authThunks';
 import { jwtDecode } from 'jwt-decode';
 
 const getUserFromToken = () => {
@@ -36,6 +36,7 @@ const initialState = {
     email: '',
     tenDangNhap: '',
     user: getUserFromToken(),
+    changePasswordSuccess: false,
 };
 
 const authSlice = createSlice({
@@ -45,6 +46,9 @@ const authSlice = createSlice({
         clearErrors: (state) => {
             state.errors = {};
             state.apiError = '';
+        },
+        clearChangePasswordSuccess: (state) => {
+            state.changePasswordSuccess = false;
         },
         logout: (state) => {
             localStorage.removeItem('accessToken');
@@ -89,9 +93,25 @@ const authSlice = createSlice({
             .addCase(verifyOtpUser.rejected, (state, action) => {
                 state.loading = false;
                 state.apiError = action.payload?.message || 'Xác thực OTP thất bại';
+            })
+
+            .addCase(changePassword.pending, (state) => {
+                state.loading = true;
+                state.apiError = '';
+                state.changePasswordSuccess = false;
+            })
+            .addCase(changePassword.fulfilled, (state) => {
+                state.loading = false;
+                state.apiError = '';
+                state.changePasswordSuccess = true;
+            })
+            .addCase(changePassword.rejected, (state, action) => {
+                state.loading = false;
+                state.apiError = action.payload?.message || 'Đổi mật khẩu thất bại';
+                state.changePasswordSuccess = false;
             });
     },
 });
 
-export const { clearErrors, logout, restoreUser } = authSlice.actions;
+export const { clearErrors, clearChangePasswordSuccess, logout, restoreUser } = authSlice.actions;
 export default authSlice.reducer;
