@@ -21,7 +21,6 @@ const getUserFromToken = () => {
             email: decoded.email,
         };
     } catch (error) {
-        console.error('Error decoding token:', error);
         localStorage.removeItem('accessToken');
         localStorage.removeItem('refreshToken');
         return null;

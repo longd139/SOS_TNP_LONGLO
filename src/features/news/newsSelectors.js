@@ -6,20 +6,20 @@ export const selectNewsLoading = (state) => state.news.loading;
 export const selectNewsError = (state) => state.news.error;
 export const selectNewsPagination = (state) => state.news.pagination;
 export const selectCurrentNews = (state) => state.news.currentNews;
+export const selectNewsFilters = (state) => state.news.filters;
+export const selectShowActive = (state) => state.news.showActive;
 
 export const selectNewsStatistics = createSelector(
     [selectNewsList],
     (news) => {
         const total = news.length;
-        const published = news.filter(item => item.trang_thai === 'XUAT_BAN').length;
-        const draft = news.filter(item => item.trang_thai === 'NHAP').length;
-        const removed = news.filter(item => item.is_removed === true).length;
+        const active = news.filter(item => item.isActive === true).length;
+        const inactive = news.filter(item => item.isActive === false).length;
 
         return {
             total,
-            published,
-            draft,
-            removed
+            active,
+            inactive
         };
     }
 );

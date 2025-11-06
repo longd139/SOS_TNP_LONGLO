@@ -19,10 +19,6 @@ const newsSchema = yup.object().shape({
             const strippedValue = value.replace(/<[^>]*>/g, '').trim();
             return strippedValue.length > 0 && strippedValue !== '';
         }),
-    trangThai: yup
-        .string()
-        .required("Trạng thái là bắt buộc")
-        .oneOf([STATUS_NEWS.DRAFT, STATUS_NEWS.PUBLISHED], "Trạng thái không hợp lệ"),
     file: yup
         .mixed()
         .test('fileRequired', 'Vui lòng chọn ảnh đại diện', (value) => {

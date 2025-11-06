@@ -3,9 +3,9 @@ import { NEWS_API } from '../../apis/news';
 
 export const fetchNews = createAsyncThunk(
     'news/fetchNews',
-    async ({ page = 1, size = 10, isRemoved = false, idDanhMuc = null }, { rejectWithValue }) => {
+    async ({ page = 1, size = 10, isActive = true, idDanhMuc = null, search = '' }, { rejectWithValue }) => {
         try {
-            const response = await NEWS_API.getAllNews(page, size, isRemoved, idDanhMuc);
+            const response = await NEWS_API.getAllNews({ page, size, isActive, idDanhMuc, search });
             
             return {
                 data: response.content || response,
@@ -61,6 +61,20 @@ export const deleteNewsItem = createAsyncThunk(
         } catch (error) {
             return rejectWithValue({
                 message: error.response?.data?.message || error.message || 'Xóa tin tức thất bại'
+            });
+        }
+    }
+);
+
+export const updateNewsStatus = createAsyncThunk(
+    'news/updateNewsStatus',
+    async ({ newsId, isActive }, { rejectWithValue }) => {
+        try {
+            await NEWS_API.updateNewsStatus(newsId, isActive);
+            return { newsId, isActive };
+        } catch (error) {
+            return rejectWithValue({
+                message: error.response?.data?.message || error.message || 'Cập nhật trạng thái tin tức thất bại'
             });
         }
     }

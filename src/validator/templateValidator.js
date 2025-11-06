@@ -72,15 +72,11 @@ export const updateTemplateSchema = yup.object().shape({
 });
 
 export async function validateTemplateForm(templateData, isEditMode = false) {
-    console.log('validateTemplateForm called with:', { templateData, isEditMode });
     
     const schema = isEditMode ? updateTemplateSchema : createTemplateSchema;
-    
-    console.log('Schema selected:', isEditMode ? 'update' : 'create');
-    
+        
     const result = await validateSchema(schema, templateData);
-    console.log('Validation result:', result);
-    
+        
     return { isValid: result.valid, errors: result.errors };
 }
 

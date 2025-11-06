@@ -45,7 +45,6 @@ const AreaFormModal = ({ isOpen, onClose, onSubmit }) => {
             setErrors({});
             onClose();
         } catch (error) {
-            console.error('Error submitting area:', error);
         } finally {
             setIsSubmitting(false);
         }

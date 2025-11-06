@@ -5,8 +5,11 @@ const createCommittee = async (data) => {
     try {
         const response = await apiClient.post("/api/uy-ban", data); 
         if (response.data.success) return response.data.data;
-        else throw new Error("Tạo ủy ban thất bại");
+        else throw new Error(response.data.message || "Tạo ủy ban thất bại");
     } catch (error) {
+        if (error.response?.data?.message) {
+            throw new Error(error.response.data.message);
+        }
         throw error;
     }
 }
@@ -17,9 +20,12 @@ const getCommittees = async () => {
         if (response.data.success) {
             return response.data.data;
         } else {
-            throw new Error("Lấy danh sách ủy ban thất bại");
+            throw new Error(response.data.message || "Lấy danh sách ủy ban thất bại");
         }
     } catch (error) {
+        if (error.response?.data?.message) {
+            throw new Error(error.response.data.message);
+        }
         throw error;
     }
 }
@@ -31,9 +37,12 @@ const updateCommittee = async (committeeId, data) => {
         if (response.data.success) {
             return response.data.data;
         } else {
-            throw new Error("Cập nhật ủy ban thất bại");
+            throw new Error(response.data.message || "Cập nhật ủy ban thất bại");
         }
     } catch (error) {
+        if (error.response?.data?.message) {
+            throw new Error(error.response.data.message);
+        }
         throw error;
     }
 }

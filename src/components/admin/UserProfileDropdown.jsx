@@ -53,7 +53,6 @@ const UserProfileDropdown = () => {
         try {
             await AUTH_API.logout();
         } catch (error) {
-            console.error('Logout error:', error);
         } finally {
             localStorage.removeItem('accessToken');
             localStorage.removeItem('refreshToken');
@@ -71,13 +70,10 @@ const UserProfileDropdown = () => {
     const handle2FAToggle = async () => {
         setIs2FALoading(true);
         try {
-            // Call enable/disable 2FA API - sends OTP
             await AUTH_API.enableOrDisable2FA();
             setIs2FAToggleModalOpen(false);
-            // Show OTP input modal
             setIs2FAOTPModalOpen(true);
         } catch (error) {
-            console.error('2FA toggle error:', error);
             throw error;
         } finally {
             setIs2FALoading(false);
@@ -87,15 +83,12 @@ const UserProfileDropdown = () => {
     const handle2FAOTPVerify = async (otp) => {
         setIs2FALoading(true);
         try {
-            // Verify OTP and toggle 2FA status
             const result = await AUTH_API.verifiedStatus2FA(otp);
             
-            // Update profile in Redux to reflect new 2FA status
             await dispatch(fetchMyProfile());
             
             setIs2FAOTPModalOpen(false);
         } catch (error) {
-            console.error('2FA OTP verification error:', error);
             throw error;
         } finally {
             setIs2FALoading(false);

@@ -48,7 +48,6 @@ const ProcedureAreasSelector = ({ formData, errors, areas: propAreas, toggleArea
                 setSearchResults(filtered);
                 setShowDropdown(true);
             } catch (error) {
-                console.error('Error searching areas:', error);
                 setSearchResults([]);
             } finally {
                 setLoading(false);

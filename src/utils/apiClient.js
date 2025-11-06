@@ -54,7 +54,6 @@ apiClient.interceptors.response.use(
                 originalRequest.headers.Authorization = `Bearer ${accessToken}`;
                 return apiClient(originalRequest);
             } catch (refreshError) {
-                console.error("Refresh token expired:", refreshError);
                 localStorage.clear();
                 window.location.replace(ROUTE_PATH.LOGIN);
                 return Promise.reject(refreshError);
@@ -113,7 +112,6 @@ apiFormClient.interceptors.response.use(
                 originalRequest.headers.Authorization = `Bearer ${accessToken}`;
                 return apiFormClient(originalRequest);
             } catch (refreshError) {
-                console.error("Refresh token expired:", refreshError);
                 localStorage.clear();
                 window.location.replace(ROUTE_PATH.LOGIN);
                 return Promise.reject(refreshError);

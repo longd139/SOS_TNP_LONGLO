@@ -4,7 +4,7 @@ import { validateSchema } from "../utils/validationUtils";
 const mauDonSchema = yup.object().shape({
     id: yup
         .string()
-        .required("Mã định danh mẫu đơn là bắt buộc"),
+        .nullable(),
     so_luong_ban_chinh: yup
         .number()
         .required("Số lượng bản chính là bắt buộc")
@@ -15,22 +15,22 @@ const mauDonSchema = yup.object().shape({
         .min(0, "Số lượng bản sao phải lớn hơn hoặc bằng 0"),
     ghi_chu: yup
         .string()
-        .required("Ghi chú là bắt buộc")
+        .nullable()
 });
 
 const cachThucHienSchema = yup.object().shape({
     hinh_thuc_ap_dung: yup
         .string()
-        .required("Hình thức áp dụng là bắt buộc"),
+        .nullable(),
     mo_ta_chi_tiet: yup
         .string()
-        .required("Mô tả chi tiết là bắt buộc"),
+        .nullable(),
     thoi_gian_giai_quyet: yup
         .string()
-        .required("Thời gian giải quyết là bắt buộc"),
+        .nullable(),
     le_phi: yup
         .mixed()
-        .required("Lệ phí là bắt buộc")
+        .nullable()
         .test('is-valid-number', 'Lệ phí phải là số hợp lệ', function(value) {
             if (!value && value !== 0) return false;
             const cleanedValue = String(value).replace(/,/g, '.').replace(/\s/g, '');
@@ -45,14 +45,14 @@ const cachThucHienSchema = yup.object().shape({
 const trinhTuThucHienSchema = yup.object().shape({
     ten_buoc: yup
         .string()
-        .required("Tên bước là bắt buộc"),
+        .nullable(),
     mo_ta_buoc: yup
         .string()
-        .required("Mô tả bước là bắt buộc"),
+        .nullable(),
     thu_tu_buoc: yup
         .number()
-        .required("Thứ tự bước là bắt buộc")
-        .min(1, "Thứ tự bước phải lớn hơn hoặc bằng 1")
+        .nullable()
+        // .min(1, "Thứ tự bước phải lớn hơn hoặc bằng 1")
 });
 
 export const createFormalitySchema = yup.object().shape({
@@ -199,14 +199,10 @@ export async function validateUpdateFormality(data) {
 }
 
 export async function validateFormalityForm(formalityData, isEditMode = false) {
-    console.log('validateFormalityForm called with:', { formalityData, isEditMode });
 
     const schema = isEditMode ? updateFormalitySchema : createFormalitySchema;
 
-    console.log('Schema selected:', isEditMode ? 'update' : 'create');
-
     const result = await validateSchema(schema, formalityData);
-    console.log('Validation result:', result);
-
+    
     return { isValid: result.valid, errors: result.errors };
 }

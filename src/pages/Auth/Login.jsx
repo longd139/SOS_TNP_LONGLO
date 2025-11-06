@@ -48,7 +48,6 @@ export default function Login() {
     };
 
     const handle2FAError = (error) => {
-        console.error('2FA login error:', error);
     };
 
     return (

@@ -6,7 +6,6 @@ import dayjs from 'dayjs';
 import { downloadUtils } from '../../utils/downLoadUtils';
 const ProcedureDetailModal = ({ isOpen, onClose, procedure }) => {
     if (!procedure) return null;
-    console.log('procedure detail modal', procedure);
     const formatCurrency = (value) => {
         return new Intl.NumberFormat('vi-VN', {
             style: 'currency',

@@ -4,8 +4,11 @@ const getMyProfile = async () => {
     try {
         const response = await apiClient.get("/api/users/my-profile");
         if (response.data.success) return response.data.data;
-        else throw new Error("Lấy thông tin cá nhân thất bại");
+        else throw new Error(response.data.message || "Lấy thông tin cá nhân thất bại");
     } catch (error) {
+        if (error.response?.data?.message) {
+            throw new Error(error.response.data.message);
+        }
         throw error;
     }
 }
@@ -47,9 +50,12 @@ const getAllUsersWithPagination = async ({
             };
             
         } else {
-            throw new Error("Lấy danh sách người dùng thất bại");
+            throw new Error(response.data.message || "Lấy danh sách người dùng thất bại");
         }
-    } catch (error) {   
+    } catch (error) {
+        if (error.response?.data?.message) {
+            throw new Error(error.response.data.message);
+        }
         throw error;
     }
 }
@@ -58,8 +64,11 @@ const updateUserProfile = async (userData) => {
     try {
         const response = await apiClient.put("/api/users", userData);
         if (response.data.success) return response.data.data;
-        else throw new Error("Cập nhật thông tin cá nhân thất bại");
+        else throw new Error(response.data.message || "Cập nhật thông tin cá nhân thất bại");
     } catch (error) {
+        if (error.response?.data?.message) {
+            throw new Error(error.response.data.message);
+        }
         throw error;
     }
 }
@@ -75,8 +84,11 @@ const createAccount = async (accountData) => {
 
         const response = await apiClient.post("/api/users/create-account", requestData);
         if (response.data.success) return response.data.data;
-        else throw new Error("Tạo tài khoản thất bại");
+        else throw new Error(response.data.message || "Tạo tài khoản thất bại");
     } catch (error) {
+        if (error.response?.data?.message) {
+            throw new Error(error.response.data.message);
+        }
         throw error;
     }
 }
@@ -92,8 +104,11 @@ const updateUserProfileByAdmin = async (userData) => {
 
         const response = await apiClient.put("/api/users/update-by-admin", requestData);
         if (response.data.success) return response.data.data;
-        else throw new Error("Cập nhật thông tin người dùng thất bại");
+        else throw new Error(response.data.message || "Cập nhật thông tin người dùng thất bại");
     } catch (error) {
+        if (error.response?.data?.message) {
+            throw new Error(error.response.data.message);
+        }
         throw error;
     }
 }
@@ -102,8 +117,11 @@ const deleteUser = async (userId) => {
     try {
         const response = await apiClient.delete(`/api/users/${userId}`);
         if (response.data.success) return response.data.data;
-        else throw new Error("Xóa người dùng thất bại");
+        else throw new Error(response.data.message || "Xóa người dùng thất bại");
     } catch (error) {
+        if (error.response?.data?.message) {
+            throw new Error(error.response.data.message);
+        }
         throw error;
     }
 }
@@ -112,8 +130,11 @@ const updateStatus = async (userId, isActive) => {
     try {
         const response = await apiClient.put(`/api/users/update-status/${userId}`, { isActive });
         if (response.data.success) return response.data.data;
-        else throw new Error("Cập nhật trạng thái người dùng thất bại");
+        else throw new Error(response.data.message || "Cập nhật trạng thái người dùng thất bại");
     } catch (error) {
+        if (error.response?.data?.message) {
+            throw new Error(error.response.data.message);
+        }
         throw error;
     }
 }

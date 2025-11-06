@@ -13,8 +13,11 @@ const getAreas = async (isActive, search) => {
         if (response.data.success) {
             return response.data.data || [];
         }
-        else throw new Error("Lấy danh sách lĩnh vực thất bại");    
+        else throw new Error(response.data.message || "Lấy danh sách lĩnh vực thất bại");    
     } catch (error) {
+        if (error.response?.data?.message) {
+            throw new Error(error.response.data.message);
+        }
         throw error;
     }
 }
@@ -25,9 +28,12 @@ const createAreas = async (areaData) => {
         if (response.data.success) {
             return response.data.data;
         }
-        else throw new Error("Tạo lĩnh vực thất bại");    
+        else throw new Error(response.data.message || "Tạo lĩnh vực thất bại");    
     }
     catch (error) {
+        if (error.response?.data?.message) {
+            throw new Error(error.response.data.message);
+        }
         throw error;
     }   
 }

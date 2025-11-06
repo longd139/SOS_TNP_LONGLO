@@ -11,7 +11,6 @@ const NewsPreviewModal = ({ isOpen, onClose, newsData, isPreview = false }) => {
     const data = isPreview ? {
         tieu_de: newsData.tieuDe,
         noi_dung: newsData.noiDung,
-        trang_thai: newsData.trangThai,
         tac_gia: newsData.tacGia,
         url_anh_dai_dien: newsData.filePreview,
         danh_muc_tin_tuc: {

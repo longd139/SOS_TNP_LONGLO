@@ -45,7 +45,6 @@ export default function ProceduresManager() {
     handleUpdateStatus: updateStatus,
   } = useProcedure();
 
-  console.log("procedures render", procedures);
   const columns = getProcedureColumns(pagination);
   const openCreateModal = () => {
     setIsCreateModalOpen(true);
@@ -138,7 +137,6 @@ export default function ProceduresManager() {
 
   const handleUpdateStatus = async (procedure) => {
     try {
-      console.log("updating status for procedure", procedure);
       await updateStatus(procedure.id, !procedure.is_active);
       showToast.success(
         `Thủ tục đã được ${

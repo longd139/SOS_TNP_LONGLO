@@ -126,7 +126,6 @@ export async function validateChangePassword(data) {
 }
 
 export async function validateUserForm(userData, isEditMode = false, includePhone = false) {
-    console.log('validateUserForm called with:', { userData, isEditMode, includePhone });
     
     let schema;
 
@@ -135,12 +134,9 @@ export async function validateUserForm(userData, isEditMode = false, includePhon
     } else {
         schema = includePhone ? createUserWithPhoneSchema : createUserSchema;
     }
-
-    console.log('Schema selected:', isEditMode ? 'update' : 'create', 'with phone:', includePhone);
     
     const result = await validateSchema(schema, userData);
-    console.log('Validation result:', result);
-    
+        
     return { isValid: result.valid, errors: result.errors };
 }
 

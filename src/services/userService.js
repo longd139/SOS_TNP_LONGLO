@@ -7,7 +7,6 @@ export class UserService {
             const result = await USER_API.createAccount(userData);
             return result;
         } catch (error) {
-            console.error('UserService.createAccount error:', error);
             throw this.formatError(error);
         }
     }
@@ -17,7 +16,6 @@ export class UserService {
             const result = await USER_API.updateUserProfileByAdmin(userData);
             return result;
         } catch (error) {
-            console.error('UserService.updateUserByAdmin error:', error);
             throw this.formatError(error);
         }
     }
@@ -27,7 +25,6 @@ export class UserService {
             const result = await USER_API.getAllUsersWithPagination(params);
             return result;
         } catch (error) {
-            console.error('UserService.getAllUsers error:', error);
             throw this.formatError(error);
         }
     }
@@ -41,7 +38,6 @@ export class UserService {
             const result = await USER_API.deleteUser(userId);
             return result;
         } catch (error) {
-            console.error('UserService.deleteUser error:', error);
             throw this.formatError(error);
         }
     }
@@ -55,7 +51,6 @@ export class UserService {
             const result = await USER_API.updateStatus(userId, isActive);
             return result;
         } catch (error) {
-            console.error('UserService.updateUserStatus error:', error);
             throw this.formatError(error);
         }
     }
@@ -65,7 +60,6 @@ export class UserService {
             const result = await USER_API.getMyProfile();
             return result;
         } catch (error) {
-            console.error('UserService.getMyProfile error:', error);
             throw this.formatError(error);
         }
     }

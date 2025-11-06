@@ -90,7 +90,6 @@ export async function validateContactForm(uyBanData, isEditMode = false) {
     const schema = isEditMode ? contactUpdateSchema : contactSchema;
         
     const result = await validateSchema(schema, uyBanData);
-    console.log('Validation result:', result);
     
     return { isValid: result.valid, errors: result.errors };
 }
