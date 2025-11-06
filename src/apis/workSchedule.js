@@ -6,16 +6,23 @@ const importWorkSchedule = async (file) => {
         formData.append('file', file);
 
         const response = await apiFormClient.post('/api/lich-tiep-dan/import', formData);
+        
         if (response.data.success) {
             return response.data;
         } else {
             throw new Error(response.data.message || "Import lịch tiếp dân thất bại");
         }
     } catch (error) {
+        if (error.response?.status === 500) {
+            const message = error.response?.data?.message || "Server đang gặp sự cố khi xử lý file";
+            throw new Error(`${message}. Vui lòng kiểm tra định dạng file và thử lại.`);
+        }
+        
         if (error.response?.data?.message) {
             throw new Error(error.response.data.message);
         }
-        throw error;
+        
+        throw new Error("Không thể kết nối đến server. Vui lòng thử lại sau.");
     }
 }
 
@@ -33,6 +40,7 @@ const getWorkSchedules = async (
         if (typeof isActive === 'boolean') params.append('isActive', isActive);
 
         const response = await apiFormClient.get('/api/lich-tiep-dan', { params });
+        
         if (response.data.success) {
             return response.data.data;
         } else {

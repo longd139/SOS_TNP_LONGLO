@@ -4,8 +4,8 @@ const getGovernment = async ({ search = '', isRemoved = false, page, size } = {}
     try {
         const params = new URLSearchParams();
         if (search) params.append('search', search);
-        params.append('isRemoved', isRemoved);
-        params.append('is_removed', isRemoved);
+        params.append('isActive', !isRemoved);
+        params.append('is_active', !isRemoved);
         if (page !== undefined) params.append('page', page);
         if (size !== undefined) params.append('size', size);
 

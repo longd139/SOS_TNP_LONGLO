@@ -50,7 +50,6 @@ const usersSlice = createSlice({
             })
             .addCase(createUser.fulfilled, (state, action) => {
                 state.loading = false;
-                // User will be added to list on next fetch
             })
             .addCase(createUser.rejected, (state, action) => {
                 state.loading = false;
@@ -63,14 +62,12 @@ const usersSlice = createSlice({
             })
             .addCase(updateUser.fulfilled, (state, action) => {
                 state.loading = false;
-                // User will be updated on next fetch
             })
             .addCase(updateUser.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload;
             })
 
-            // Delete user
             .addCase(deleteUser.pending, (state) => {
                 state.loading = true;
                 state.error = null;
