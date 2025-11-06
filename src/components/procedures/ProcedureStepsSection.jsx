@@ -37,9 +37,8 @@ const SortableStepItem = ({ step, index, removeStep, updateStep }) => {
         <div
             ref={setNodeRef}
             style={style}
-            className={`bg-white p-3 rounded-lg border border-gray-200 ${
-                isDragging ? 'shadow-lg ring-2 ring-blue-400' : ''
-            }`}
+            className={`bg-white p-3 rounded-lg border border-gray-200 ${isDragging ? 'shadow-lg ring-2 ring-blue-400' : ''
+                }`}
         >
             <div className="flex justify-between items-center mb-2">
                 <div className="flex items-center gap-2">
@@ -56,7 +55,7 @@ const SortableStepItem = ({ step, index, removeStep, updateStep }) => {
                         Bước {step.thu_tu_buoc}
                     </span>
                 </div>
-                
+
                 <button
                     type="button"
                     onClick={() => removeStep(index)}
@@ -124,37 +123,39 @@ const ProcedureStepsSection = ({ steps, addStep, removeStep, updateStep, reorder
 
     return (
         <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-                Trình tự thực hiện
-            </label>
+            <div className="flex items-center justify-between mb-2">
+                <h3 className="text-sm font-medium text-gray-900">Trình tự thực hiện</h3>
+            </div>
             <div className="space-y-3 bg-gray-50 p-3 rounded-lg">
-                <DndContext
-                    sensors={sensors}
-                    collisionDetection={closestCenter}
-                    onDragEnd={handleDragEnd}
-                >
-                    <SortableContext
-                        items={steps.map((step, idx) => step.id || `step-${idx}`)}
-                        strategy={verticalListSortingStrategy}
+                {steps.length > 0 && (
+                    <DndContext
+                        sensors={sensors}
+                        collisionDetection={closestCenter}
+                        onDragEnd={handleDragEnd}
                     >
-                        <div className="space-y-3">
-                            {steps.map((step, index) => (
-                                <SortableStepItem
-                                    key={step.id || `step-${index}`}
-                                    step={step}
-                                    index={index}
-                                    removeStep={removeStep}
-                                    updateStep={updateStep}
-                                />
-                            ))}
-                        </div>
-                    </SortableContext>
-                </DndContext>
+                        <SortableContext
+                            items={steps.map((step, idx) => step.id || `step-${idx}`)}
+                            strategy={verticalListSortingStrategy}
+                        >
+                            <div className="space-y-3">
+                                {steps.map((step, index) => (
+                                    <SortableStepItem
+                                        key={step.id || `step-${index}`}
+                                        step={step}
+                                        index={index}
+                                        removeStep={removeStep}
+                                        updateStep={updateStep}
+                                    />
+                                ))}
+                            </div>
+                        </SortableContext>
+                    </DndContext>
+                )}
 
                 <button
                     type="button"
                     onClick={addStep}
-                    className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+                    className="w-full py-2 px-4 text-sm text-blue-600 hover:text-blue-700 hover:bg-blue-50 border border-blue-200 rounded-lg font-medium transition-colors"
                 >
                     + Thêm bước thực hiện
                 </button>

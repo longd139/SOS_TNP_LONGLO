@@ -27,7 +27,7 @@ export const loginUser = createAsyncThunk(
             const res = await AUTH_API.login(credentials);
             const response = res?.data || res;
 
-            if (response.requiresTwoFactorAuth) {
+            if (response.requiresTwoFactorAuth || response.requires_two_factor_auth) {
                 return {
                     requiresTwoFactorAuth: true,
                     tenDangNhap: credentials.tenDangNhap,

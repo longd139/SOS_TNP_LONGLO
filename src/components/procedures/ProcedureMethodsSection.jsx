@@ -4,11 +4,10 @@ import PropTypes from 'prop-types';
 const ProcedureMethodsSection = ({ methods, addMethod, removeMethod, updateMethod }) => {
     return (
         <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-                Cách thức thực hiện
-            </label>
+            <div className="flex items-center justify-between mb-2">
+                <h3 className="text-sm font-medium text-gray-900">Cách thức thực hiện</h3>
+            </div>
             <div className="space-y-3 bg-gray-50 p-3 rounded-lg">
-                <div className="space-y-3">
                 {methods.map((method, index) => (
                     <div
                         key={method.id || `method-${index}`}
@@ -81,12 +80,11 @@ const ProcedureMethodsSection = ({ methods, addMethod, removeMethod, updateMetho
                         </div>
                     </div>
                 ))}
-                </div>
 
                 <button
                     type="button"
                     onClick={addMethod}
-                    className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+                    className="w-full py-2 px-4 text-sm text-blue-600 hover:text-blue-700 hover:bg-blue-50 border border-blue-200 rounded-lg font-medium transition-colors"
                 >
                     + Thêm cách thức thực hiện
                 </button>

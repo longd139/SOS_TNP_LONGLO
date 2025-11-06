@@ -13,6 +13,7 @@ const ProcedureDetailModal = ({ isOpen, onClose, procedure }) => {
         }).format(value);
     };
 
+    console.log('procedure', procedure);
     return (
         <BaseModal
             isOpen={isOpen}
@@ -36,19 +37,27 @@ const ProcedureDetailModal = ({ isOpen, onClose, procedure }) => {
                     <div className="grid grid-cols-2 gap-3">
                         <div>
                             <label className="block text-sm font-medium text-gray-600 mb-1">Mã thủ tục</label>
-                            <p className="text-sm text-gray-900">{procedure.ma_thu_tuc}</p>
+                            <p className="text-sm text-gray-900 truncate" title={procedure.ma_thu_tuc}>
+                                {procedure.ma_thu_tuc}
+                            </p>
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-gray-600 mb-1">Tên thủ tục</label>
-                            <p className="text-sm text-gray-900">{procedure.ten_thu_tuc}</p>
+                            <p className="text-sm text-gray-900 truncate" title={procedure.ten_thu_tuc}>
+                                {procedure.ten_thu_tuc}
+                            </p>
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-gray-600 mb-1">Đối tượng thực hiện</label>
-                            <p className="text-sm text-gray-900">{procedure.doi_tuong_thuc_hien}</p>
+                            <p className="text-sm text-gray-900 truncate" title={procedure.doi_tuong_thuc_hien}>
+                                {procedure.doi_tuong_thuc_hien}
+                            </p>
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-gray-600 mb-1">Số quyết định</label>
-                            <p className="text-sm text-gray-900">{procedure.so_quyet_dinh || 'Không có'}</p>
+                            <p className="text-sm text-gray-900 truncate" title={procedure.so_quyet_dinh || 'Không có'}>
+                                {procedure.so_quyet_dinh || 'Không có'}
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -59,11 +68,15 @@ const ProcedureDetailModal = ({ isOpen, onClose, procedure }) => {
                         <div className="space-y-2">
                             <div>
                                 <label className="block text-sm font-medium text-gray-600 mb-1">Tên cơ sở</label>
-                                <p className="text-sm text-gray-900">{procedure.co_so_dich_vu_cong.ten_co_so}</p>
+                                <p className="text-sm text-gray-900 truncate" title={procedure.co_so_dich_vu_cong.ten_co_so}>
+                                    {procedure.co_so_dich_vu_cong.ten_co_so}
+                                </p>
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-gray-600 mb-1">Địa chỉ</label>
-                                <p className="text-sm text-gray-900">{procedure.co_so_dich_vu_cong.dia_chi}</p>
+                                <p className="text-sm text-gray-900 truncate" title={procedure.co_so_dich_vu_cong.dia_chi}>
+                                    {procedure.co_so_dich_vu_cong.dia_chi}
+                                </p>
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-gray-600 mb-1">Số điện thoại</label>
@@ -76,7 +89,8 @@ const ProcedureDetailModal = ({ isOpen, onClose, procedure }) => {
                                         href={procedure.co_so_dich_vu_cong.link_google_map}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="text-sm text-blue-600 hover:underline"
+                                        className="text-sm text-blue-600 hover:underline truncate block"
+                                        title={procedure.co_so_dich_vu_cong.link_google_map}
                                     >
                                         Xem trên bản đồ
                                     </a>
@@ -121,9 +135,13 @@ const ProcedureDetailModal = ({ isOpen, onClose, procedure }) => {
                                             <span className="flex-shrink-0 w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-semibold text-sm">
                                                 {step.thu_tu_buoc}
                                             </span>
-                                            <div className="flex-1">
-                                                <h4 className="font-medium text-gray-900 mb-1">{step.ten_buoc}</h4>
-                                                <p className="text-sm text-gray-600">{step.mo_ta_buoc}</p>
+                                            <div className="flex-1 min-w-0">
+                                                <h4 className="font-medium text-gray-900 mb-1 truncate" title={step.ten_buoc}>
+                                                    {step.ten_buoc}
+                                                </h4>
+                                                <p className="text-sm text-gray-600 line-clamp-2" title={step.mo_ta_buoc}>
+                                                    {step.mo_ta_buoc}
+                                                </p>
                                             </div>
                                         </div>
                                     </div>
@@ -135,37 +153,99 @@ const ProcedureDetailModal = ({ isOpen, onClose, procedure }) => {
                 {procedure.cach_thuc_thuc_hien && procedure.cach_thuc_thuc_hien.length > 0 && (
                     <div className="bg-gray-50 p-3 rounded-lg">
                         <h3 className="text-lg font-semibold text-gray-900 mb-3">Cách thức thực hiện</h3>
-                        <div className="space-y-3">
-                            {procedure.cach_thuc_thuc_hien.map((cach, index) => (
-                                <div key={cach.id} className="bg-white p-3 rounded-lg border border-gray-200">
-                                    <h4 className="font-medium text-gray-900 mb-2">Cách thức {index + 1}: {cach.hinh_thuc_ap_dung}</h4>
-                                    <div className="space-y-2">
+                        {procedure.cach_thuc_thuc_hien.map((cach, index) => (
+                            <div key={cach.id} className="bg-white p-3 rounded-lg border border-gray-200">
+                                <h4 className="font-medium text-gray-900 mb-2 truncate" title={`Cách thức ${index + 1}: ${cach.hinh_thuc_ap_dung}`}>
+                                    Cách thức {index + 1}: {cach.hinh_thuc_ap_dung}
+                                </h4>
+                                <div className="space-y-2">
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-600 mb-1">Mô tả chi tiết</label>
+                                        <p className="text-sm text-gray-900 line-clamp-2" title={cach.mo_ta_chi_tiet}>
+                                            {cach.mo_ta_chi_tiet}
+                                        </p>
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-3">
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-600 mb-1">Mô tả chi tiết</label>
-                                            <p className="text-sm text-gray-900">{cach.mo_ta_chi_tiet}</p>
+                                            <label className="block text-sm font-medium text-gray-600 mb-1">Thời gian giải quyết</label>
+                                            <p className="text-sm text-gray-900 truncate" title={cach.thoi_gian_giai_quyet}>
+                                                {cach.thoi_gian_giai_quyet}
+                                            </p>
                                         </div>
-                                        <div className="grid grid-cols-2 gap-3">
-                                            <div>
-                                                <label className="block text-sm font-medium text-gray-600 mb-1">Thời gian giải quyết</label>
-                                                <p className="text-sm text-gray-900">{cach.thoi_gian_giai_quyet}</p>
-                                            </div>
-                                            <div>
-                                                <label className="block text-sm font-medium text-gray-600 mb-1">Lệ phí</label>
-                                                <p className="text-sm text-gray-900 font-semibold text-green-600">
-                                                    {formatCurrency(parseFloat(cach.le_phi) || 0)}
-                                                </p>
-                                            </div>
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-600 mb-1">Lệ phí</label>
+                                            <p className="text-sm text-gray-900 font-semibold text-green-600">
+                                                {formatCurrency(parseFloat(cach.le_phi) || 0)}
+                                            </p>
                                         </div>
-                                        {cach.ghi_chu_le_phi && (
-                                            <div>
-                                                <label className="block text-sm font-medium text-gray-600 mb-1">Ghi chú lệ phí</label>
-                                                <p className="text-sm text-gray-900">{cach.ghi_chu_le_phi}</p>
-                                            </div>
+                                    </div>
+                                    {cach.ghi_chu_le_phi && (
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-600 mb-1">Ghi chú lệ phí</label>
+                                            <p className="text-sm text-gray-900 truncate" title={cach.ghi_chu_le_phi}>
+                                                {cach.ghi_chu_le_phi}
+                                            </p>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                )}
+
+                {procedure.truong_hop_thu_tuc && procedure.truong_hop_thu_tuc.length > 0 && (
+                    <div className="bg-yellow-50 p-3 rounded-lg">
+                        <h3 className="text-lg font-semibold text-gray-900 mb-3">Trường hợp thủ tục</h3>
+                        {[...procedure.truong_hop_thu_tuc]
+                            .sort((a, b) => a.thu_tu - b.thu_tu)
+                            .map((caseItem, index) => (
+                                <div key={caseItem.id} className="bg-white p-3 rounded-lg border border-gray-200">
+                                    <div className="mb-3">
+                                        <h4 className="font-medium text-gray-900 mb-1 truncate" title={`Trường hợp ${caseItem.thu_tu}: ${caseItem.ten_truong_hop}`}>
+                                            Trường hợp {caseItem.thu_tu}: {caseItem.ten_truong_hop}
+                                        </h4>
+                                        {caseItem.mo_ta && (
+                                            <p className="text-sm text-gray-600 line-clamp-2" title={caseItem.mo_ta}>
+                                                {caseItem.mo_ta}
+                                            </p>
                                         )}
                                     </div>
+
+                                    {caseItem.thanh_phan_ho_so && caseItem.thanh_phan_ho_so.length > 0 && (
+                                        <div className="mt-3 pl-3 border-l-2 border-yellow-300">
+                                            <h5 className="text-sm font-semibold text-gray-700 mb-2">Thành phần hồ sơ:</h5>
+                                            <div className="space-y-2">
+                                                {caseItem.thanh_phan_ho_so.map((component, compIndex) => (
+                                                    <div key={compIndex} className="bg-gray-50 p-2 rounded border border-gray-200">
+                                                        <div className="flex items-start gap-2 mb-1">
+                                                            <span className="flex-shrink-0 w-5 h-5 bg-yellow-500 text-white rounded-full flex items-center justify-center text-xs font-semibold">
+                                                                {compIndex + 1}
+                                                            </span>
+                                                            <p className="text-sm font-medium text-gray-900 truncate flex-1" title={component.ten_thanh_phan}>
+                                                                {component.ten_thanh_phan}
+                                                            </p>
+                                                        </div>
+                                                        {component.mo_ta_chi_tiet && (
+                                                            <p className="text-xs text-gray-600 ml-7 mb-1 line-clamp-2" title={component.mo_ta_chi_tiet}>
+                                                                {component.mo_ta_chi_tiet}
+                                                            </p>
+                                                        )}
+                                                        <div className="ml-7 flex gap-3 text-xs text-gray-600">
+                                                            <span>Bản chính: <strong>{component.so_luong_ban_chinh || 0}</strong></span>
+                                                            <span>Bản sao: <strong>{component.so_luong_ban_sao || 0}</strong></span>
+                                                            {component.ghi_chu && (
+                                                                <span className="truncate" title={component.ghi_chu}>
+                                                                    Ghi chú: <em>{component.ghi_chu}</em>
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
                             ))}
-                        </div>
                     </div>
                 )}
 

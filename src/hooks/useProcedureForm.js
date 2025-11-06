@@ -149,6 +149,64 @@ export const useProcedureForm = ({ initialData, mode, isOpen, onSubmit }) => {
         updateField('danhSachMauDon', newMauDon);
     };
 
+    const addTruongHop = () => {
+        const newTruongHop = [
+            ...formData.truongHopThuTuc,
+            {
+                ten_truong_hop: '',
+                mo_ta: '',
+                thu_tu: formData.truongHopThuTuc.length + 1,
+                thanh_phan_ho_so: []
+            }
+        ];
+        updateField('truongHopThuTuc', newTruongHop);
+    };
+
+    const removeTruongHop = (index) => {
+        const newTruongHop = formData.truongHopThuTuc
+            .filter((_, i) => i !== index)
+            .map((item, i) => ({ ...item, thu_tu: i + 1 }));
+        updateField('truongHopThuTuc', newTruongHop);
+    };
+
+    const updateTruongHop = (index, field, value) => {
+        const newTruongHop = [...formData.truongHopThuTuc];
+        newTruongHop[index] = { ...newTruongHop[index], [field]: value };
+        updateField('truongHopThuTuc', newTruongHop);
+    };
+
+    const addThanhPhanHoSo = (caseIndex) => {
+        const newTruongHop = [...formData.truongHopThuTuc];
+        if (!newTruongHop[caseIndex].thanh_phan_ho_so) {
+            newTruongHop[caseIndex].thanh_phan_ho_so = [];
+        }
+        newTruongHop[caseIndex].thanh_phan_ho_so.push({
+            ten_thanh_phan: '',
+            mo_ta_chi_tiet: '',
+            so_luong_ban_chinh: 0,
+            so_luong_ban_sao: 0,
+            ghi_chu: ''
+        });
+        updateField('truongHopThuTuc', newTruongHop);
+    };
+
+    const removeThanhPhanHoSo = (caseIndex, componentIndex) => {
+        const newTruongHop = [...formData.truongHopThuTuc];
+        newTruongHop[caseIndex].thanh_phan_ho_so = newTruongHop[caseIndex].thanh_phan_ho_so.filter(
+            (_, i) => i !== componentIndex
+        );
+        updateField('truongHopThuTuc', newTruongHop);
+    };
+
+    const updateThanhPhanHoSo = (caseIndex, componentIndex, field, value) => {
+        const newTruongHop = [...formData.truongHopThuTuc];
+        newTruongHop[caseIndex].thanh_phan_ho_so[componentIndex] = {
+            ...newTruongHop[caseIndex].thanh_phan_ho_so[componentIndex],
+            [field]: value
+        };
+        updateField('truongHopThuTuc', newTruongHop);
+    };
+
     const handleSubmit = async () => {
         const validation = await validateFormalityForm(formData, mode === 'edit');
 
@@ -191,6 +249,12 @@ export const useProcedureForm = ({ initialData, mode, isOpen, onSubmit }) => {
         addCachThucHien,
         removeCachThucHien,
         updateCachThucHien,
+        addTruongHop,
+        removeTruongHop,
+        updateTruongHop,
+        addThanhPhanHoSo,
+        removeThanhPhanHoSo,
+        updateThanhPhanHoSo,
         handleSubmit,
         resetForm
     };
