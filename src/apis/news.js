@@ -20,14 +20,13 @@ const getAllNews = async ({ page, size, isActive, idDanhMuc, search }) => {
         if (idDanhMuc) params.idDanhMuc = idDanhMuc;
         if (search) params.search = search;
         const response = await apiFormClient.get("/api/tin-tuc", { params });
-        
         if (response.data.success) {
             return {
                 content: response.data.data || [],
                 pagination: response.data.pagination || {
-                    currentPage: page,
-                    pageSize: size,
-                    totalPages: 1,
+                    currentPage: response.data.pagination?.currentPage || page,
+                    pageSize: response.data.pagination?.pageSize || size,
+                    totalPages: response.data.pagination?.totalPages || 1,
                     totalItems: response.data.data?.length || 0
                 }
             };
@@ -96,7 +95,7 @@ const deleteNews = async (newsId) => {
 
 const uploadFile = async (idTinTuc, fileData) => {
     try {
-        const response = await apiFormClient.post(`/api/tin-tuc/upload/${idTinTuc}`, fileData);
+        const response = await apiFormClient.post(`/api/tin-tuc/upload`, fileData);
         if (response.data.success) return response.data.data;
         else throw new Error(response.data.message || "Tải lên tệp tin thất bại");
     } catch (error) {

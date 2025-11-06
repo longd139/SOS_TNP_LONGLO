@@ -18,19 +18,32 @@ export const transformInitialData = (initialData, mode) => {
     }
 
     if (mode === 'edit') {
+        let tenCoSoDichVuCong = '';
+        if (typeof initialData.co_so_dich_vu_cong === 'string') {
+            tenCoSoDichVuCong = initialData.co_so_dich_vu_cong;
+        } else if (typeof initialData.co_so_dich_vu_cong === 'object' && initialData.co_so_dich_vu_cong !== null) {
+            tenCoSoDichVuCong = initialData.co_so_dich_vu_cong.ten_co_so || '';
+        }
+
+        let danhSachLinhVucIds = [];
+        if (initialData.thu_tuc_hanh_chinh_linh_vuc) {
+            danhSachLinhVucIds = initialData.thu_tuc_hanh_chinh_linh_vuc.map(
+                item => item.id_linh_vuc
+            );
+        } else if (initialData.linh_vuc && Array.isArray(initialData.linh_vuc)) {
+            danhSachLinhVucIds = initialData.linh_vuc;
+        }
+
         return {
             idCoSoDichVuCong: initialData.id_co_so_dich_vu_cong || '',
-            tenCoSoDichVuCong: initialData.co_so_dich_vu_cong?.ten_co_so || '',
+            tenCoSoDichVuCong: tenCoSoDichVuCong,
             tenThuTuc: initialData.ten_thu_tuc || '',
             maThuTuc: initialData.ma_thu_tuc || '',
             doiTuongThucHien: initialData.doi_tuong_thuc_hien || '',
             yeuCauDieuKienChung: initialData.yeu_cau_dieu_kien_chung || '',
             soQuyetDinh: initialData.so_quyet_dinh || '',
 
-
-            danhSachLinhVucIds: initialData.thu_tuc_hanh_chinh_linh_vuc?.map(
-                item => item.id_linh_vuc
-            ) || [],
+            danhSachLinhVucIds: danhSachLinhVucIds,
 
             danhSachMauDon: initialData.thu_tuc_hanh_chinh_mau_don?.map(item => ({
                 id: item.id_mau_don || item.id,

@@ -67,7 +67,8 @@ export default function TemplateManager() {
             setDeleteModal({ isOpen: false, template: null });
             dispatch(fetchTemplates(showRemoved));
         } catch (error) {
-            showToast.error(error.message || 'Có lỗi xảy ra khi xóa biểu mẫu!');
+            const errorMessage = error?.message || error || 'Có lỗi xảy ra khi xóa biểu mẫu!';
+            showToast.error(errorMessage);
         }
     };
 
@@ -82,7 +83,8 @@ export default function TemplateManager() {
             showToast.success('Tạo biểu mẫu thành công!');
             dispatch(fetchTemplates(showRemoved));
         } catch (error) {
-            showToast.error(error.message || 'Tạo biểu mẫu thất bại!');
+            const errorMessage = error?.message || error || 'Tạo biểu mẫu thất bại!';
+            showToast.error(errorMessage);
             throw error;
         }
     };
@@ -102,7 +104,8 @@ export default function TemplateManager() {
             showToast.success('Cập nhật biểu mẫu thành công!');
             dispatch(fetchTemplates(showRemoved));
         } catch (error) {
-            showToast.error(error.message || 'Cập nhật biểu mẫu thất bại!');
+            const errorMessage = error?.message || error || 'Cập nhật biểu mẫu thất bại!';
+            showToast.error(errorMessage);
             throw error;
         }
     };
@@ -126,7 +129,8 @@ export default function TemplateManager() {
             showToast.success(`Biểu mẫu đã được ${!current ? 'kích hoạt' : 'vô hiệu hóa'} thành công!`);
             dispatch(fetchTemplates(showRemoved));
         } catch (error) {
-            showToast.error(error.message || 'Có lỗi xảy ra khi cập nhật trạng thái biểu mẫu!');
+            const errorMessage = error?.message || error || 'Có lỗi xảy ra khi cập nhật trạng thái biểu mẫu!';
+            showToast.error(errorMessage);
         }
     };
 

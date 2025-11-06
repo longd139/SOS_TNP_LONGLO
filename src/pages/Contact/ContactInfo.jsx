@@ -128,7 +128,7 @@ export default function ContactInfo() {
 
     return (
         <div className="min-h-screen">
-            <div className="max-w-7xl mx-auto px-2 py-1 md:py-2">
+            <div className="px-2 py-1 md:py-2">
                 <div className="mb-3 md:mb-4">
                     <h1 className="text-xl md:text-2xl font-bold text-gray-900">
                         Ủy ban Phường

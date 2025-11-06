@@ -57,7 +57,7 @@ export const useNews = () => {
             fetchNewsList(pagination.currentPage, pagination.pageSize);
             return { success: true, data: result.payload };
         } else {
-            return { success: false, error: result.payload?.message };
+            return { success: false, error: result.payload?.message || result.payload || 'Tạo tin tức thất bại!' };
         }
     }, [dispatch, fetchNewsList, pagination]);
 
@@ -67,7 +67,7 @@ export const useNews = () => {
             fetchNewsList(pagination.currentPage, pagination.pageSize);
             return { success: true, data: result.payload };
         } else {
-            return { success: false, error: result.payload?.message };
+            return { success: false, error: result.payload?.message || result.payload || 'Cập nhật tin tức thất bại!' };
         }
     }, [dispatch, fetchNewsList, pagination]);
 
@@ -81,7 +81,7 @@ export const useNews = () => {
         if (updateNewsStatusThunk.fulfilled.match(result)) {
             return { success: true };
         } else {
-            return { success: false, error: result.payload?.message };
+            return { success: false, error: result.payload?.message || result.payload || 'Cập nhật trạng thái thất bại!' };
         }
     }, [dispatch]);
 
@@ -91,7 +91,7 @@ export const useNews = () => {
             fetchNewsList(pagination.currentPage, pagination.pageSize);
             return { success: true };
         } else {
-            return { success: false, error: result.payload?.message };
+            return { success: false, error: result.payload?.message || result.payload || 'Xóa tin tức thất bại!' };
         }
     }, [dispatch, fetchNewsList, pagination]);
 
