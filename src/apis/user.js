@@ -2,9 +2,31 @@ import apiClient from "../utils/apiClient";
 
 const getMyProfile = async () => {
     try {
-        const response = await apiClient.get("/api/users/my-profile");
-        if (response.data.success) return response.data.data;
-        else throw new Error(response.data.message || "Lấy thông tin cá nhân thất bại");
+        const primary = "/api/users/my-profile";
+
+        try {
+            const response = await apiClient.get(primary);
+            if (response.data && response.data.success) return response.data.data;
+            if (response && response.data && typeof response.data === 'object' && Object.keys(response.data).length > 0) {
+                return response.data;
+            }
+            throw new Error(response.data?.message || "Lấy thông tin cá nhân thất bại");
+        } catch (err) {
+            const status = err?.response?.status;
+            if (status === 404) {
+                const alternatives = ["/api/users/me", "/api/users/profile", "/api/auth/me"];
+                for (const path of alternatives) {
+                    try {
+                        const r = await apiClient.get(path);
+                        if (r.data && r.data.success) return r.data.data;
+                        if (r.data && !r.data.success && typeof r.data === 'object' && Object.keys(r.data).length > 0) return r.data;
+                    } catch (e2) {
+                      
+                    }
+                }
+            }
+            throw err;
+        }
     } catch (error) {
         if (error.response?.data?.message) {
             throw new Error(error.response.data.message);
