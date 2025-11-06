@@ -1,0 +1,110 @@
+const getReportPagination = async (
+    idLinhVucPhanAnh,
+    trangThai,
+    mucDo,
+    page,
+    size,
+    maPhanAnh
+) => {
+    try {
+        const params = new URLSearchParams({
+            page,
+            size
+        });
+        if (idLinhVucPhanAnh) {
+            params.append('idLinhVucPhanAnh', idLinhVucPhanAnh);
+        }
+        if (trangThai) {
+            params.append('trangThai', trangThai);
+        }
+        if (mucDo) {
+            params.append('mucDo', mucDo);
+        }
+        if (maPhanAnh) {
+            params.append('maPhanAnh', maPhanAnh);
+        }
+        const response = await apiClient.get("/api/phan-anh", { params });
+        if (response.data.success) {
+            return response.data.data;
+        } else {
+            throw new Error(response.data.message || "Lấy danh sách phản ánh thất bại");
+        }
+    } catch (error) {
+        if (error.response?.data?.message) {
+            throw new Error(error.response.data.message);
+        }
+        throw error;
+    }
+}
+
+const getHistoryStatus = async (reportId) => {
+    try {
+        const response = await apiClient.get(`/api/phan-anh/${reportId}/lich-su-trang-thai`);
+        if (response.data.success) {
+            return response.data.data;
+        } else {
+            throw new Error(response.data.message || "Lấy lịch sử trạng thái thất bại");
+        }
+    } catch (error) {
+        if (error.response?.data?.message) {
+            throw new Error(error.response.data.message);
+        }
+        throw error;
+    }
+}
+
+const getExtent = async () => {
+    try {
+        const response = await apiClient.get("/api/phan-anh/muc-do");
+        if (response.data.success) {
+            return response.data.data;
+        } else {
+            throw new Error(response.data.message || "Lấy mức độ phản ánh thất bại");
+        }
+    } catch (error) {
+        if (error.response?.data?.message) {
+            throw new Error(error.response.data.message);
+        }
+        throw error;
+    }
+}
+
+const getStatusReport = async () => {
+    try {
+        const response = await apiClient.get("/api/phan-anh/trang-thai");
+        if (response.data.success) {
+            return response.data.data;
+        } else {
+            throw new Error(response.data.message || "Lấy trạng thái phản ánh thất bại");
+        }
+    } catch (error) {
+        if (error.response?.data?.message) {
+            throw new Error(error.response.data.message);
+        }
+        throw error;
+    }
+}
+
+const getReportById = async (reportId) => {
+    try {
+        const response = await apiClient.get(`/api/phan-anh/${reportId}`);
+        if (response.data.success) {
+            return response.data.data;
+        } else {
+            throw new Error(response.data.message || "Lấy phản ánh thất bại");
+        }
+    } catch (error) {
+        if (error.response?.data?.message) {
+            throw new Error(error.response.data.message);
+        }
+        throw error;
+    }
+}
+
+export const REPORT_API = {
+    getReportPagination,
+    getHistoryStatus,
+    getExtent,
+    getStatusReport,
+    getReportById
+};
