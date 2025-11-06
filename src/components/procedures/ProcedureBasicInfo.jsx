@@ -15,23 +15,21 @@ const ProcedureBasicInfo = ({ formData, errors, updateField }) => {
     const containerRef = useRef(null);
 
     useEffect(() => {
-        if (!search) {
-            setResults([]);
-            return;
-        }
-
         const t = setTimeout(async () => {
             setLoading(true);
             try {
-                const resp = await GOVERNMENT_API.getGovernment({ search, isRemoved: false, size: 10 });
+                const resp = await GOVERNMENT_API.getGovernment({ 
+                    search: search || '', 
+                    isRemoved: false, 
+                    size: search ? 10 : 20 
+                });
                 setResults(resp.content || []);
-                setShowDropdown(true);
             } catch (err) {
                 setResults([]);
             } finally {
                 setLoading(false);
             }
-        }, 300);
+        }, search ? 300 : 0);
 
         return () => clearTimeout(t);
     }, [search]);
@@ -99,16 +97,19 @@ const ProcedureBasicInfo = ({ formData, errors, updateField }) => {
                                 onChange={(e) => {
                                     const v = e.target.value;
                                     setSearch(v);
-                                    if (!v) {
+                                    if (!v && formData.idCoSoDichVuCong) {
                                         updateField('idCoSoDichVuCong', '');
                                         updateField('tenCoSoDichVuCong', '');
-                                        setResults([]);
-                                        setShowDropdown(false);
-                                    } else {
+                                    } else if (v && formData.idCoSoDichVuCong) {
                                         updateField('idCoSoDichVuCong', '');
                                     }
                                 }}
-                                onFocus={() => { if (results.length) setShowDropdown(true); }}
+                                onFocus={() => { 
+                                    setShowDropdown(true);
+                                    if (!search && results.length === 0) {
+                                        setSearch('');
+                                    }
+                                }}
                                 onKeyDown={handleKeyDown}
                                 placeholder="Tìm hoặc chọn cơ sở..."
                                 className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.idCoSoDichVuCong ? 'border-red-500' : 'border-gray-300'}`}
@@ -117,7 +118,7 @@ const ProcedureBasicInfo = ({ formData, errors, updateField }) => {
                                 <p className="mt-1 text-sm text-red-600">{errors.idCoSoDichVuCong}</p>
                             )}
 
-                            {showDropdown && (results.length > 0 || loading) && (
+                            {showDropdown && (
                                 <div className="absolute z-40 left-0 right-[52px] mt-1 bg-white border rounded-md shadow-lg max-h-60 overflow-auto">
                                     {loading && (
                                         <div className="p-2 text-sm text-gray-500">Đang tìm...</div>
@@ -133,8 +134,8 @@ const ProcedureBasicInfo = ({ formData, errors, updateField }) => {
                                             onMouseEnter={() => setHighlightedIndex(idx)}
                                             className={`w-full text-left px-3 py-2 hover:bg-gray-100 ${highlightedIndex === idx ? 'bg-blue-100' : ''}`}
                                         >
-                                            <div className="font-medium">{r.ten_co_so}</div>
-                                            <div className="text-xs text-gray-500">{r.dia_chi}</div>
+                                            <div className="font-medium truncate">{r.ten_co_so}</div>
+                                            <div className="text-xs text-gray-500 truncate">{r.dia_chi}</div>
                                         </button>
                                     ))}
                                 </div>

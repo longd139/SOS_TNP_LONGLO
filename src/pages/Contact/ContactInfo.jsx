@@ -57,8 +57,6 @@ export default function ContactInfo() {
         if (updateSuccess) {
             showToast.success("Cập nhật thông tin thành công!");
             dispatch(clearUpdateSuccess());
-            // Không khóa form, cho phép tiếp tục chỉnh sửa
-            // setIsEditing(false);
         }
     }, [updateSuccess, dispatch]);
 
@@ -98,19 +96,11 @@ export default function ContactInfo() {
         }
 
         setErrors({});
-        
-        const contactData = {
-            ...formData,
-            gioLamViec: {
-                ...formData.gioLamViec,
-                ghi_chu: formData.gioLamViec.ghi_chu?.trim() || null
-            }
-        };
 
         dispatch(
             updateContact({
                 committeeId: formData.id,
-                contactData,
+                contactData: formData,
             })
         );
     };
@@ -148,8 +138,8 @@ export default function ContactInfo() {
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-gray-600 mb-1">
-                                Tên đơn vị <span className="text-red-500">*</span>
+                            <label className="block text-sm font-medium text-gray-600 mb-1 required-label">
+                                Tên đơn vị
                             </label>
                             <input
                                 type="text"
@@ -170,8 +160,8 @@ export default function ContactInfo() {
 
                         <div className="space-y-3">
                             <div>
-                                <label className="block text-sm font-medium text-gray-600 mb-1">
-                                    Địa chỉ đầy đủ <span className="text-red-500">*</span>
+                                <label className="block text-sm font-medium text-gray-600 mb-1 required-label">
+                                    Địa chỉ đầy đủ
                                 </label>
                                 <input
                                     type="text"
@@ -183,8 +173,8 @@ export default function ContactInfo() {
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-gray-600 mb-1">
-                                    Link Google Map <span className="text-red-500">*</span>
+                                <label className="block text-sm font-medium text-gray-600 mb-1 required-label">
+                                    Link Google Map
                                 </label>
                                 <input
                                     type="text"
@@ -208,8 +198,8 @@ export default function ContactInfo() {
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                             <div>
-                                <label className="block text-sm font-medium text-gray-600 mb-1">
-                                    Số điện thoại <span className="text-red-500">*</span>
+                                <label className="block text-sm font-medium text-gray-600 mb-1 required-label">
+                                    Số điện thoại
                                 </label>
                                 <input
                                     type="text"
@@ -222,8 +212,8 @@ export default function ContactInfo() {
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-gray-600 mb-1">
-                                    Email liên hệ <span className="text-red-500">*</span>
+                                <label className="block text-sm font-medium text-gray-600 mb-1 required-label">
+                                    Email liên hệ
                                 </label>
                                 <input
                                     type="email"
@@ -235,7 +225,8 @@ export default function ContactInfo() {
                                 />
                             </div>
                         </div>
-                    </div>                    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3">
+                    </div>                    
+                    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3">
                         <div className="flex items-center gap-2 mb-3">
                             <Clock className="w-4 h-4 text-blue-600" />
                             <h2 className="text-base font-semibold text-gray-900">
@@ -246,8 +237,8 @@ export default function ContactInfo() {
                         <div className="space-y-3">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-600 mb-1">
-                                        Buổi sáng <span className="text-red-500">*</span>
+                                    <label className="block text-sm font-medium text-gray-600 mb-1 required-label">
+                                        Buổi sáng
                                     </label>
                                     <div className="flex items-center gap-2">
                                         <div className="flex-1">
@@ -288,8 +279,8 @@ export default function ContactInfo() {
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-600 mb-1">
-                                        Buổi chiều <span className="text-red-500">*</span>
+                                    <label className="block text-sm font-medium text-gray-600 mb-1 required-label">
+                                        Buổi chiều
                                     </label>
                                     <div className="flex items-center gap-2">
                                         <div className="flex-1">
@@ -330,8 +321,16 @@ export default function ContactInfo() {
                                 </div>
                             </div>
 
+                            {errors['gioLamViec'] && (
+                                <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+                                    <p className="text-sm text-red-600 font-medium">
+                                        {errors['gioLamViec']}
+                                    </p>
+                                </div>
+                            )}
+
                             <div>
-                                <label className="block text-sm font-medium text-gray-600 mb-1">
+                                <label className="block text-sm font-medium text-gray-600 mb-1 required-label">
                                     Ghi chú
                                 </label>
                                 <input
