@@ -51,6 +51,10 @@ export default function AdminManager() {
         });
     };
 
+    const canDelete = (user) => {
+        return !user.active;
+    };
+
     const handleUserModalSubmit = async (userData) => {
         try {
             setModalLoading(true);
@@ -323,6 +327,7 @@ export default function AdminManager() {
                 onPageChange={handlePageChange}
                 onEdit={handleEditUser}
                 onDelete={handleDeleteUser}
+                canDelete={canDelete}
                 onUpdateStatus={handleUpdateStatus}
                 emptyMessage="Không có tài khoản nào"
             />

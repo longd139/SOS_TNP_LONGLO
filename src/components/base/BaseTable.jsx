@@ -9,6 +9,7 @@ const BaseTable = ({
     onDelete,
     onView,
     onUpdateStatus,
+    canDelete,
     viewIcon = null,
     pagination = null,
     onPageChange,
@@ -108,7 +109,7 @@ const BaseTable = ({
                                                         <Pencil className="w-4 h-4" />
                                                     </button>
                                                 )}
-                                                {onDelete && (
+                                                {onDelete && (!canDelete || canDelete(item)) && (
                                                     <button
                                                         onClick={() => onDelete(item)}
                                                         className="text-red-600 hover:text-red-900 p-1 rounded hover:bg-red-100"

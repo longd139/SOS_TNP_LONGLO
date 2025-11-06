@@ -13,7 +13,6 @@ const importWorkSchedule = async (file) => {
             throw new Error(response.data.message || "Import lịch tiếp dân thất bại");
         }
     } catch (error) {
-        // Enhanced error handling
         if (error.response?.status === 500) {
             const message = error.response?.data?.message || "Server đang gặp sự cố khi xử lý file";
             throw new Error(`${message}. Vui lòng kiểm tra định dạng file và thử lại.`);

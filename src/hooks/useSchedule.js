@@ -49,38 +49,74 @@ export const useSchedule = () => {
     const hasScheduleForDay = useSelector(selectHasScheduleForDay);
     const statistics = useSelector(selectScheduleStatistics);
 
-    // Get schedules for a specific date
     const getSchedulesForDate = useCallback((date) => {
         if (!date) return [];
-        return schedules.filter(schedule => {
+        
+        const normalizeDate = (dateStr) => {
+            if (!dateStr) return '';
+            
+            if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+                return dateStr;
+            }
+            
+            if (/^\d{2}\/\d{2}\/\d{4}$/.test(dateStr)) {
+                const [day, month, year] = dateStr.split('/');
+                return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+            }
+            
+            if (dateStr.includes('T') || dateStr.includes('Z') || /^\d{4}-\d{2}-\d{2}T/.test(dateStr)) {
+                const d = new Date(dateStr);
+                if (!isNaN(d.getTime())) {
+                    const year = d.getFullYear();
+                    const month = String(d.getMonth() + 1).padStart(2, '0');
+                    const day = String(d.getDate()).padStart(2, '0');
+                    return `${year}-${month}-${day}`;
+                }
+            }
+            
+            try {
+                const d = new Date(dateStr);
+                if (!isNaN(d.getTime())) {
+                    const year = d.getFullYear();
+                    const month = String(d.getMonth() + 1).padStart(2, '0');
+                    const day = String(d.getDate()).padStart(2, '0');
+                    return `${year}-${month}-${day}`;
+                }
+            } catch (e) {
+            }
+            
+            return dateStr;
+        };
+        
+        const normalizedDate = normalizeDate(date);
+        
+        const filtered = schedules.filter(schedule => {
             const scheduleDate = schedule.ngay_tiep_dan || schedule.date;
-            return scheduleDate === date;
+            const normalizedScheduleDate = normalizeDate(scheduleDate);
+            return normalizedScheduleDate === normalizedDate;
         }).sort((a, b) => {
             const timeA = a.thoi_gian || a.time || '';
             const timeB = b.thoi_gian || b.time || '';
             return timeA.localeCompare(timeB);
         });
+        
+        return filtered;
     }, [schedules]);
 
-    // Fetch schedules
     const fetchSchedules = useCallback((params = {}) => {
         const defaultParams = {
             weekYear: filters.weekYear,
             monthYear: filters.monthYear,
             date: filters.date,
-            // isActive: showActive,
             ...params
         };
         return dispatch(fetchWorkSchedules(defaultParams));
-    }, [dispatch, filters, /* showActive */]);
+    }, [dispatch, filters]);
 
-    // Import schedule from Excel file
     const importSchedule = useCallback(async (file) => {
         try {
-            console.log('Importing schedule with file:', file);
             const result = await dispatch(importWorkSchedule(file));
             if (importWorkSchedule.fulfilled.match(result)) {
-                // Refresh the schedule list after successful import
                 await fetchSchedules();
                 return { success: true, data: result.payload };
             } else {

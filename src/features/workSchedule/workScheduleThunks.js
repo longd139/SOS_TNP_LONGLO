@@ -19,12 +19,9 @@ export const importWorkSchedule = createAsyncThunk(
     'workSchedule/importWorkSchedule',
     async (file, { rejectWithValue }) => {
         try {
-            console.log('Importing work schedule from file:', file);
             const response = await WORK_SCHEDULE_API.importWorkSchedule(file);
-            console.log('Import work schedule response:', response);
             return response;
         } catch (error) {
-            console.error('Error importing work schedule:', error);
             return rejectWithValue({
                 message: error.message || 'Import lịch tiếp dân thất bại'
             });
