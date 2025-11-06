@@ -2,6 +2,11 @@ import { createSelector } from '@reduxjs/toolkit';
 
 const selectWorkScheduleState = (state) => state.workSchedule;
 
+// Helper function to get date field value
+const getScheduleDateField = (schedule) => {
+    return schedule.ngay_tiep_dan || schedule.date;
+};
+
 export const selectSchedulesList = createSelector(
     [selectWorkScheduleState],
     (workSchedule) => workSchedule.schedules
@@ -37,18 +42,30 @@ export const selectSelectedYear = createSelector(
     (workSchedule) => workSchedule.selectedYear
 );
 
-export const selectShowActive = createSelector(
-    [selectWorkScheduleState],
-    (workSchedule) => workSchedule.showActive
-);
+// export const selectShowActive = createSelector(
+//     [selectWorkScheduleState],
+//     (workSchedule) => workSchedule.showActive
+// );
 
 // Computed selectors
 export const selectSchedulesForDisplay = createSelector(
     [selectSchedulesList],
     (schedules) => {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        
         return schedules
+            .filter(schedule => {
+                const scheduleDate = new Date(getScheduleDateField(schedule));
+                scheduleDate.setHours(0, 0, 0, 0);
+                return scheduleDate >= today;
+            })
             .slice()
-            .sort((a, b) => new Date(a.date) - new Date(b.date));
+            .sort((a, b) => {
+                const dateA = new Date(getScheduleDateField(a));
+                const dateB = new Date(getScheduleDateField(b));
+                return dateA - dateB;
+            });
     }
 );
 
@@ -56,7 +73,7 @@ export const selectSchedulesForMonth = createSelector(
     [selectSchedulesList, selectSelectedMonth, selectSelectedYear],
     (schedules, month, year) => {
         return schedules.filter(schedule => {
-            const scheduleDate = new Date(schedule.date);
+            const scheduleDate = new Date(getScheduleDateField(schedule));
             return scheduleDate.getMonth() + 1 === month && scheduleDate.getFullYear() === year;
         });
     }
@@ -67,19 +84,48 @@ export const selectHasScheduleForDay = createSelector(
     (monthSchedules) => (day) => {
         if (!day) return false;
         return monthSchedules.some(schedule => {
-            const scheduleDate = new Date(schedule.date);
+            const scheduleDate = new Date(getScheduleDateField(schedule));
             return scheduleDate.getDate() === day;
+        });
+    }
+);
+
+// Selector for schedules on a specific date
+export const selectSchedulesForDate = createSelector(
+    [selectSchedulesList, (state, date) => date],
+    (schedules, date) => {
+        if (!date) return [];
+        return schedules.filter(schedule => {
+            const scheduleDate = getScheduleDateField(schedule);
+            return scheduleDate === date;
+        }).sort((a, b) => {
+            const timeA = a.thoi_gian || a.time || '';
+            const timeB = b.thoi_gian || b.time || '';
+            return timeA.localeCompare(timeB);
         });
     }
 );
 
 export const selectScheduleStatistics = createSelector(
     [selectSchedulesList],
-    (schedules) => ({
-        total: schedules.length,
-        active: schedules.filter(s => s.isActive).length,
-        inactive: schedules.filter(s => !s.isActive).length,
-        upcoming: schedules.filter(s => new Date(s.date) > new Date()).length,
-        past: schedules.filter(s => new Date(s.date) < new Date()).length
-    })
+    (schedules) => {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        
+        return {
+            total: schedules.length,
+            active: schedules.filter(s => s.isActive || s.is_active).length,
+            inactive: schedules.filter(s => !(s.isActive || s.is_active)).length,
+            upcoming: schedules.filter(s => {
+                const scheduleDate = new Date(getScheduleDateField(s));
+                scheduleDate.setHours(0, 0, 0, 0);
+                return scheduleDate >= today;
+            }).length,
+            past: schedules.filter(s => {
+                const scheduleDate = new Date(getScheduleDateField(s));
+                scheduleDate.setHours(0, 0, 0, 0);
+                return scheduleDate < today;
+            }).length
+        };
+    }
 );

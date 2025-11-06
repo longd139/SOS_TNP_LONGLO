@@ -27,7 +27,7 @@ import {
     selectScheduleFilters,
     selectSelectedMonth,
     selectSelectedYear,
-    selectShowActive,
+    // selectShowActive,
     selectSchedulesForDisplay,
     selectSchedulesForMonth,
     selectHasScheduleForDay,
@@ -43,11 +43,24 @@ export const useSchedule = () => {
     const filters = useSelector(selectScheduleFilters);
     const selectedMonth = useSelector(selectSelectedMonth);
     const selectedYear = useSelector(selectSelectedYear);
-    const showActive = useSelector(selectShowActive);
+    // const showActive = useSelector(selectShowActive);
     const schedulesForDisplay = useSelector(selectSchedulesForDisplay);
     const schedulesForMonth = useSelector(selectSchedulesForMonth);
     const hasScheduleForDay = useSelector(selectHasScheduleForDay);
     const statistics = useSelector(selectScheduleStatistics);
+
+    // Get schedules for a specific date
+    const getSchedulesForDate = useCallback((date) => {
+        if (!date) return [];
+        return schedules.filter(schedule => {
+            const scheduleDate = schedule.ngay_tiep_dan || schedule.date;
+            return scheduleDate === date;
+        }).sort((a, b) => {
+            const timeA = a.thoi_gian || a.time || '';
+            const timeB = b.thoi_gian || b.time || '';
+            return timeA.localeCompare(timeB);
+        });
+    }, [schedules]);
 
     // Fetch schedules
     const fetchSchedules = useCallback((params = {}) => {
@@ -55,11 +68,11 @@ export const useSchedule = () => {
             weekYear: filters.weekYear,
             monthYear: filters.monthYear,
             date: filters.date,
-            isActive: showActive,
+            // isActive: showActive,
             ...params
         };
         return dispatch(fetchWorkSchedules(defaultParams));
-    }, [dispatch, filters, showActive]);
+    }, [dispatch, filters, /* showActive */]);
 
     // Import schedule from Excel file
     const importSchedule = useCallback(async (file) => {
@@ -191,7 +204,7 @@ export const useSchedule = () => {
         filters,
         selectedMonth,
         selectedYear,
-        showActive,
+        // showActive,
         schedulesForDisplay,
         schedulesForMonth,
         hasScheduleForDay,
@@ -223,6 +236,7 @@ export const useSchedule = () => {
         clearError: clearScheduleError,
         hasSchedule,
         getSchedulesForDisplay,
+        getSchedulesForDate,
         formatDate
     };
 };
