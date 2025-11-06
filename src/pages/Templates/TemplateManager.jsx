@@ -11,7 +11,8 @@ import {
     fetchTemplates,
     createTemplate as createTemplateThunk,
     updateTemplate as updateTemplateThunk,
-    deleteTemplate as deleteTemplateThunk
+    deleteTemplate as deleteTemplateThunk,
+    updateTemplateStatus
 } from '../../features/templates/templatesThunks';
 import {
     selectTemplates,
@@ -37,8 +38,6 @@ export default function TemplateManager() {
     });
 
     useEffect(() => {
-        // Log when we trigger the fetch so you can correlate with Network tab
-        console.log('[TemplateManager] dispatching fetchTemplates, showRemoved =', showRemoved);
         dispatch(fetchTemplates(showRemoved));
     }, [dispatch, showRemoved]);
 
@@ -46,8 +45,6 @@ export default function TemplateManager() {
         const baseUrl = process.env.REACT_APP_API_URL || '';
         const filePath = template?.urlFilePdf ?? template?.url_file_pdf ?? '';
         const fileUrl = `${baseUrl}${filePath}`;
-        // Log the full URL opened
-        console.log('[TemplateManager] Viewing template file URL:', fileUrl, 'template:', template);
         window.open(fileUrl, '_blank');
     };
 
@@ -65,16 +62,11 @@ export default function TemplateManager() {
 
     const handleDeleteConfirm = async () => {
         try {
-            console.log('[TemplateManager] Deleting template id:', deleteModal.template?.id);
             const result = await dispatch(deleteTemplateThunk(deleteModal.template.id)).unwrap();
-            console.log('[TemplateManager] Delete result (thunk returned):', result);
             showToast.success('Xóa biểu mẫu thành công!');
             setDeleteModal({ isOpen: false, template: null });
-            // refresh
             dispatch(fetchTemplates(showRemoved));
         } catch (error) {
-            console.error('[TemplateManager] Delete failed:', error);
-            console.error('Full error object:', error);
             showToast.error(error.message || 'Có lỗi xảy ra khi xóa biểu mẫu!');
         }
     };
@@ -85,17 +77,11 @@ export default function TemplateManager() {
 
     const handleSubmitCreate = async (formData, options = {}) => {
         try {
-            // Log payload to see what fields are being sent
-            console.log('[TemplateManager] Creating template - payload:', formData);
-
             const result = await dispatch(createTemplateThunk({ formData, options })).unwrap();
-            console.log('[TemplateManager] Create result:', result);
-
             setIsCreateModalOpen(false);
             showToast.success('Tạo biểu mẫu thành công!');
             dispatch(fetchTemplates(showRemoved));
         } catch (error) {
-            console.error('[TemplateManager] Create failed:', error);
             showToast.error(error.message || 'Tạo biểu mẫu thất bại!');
             throw error;
         }
@@ -105,23 +91,17 @@ export default function TemplateManager() {
         if (!selectedTemplate) return;
 
         try {
-            // Log payload and target id
-            console.log('[TemplateManager] Updating template id:', selectedTemplate.id, 'payload:', formData);
-
             const result = await dispatch(updateTemplateThunk({
                 templateId: selectedTemplate.id,
                 formData,
                 options
             })).unwrap();
 
-            console.log('[TemplateManager] Update result:', result);
-
             setIsEditModalOpen(false);
             setSelectedTemplate(null);
             showToast.success('Cập nhật biểu mẫu thành công!');
             dispatch(fetchTemplates(showRemoved));
         } catch (error) {
-            console.error('[TemplateManager] Update failed:', error);
             showToast.error(error.message || 'Cập nhật biểu mẫu thất bại!');
             throw error;
         }
@@ -134,6 +114,20 @@ export default function TemplateManager() {
     const closeEditModal = () => {
         setIsEditModalOpen(false);
         setSelectedTemplate(null);
+    };
+
+    const handleUpdateStatus = async (template) => {
+        const current = typeof template?.isActive !== 'undefined'
+            ? template.isActive
+            : (typeof template?.is_active !== 'undefined' ? template.is_active : false);
+
+        try {
+            await dispatch(updateTemplateStatus({ templateId: template.id, isActive: !current })).unwrap();
+            showToast.success(`Biểu mẫu đã được ${!current ? 'kích hoạt' : 'vô hiệu hóa'} thành công!`);
+            dispatch(fetchTemplates(showRemoved));
+        } catch (error) {
+            showToast.error(error.message || 'Có lỗi xảy ra khi cập nhật trạng thái biểu mẫu!');
+        }
     };
 
     const columns = [
@@ -201,7 +195,6 @@ export default function TemplateManager() {
             key: 'kichThuocFileMb',
             width: '100px',
             render: (value, record) => {
-                // accept camelCase or snake_case from API
                 const v = value ?? record?.kich_thuoc_file_mb ?? record?.kichThuocFileMb;
                 return <span className="text-sm text-gray-600">{v} MB</span>;
             }
@@ -238,10 +231,6 @@ export default function TemplateManager() {
             }
         }
     ];
-
-    // A lightweight render-time log to show list size (optional)
-    // You can remove this if it becomes too noisy.
-    console.log('[TemplateManager] render - templates count =', templates?.length);
 
     return (
         <div className="min-h-screen">
@@ -300,6 +289,7 @@ export default function TemplateManager() {
                         onView={handleView}
                         onEdit={handleEdit}
                         onDelete={showRemoved ? handleDelete : null}
+                        onUpdateStatus={handleUpdateStatus}
                         viewIcon={<Download className="w-4 h-4" />}
                         showActions={true}
                         actionColumnWidth="150px"
