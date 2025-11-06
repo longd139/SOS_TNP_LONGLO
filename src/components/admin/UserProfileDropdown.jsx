@@ -33,7 +33,6 @@ const UserProfileDropdown = () => {
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
-    // Fetch profile on mount if not already loaded
     useEffect(() => {
         if (!profile) {
             dispatch(fetchMyProfile());

@@ -1,4 +1,3 @@
-// apis/committee.js
 import apiClient from "../utils/apiClient";
 
 const createCommittee = async (data) => {
