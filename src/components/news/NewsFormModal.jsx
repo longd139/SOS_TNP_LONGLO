@@ -243,8 +243,14 @@ const NewsFormModal = ({ isOpen, onClose, onSubmit, initialData = null, isLoadin
                     const updatedContent = replaceImageUrls(formData.noiDung, uploadedUrls);
                     
                     const updateFormData = new FormData();
+                    updateFormData.append('idDanhMuc', formData.idDanhMuc);
+                    updateFormData.append('tieuDe', formData.tieuDe);
                     updateFormData.append('noiDung', updatedContent);
                     updateFormData.append('isActive', String(formData.isActive));
+                    
+                    if (formData.tacGia) {
+                        updateFormData.append('tacGia', formData.tacGia);
+                    }
                     
                     await onSubmit(updateFormData, null, true);
                 }
