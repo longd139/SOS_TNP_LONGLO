@@ -1,11 +1,32 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { FORM_API } from '../../apis/form';
 
+const toBoolean = (v) => {
+    if (typeof v === 'boolean') return v;
+    if (typeof v === 'number') return v === 1;
+    if (typeof v === 'string') return v === 'true' || v === '1';
+    return false;
+};
+
 export const fetchTemplates = createAsyncThunk(
     'templates/fetchTemplates',
     async (isRemoved = false, { rejectWithValue }) => {
         try {
             const response = await FORM_API.getAllForms(isRemoved);
+            if (Array.isArray(response)) {
+                const normalized = response.map(item => ({
+                    ...item,
+                    isActive: toBoolean(item.isActive ?? item.is_active),
+                    isDelete: toBoolean(item.isDelete ?? item.is_deleted ?? item.is_delete)
+                }));
+                return normalized;
+            }
+            if (response && typeof response === 'object') {
+                const item = response;
+                item.isActive = toBoolean(item.isActive ?? item.is_active);
+                item.isDelete = toBoolean(item.isDelete ?? item.is_deleted ?? item.is_delete);
+                return item;
+            }
             return response || [];
         } catch (error) {
             return rejectWithValue({
@@ -17,11 +38,14 @@ export const fetchTemplates = createAsyncThunk(
 
 export const createTemplate = createAsyncThunk(
     'templates/createTemplate',
-    // payload: { formData, options }
     async (payload, { rejectWithValue }) => {
         const { formData, options } = payload || {};
         try {
             const response = await FORM_API.createForm(formData, options);
+            if (response && typeof response === 'object') {
+                response.isActive = toBoolean(response.isActive ?? response.is_active);
+                response.isDelete = toBoolean(response.isDelete ?? response.is_deleted ?? response.is_delete);
+            }
             return response;
         } catch (error) {
             return rejectWithValue({
@@ -33,10 +57,13 @@ export const createTemplate = createAsyncThunk(
 
 export const updateTemplate = createAsyncThunk(
     'templates/updateTemplate',
-    // payload: { templateId, formData, options }
     async ({ templateId, formData, options }, { rejectWithValue }) => {
         try {
             const response = await FORM_API.updateForm(templateId, formData, options);
+            if (response && typeof response === 'object') {
+                response.isActive = toBoolean(response.isActive ?? response.is_active);
+                response.isDelete = toBoolean(response.isDelete ?? response.is_deleted ?? response.is_delete);
+            }
             return response;
         } catch (error) {
             return rejectWithValue({
@@ -50,13 +77,25 @@ export const deleteTemplate = createAsyncThunk(
     'templates/deleteTemplate',
     async (templateId, { rejectWithValue }) => {
         try {
-            console.log('[templatesThunks] calling FORM_API.deleteForm with id:', templateId);
             const resp = await FORM_API.deleteForm(templateId);
-            console.log('[templatesThunks] deleteForm response:', resp);
-            return templateId;
+            return { templateId, serverData: resp };
         } catch (error) {
             return rejectWithValue({
                 message: error.response?.data?.message || error.message || 'Xóa biểu mẫu thất bại'
+            });
+        }
+    }
+);
+
+export const updateTemplateStatus = createAsyncThunk(
+    'templates/updateTemplateStatus',
+    async ({ templateId, isActive, options } = {}, { rejectWithValue }) => {
+        try {
+            const response = await FORM_API.updateMauDonStatus(templateId, isActive, options);
+            return { templateId, data: response };
+        } catch (error) {
+            return rejectWithValue({
+                message: error.response?.data?.message || error.message || 'Cập nhật trạng thái biểu mẫu thất bại'
             });
         }
     }

@@ -62,9 +62,18 @@ const templatesSlice = createSlice({
             })
             .addCase(updateTemplate.fulfilled, (state, action) => {
                 state.loading = false;
-                const index = state.templates.findIndex(t => t.id === action.payload?.id);
-                if (index !== -1 && action.payload) {
-                    state.templates[index] = action.payload;
+                if (action.payload) {
+                    const updated = action.payload;
+                    const index = state.templates.findIndex(t => t.id === updated.id);
+                    const isDeleted = updated.isDelete ?? updated.is_deleted ?? updated.isRemoved ?? updated.is_removed ?? false;
+
+                    if (isDeleted) {
+                        state.templates = state.templates.filter(t => t.id !== updated.id);
+                    } else if (index !== -1) {
+                        state.templates[index] = updated;
+                    } else {
+                        state.templates.unshift(updated);
+                    }
                 }
             })
             .addCase(updateTemplate.rejected, (state, action) => {
@@ -78,7 +87,18 @@ const templatesSlice = createSlice({
             })
             .addCase(deleteTemplate.fulfilled, (state, action) => {
                 state.loading = false;
-                state.templates = state.templates.filter(t => t.id !== action.payload);
+                const payload = action.payload;
+                let idToRemove = null;
+                if (!payload) return;
+                if (typeof payload === 'object' && payload.templateId) {
+                    idToRemove = payload.templateId;
+                } else if (typeof payload === 'number' || typeof payload === 'string') {
+                    idToRemove = payload;
+                }
+
+                if (idToRemove !== null) {
+                    state.templates = state.templates.filter(t => t.id !== idToRemove);
+                }
             })
             .addCase(deleteTemplate.rejected, (state, action) => {
                 state.loading = false;
