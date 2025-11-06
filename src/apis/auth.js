@@ -34,7 +34,11 @@ const logoutApi = async () => {
 
 const changePasswordApi = async (data) => {
     try {
-        const response = await apiClient.put('/api/auths/change-password', data);
+        const payload = {
+            matKhauHienTai: data.matKhauHienTai,
+            matKhauMoi: data.matKhauMoi,
+        };
+        const response = await apiClient.put('/api/auths/change-password', payload);
         if (response.data.success) return response.data.data;
         else throw new Error(response.data.message || "Đổi mật khẩu thất bại");
     } catch (error) {
@@ -113,7 +117,7 @@ const resetPasswordApi = async (data) => {
     try {
         const response = await apiClient.put('/api/auths/reset-password', {
             email: data.email,
-            newPassword: data.newPassword,
+            matKhauMoi: data.matKhauMoi,
             otp: data.otp
         });
         if (response.data.success) return response.data.data;

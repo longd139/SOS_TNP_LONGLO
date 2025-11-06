@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { LogOut, User, Lock, ChevronDown } from 'lucide-react';
+import { LogOut, User, Lock, ChevronDown, Key } from 'lucide-react';
 import { logout } from '../../features/auth/authSlice';
 import { fetchMyProfile } from '../../features/userProfile/userProfileThunks';
 import { selectProfile, selectLoading } from '../../features/userProfile/userProfileSelectors';
@@ -8,12 +8,14 @@ import { AUTH_API } from '../../apis/auth';
 import UserProfileModal from './UserProfileModal';
 import TwoFactorToggleModal from '../twoFactor/TwoFactorToggleModal';
 import TwoFactorOTPModal from '../twoFactor/TwoFactorOTPModal';
+import ChangePasswordModal from './ChangePasswordModal';
 
 const UserProfileDropdown = () => {
     const [isOpen, setIsOpen] = useState(false);
     const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
     const [is2FAToggleModalOpen, setIs2FAToggleModalOpen] = useState(false);
     const [is2FAOTPModalOpen, setIs2FAOTPModalOpen] = useState(false);
+    const [isChangePasswordModalOpen, setIsChangePasswordModalOpen] = useState(false);
     const [isLoggingOut, setIsLoggingOut] = useState(false);
     const [is2FALoading, setIs2FALoading] = useState(false);
     const dropdownRef = useRef(null);
@@ -64,6 +66,11 @@ const UserProfileDropdown = () => {
     const handleOpen2FAToggle = () => {
         setIsOpen(false);
         setIs2FAToggleModalOpen(true);
+    };
+
+    const handleOpenChangePassword = () => {
+        setIsOpen(false);
+        setIsChangePasswordModalOpen(true);
     };
 
     const handle2FAToggle = async () => {
@@ -144,6 +151,14 @@ const UserProfileDropdown = () => {
                                 </div>
                             </button>
 
+                            <button
+                                onClick={handleOpenChangePassword}
+                                className="w-full px-4 py-2 text-left hover:bg-gray-50 transition-colors flex items-center gap-3 text-gray-700 text-sm"
+                            >
+                                <Key className="w-4 h-4 text-gray-600" />
+                                <span>Đổi mật khẩu</span>
+                            </button>
+
                             <div className="my-2 border-t border-gray-200"></div>
 
                             <button
@@ -180,6 +195,11 @@ const UserProfileDropdown = () => {
                 onVerify={handle2FAOTPVerify}
                 isLoading={is2FALoading}
                 action={profile?.xacThucHaiYeuTo ? 'tắt' : 'bật'}
+            />
+
+            <ChangePasswordModal
+                isOpen={isChangePasswordModalOpen}
+                onClose={() => setIsChangePasswordModalOpen(false)}
             />
         </>
     );
