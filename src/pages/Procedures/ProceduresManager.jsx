@@ -245,7 +245,7 @@ export default function ProceduresManager() {
         pagination={pagination}
         onPageChange={changePage}
         onEdit={handleEdit}
-        onDelete={!showActive ? handleDelete : null}
+        onDelete={!JSON.parse(showActive) ? handleDelete : null}
         onView={handleView}
         showActions={true}
         emptyMessage="Không có thủ tục nào được tìm thấy"
