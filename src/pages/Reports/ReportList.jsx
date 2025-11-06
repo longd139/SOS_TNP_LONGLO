@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { AlertTriangle } from 'lucide-react';
 import { feedbackList } from '../../mockData';
-import BaseTable from '../../components/BaseTable';
+import BaseTable from '../../components/base/BaseTable';
 
 export default function ReportList() {
     const [filters, setFilters] = useState({

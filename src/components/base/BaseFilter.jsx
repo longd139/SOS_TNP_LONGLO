@@ -62,8 +62,14 @@ export default function BaseFilter({
                             </label>
                         )}
                         <select
-                            value={filters[name] || ''}
-                            onChange={(e) => handleFilterChange(name, e.target.value)}
+                            value={filters[name]?.toString() || ''}
+                            onChange={(e) => {
+                                let value = e.target.value;
+                                if (value === 'true') value = true;
+                                else if (value === 'false') value = false;
+                                else if (value !== '' && !isNaN(value)) value = Number(value);
+                                handleFilterChange(name, value);
+                            }}
                             className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         >
                             {options?.map((opt) => (

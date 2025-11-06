@@ -69,6 +69,37 @@ export const useProcedureForm = ({ initialData, mode, isOpen, onSubmit }) => {
         updateField('trinhTuThucHien', newSteps);
     };
 
+    const moveStep = (index, direction) => {
+        const newSteps = [...formData.trinhTuThucHien];
+        const targetIndex = direction === 'up' ? index - 1 : index + 1;
+        
+        if (targetIndex < 0 || targetIndex >= newSteps.length) {
+            return;
+        }
+
+        [newSteps[index], newSteps[targetIndex]] = [newSteps[targetIndex], newSteps[index]];
+        
+        const reorderedSteps = newSteps.map((step, i) => ({
+            ...step,
+            thu_tu_buoc: i + 1
+        }));
+        
+        updateField('trinhTuThucHien', reorderedSteps);
+    };
+
+    const reorderSteps = (oldIndex, newIndex) => {
+        const newSteps = [...formData.trinhTuThucHien];
+        const [movedStep] = newSteps.splice(oldIndex, 1);
+        newSteps.splice(newIndex, 0, movedStep);
+        
+        const reorderedSteps = newSteps.map((step, i) => ({
+            ...step,
+            thu_tu_buoc: i + 1
+        }));
+        
+        updateField('trinhTuThucHien', reorderedSteps);
+    };
+
     const addCachThucHien = () => {
         const newCachThucHien = [
             ...formData.cachThuThucHien,
@@ -76,7 +107,7 @@ export const useProcedureForm = ({ initialData, mode, isOpen, onSubmit }) => {
                 hinh_thuc_ap_dung: '',
                 mo_ta_chi_tiet: '',
                 thoi_gian_giai_quyet: '',
-                le_phi: 0,
+                le_phi: '',
                 ghi_chu_le_phi: ''
             }
         ];
@@ -118,6 +149,64 @@ export const useProcedureForm = ({ initialData, mode, isOpen, onSubmit }) => {
         updateField('danhSachMauDon', newMauDon);
     };
 
+    const addTruongHop = () => {
+        const newTruongHop = [
+            ...formData.truongHopThuTuc,
+            {
+                ten_truong_hop: '',
+                mo_ta: '',
+                thu_tu: formData.truongHopThuTuc.length + 1,
+                thanh_phan_ho_so: []
+            }
+        ];
+        updateField('truongHopThuTuc', newTruongHop);
+    };
+
+    const removeTruongHop = (index) => {
+        const newTruongHop = formData.truongHopThuTuc
+            .filter((_, i) => i !== index)
+            .map((item, i) => ({ ...item, thu_tu: i + 1 }));
+        updateField('truongHopThuTuc', newTruongHop);
+    };
+
+    const updateTruongHop = (index, field, value) => {
+        const newTruongHop = [...formData.truongHopThuTuc];
+        newTruongHop[index] = { ...newTruongHop[index], [field]: value };
+        updateField('truongHopThuTuc', newTruongHop);
+    };
+
+    const addThanhPhanHoSo = (caseIndex) => {
+        const newTruongHop = [...formData.truongHopThuTuc];
+        if (!newTruongHop[caseIndex].thanh_phan_ho_so) {
+            newTruongHop[caseIndex].thanh_phan_ho_so = [];
+        }
+        newTruongHop[caseIndex].thanh_phan_ho_so.push({
+            ten_thanh_phan: '',
+            mo_ta_chi_tiet: '',
+            so_luong_ban_chinh: 0,
+            so_luong_ban_sao: 0,
+            ghi_chu: ''
+        });
+        updateField('truongHopThuTuc', newTruongHop);
+    };
+
+    const removeThanhPhanHoSo = (caseIndex, componentIndex) => {
+        const newTruongHop = [...formData.truongHopThuTuc];
+        newTruongHop[caseIndex].thanh_phan_ho_so = newTruongHop[caseIndex].thanh_phan_ho_so.filter(
+            (_, i) => i !== componentIndex
+        );
+        updateField('truongHopThuTuc', newTruongHop);
+    };
+
+    const updateThanhPhanHoSo = (caseIndex, componentIndex, field, value) => {
+        const newTruongHop = [...formData.truongHopThuTuc];
+        newTruongHop[caseIndex].thanh_phan_ho_so[componentIndex] = {
+            ...newTruongHop[caseIndex].thanh_phan_ho_so[componentIndex],
+            [field]: value
+        };
+        updateField('truongHopThuTuc', newTruongHop);
+    };
+
     const handleSubmit = async () => {
         const validation = await validateFormalityForm(formData, mode === 'edit');
 
@@ -152,12 +241,20 @@ export const useProcedureForm = ({ initialData, mode, isOpen, onSubmit }) => {
         addStep,
         removeStep,
         updateStep,
+        moveStep,
+        reorderSteps,
         addMauDon,
         removeMauDon,
         updateMauDon,
         addCachThucHien,
         removeCachThucHien,
         updateCachThucHien,
+        addTruongHop,
+        removeTruongHop,
+        updateTruongHop,
+        addThanhPhanHoSo,
+        removeThanhPhanHoSo,
+        updateThanhPhanHoSo,
         handleSubmit,
         resetForm
     };

@@ -32,7 +32,7 @@ apiClient.interceptors.response.use(
     async (error) => {
         const originalRequest = error.config;
 
-        if (error.response?.status === 401 && !originalRequest._retry) {
+        if ((error.response?.status === 401 || error.response?.status === 500) && !originalRequest._retry) {
             originalRequest._retry = true;
 
             const refreshToken = localStorage.getItem("refreshToken");
@@ -54,7 +54,6 @@ apiClient.interceptors.response.use(
                 originalRequest.headers.Authorization = `Bearer ${accessToken}`;
                 return apiClient(originalRequest);
             } catch (refreshError) {
-                console.error("Refresh token expired:", refreshError);
                 localStorage.clear();
                 window.location.replace(ROUTE_PATH.LOGIN);
                 return Promise.reject(refreshError);
@@ -66,10 +65,7 @@ apiClient.interceptors.response.use(
 
 const apiFormClient = axios.create({
     baseURL: API_URL,
-    timeout: 10000,
-    headers: {
-        "Content-Type": "multipart/form-data",
-    }
+    headers: {}
 })
 
 apiFormClient.interceptors.request.use(
@@ -112,7 +108,6 @@ apiFormClient.interceptors.response.use(
                 originalRequest.headers.Authorization = `Bearer ${accessToken}`;
                 return apiFormClient(originalRequest);
             } catch (refreshError) {
-                console.error("Refresh token expired:", refreshError);
                 localStorage.clear();
                 window.location.replace(ROUTE_PATH.LOGIN);
                 return Promise.reject(refreshError);

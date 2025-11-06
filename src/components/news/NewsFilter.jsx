@@ -1,7 +1,6 @@
 import React from 'react';
-import BaseFilter from '../BaseFilter';
+import BaseFilter from '../base/BaseFilter';
 import { useCategories } from '../../hooks/useCategories';
-import { STATUS_NEWS, STATUS_NEWS_LABELS } from '../../constants/status';
 
 export default function NewsFilter({ onFilter, onReset }) {
     const { activeCategories } = useCategories({ autoFetch: true, isRemoved: false });
@@ -9,8 +8,8 @@ export default function NewsFilter({ onFilter, onReset }) {
     const initialFilters = {
         search: '',
         idDanhMuc: '',
-        trangThai: '',
-        isRemoved: false
+        isActive: true,
+        pageSize: 10
     };
 
     const filterFields = [
@@ -18,7 +17,7 @@ export default function NewsFilter({ onFilter, onReset }) {
             name: 'search',
             type: 'search',
             isSearch: true,
-            placeholder: 'Tìm kiếm theo tiêu đề...'
+            placeholder: 'Tìm kiếm theo tiêu đề, tác giả...'
         },
         {
             name: 'idDanhMuc',
@@ -33,34 +32,30 @@ export default function NewsFilter({ onFilter, onReset }) {
             ]
         },
         {
-            name: 'trangThai',
+            name: 'isActive',
             label: 'Trạng thái',
             type: 'select',
             options: [
-                { value: '', label: 'Tất cả trạng thái' },
-                { value: STATUS_NEWS.DRAFT, label: STATUS_NEWS_LABELS[STATUS_NEWS.DRAFT] },
-                { value: STATUS_NEWS.PUBLISHED, label: STATUS_NEWS_LABELS[STATUS_NEWS.PUBLISHED] }
+                { value: true, label: 'Đang hoạt động' },
+                { value: false, label: 'Không hoạt động' }
             ]
         },
         {
-            name: 'isRemoved',
-            label: 'Hiển thị',
+            name: 'pageSize',
+            label: 'Số bản ghi',
             type: 'select',
             options: [
-                { value: false, label: 'Đang hoạt động' },
-                { value: true, label: 'Đã xóa' }
+                { value: 5, label: '5 bản ghi' },
+                { value: 10, label: '10 bản ghi' },
+                { value: 20, label: '20 bản ghi' },
+                { value: 50, label: '50 bản ghi' },
+                { value: 100, label: '100 bản ghi' }
             ]
         }
     ];
 
     const handleFilter = (filters) => {
-        const activeFilters = {};
-        if (filters.search) activeFilters.search = filters.search;
-        if (filters.idDanhMuc) activeFilters.idDanhMuc = filters.idDanhMuc;
-        if (filters.trangThai) activeFilters.trangThai = filters.trangThai;
-        if (filters.isRemoved) activeFilters.isRemoved = filters.isRemoved;
-        
-        onFilter(activeFilters);
+        onFilter(filters);
     };
 
     return (

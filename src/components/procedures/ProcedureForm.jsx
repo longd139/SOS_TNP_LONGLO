@@ -1,14 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import BaseModal, { ModalFooter } from '../BaseModal';
+import BaseModal, { ModalFooter } from '../base/BaseModal';
 import { useProcedureForm } from '../../hooks/useProcedureForm';
 import ProcedureBasicInfo from './ProcedureBasicInfo';
-import ProcedureRemoveToggle from './ProcedureRemoveToggle';
 import ProcedureAreasSelector from './ProcedureAreasSelector';
 import ProcedureAdditionalInfo from './ProcedureAdditionalInfo';
 import ProcedureStepsSection from './ProcedureStepsSection';
 import ProcedureMethodsSection from './ProcedureMethodsSection';
 import ProcedureMauDonSection from './ProcedureMauDonSection';
+import ProcedureCasesSection from './ProcedureCasesSection';
 
 const ProcedureForm = ({
     isOpen,
@@ -27,12 +27,20 @@ const ProcedureForm = ({
         addStep,
         removeStep,
         updateStep,
+        moveStep,
+        reorderSteps,
         addMauDon,
         removeMauDon,
         updateMauDon,
         addCachThucHien,
         removeCachThucHien,
         updateCachThucHien,
+        addTruongHop,
+        removeTruongHop,
+        updateTruongHop,
+        addThanhPhanHoSo,
+        removeThanhPhanHoSo,
+        updateThanhPhanHoSo,
         handleSubmit,
         resetForm
     } = useProcedureForm({ initialData, mode, isOpen, onSubmit });
@@ -69,13 +77,6 @@ const ProcedureForm = ({
                     updateField={updateField}
                 />
 
-                {mode === 'edit' && (
-                    <ProcedureRemoveToggle
-                        isRemoved={formData.isRemoved}
-                        updateField={updateField}
-                    />
-                )}
-
                 <div className="flex flex-col md:flex-row gap-3 items-stretch">
                     <div className="md:w-1/2 min-w-0">
                         <ProcedureAreasSelector
@@ -90,25 +91,43 @@ const ProcedureForm = ({
                         <ProcedureAdditionalInfo
                             formData={formData}
                             updateField={updateField}
+                            errors={errors}
                         />
                     </div>
                 </div>
 
-                <ProcedureMauDonSection
-                    items={formData.danhSachMauDon}
-                    addItem={addMauDon}
-                    removeItem={removeMauDon}
-                    updateItem={updateMauDon}
-                    errors={errors}
-                />
+                <div className="flex flex-col md:flex-row gap-3 md:items-start">
+                    <div className="flex-1 min-w-0">
+                        <ProcedureMauDonSection
+                            items={formData.danhSachMauDon}
+                            addItem={addMauDon}
+                            removeItem={removeMauDon}
+                            updateItem={updateMauDon}
+                            errors={errors}
+                        />
+                    </div>
 
-                <div className="flex flex-col md:flex-row gap-3">
+                    <div className="flex-1 min-w-0">
+                        <ProcedureCasesSection
+                            cases={formData.truongHopThuTuc}
+                            addCase={addTruongHop}
+                            removeCase={removeTruongHop}
+                            updateCase={updateTruongHop}
+                            addCaseComponent={addThanhPhanHoSo}
+                            removeCaseComponent={removeThanhPhanHoSo}
+                            updateCaseComponent={updateThanhPhanHoSo}
+                        />
+                    </div>
+                </div>
+
+                <div className="flex flex-col md:flex-row gap-3 md:items-start">
                     <div className="flex-1 min-w-0">
                         <ProcedureStepsSection
                             steps={formData.trinhTuThucHien}
                             addStep={addStep}
                             removeStep={removeStep}
                             updateStep={updateStep}
+                            reorderSteps={reorderSteps}
                         />
                     </div>
 

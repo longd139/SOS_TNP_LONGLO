@@ -4,13 +4,13 @@ import { AREAS_API } from '../../apis/areas';
 
 export const fetchProcedures = createAsyncThunk(
     'procedures/fetchProcedures',
-    async ({ page = 1, size = 10, search = '', id_linh_vuc = '', is_removed = false }, { rejectWithValue }) => {
+    async ({ page = 1, size = 10, search = '', id_linh_vuc = '', isActive = true }, { rejectWithValue }) => {
         try {
             const params = {
                 page,
                 size,
                 search,
-                is_removed
+                isActive
             };
 
             if (id_linh_vuc) {
@@ -20,11 +20,11 @@ export const fetchProcedures = createAsyncThunk(
             const response = await FORMALITY_API.getFormalityApi(params);
 
             return {
-                content: response.content || [],
-                page,
-                size,
-                totalElements: response.totalElements || 0,
-                totalPages: response.totalPages || 0
+                content: response.data || response.content || [],
+                page: response.pagination?.currentPage || page,
+                size: response.pagination?.pageSize || size,
+                totalElements: response.pagination?.totalItems || response.totalElements || 0,
+                totalPages: response.pagination?.totalPages || response.totalPages || 0
             };
         } catch (error) {
             return rejectWithValue(error.message || 'Failed to fetch procedures');
@@ -88,6 +88,18 @@ export const fetchProcedureById = createAsyncThunk(
             return response;
         } catch (error) {
             return rejectWithValue(error.message || 'Failed to fetch procedure');
+        }
+    }
+);
+
+export const updateProcedureStatus = createAsyncThunk(
+    'procedures/updateProcedureStatus',
+    async ({ procedureId, isActive }, { rejectWithValue }) => {
+        try {
+            const result = await FORMALITY_API.updateStatus(procedureId, isActive);
+            return { procedureId, isActive };
+        } catch (error) {
+            return rejectWithValue(error.message || 'Không thể cập nhật trạng thái thủ tục');
         }
     }
 );

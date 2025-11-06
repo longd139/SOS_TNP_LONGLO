@@ -1,43 +1,52 @@
 import React, { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
-import { X } from 'lucide-react';
+import { X, PlusCircle } from 'lucide-react';
+import { useDispatch, useSelector } from 'react-redux';
 import { AREAS_API } from '../../apis/areas';
 import { handleSearchDropdownKeyDown } from '../../utils/keyboardNavigation';
+import { createArea, fetchAreas } from '../../features/areas/areasThunks';
+import { selectAreas } from '../../features/areas/areasSelectors';
+import { showToast } from '../../utils/toastNotification';
+import AreaFormModal from '../areas/AreaFormModal';
 
-const ProcedureAreasSelector = ({ formData, errors, areas, toggleArea, updateField }) => {
+const ProcedureAreasSelector = ({ formData, errors, areas: propAreas, toggleArea, updateField }) => {
+    const dispatch = useDispatch();
+    const reduxAreas = useSelector(selectAreas);
     const [search, setSearch] = useState('');
     const [searchResults, setSearchResults] = useState([]);
     const [loading, setLoading] = useState(false);
     const [showDropdown, setShowDropdown] = useState(false);
     const [highlightedIndex, setHighlightedIndex] = useState(-1);
+    const [isAreaModalOpen, setIsAreaModalOpen] = useState(false);
     const containerRef = useRef(null);
+
+    const areas = reduxAreas.length > 0 ? reduxAreas : propAreas;
 
     const selectedAreas = areas.filter(area => 
         formData.danhSachLinhVucIds.includes(area.id)
     );
 
     useEffect(() => {
-        if (!search) {
-            setSearchResults([]);
-            return;
+        if (reduxAreas.length === 0) {
+            dispatch(fetchAreas({ isActive: true }));
         }
+    }, [dispatch, reduxAreas.length]);
 
+    useEffect(() => {
         const timer = setTimeout(async () => {
             setLoading(true);
             try {
-                const results = await AREAS_API.getAreas(false, search);
+                const results = await AREAS_API.getAreas(true, search || '');
                 const filtered = results.filter(
                     area => !formData.danhSachLinhVucIds.includes(area.id)
                 );
                 setSearchResults(filtered);
-                setShowDropdown(true);
             } catch (error) {
-                console.error('Error searching areas:', error);
                 setSearchResults([]);
             } finally {
                 setLoading(false);
             }
-        }, 300);
+        }, search ? 300 : 0);
 
         return () => clearTimeout(timer);
     }, [search, formData.danhSachLinhVucIds]);
@@ -78,6 +87,24 @@ const ProcedureAreasSelector = ({ formData, errors, areas, toggleArea, updateFie
         });
     };
 
+    const handleCreateArea = async (areaData) => {
+        try {
+            const result = await dispatch(createArea(areaData)).unwrap();
+            showToast.success('Tạo lĩnh vực thành công!');
+            
+            await dispatch(fetchAreas({ isActive: true }));
+            
+            if (result && result.id) {
+                toggleArea(result.id);
+            }
+            
+            setIsAreaModalOpen(false);
+        } catch (error) {
+            showToast.error(error.message || 'Tạo lĩnh vực thất bại!');
+            throw error;
+        }
+    };
+
     return (
         <div className="space-y-3">
             <div>
@@ -85,23 +112,27 @@ const ProcedureAreasSelector = ({ formData, errors, areas, toggleArea, updateFie
                     Lĩnh vực
                 </label>
 
-                <div ref={containerRef} className="relative">
-                <input
-                    type="text"
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                    onFocus={() => { 
-                        if (searchResults.length) setShowDropdown(true); 
-                    }}
-                    onKeyDown={handleKeyDown}
-                    placeholder="Tìm kiếm lĩnh vực..."
-                    className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                        errors.danhSachLinhVucIds ? 'border-red-500' : 'border-gray-300'
-                    }`}
-                />
+                <div className="flex gap-2">
+                    <div ref={containerRef} className="relative flex-1">
+                        <input
+                            type="text"
+                            value={search}
+                            onChange={(e) => setSearch(e.target.value)}
+                            onFocus={() => { 
+                                setShowDropdown(true);
+                                if (!search && searchResults.length === 0) {
+                                    setSearch('');
+                                }
+                            }}
+                            onKeyDown={handleKeyDown}
+                            placeholder="Tìm kiếm lĩnh vực..."
+                            className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                                errors.danhSachLinhVucIds ? 'border-red-500' : 'border-gray-300'
+                            }`}
+                        />
 
-                {showDropdown && (searchResults.length > 0 || loading) && (
-                    <div className="absolute z-40 left-0 right-0 mt-1 bg-white border rounded-md shadow-lg max-h-60 overflow-auto">
+                        {showDropdown && (
+                            <div className="absolute z-40 left-0 right-0 mt-1 bg-white border rounded-md shadow-lg max-h-60 overflow-auto">
                         {loading && (
                             <div className="p-2 text-sm text-gray-500">Đang tìm...</div>
                         )}
@@ -118,16 +149,26 @@ const ProcedureAreasSelector = ({ formData, errors, areas, toggleArea, updateFie
                                     highlightedIndex === idx ? 'bg-blue-100' : ''
                                 }`}
                             >
-                                <div className="font-medium text-sm">{area.ten_linh_vuc}</div>
+                                <div className="font-medium text-sm truncate">{area.ten_linh_vuc}</div>
                             </button>
                         ))}
+                            </div>
+                        )}
                     </div>
-                )}
-            </div>
 
-            {errors.danhSachLinhVucIds && (
-                <p className="mt-1 text-sm text-red-600">{errors.danhSachLinhVucIds}</p>
-            )}
+                    <button
+                        type="button"
+                        onClick={() => setIsAreaModalOpen(true)}
+                        className="flex-shrink-0 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors flex items-center justify-center"
+                        title="Tạo lĩnh vực mới"
+                    >
+                        <PlusCircle className="w-5 h-5" />
+                    </button>
+                </div>
+
+                {errors.danhSachLinhVucIds && (
+                    <p className="mt-1 text-sm text-red-600">{errors.danhSachLinhVucIds}</p>
+                )}
 
             {selectedAreas.length > 0 && (
                 <div className="mt-3 bg-gray-50 p-3 rounded-lg border border-gray-200">
@@ -167,9 +208,20 @@ const ProcedureAreasSelector = ({ formData, errors, areas, toggleArea, updateFie
                     value={formData.soQuyetDinh}
                     onChange={(e) => updateField('soQuyetDinh', e.target.value)}
                     placeholder="Nhập số quyết định..."
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                        errors.soQuyetDinh ? 'border-red-500' : 'border-gray-300'
+                    }`}
                 />
+                {errors.soQuyetDinh && (
+                    <p className="mt-1 text-sm text-red-600">{errors.soQuyetDinh}</p>
+                )}
             </div>
+
+            <AreaFormModal
+                isOpen={isAreaModalOpen}
+                onClose={() => setIsAreaModalOpen(false)}
+                onSubmit={handleCreateArea}
+            />
         </div>
     );
 };

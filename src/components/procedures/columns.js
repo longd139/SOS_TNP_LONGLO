@@ -77,7 +77,7 @@ export const getProcedureColumns = (pagination) => [
         }
     },
     {
-        title: 'THOI GIAN TẠO',
+        title: 'THỜI GIAN TẠO',
         dataIndex: 'thoi_gian_tao',
         key: 'thoi_gian_tao',
         width: '150px',
@@ -87,6 +87,20 @@ export const getProcedureColumns = (pagination) => [
                 title={value ? dayjs(value).format('HH:mm:ss DD/MM/YYYY') : 'N/A'}
             >
                 {value ? dayjs(value).format('HH:mm:ss DD/MM/YYYY') : 'N/A'}
+            </span>
+        )
+    },
+    {
+        title: 'TRẠNG THÁI',
+        dataIndex: 'is_active',
+        key: 'is_active',
+        width: '120px',
+        render: (value) => (
+            <span 
+                className="block max-w-[120px] truncate text-ellipsis overflow-hidden whitespace-nowrap text-sm text-gray-900"
+                title={value ? 'Hoạt động' : 'Không hoạt động'}
+            >
+                {value ? 'Hoạt động' : 'Không hoạt động'}
             </span>
         )
     }

@@ -5,14 +5,14 @@ const getFormalityApi = async ({
     size = 10,
     search = '',
     id_linh_vuc,
-    is_removed = false
+    isActive = true
 }) => {
     try {
         const params = new URLSearchParams({
             page,
             size,
             search,
-            is_removed
+            isActive
         });
 
         if (id_linh_vuc) {
@@ -32,7 +32,7 @@ const getFormalityApi = async ({
                 content = [];
             }
 
-            const paginationObj = response.data.pagintation || (topData && (topData.pagination || topData.pagintation)) || null;
+            const paginationObj = response.data.pagination || response.data.pagintation || (topData && (topData.pagination || topData.pagintation)) || null;
 
             return {
                 content: content,
@@ -42,8 +42,11 @@ const getFormalityApi = async ({
                 pageSize: paginationObj?.pageSize || size
             };
         }
-        else throw new Error("Lấy danh sách thủ tục hành chính thất bại");
+        else throw new Error(response.data.message || "Lấy danh sách thủ tục hành chính thất bại");
     } catch (error) {
+        if (error.response?.data?.message) {
+            throw new Error(error.response.data.message);
+        }
         throw error;
     }
 }
@@ -52,8 +55,11 @@ const createFormality = async (data) => {
     try {
         const response = await apiClient.post("/api/thu-tuc", data);
         if (response.data.success) return response.data.data;
-        else throw new Error("Tạo thủ tục hành chính thất bại");
+        else throw new Error(response.data.message || "Tạo thủ tục hành chính thất bại");
     } catch (error) {
+        if (error.response?.data?.message) {
+            throw new Error(error.response.data.message);
+        }
         throw error;
     }
 }
@@ -62,8 +68,11 @@ const getFormalityById = async (formalityId) => {
     try {
         const response = await apiClient.get(`/api/thu-tuc/${formalityId}`);
         if (response.data.success) return response.data.data;
-        else throw new Error("Lấy thủ tục hành chính theo ID thất bại");
+        else throw new Error(response.data.message || "Lấy thủ tục hành chính theo ID thất bại");
     } catch (error) {
+        if (error.response?.data?.message) {
+            throw new Error(error.response.data.message);
+        }
         throw error;
     }
 }
@@ -72,8 +81,11 @@ const getFormByFormalityId = async (formalityId) => {
     try {
         const response = await apiClient.get(`/api/thu-tuc/${formalityId}/mau-don`);
         if (response.data.success) return response.data.data;
-        else throw new Error("Lấy biểu mẫu theo thủ tục hành chính thất bại");
+        else throw new Error(response.data.message || "Lấy biểu mẫu theo thủ tục hành chính thất bại");
     } catch (error) {
+        if (error.response?.data?.message) {
+            throw new Error(error.response.data.message);
+        }
         throw error;
     }
 }
@@ -82,8 +94,11 @@ const updateFormality = async (formalityId, data) => {
     try {
         const response = await apiClient.put(`/api/thu-tuc/${formalityId}`, data);
         if (response.data.success) return response.data.data;
-        else throw new Error("Cập nhật thủ tục hành chính thất bại");
+        else throw new Error(response.data.message || "Cập nhật thủ tục hành chính thất bại");
     } catch (error) {
+        if (error.response?.data?.message) {
+            throw new Error(error.response.data.message);
+        }
         throw error;
     }
 }
@@ -92,8 +107,24 @@ const deleteFormality = async (formalityId) => {
     try {
         const response = await apiClient.delete(`/api/thu-tuc/${formalityId}`);
         if (response.data.success) return response.data.data;
-        else throw new Error("Xóa thủ tục hành chính thất bại");
+        else throw new Error(response.data.message || "Xóa thủ tục hành chính thất bại");
     } catch (error) {
+        if (error.response?.data?.message) {
+            throw new Error(error.response.data.message);
+        }
+        throw error;
+    }
+}
+
+const updateStatus = async (userProcedureId, isActive) => {
+    try {
+        const response = await apiClient.put(`/api/thu-tuc/update-status/${userProcedureId}`, { isActive });
+        if (response.data.success) return response.data.data;
+        else throw new Error(response.data.message || "Cập nhật trạng thái thủ tục thất bại");
+    } catch (error) {
+        if (error.response?.data?.message) {
+            throw new Error(error.response.data.message);
+        }
         throw error;
     }
 }
@@ -104,5 +135,6 @@ export const FORMALITY_API = {
     getFormalityById,
     getFormByFormalityId,
     updateFormality,
-    deleteFormality
+    deleteFormality,
+    updateStatus
 }

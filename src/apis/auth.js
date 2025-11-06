@@ -5,9 +5,12 @@ const loginApi = async (credentials) => {
         const response = await apiClient.post('/api/auths/login', credentials)
         
         if (response.data.success)  return response.data.data;
-        else throw new Error("Đăng nhập thất bại");
+        else throw new Error(response.data.message || "Đăng nhập thất bại");
 
     } catch (error) {
+        if (error.response?.data?.message) {
+            throw new Error(error.response.data.message);
+        }
         throw error;
     }
 }
@@ -20,18 +23,28 @@ const logoutApi = async () => {
             refreshToken
         });
         if (response.data.success) return response.data.data;
-        else throw new Error("Đăng xuất thất bại");
+        else throw new Error(response.data.message || "Đăng xuất thất bại");
     } catch (error) {
+        if (error.response?.data?.message) {
+            throw new Error(error.response.data.message);
+        }
         throw error;
     }
 }
 
 const changePasswordApi = async (data) => {
     try {
-        const response = await apiClient.put('/api/auths/change-password', data);
+        const payload = {
+            matKhauHienTai: data.matKhauHienTai,
+            matKhauMoi: data.matKhauMoi,
+        };
+        const response = await apiClient.put('/api/auths/change-password', payload);
         if (response.data.success) return response.data.data;
-        else throw new Error("Đổi mật khẩu thất bại");
+        else throw new Error(response.data.message || "Đổi mật khẩu thất bại");
     } catch (error) {
+        if (error.response?.data?.message) {
+            throw new Error(error.response.data.message);
+        }
         throw error;
     }
 }
@@ -42,6 +55,9 @@ const enableOrDisable2FAApi = async () => {
         if (response.data.success) return response.data;
         else throw new Error(response.data.message || "Lỗi bật/tắt 2FA");
     } catch (error) {
+        if (error.response?.data?.message) {
+            throw new Error(error.response.data.message);
+        }
         throw error;
     }
 }
@@ -50,8 +66,11 @@ const status2FA = async () => {
     try {
         const response = await apiClient.post('/api/auths/enable-or-disable-2fa');
         if (response.data.success) return response.data.data;
-        else throw new Error("Lấy trạng thái 2FA thất bại");
+        else throw new Error(response.data.message || "Lấy trạng thái 2FA thất bại");
     } catch (error) {
+        if (error.response?.data?.message) {
+            throw new Error(error.response.data.message);
+        }
         throw error;
     }
 }
@@ -65,6 +84,9 @@ const verify2FAApi = async (data) => {
         if (response.data.success) return response.data;
         else throw new Error(response.data.message || "Xác thực 2FA thất bại");
     } catch (error) {
+        if (error.response?.data?.message) {
+            throw new Error(error.response.data.message);
+        }
         throw error;
     }
 }
@@ -81,6 +103,9 @@ export const sendOtpApi = async ({ email, type = 'LOGIN' }) => {
             throw new Error(response.data.message || "Gửi OTP thất bại");
         }
     } catch (error) {
+        if (error.response?.data?.message) {
+            throw new Error(error.response.data.message);
+        }
         throw error;
     }
 };
@@ -92,12 +117,15 @@ const resetPasswordApi = async (data) => {
     try {
         const response = await apiClient.put('/api/auths/reset-password', {
             email: data.email,
-            newPassword: data.newPassword,
+            matKhauMoi: data.matKhauMoi,
             otp: data.otp
         });
         if (response.data.success) return response.data.data;
-        else throw new Error("Đặt lại mật khẩu thất bại");
+        else throw new Error(response.data.message || "Đặt lại mật khẩu thất bại");
     } catch (error) {
+        if (error.response?.data?.message) {
+            throw new Error(error.response.data.message);
+        }
         throw error;
     }
 }
@@ -106,8 +134,11 @@ const verifiedStatus2FAApi = async (otp) => {
     try {
         const response = await apiClient.post('/api/auths/verify-enable-or-disable-2fa', { otp });
         if (response.data.success) return response.data.data;
-        else throw new Error("Xác thực trạng thái 2FA thất bại");
+        else throw new Error(response.data.message || "Xác thực trạng thái 2FA thất bại");
     } catch (error) {
+        if (error.response?.data?.message) {
+            throw new Error(error.response.data.message);
+        }
         throw error;
     }
 }

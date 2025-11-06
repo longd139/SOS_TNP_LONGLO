@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import BaseTable from '../../components/BaseTable';
+import BaseTable from '../../components/base/BaseTable';
 import UserModal from '../../components/users/UserModal';
-import { ConfirmModal } from '../../components/BaseModal';
+import { ConfirmModal } from '../../components/base/BaseModal';
 import { ROLE_LABELS, ROLE_COLORS } from '../../constants/role';
 import { useUsers } from '../../hooks/useUsers';
 import { showToast } from '../../utils/toastNotification';
@@ -15,6 +15,7 @@ export default function AdminManager() {
         handlePageChange,
         createUser,
         updateUser,
+        updateStatus,
         deleteUser: deleteUserAction
     } = useUsers();
 
@@ -48,6 +49,10 @@ export default function AdminManager() {
             isOpen: true,
             user
         });
+    };
+
+    const canDelete = (user) => {
+        return !user.active;
     };
 
     const handleUserModalSubmit = async (userData) => {
@@ -93,6 +98,15 @@ export default function AdminManager() {
         setDeleteModal({ isOpen: false, user: null });
     };
 
+    const handleUpdateStatus = async (user) => {
+        try {
+            await updateStatus(user.id, !user.active);
+            showToast.success(`Tài khoản đã được ${!user.active ? 'kích hoạt' : 'vô hiệu hóa'} thành công!`);
+        } catch (error) {
+            showToast.error(error.message || 'Có lỗi xảy ra khi cập nhật trạng thái tài khoản!');
+        }
+    };
+
     const columns = [
         {
             title: 'ID',
@@ -107,7 +121,7 @@ export default function AdminManager() {
             key: 'username',
             width: '150px',
             render: (value) => (
-                <span 
+                <span
                     className="block max-w-[150px] truncate text-ellipsis overflow-hidden whitespace-nowrap text-sm"
                     title={value}
                 >
@@ -121,7 +135,7 @@ export default function AdminManager() {
             key: 'fullName',
             width: '180px',
             render: (value) => (
-                <span 
+                <span
                     className="block max-w-[180px] truncate text-ellipsis overflow-hidden whitespace-nowrap text-sm"
                     title={value}
                 >
@@ -135,7 +149,7 @@ export default function AdminManager() {
             key: 'email',
             width: '200px',
             render: (value) => (
-                <span 
+                <span
                     className="block max-w-[200px] truncate text-ellipsis overflow-hidden whitespace-nowrap text-sm"
                     title={value}
                 >
@@ -155,13 +169,33 @@ export default function AdminManager() {
             )
         },
         {
-            title: 'Trạng thái',
-            dataIndex: 'status',
-            key: 'status',
-            render: (status, record) => (
-                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${record.active !== false ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                    }`}>
-                    {record.active !== false ? 'Hoạt động' : 'Đã khóa'}
+            title: 'SỐ ĐIỆN THOẠI',
+            dataIndex: 'phone',
+            key: 'phone',
+            width: '150px',
+            render: (value) => (
+                <span
+                    className="block max-w-[150px] truncate text-ellipsis overflow-hidden whitespace-nowrap text-sm text-gray-900"
+                    title={value}
+                >
+                    {value}
+                </span>
+            )
+        },
+        {
+            title: 'TRẠNG THÁI',
+            dataIndex: 'active',
+            key: 'active',
+            width: '150px',
+            render: (value) => (
+                <span
+                    className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
+                        value 
+                            ? 'bg-green-100 text-green-800' 
+                            : 'bg-red-100 text-red-800'
+                    }`}
+                >
+                    {value ? 'Hoạt động' : 'Đã khóa'}
                 </span>
             )
         }
@@ -293,6 +327,8 @@ export default function AdminManager() {
                 onPageChange={handlePageChange}
                 onEdit={handleEditUser}
                 onDelete={handleDeleteUser}
+                canDelete={canDelete}
+                onUpdateStatus={handleUpdateStatus}
                 emptyMessage="Không có tài khoản nào"
             />
 

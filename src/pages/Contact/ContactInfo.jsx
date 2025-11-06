@@ -1,4 +1,3 @@
-// pages/ContactInfo.jsx
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { MapPin, Phone, Clock } from "lucide-react";
@@ -11,6 +10,7 @@ import {
     selectUpdateSuccess,
 } from "../../features/contact/contactSelectors";
 import { showToast } from "../../utils/toastNotification";
+import { validateContactForm } from "../../validator/contactValidator";
 
 export default function ContactInfo() {
     const dispatch = useDispatch();
@@ -40,6 +40,7 @@ export default function ContactInfo() {
     });
 
     const [isEditing, setIsEditing] = useState(true);
+    const [errors, setErrors] = useState({});
 
     useEffect(() => {
         dispatch(fetchContact());
@@ -55,7 +56,6 @@ export default function ContactInfo() {
         if (updateSuccess) {
             showToast.success("Cập nhật thông tin thành công!");
             dispatch(clearUpdateSuccess());
-            setIsEditing(false);
         }
     }, [updateSuccess, dispatch]);
 
@@ -80,11 +80,21 @@ export default function ContactInfo() {
         });
     };
 
-    const handleSave = () => {
+    const handleSave = async () => {
         if (!formData.id) {
             showToast.error("ID ủy ban không hợp lệ");
             return;
         }
+
+        const { isValid, errors: validationErrors } = await validateContactForm(formData, true);
+        
+        if (!isValid) {
+            setErrors(validationErrors);
+            showToast.error("Vui lòng kiểm tra lại thông tin!");
+            return;
+        }
+
+        setErrors({});
 
         dispatch(
             updateContact({
@@ -107,7 +117,7 @@ export default function ContactInfo() {
 
     return (
         <div className="min-h-screen">
-            <div className="max-w-7xl mx-auto px-2 py-1 md:py-2">
+            <div className="px-2 py-1 md:py-2">
                 <div className="mb-3 md:mb-4">
                     <h1 className="text-xl md:text-2xl font-bold text-gray-900">
                         Ủy ban Phường
@@ -127,8 +137,8 @@ export default function ContactInfo() {
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-gray-600 mb-1">
-                                Tên đơn vị <span className="text-red-500">*</span>
+                            <label className="block text-sm font-medium text-gray-600 mb-1 required-label">
+                                Tên đơn vị
                             </label>
                             <input
                                 type="text"
@@ -149,8 +159,8 @@ export default function ContactInfo() {
 
                         <div className="space-y-3">
                             <div>
-                                <label className="block text-sm font-medium text-gray-600 mb-1">
-                                    Địa chỉ đầy đủ <span className="text-red-500">*</span>
+                                <label className="block text-sm font-medium text-gray-600 mb-1 required-label">
+                                    Địa chỉ đầy đủ
                                 </label>
                                 <input
                                     type="text"
@@ -162,8 +172,8 @@ export default function ContactInfo() {
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-gray-600 mb-1">
-                                    Link Google Map <span className="text-red-500">*</span>
+                                <label className="block text-sm font-medium text-gray-600 mb-1 required-label">
+                                    Link Google Map
                                 </label>
                                 <input
                                     type="text"
@@ -187,8 +197,8 @@ export default function ContactInfo() {
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                             <div>
-                                <label className="block text-sm font-medium text-gray-600 mb-1">
-                                    Số điện thoại <span className="text-red-500">*</span>
+                                <label className="block text-sm font-medium text-gray-600 mb-1 required-label">
+                                    Số điện thoại
                                 </label>
                                 <input
                                     type="text"
@@ -201,8 +211,8 @@ export default function ContactInfo() {
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-gray-600 mb-1">
-                                    Email liên hệ <span className="text-red-500">*</span>
+                                <label className="block text-sm font-medium text-gray-600 mb-1 required-label">
+                                    Email liên hệ
                                 </label>
                                 <input
                                     type="email"
@@ -214,7 +224,8 @@ export default function ContactInfo() {
                                 />
                             </div>
                         </div>
-                    </div>                    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3">
+                    </div>                    
+                    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3">
                         <div className="flex items-center gap-2 mb-3">
                             <Clock className="w-4 h-4 text-blue-600" />
                             <h2 className="text-base font-semibold text-gray-900">
@@ -225,8 +236,8 @@ export default function ContactInfo() {
                         <div className="space-y-3">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-600 mb-1">
-                                        Buổi sáng <span className="text-red-500">*</span>
+                                    <label className="block text-sm font-medium text-gray-600 mb-1 required-label">
+                                        Buổi sáng
                                     </label>
                                     <div className="flex items-center gap-2">
                                         <div className="flex-1">
@@ -237,7 +248,9 @@ export default function ContactInfo() {
                                                     handleChange("gioLamViec.buoi_sang.tu", e.target.value)
                                                 }
                                                 disabled={!isEditing}
-                                                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg bg-gray-50 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50"
+                                                className={`w-full px-3 py-2 text-sm border rounded-lg bg-gray-50 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50 ${
+                                                    errors['gioLamViec.buoi_sang.tu'] ? 'border-red-500' : 'border-gray-300'
+                                                }`}
                                                 placeholder="07:30"
                                             />
                                         </div>
@@ -250,16 +263,23 @@ export default function ContactInfo() {
                                                     handleChange("gioLamViec.buoi_sang.den", e.target.value)
                                                 }
                                                 disabled={!isEditing}
-                                                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg bg-gray-50 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50"
+                                                className={`w-full px-3 py-2 text-sm border rounded-lg bg-gray-50 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50 ${
+                                                    errors['gioLamViec.buoi_sang.den'] ? 'border-red-500' : 'border-gray-300'
+                                                }`}
                                                 placeholder="11:30"
                                             />
                                         </div>
                                     </div>
+                                    {(errors['gioLamViec.buoi_sang.tu'] || errors['gioLamViec.buoi_sang.den']) && (
+                                        <p className="mt-1 text-xs text-red-600">
+                                            {errors['gioLamViec.buoi_sang.tu'] || errors['gioLamViec.buoi_sang.den']}
+                                        </p>
+                                    )}
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-600 mb-1">
-                                        Buổi chiều <span className="text-red-500">*</span>
+                                    <label className="block text-sm font-medium text-gray-600 mb-1 required-label">
+                                        Buổi chiều
                                     </label>
                                     <div className="flex items-center gap-2">
                                         <div className="flex-1">
@@ -270,7 +290,9 @@ export default function ContactInfo() {
                                                     handleChange("gioLamViec.buoi_chieu.tu", e.target.value)
                                                 }
                                                 disabled={!isEditing}
-                                                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg bg-gray-50 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50"
+                                                className={`w-full px-3 py-2 text-sm border rounded-lg bg-gray-50 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50 ${
+                                                    errors['gioLamViec.buoi_chieu.tu'] ? 'border-red-500' : 'border-gray-300'
+                                                }`}
                                                 placeholder="13:00"
                                             />
                                         </div>
@@ -283,27 +305,48 @@ export default function ContactInfo() {
                                                     handleChange("gioLamViec.buoi_chieu.den", e.target.value)
                                                 }
                                                 disabled={!isEditing}
-                                                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg bg-gray-50 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50"
+                                                className={`w-full px-3 py-2 text-sm border rounded-lg bg-gray-50 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50 ${
+                                                    errors['gioLamViec.buoi_chieu.den'] ? 'border-red-500' : 'border-gray-300'
+                                                }`}
                                                 placeholder="17:00"
                                             />
                                         </div>
                                     </div>
+                                    {(errors['gioLamViec.buoi_chieu.tu'] || errors['gioLamViec.buoi_chieu.den']) && (
+                                        <p className="mt-1 text-xs text-red-600">
+                                            {errors['gioLamViec.buoi_chieu.tu'] || errors['gioLamViec.buoi_chieu.den']}
+                                        </p>
+                                    )}
                                 </div>
                             </div>
 
+                            {errors['gioLamViec'] && (
+                                <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+                                    <p className="text-sm text-red-600 font-medium">
+                                        {errors['gioLamViec']}
+                                    </p>
+                                </div>
+                            )}
+
                             <div>
-                                <label className="block text-sm font-medium text-gray-600 mb-1">
+                                <label className="block text-sm font-medium text-gray-600 mb-1 required-label">
                                     Ghi chú
                                 </label>
                                 <input
                                     type="text"
-                                    value={formData.gioLamViec.ghi_chu}
+                                    value={formData.gioLamViec.ghi_chu || ''}
                                     onChange={(e) =>
                                         handleChange("gioLamViec.ghi_chu", e.target.value)
                                     }
                                     disabled={!isEditing}
-                                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg bg-gray-50 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50"
+                                    className={`w-full px-3 py-2 text-sm border rounded-lg bg-gray-50 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50 ${
+                                        errors['gioLamViec.ghi_chu'] ? 'border-red-500' : 'border-gray-300'
+                                    }`}
+                                    placeholder="Ghi chú thêm về giờ làm việc (không bắt buộc)"
                                 />
+                                {errors['gioLamViec.ghi_chu'] && (
+                                    <p className="mt-1 text-xs text-red-600">{errors['gioLamViec.ghi_chu']}</p>
+                                )}
                             </div>
                         </div>
                     </div>

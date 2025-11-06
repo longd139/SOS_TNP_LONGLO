@@ -1,21 +1,22 @@
 import React from 'react';
-import BaseFilter from '../BaseFilter';
+import BaseFilter from '../base/BaseFilter';
 
 export default function ProceduresFilter({ 
     areas = [], 
     filters = {},
     pagination = {},
-    showRemoved = false,
+    showActive = true,
     onFilterChange,
     onSearch,
     onReset,
-    onToggleRemoved,
-    onPageSizeChange
+    onToggleActive,
+    onPageSizeChange,
+    onSearchWithFilters
 }) {
     const initialFilters = {
         searchKeyword: filters.searchKeyword || '',
         selectedDomain: filters.selectedDomain || '',
-        showRemoved: showRemoved,
+        showActive: showActive,
         pageSize: pagination.pageSize || 10
     };
 
@@ -39,12 +40,12 @@ export default function ProceduresFilter({
             ]
         },
         {
-            name: 'showRemoved',
+            name: 'showActive',
             label: 'Trạng thái',
             type: 'select',
             options: [
-                { value: false, label: 'Hoạt động' },
-                { value: true, label: 'Đã xóa' }
+                { value: true, label: 'Hoạt động' },
+                { value: false, label: 'Đã xóa' }
             ]
         },
         {
@@ -67,14 +68,24 @@ export default function ProceduresFilter({
         if (newFilters.selectedDomain !== filters.selectedDomain) {
             onFilterChange?.('selectedDomain', newFilters.selectedDomain);
         }
-        if (newFilters.showRemoved !== showRemoved) {
-            onToggleRemoved?.(newFilters.showRemoved);
-        }
-        if (newFilters.pageSize !== pagination.pageSize) {
-            onPageSizeChange?.(Number(newFilters.pageSize));
+
+        if (newFilters.showActive !== showActive) {
+            onToggleActive?.(newFilters.showActive);
         }
 
-        onSearch?.();
+        if (onSearchWithFilters) {
+            onSearchWithFilters({
+                searchKeyword: newFilters.searchKeyword,
+                selectedDomain: newFilters.selectedDomain,
+                showActive: newFilters.showActive,
+                pageSize: Number(newFilters.pageSize)
+            });
+        } else {
+            if (newFilters.pageSize !== pagination.pageSize) {
+                onPageSizeChange?.(Number(newFilters.pageSize));
+            }
+            onSearch?.();
+        }
     };
 
     const handleReset = () => {

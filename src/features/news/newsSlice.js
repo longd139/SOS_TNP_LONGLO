@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { fetchNews, createNewsItem, updateNewsItem, deleteNewsItem } from './newsThunks';
+import { fetchNews, createNewsItem, updateNewsItem, deleteNewsItem, updateNewsStatus } from './newsThunks';
 
 const initialState = {
     news: [],
@@ -11,7 +11,12 @@ const initialState = {
         pageSize: 10,
         totalPages: 0,
         totalItems: 0
-    }
+    },
+    filters: {
+        idDanhMuc: null,
+        search: ''
+    },
+    showActive: true
 };
 
 const newsSlice = createSlice({
@@ -26,6 +31,15 @@ const newsSlice = createSlice({
         },
         clearCurrentNews: (state) => {
             state.currentNews = null;
+        },
+        setFilters: (state, action) => {
+            state.filters = { ...state.filters, ...action.payload };
+        },
+        resetFilters: (state) => {
+            state.filters = initialState.filters;
+        },
+        setShowActive: (state, action) => {
+            state.showActive = action.payload;
         }
     },
     extraReducers: (builder) => {
@@ -88,9 +102,26 @@ const newsSlice = createSlice({
             .addCase(deleteNewsItem.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload?.message || 'Xóa tin tức thất bại';
+            })
+            
+            .addCase(updateNewsStatus.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(updateNewsStatus.fulfilled, (state, action) => {
+                state.loading = false;
+                const { newsId, isActive } = action.payload;
+                const index = state.news.findIndex(item => item.id === newsId);
+                if (index !== -1) {
+                    state.news[index].isActive = isActive;
+                }
+            })
+            .addCase(updateNewsStatus.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload?.message || 'Cập nhật trạng thái tin tức thất bại';
             });
     }
 });
 
-export const { clearError, setCurrentNews, clearCurrentNews } = newsSlice.actions;
+export const { clearError, setCurrentNews, clearCurrentNews, setFilters, resetFilters, setShowActive } = newsSlice.actions;
 export default newsSlice.reducer;

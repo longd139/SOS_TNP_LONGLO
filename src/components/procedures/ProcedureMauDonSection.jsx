@@ -1,21 +1,31 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { useTemplates } from '../../hooks/useTemplates';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchTemplates } from '../../features/templates/templatesThunks';
+import { selectTemplates, selectTemplatesLoading } from '../../features/templates/templatesSelectors';
 import TemplateSelector from './TemplateSelector';
 
 const ProcedureMauDonSection = ({ items, addItem, removeItem, updateItem, errors }) => {
+    const dispatch = useDispatch();
+    const templates = useSelector(selectTemplates);
+    const loading = useSelector(selectTemplatesLoading);
+
+    useEffect(() => {
+        if (templates.length === 0) {
+            dispatch(fetchTemplates(false));
+        }
+    }, [dispatch, templates.length]);
+
     const getError = (index, field) => {
         const bracketKey = `danhSachMauDon[${index}].${field}`;
         const dotKey = `danhSachMauDon.${index}.${field}`;
         return errors?.[bracketKey] || errors?.[dotKey];
     };
 
-    const { templates = [], loading } = useTemplates(false);
-
     return (
         <div>
             <div className="flex items-center justify-between mb-2">
-                <h3 className="text-sm font-medium text-gray-900 required-label">Danh sách mẫu đơn</h3>
+                <h3 className="text-sm font-medium text-gray-900">Danh sách mẫu đơn</h3>
             </div>
             <div className="space-y-3 bg-gray-50 p-3 rounded-lg">
                 {items.map((item, idx) => {
@@ -25,8 +35,22 @@ const ProcedureMauDonSection = ({ items, addItem, removeItem, updateItem, errors
                     
                     return (
                         <div key={idx} className="p-3 border border-gray-200 rounded-lg bg-white">
-                            <div className="grid grid-cols-1 lg:grid-cols-12 gap-3">
-                                <div className="lg:col-span-5">
+                            <div className="flex justify-between items-center mb-2">
+                                <span className="text-sm font-medium text-gray-700">Mẫu đơn {idx + 1}</span>
+                                <button
+                                    type="button"
+                                    onClick={() => removeItem(idx)}
+                                    className="text-red-600 hover:bg-red-50 p-1.5 rounded transition-colors"
+                                    title="Xóa mẫu đơn"
+                                >
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </button>
+                            </div>
+
+                            <div className="space-y-2">
+                                <div>
                                     <label className="block text-xs font-medium text-gray-700 mb-1">Mẫu đơn</label>
                                     <TemplateSelector
                                         value={item.id || ''}
@@ -39,7 +63,7 @@ const ProcedureMauDonSection = ({ items, addItem, removeItem, updateItem, errors
                                     {getError(idx, 'id') && <p className="text-xs text-red-600 mt-1">{getError(idx, 'id')}</p>}
                                 </div>
 
-                                <div className="lg:col-span-2">
+                                <div>
                                     <label className="block text-xs font-medium text-gray-700 mb-1">Bản chính</label>
                                     <input
                                         type="number"
@@ -55,7 +79,7 @@ const ProcedureMauDonSection = ({ items, addItem, removeItem, updateItem, errors
                                     {getError(idx, 'so_luong_ban_chinh') && <p className="text-xs text-red-600 mt-1">{getError(idx, 'so_luong_ban_chinh')}</p>}
                                 </div>
 
-                                <div className="lg:col-span-2">
+                                <div>
                                     <label className="block text-xs font-medium text-gray-700 mb-1">Bản sao</label>
                                     <input
                                         type="number"
@@ -71,7 +95,7 @@ const ProcedureMauDonSection = ({ items, addItem, removeItem, updateItem, errors
                                     {getError(idx, 'so_luong_ban_sao') && <p className="text-xs text-red-600 mt-1">{getError(idx, 'so_luong_ban_sao')}</p>}
                                 </div>
 
-                                <div className="lg:col-span-2">
+                                <div>
                                     <label className="block text-xs font-medium text-gray-700 mb-1">Ghi chú</label>
                                     <input
                                         type="text"
@@ -86,24 +110,15 @@ const ProcedureMauDonSection = ({ items, addItem, removeItem, updateItem, errors
                                     />
                                     {getError(idx, 'ghi_chu') && <p className="text-xs text-red-600 mt-1">{getError(idx, 'ghi_chu')}</p>}
                                 </div>
-
-                                <div className="lg:col-span-1 flex items-end justify-center pb-1">
-                                    <button
-                                        type="button"
-                                        onClick={() => removeItem(idx)}
-                                        className="text-red-600 hover:bg-red-50 p-2 rounded transition-colors"
-                                        title="Xóa mẫu đơn"
-                                    >
-                                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                                        </svg>
-                                    </button>
-                                </div>
                             </div>
                         </div>
                     );
                 })}
-                <button type="button" onClick={addItem} className="text-sm text-blue-600 hover:text-blue-700 font-medium">
+                <button 
+                    type="button" 
+                    onClick={addItem} 
+                    className="w-full py-2 px-4 text-sm text-blue-600 hover:text-blue-700 hover:bg-blue-50 border border-blue-200 rounded-lg font-medium transition-colors"
+                >
                     + Thêm mẫu đơn
                 </button>
             </div>

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { AlertCircle, Loader2 } from 'lucide-react';
-import { AUTH_API } from '../apis/auth';
+import { AUTH_API } from '../../apis/auth';
 import { jwtDecode } from 'jwt-decode';
 
 const TwoFALoginModal = ({ isOpen, onClose, tenDangNhap, onSuccess, onError }) => {
@@ -31,8 +31,8 @@ const TwoFALoginModal = ({ isOpen, onClose, tenDangNhap, onSuccess, onError }) =
             }
 
             const tokenData = response.data;
-            const accessToken = tokenData.accessToken;
-            const refreshToken = tokenData.refreshToken;
+            const accessToken = tokenData.access_token;
+            const refreshToken = tokenData.refresh_token;
 
             if (!accessToken || !refreshToken) {
                 throw new Error('Không nhận được token');

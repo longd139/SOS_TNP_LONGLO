@@ -27,7 +27,7 @@ export const loginUser = createAsyncThunk(
             const res = await AUTH_API.login(credentials);
             const response = res?.data || res;
 
-            if (response.requiresTwoFactorAuth) {
+            if (response.requiresTwoFactorAuth || response.requires_two_factor_auth) {
                 return {
                     requiresTwoFactorAuth: true,
                     tenDangNhap: credentials.tenDangNhap,
@@ -41,12 +41,12 @@ export const loginUser = createAsyncThunk(
                 };
             }
 
-            if (!response.accessToken) throw new Error('Phản hồi không hợp lệ');
+            if (!response.access_token) throw new Error('Phản hồi không hợp lệ');
 
-            const decoded = decodeToken(response.accessToken);
+            const decoded = decodeToken(response.access_token);
             if (!decoded) throw new Error('Token không hợp lệ');
 
-            storeTokens(response.accessToken, response.refreshToken);
+            storeTokens(response.access_token, response.refresh_token);
 
             return {
                 user: {
@@ -70,8 +70,8 @@ export const verifyOtpUser = createAsyncThunk(
             if (!response.success) throw new Error(response.message || 'OTP sai');
             
             const tokenData = response.data;
-            const accessToken = tokenData.accessToken;
-            const refreshToken = tokenData.refreshToken;
+            const accessToken = tokenData.access_token;
+            const refreshToken = tokenData.refresh_token;
 
             if (!accessToken) throw new Error('Không nhận được token');
 
@@ -88,6 +88,43 @@ export const verifyOtpUser = createAsyncThunk(
             };
         } catch (error) {
             return rejectWithValue({ message: error.message });
+        }
+    }
+);
+
+export const changePassword = createAsyncThunk(
+    'auth/changePassword',
+    async (passwordData, { rejectWithValue }) => {
+        try {
+            if (!passwordData.matKhauHienTai || !passwordData.matKhauMoi || !passwordData.confirmMatKhauMoi) {
+                throw new Error('Vui lòng điền đầy đủ thông tin');
+            }
+
+            if (passwordData.matKhauMoi !== passwordData.confirmMatKhauMoi) {
+                throw new Error('Mật khẩu mới không khớp');
+            }
+
+            if (passwordData.matKhauMoi.length < 6) {
+                throw new Error('Mật khẩu mới phải có ít nhất 6 ký tự');
+            }
+
+            if (passwordData.matKhauHienTai === passwordData.matKhauMoi) {
+                throw new Error('Mật khẩu mới phải khác mật khẩu cũ');
+            }
+
+            const response = await AUTH_API.changePassword({
+                matKhauHienTai: passwordData.matKhauHienTai,
+                matKhauMoi: passwordData.matKhauMoi,
+            });
+
+            return {
+                message: 'Đổi mật khẩu thành công',
+                data: response,
+            };
+        } catch (error) {
+            return rejectWithValue({ 
+                message: error.message || 'Đổi mật khẩu thất bại' 
+            });
         }
     }
 );

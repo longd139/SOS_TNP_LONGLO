@@ -19,7 +19,6 @@ export const useAuthRedirect = () => {
                         navigate(ROUTE_PATH.DASHBOARD, { replace: true });
                     }
                 } catch (error) {
-                    console.error('Invalid token:', error);
                     localStorage.removeItem('accessToken');
                     localStorage.removeItem('refreshToken');
                 }

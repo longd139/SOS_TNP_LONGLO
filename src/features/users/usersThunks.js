@@ -56,3 +56,15 @@ export const deleteUser = createAsyncThunk(
         }
     }
 );
+
+export const updateUserStatus = createAsyncThunk(
+    'users/updateUserStatus',
+    async ({ userId, isActive }, { rejectWithValue }) => {
+        try {
+            const result = await UserService.updateUserStatus(userId, isActive);
+            return { userId, isActive };
+        } catch (error) {
+            return rejectWithValue(error.message || 'Không thể cập nhật trạng thái tài khoản');
+        }
+    }
+);

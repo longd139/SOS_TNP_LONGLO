@@ -1,24 +1,43 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Plus, Loader2 } from 'lucide-react';
-import BaseTable from '../../components/BaseTable';
-import { ConfirmModal } from '../../components/BaseModal';
+import BaseTable from '../../components/base/BaseTable';
+import { ConfirmModal } from '../../components/base/BaseModal';
 import NewsFormModal from '../../components/news/NewsFormModal';
 import NewsFilter from '../../components/news/NewsFilter';
 import NewsPreviewModal from '../../components/news/NewsPreviewModal';
 import { useNews } from '../../hooks/useNews';
 import { formatDate } from '../../utils/formatDate';
-import { STATUS_NEWS, STATUS_NEWS_LABELS } from '../../constants/status';
 import { showToast } from '../../utils/toastNotification';
 
 export default function NewsManager() {
-    const { news, loading, error, pagination, loadNews, createNews, updateNews, deleteNews, clearError } = useNews();
+    const { 
+        news, 
+        loading, 
+        error, 
+        pagination, 
+        filters,
+        showActive,
+        fetchNewsList,
+        loadNews, 
+        createNews, 
+        updateNews, 
+        updateStatus,
+        deleteNews, 
+        setFilters,
+        setShowActive,
+        clearError 
+    } = useNews();
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
     const [selectedNews, setSelectedNews] = useState(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [currentFilters, setCurrentFilters] = useState({});
+    const [pageSize, setPageSize] = useState(10);
+
+    useEffect(() => {
+        fetchNewsList(1, pageSize);
+    }, []);
 
     const handleView = (item) => {
         setSelectedNews(item);
@@ -35,11 +54,27 @@ export default function NewsManager() {
         setIsDeleteModalOpen(true);
     };
 
+    const handleUpdateStatus = async (newsItem) => {
+        const newStatus = !newsItem.is_active;
+        const result = await updateStatus(newsItem);
+        if (result.success) {
+            showToast.success(`Tin tức đã được ${newStatus ? 'kích hoạt' : 'vô hiệu hóa'} thành công!`);
+            loadNews({
+                page: pagination.currentPage,
+                size: pageSize,
+                isActive: showActive,
+                idDanhMuc: filters.idDanhMuc,
+                search: filters.search
+            });
+        } else {
+            showToast.error(result.error || 'Cập nhật trạng thái thất bại!');
+        }
+    };
+
     const handleConfirmDelete = async () => {
         const result = await deleteNews(selectedNews.id);
         if (result.success) {
             showToast.success('Xóa tin tức thành công!');
-            loadNews(currentFilters);
         } else {
             showToast.error(result.error || 'Xóa tin tức thất bại!');
         }
@@ -47,14 +82,27 @@ export default function NewsManager() {
         setSelectedNews(null);
     };
 
-    const handleCreateSubmit = async (formData) => {
+    const handleCreateSubmit = async (formData, callback = null, isUpdate = false) => {
+        if (isUpdate) {
+            try {
+                await updateNews(selectedNews.id, formData);
+            } catch (error) {
+            }
+            return;
+        }
+
         setIsSubmitting(true);
         try {
             const result = await createNews(formData);
             if (result.success) {
+                const newsId = result.data?.id;
                 showToast.success('Tạo tin tức thành công!');
+                
+                if (callback && newsId) {
+                    await callback(newsId);
+                }
+                
                 setIsCreateModalOpen(false);
-                loadNews(currentFilters);
             } else {
                 showToast.error(result.error || 'Tạo tin tức thất bại!');
             }
@@ -65,15 +113,27 @@ export default function NewsManager() {
         }
     };
 
-    const handleEditSubmit = async (formData) => {
+    const handleEditSubmit = async (formData, callback = null, isUpdate = false) => {
+        if (isUpdate) {
+            try {
+                await updateNews(selectedNews.id, formData);
+            } catch (error) {
+            }
+            return;
+        }
+
         setIsSubmitting(true);
         try {
             const result = await updateNews(selectedNews.id, formData);
             if (result.success) {
                 showToast.success('Cập nhật tin tức thành công!');
+                
+                if (callback && selectedNews.id) {
+                    await callback(selectedNews.id);
+                }
+                
                 setIsEditModalOpen(false);
                 setSelectedNews(null);
-                loadNews(currentFilters);
             } else {
                 showToast.error(result.error || 'Cập nhật tin tức thất bại!');
             }
@@ -84,23 +144,53 @@ export default function NewsManager() {
         }
     };
 
-    const handleFilter = (filters) => {
-        setCurrentFilters(filters);
-        loadNews(filters);
+    const handlePageChange = (page) => {
+        fetchNewsList(page, pageSize);
+    };
+
+    const handleFilter = (newFilters) => {
+        
+        const updatedFilters = {};
+        if (newFilters.idDanhMuc !== undefined) {
+            updatedFilters.idDanhMuc = newFilters.idDanhMuc || null;
+        }
+        if (newFilters.search !== undefined) {
+            updatedFilters.search = newFilters.search || '';
+        }
+        if (Object.keys(updatedFilters).length > 0) {
+            setFilters(updatedFilters);
+        }
+        
+        if (newFilters.isActive !== undefined) {
+            setShowActive(newFilters.isActive);
+        }
+
+        const selectedPageSize = newFilters.pageSize !== undefined ? Number(newFilters.pageSize) : pageSize;
+        if (newFilters.pageSize !== undefined) {
+            setPageSize(selectedPageSize);
+        }
+        
+        loadNews({
+            page: 1,
+            size: selectedPageSize,
+            isActive: newFilters.isActive !== undefined ? newFilters.isActive : showActive,
+            idDanhMuc: newFilters.idDanhMuc !== undefined ? (newFilters.idDanhMuc || null) : filters.idDanhMuc,
+            search: newFilters.search !== undefined ? newFilters.search : filters.search
+        });
     };
 
     const handleResetFilter = () => {
-        const defaultFilters = { page: 1, size: 10 };
-        setCurrentFilters(defaultFilters);
-        loadNews(defaultFilters);
-    };
-
-    const getStatusDisplay = (trangThai) => {
-        const statusMap = {
-            [STATUS_NEWS.DRAFT]: { label: STATUS_NEWS_LABELS[STATUS_NEWS.DRAFT], bg: '#FEF3C7', color: '#92400E' },
-            [STATUS_NEWS.PUBLISHED]: { label: STATUS_NEWS_LABELS[STATUS_NEWS.PUBLISHED], bg: '#D1FAE5', color: '#065F46' }
-        };
-        return statusMap[trangThai] || { label: trangThai, bg: '#E5E7EB', color: '#374151' };
+        setFilters({ idDanhMuc: null, search: '' });
+        setShowActive(true);
+        setPageSize(10);
+        
+        loadNews({
+            page: 1,
+            size: 10,
+            isActive: true,
+            idDanhMuc: null,
+            search: ''
+        });
     };
 
     const columns = [
@@ -109,7 +199,7 @@ export default function NewsManager() {
             key: 'stt',
             render: (value, record, index) => (
                 <span className="text-sm font-medium text-gray-900">
-                    #{(pagination.currentPage - 1) * pagination.pageSize + index + 1}
+                    #{((pagination?.currentPage || 1) - 1) * (pagination?.pageSize || pageSize) + index + 1}
                 </span>
             )
         },
@@ -119,7 +209,7 @@ export default function NewsManager() {
             key: 'tieu_de',
             width: '300px',
             render: (value) => (
-                <div 
+                <div
                     className="text-sm text-gray-900 max-w-[300px] truncate text-ellipsis overflow-hidden whitespace-nowrap"
                     title={value}
                 >
@@ -138,25 +228,6 @@ export default function NewsManager() {
             )
         },
         {
-            title: 'Trạng thái',
-            dataIndex: 'trang_thai',
-            key: 'trang_thai',
-            render: (value) => {
-                const status = getStatusDisplay(value);
-                return (
-                    <span
-                        className="inline-flex px-3 py-1 text-xs font-medium rounded-full"
-                        style={{
-                            backgroundColor: status.bg,
-                            color: status.color
-                        }}
-                    >
-                        {status.label}
-                    </span>
-                );
-            }
-        },
-        {
             title: 'Tác giả',
             dataIndex: 'tac_gia',
             key: 'tac_gia',
@@ -171,6 +242,23 @@ export default function NewsManager() {
             render: (value) => (
                 <span className="text-sm text-gray-600">
                     {value ? formatDate(value) : 'N/A'}
+                </span>
+            )
+        },
+        {
+            title: 'TRẠNG THÁI',
+            dataIndex: 'is_active',
+            key: 'is_active',
+            width: '120px',
+            render: (value) => (
+                <span
+                    className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                        value
+                            ? 'bg-green-100 text-green-800'
+                            : 'bg-gray-100 text-gray-800'
+                    }`}
+                >
+                    {value ? 'Hoạt động' : 'Không hoạt động'}
                 </span>
             )
         }
@@ -220,9 +308,12 @@ export default function NewsManager() {
                 columns={columns}
                 onView={handleView}
                 onEdit={handleEdit}
-                onDelete={news.is_removed ? handleDelete : undefined }
+                onDelete={!showActive ? handleDelete : null}
+                onUpdateStatus={handleUpdateStatus}
                 showActions={true}
                 emptyMessage={loading ? "Đang tải dữ liệu..." : "Không có bài viết nào"}
+                pagination={pagination}
+                onPageChange={handlePageChange}
             />
 
             <NewsFormModal
