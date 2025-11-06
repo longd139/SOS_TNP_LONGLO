@@ -37,9 +37,76 @@ const createAreas = async (areaData) => {
         throw error;
     }   
 }
+
+const updateArea = async (areaId, areaData) => {
+    try {
+        const response = await apiClient.put(`/api/linh-vuc/${areaId}`, areaData);
+        if (response.data.success) {
+            return response.data.data;
+        }
+        else throw new Error(response.data.message || "Cập nhật lĩnh vực thất bại");    
+    } catch (error) {
+        if (error.response?.data?.message) {
+            throw new Error(error.response.data.message);
+        }
+        throw error;
+    }
+}
+
+const deleteArea = async (areaId) => {
+    try {
+        const response = await apiClient.delete(`/api/linh-vuc/${areaId}`);
+        if (response.data.success) {
+            return response.data.data;
+        } else {
+            throw new Error(response.data.message || "Xóa lĩnh vực thất bại");
+        }
+    } catch (error) {
+        if (error.response?.data?.message) {
+            throw new Error(error.response.data.message);
+        }   
+        throw error;
+    }
+}
+
+const getAreaById = async (areaId) => {
+    try {
+        const response = await apiClient.get(`/api/linh-vuc/${areaId}`);
+        if (response.data.success) {
+            return response.data.data;
+        } else {
+            throw new Error(response.data.message || "Lấy lĩnh vực thất bại");
+        }
+    } catch (error) {
+        if (error.response?.data?.message) {
+            throw new Error(error.response.data.message);
+        }
+        throw error;
+    }
+}
+
+const updateAreaStatus = async (areaId, isActive) => {
+    try {
+        const response = await apiClient.put(`/api/linh-vuc/update-status/${areaId}`, { isActive });
+        if (response.data.success) {
+            return response.data.data;
+        }
+        else throw new Error(response.data.message || "Cập nhật trạng thái lĩnh vực thất bại");    
+    } catch (error) {
+        if (error.response?.data?.message) {
+            throw new Error(error.response.data.message);
+        }
+        throw error;
+    }
+}
+
 export const AREAS_API = {
     getAreas,
-    createAreas
+    createAreas,
+    updateArea,
+    deleteArea,
+    getAreaById,
+    updateAreaStatus
 };
 
 export default AREAS_API;
