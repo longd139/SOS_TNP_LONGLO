@@ -8,13 +8,16 @@ const TwoFactorOTPModal = ({ isOpen, onClose, onVerify, isLoading, action = 'báº
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        e.stopPropagation();
         setError('');
 
         const validation = await validateOtp({ otp });
-        if (!validation.isValid) {
+        
+        if (!validation.valid) {
             setError(validation.errors.otp);
             return;
         }
+
 
         try {
             await onVerify(otp);

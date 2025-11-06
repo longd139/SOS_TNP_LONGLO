@@ -8,6 +8,7 @@ import ProcedureAdditionalInfo from './ProcedureAdditionalInfo';
 import ProcedureStepsSection from './ProcedureStepsSection';
 import ProcedureMethodsSection from './ProcedureMethodsSection';
 import ProcedureMauDonSection from './ProcedureMauDonSection';
+import ProcedureCasesSection from './ProcedureCasesSection';
 
 const ProcedureForm = ({
     isOpen,
@@ -34,6 +35,12 @@ const ProcedureForm = ({
         addCachThucHien,
         removeCachThucHien,
         updateCachThucHien,
+        addTruongHop,
+        removeTruongHop,
+        updateTruongHop,
+        addThanhPhanHoSo,
+        removeThanhPhanHoSo,
+        updateThanhPhanHoSo,
         handleSubmit,
         resetForm
     } = useProcedureForm({ initialData, mode, isOpen, onSubmit });
@@ -89,13 +96,29 @@ const ProcedureForm = ({
                     </div>
                 </div>
 
-                <ProcedureMauDonSection
-                    items={formData.danhSachMauDon}
-                    addItem={addMauDon}
-                    removeItem={removeMauDon}
-                    updateItem={updateMauDon}
-                    errors={errors}
-                />
+                <div className="flex flex-col md:flex-row gap-3 md:items-start">
+                    <div className="flex-1 min-w-0">
+                        <ProcedureMauDonSection
+                            items={formData.danhSachMauDon}
+                            addItem={addMauDon}
+                            removeItem={removeMauDon}
+                            updateItem={updateMauDon}
+                            errors={errors}
+                        />
+                    </div>
+
+                    <div className="flex-1 min-w-0">
+                        <ProcedureCasesSection
+                            cases={formData.truongHopThuTuc}
+                            addCase={addTruongHop}
+                            removeCase={removeTruongHop}
+                            updateCase={updateTruongHop}
+                            addCaseComponent={addThanhPhanHoSo}
+                            removeCaseComponent={removeThanhPhanHoSo}
+                            updateCaseComponent={updateThanhPhanHoSo}
+                        />
+                    </div>
+                </div>
 
                 <div className="flex flex-col md:flex-row gap-3 md:items-start">
                     <div className="flex-1 min-w-0">
