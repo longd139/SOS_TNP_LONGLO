@@ -82,12 +82,27 @@ export default function NewsManager() {
         setSelectedNews(null);
     };
 
-    const handleCreateSubmit = async (formData) => {
+    const handleCreateSubmit = async (formData, callback = null, isUpdate = false) => {
+        if (isUpdate) {
+            try {
+                await updateNews(selectedNews.id, formData);
+            } catch (error) {
+            }
+            return;
+        }
+
         setIsSubmitting(true);
         try {
             const result = await createNews(formData);
             if (result.success) {
+                const newsId = result.data?.id;
                 showToast.success('Tạo tin tức thành công!');
+                
+                // Call callback with news ID if provided
+                if (callback && newsId) {
+                    await callback(newsId);
+                }
+                
                 setIsCreateModalOpen(false);
             } else {
                 showToast.error(result.error || 'Tạo tin tức thất bại!');
@@ -99,12 +114,26 @@ export default function NewsManager() {
         }
     };
 
-    const handleEditSubmit = async (formData) => {
+    const handleEditSubmit = async (formData, callback = null, isUpdate = false) => {
+        if (isUpdate) {
+            try {
+                await updateNews(selectedNews.id, formData);
+            } catch (error) {
+            }
+            return;
+        }
+
         setIsSubmitting(true);
         try {
             const result = await updateNews(selectedNews.id, formData);
             if (result.success) {
                 showToast.success('Cập nhật tin tức thành công!');
+                
+                // Call callback with news ID if provided
+                if (callback && selectedNews.id) {
+                    await callback(selectedNews.id);
+                }
+                
                 setIsEditModalOpen(false);
                 setSelectedNews(null);
             } else {

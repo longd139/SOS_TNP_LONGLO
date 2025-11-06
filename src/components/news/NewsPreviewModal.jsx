@@ -2,7 +2,6 @@ import React from 'react';
 import { Calendar, FolderOpen, User } from 'lucide-react';
 import BaseModal from '../base/BaseModal';
 import { downloadUtils } from '../../utils/downLoadUtils';
-import { STATUS_NEWS_LABELS } from '../../constants/status';
 import { formatDate } from '../../utils/formatDate';
 
 const NewsPreviewModal = ({ isOpen, onClose, newsData, isPreview = false }) => {
@@ -22,11 +21,6 @@ const NewsPreviewModal = ({ isOpen, onClose, newsData, isPreview = false }) => {
     const imageUrl = isPreview 
         ? data.url_anh_dai_dien 
         : (data.url_anh_dai_dien ? downloadUtils.handleViewImage(data) : null);
-
-    const statusLabel = STATUS_NEWS_LABELS[data.trang_thai] || data.trang_thai;
-    const statusColor = data.trang_thai === 'NHAP' 
-        ? 'text-yellow-800 bg-yellow-100' 
-        : 'text-green-800 bg-green-100';
 
     return (
         <BaseModal
@@ -52,9 +46,6 @@ const NewsPreviewModal = ({ isOpen, onClose, newsData, isPreview = false }) => {
                     </h2>
                 </div>
                 <div className="flex flex-wrap items-center gap-3 text-sm border-b border-gray-200 pb-4">
-                    <span className={`inline-flex px-3 py-1 rounded-full font-medium ${statusColor}`}>
-                        {statusLabel}
-                    </span>
 
                     <span className="flex items-center gap-1.5 text-gray-600">
                         <Calendar className="w-4 h-4" />

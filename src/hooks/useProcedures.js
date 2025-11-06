@@ -77,7 +77,7 @@ export const useProcedure = () => {
 
             return { success: true };
         } catch (error) {
-            return { success: false, error };
+            return { success: false, error: { message: error } };
         }
     }, [dispatch, pagination, filters, showActive]);
 
@@ -95,7 +95,7 @@ export const useProcedure = () => {
 
             return { success: true };
         } catch (error) {
-            return { success: false, error };
+            return { success: false, error: { message: error } };
         }
     }, [dispatch, pagination, filters, showActive]);
 
@@ -116,7 +116,7 @@ export const useProcedure = () => {
             if (error === 'User cancelled') {
                 return { success: false, cancelled: true };
             }
-            return { success: false, error };
+            return { success: false, error: { message: error } };
         }
     }, [dispatch, pagination, filters, showActive]);
 

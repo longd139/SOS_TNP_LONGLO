@@ -91,7 +91,7 @@ export const createFormalitySchema = yup.object().shape({
         .nullable(),
     soQuyetDinh: yup
         .string()
-        .nullable(),
+        .required("Số quyết định là bắt buộc"),
     danhSachLinhVucIds: yup
         .array()
         .of(yup.string())

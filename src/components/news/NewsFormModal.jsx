@@ -1,14 +1,17 @@
 import React, { useState, useEffect } from 'react';
+import { useDispatch } from 'react-redux';
 import BaseModal, { ModalFooter } from '../base/BaseModal';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import { useCategories } from '../../hooks/useCategories';
 import { downloadUtils } from '../../utils/downLoadUtils';
 import { validateNewsForm } from '../../validator/newsValidator';
-import { STATUS_NEWS, STATUS_NEWS_OPTIONS } from '../../constants/status';
 import NewsPreviewModal from './NewsPreviewModal';
+import { uploadNewsFile } from '../../features/news/newsThunks';
+import { showToast } from '../../utils/toastNotification';
 
 const NewsFormModal = ({ isOpen, onClose, onSubmit, initialData = null, isLoading = false }) => {
+    const dispatch = useDispatch();
     const [formData, setFormData] = useState({
         idDanhMuc: '',
         tieuDe: '',
@@ -20,6 +23,7 @@ const NewsFormModal = ({ isOpen, onClose, onSubmit, initialData = null, isLoadin
     const [filePreview, setFilePreview] = useState(null);
     const [errors, setErrors] = useState({});
     const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+    const [contentImages, setContentImages] = useState([]);
     const { activeCategories, loading: categoriesLoading } = useCategories({ autoFetch: true});
 
     const modules = {
@@ -145,6 +149,70 @@ const NewsFormModal = ({ isOpen, onClose, onSubmit, initialData = null, isLoadin
         return true;
     };
 
+    const extractBase64Images = (html) => {
+        const imgRegex = /<img[^>]+src="data:image\/([^;]+);base64,([^"]+)"/g;
+        const images = [];
+        let match;
+
+        while ((match = imgRegex.exec(html)) !== null) {
+            images.push({
+                format: match[1],
+                base64: match[2],
+                fullSrc: match[0]
+            });
+        }
+
+        return images;
+    };
+
+    const base64ToFile = (base64String, format, index) => {
+        const byteString = atob(base64String);
+        const arrayBuffer = new ArrayBuffer(byteString.length);
+        const uint8Array = new Uint8Array(arrayBuffer);
+
+        for (let i = 0; i < byteString.length; i++) {
+            uint8Array[i] = byteString.charCodeAt(i);
+        }
+
+        const blob = new Blob([uint8Array], { type: `image/${format}` });
+        return new File([blob], `content-image-${index}.${format}`, { type: `image/${format}` });
+    };
+
+    const uploadContentImages = async (newsId, images) => {
+        const uploadedUrls = [];
+
+        for (let i = 0; i < images.length; i++) {
+            const image = images[i];
+            const file = base64ToFile(image.base64, image.format, i);
+            
+            const fileFormData = new FormData();
+            fileFormData.append('idTinTuc', newsId);
+            fileFormData.append('file', file);
+
+            try {
+                const result = await dispatch(uploadNewsFile({ idTinTuc: newsId, fileData: fileFormData })).unwrap();
+                if (result.url_file) {
+                    uploadedUrls.push({
+                        oldSrc: `data:image/${image.format};base64,${image.base64}`,
+                        newSrc: process.env.REACT_APP_API_URL + result.url_file
+                    });
+                }
+            } catch (error) {
+                showToast.error(`Lỗi khi tải ảnh lên: ${error.message || 'Không xác định'}`);
+            }
+        }
+
+        return uploadedUrls;
+    };
+
+    const replaceImageUrls = (html, urlMap) => {
+        let updatedHtml = html;
+        urlMap.forEach(({ oldSrc, newSrc }) => {
+            updatedHtml = updatedHtml.replace(new RegExp(oldSrc.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'), newSrc);
+        });
+        return updatedHtml;
+    };
+
     const handleSubmit = async () => {
         const isValid = await validateForm();
         if (!isValid) {
@@ -155,7 +223,7 @@ const NewsFormModal = ({ isOpen, onClose, onSubmit, initialData = null, isLoadin
         submitData.append('idDanhMuc', formData.idDanhMuc);
         submitData.append('tieuDe', formData.tieuDe);
         submitData.append('noiDung', formData.noiDung);
-        submitData.append('isActive', formData.isActive);
+        submitData.append('isActive', String(formData.isActive));
 
         if (formData.tacGia) {
             submitData.append('tacGia', formData.tacGia);
@@ -164,7 +232,24 @@ const NewsFormModal = ({ isOpen, onClose, onSubmit, initialData = null, isLoadin
             submitData.append('file', formData.file);
         }
 
-        onSubmit(submitData);
+        const base64Images = extractBase64Images(formData.noiDung);
+        setContentImages(base64Images);
+
+        await onSubmit(submitData, async (createdNewsId) => {
+            if (base64Images.length > 0 && createdNewsId) {
+                const uploadedUrls = await uploadContentImages(createdNewsId, base64Images);
+                
+                if (uploadedUrls.length > 0) {
+                    const updatedContent = replaceImageUrls(formData.noiDung, uploadedUrls);
+                    
+                    const updateFormData = new FormData();
+                    updateFormData.append('noiDung', updatedContent);
+                    updateFormData.append('isActive', String(formData.isActive));
+                    
+                    await onSubmit(updateFormData, null, true);
+                }
+            }
+        });
     };
 
     const handleClose = () => {

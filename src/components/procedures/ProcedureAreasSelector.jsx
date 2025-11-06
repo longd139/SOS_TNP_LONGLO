@@ -33,26 +33,20 @@ const ProcedureAreasSelector = ({ formData, errors, areas: propAreas, toggleArea
     }, [dispatch, reduxAreas.length]);
 
     useEffect(() => {
-        if (!search) {
-            setSearchResults([]);
-            return;
-        }
-
         const timer = setTimeout(async () => {
             setLoading(true);
             try {
-                const results = await AREAS_API.getAreas(true, search);
+                const results = await AREAS_API.getAreas(true, search || '');
                 const filtered = results.filter(
                     area => !formData.danhSachLinhVucIds.includes(area.id)
                 );
                 setSearchResults(filtered);
-                setShowDropdown(true);
             } catch (error) {
                 setSearchResults([]);
             } finally {
                 setLoading(false);
             }
-        }, 300);
+        }, search ? 300 : 0);
 
         return () => clearTimeout(timer);
     }, [search, formData.danhSachLinhVucIds]);
@@ -125,7 +119,10 @@ const ProcedureAreasSelector = ({ formData, errors, areas: propAreas, toggleArea
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
                             onFocus={() => { 
-                                if (searchResults.length) setShowDropdown(true); 
+                                setShowDropdown(true);
+                                if (!search && searchResults.length === 0) {
+                                    setSearch('');
+                                }
                             }}
                             onKeyDown={handleKeyDown}
                             placeholder="Tìm kiếm lĩnh vực..."
@@ -134,7 +131,7 @@ const ProcedureAreasSelector = ({ formData, errors, areas: propAreas, toggleArea
                             }`}
                         />
 
-                        {showDropdown && (searchResults.length > 0 || loading) && (
+                        {showDropdown && (
                             <div className="absolute z-40 left-0 right-0 mt-1 bg-white border rounded-md shadow-lg max-h-60 overflow-auto">
                         {loading && (
                             <div className="p-2 text-sm text-gray-500">Đang tìm...</div>
@@ -152,7 +149,7 @@ const ProcedureAreasSelector = ({ formData, errors, areas: propAreas, toggleArea
                                     highlightedIndex === idx ? 'bg-blue-100' : ''
                                 }`}
                             >
-                                <div className="font-medium text-sm">{area.ten_linh_vuc}</div>
+                                <div className="font-medium text-sm truncate">{area.ten_linh_vuc}</div>
                             </button>
                         ))}
                             </div>
