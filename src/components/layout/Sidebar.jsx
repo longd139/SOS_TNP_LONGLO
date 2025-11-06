@@ -1,5 +1,4 @@
 import { BarChart3, Calendar, FileText, FolderOpen, LayoutDashboard, MessageSquare, Newspaper, Phone, UserCog, Menu, ChevronLeft, X } from 'lucide-react';
-import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import ROUTE_PATH from '../../constants/routes';

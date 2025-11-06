@@ -98,7 +98,6 @@ export default function NewsManager() {
                 const newsId = result.data?.id;
                 showToast.success('Tạo tin tức thành công!');
                 
-                // Call callback with news ID if provided
                 if (callback && newsId) {
                     await callback(newsId);
                 }
@@ -129,7 +128,6 @@ export default function NewsManager() {
             if (result.success) {
                 showToast.success('Cập nhật tin tức thành công!');
                 
-                // Call callback with news ID if provided
                 if (callback && selectedNews.id) {
                     await callback(selectedNews.id);
                 }
@@ -167,7 +165,6 @@ export default function NewsManager() {
             setShowActive(newFilters.isActive);
         }
 
-        // Update page size if provided
         const selectedPageSize = newFilters.pageSize !== undefined ? Number(newFilters.pageSize) : pageSize;
         if (newFilters.pageSize !== undefined) {
             setPageSize(selectedPageSize);

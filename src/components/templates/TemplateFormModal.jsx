@@ -29,12 +29,10 @@ const TemplateFormModal = ({
     useEffect(() => {
         if (initialData && mode === 'edit') {
             setFormData({
-                // accept both snake_case (from API) and camelCase (internal) to be robust
                 tenMauDon: initialData?.ten_mau_don ?? initialData?.tenMauDon ?? '',
                 maMauDon: initialData?.ma_mau_don ?? initialData?.maMauDon ?? '',
                 moTa: initialData?.mo_ta ?? initialData?.moTa ?? '',
                 file: null,
-                // backend may return `is_removed` or `is_delete` (sample shows `is_delete`) — accept both
                 isRemoved: initialData?.is_removed ?? initialData?.is_delete ?? initialData?.isRemoved ?? false
             });
             setFileName('');
@@ -90,7 +88,6 @@ const TemplateFormModal = ({
             }
 
             if (mode === 'edit') {
-                // send both camelCase and common snake_case variants so backend accepts either key
                 formDataToSubmit.append('isRemoved', formData.isRemoved);
                 formDataToSubmit.append('is_removed', formData.isRemoved);
                 formDataToSubmit.append('is_delete', formData.isRemoved);
@@ -100,14 +97,12 @@ const TemplateFormModal = ({
                 formDataToSubmit.append('file', formData.file);
             }
 
-            // prepare options for upload: progress callback and longer timeout
             const options = {
                 onUploadProgress: (e) => {
                     if (e.lengthComputable) {
                         const pct = Math.round((e.loaded * 100) / e.total);
                         setUploadProgress(pct);
                     } else {
-                        // unknown total size
                         setUploadProgress(null);
                     }
                 }
@@ -329,7 +324,6 @@ const TemplateFormModal = ({
                     )}
                 </div>
 
-                {/* Upload progress bar */}
                 {isSubmitting && uploadProgress !== null && (
                     <div className="w-full bg-gray-100 rounded-full h-3 overflow-hidden">
                         <div

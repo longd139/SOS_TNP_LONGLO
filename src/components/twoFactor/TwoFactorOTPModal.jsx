@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import BaseModal from '../base/BaseModal';
+import { validateOtp } from '../../validator/otpValidator';
 
 const TwoFactorOTPModal = ({ isOpen, onClose, onVerify, isLoading, action = 'bật' }) => {
     const [otp, setOtp] = useState('');
@@ -9,13 +10,9 @@ const TwoFactorOTPModal = ({ isOpen, onClose, onVerify, isLoading, action = 'b�
         e.preventDefault();
         setError('');
 
-        if (!otp.trim()) {
-            setError('Vui lòng nhập mã OTP');
-            return;
-        }
-
-        if (otp.length !== 6 || !/^\d+$/.test(otp)) {
-            setError('Mã OTP phải là 6 chữ số');
+        const validation = await validateOtp({ otp });
+        if (!validation.isValid) {
+            setError(validation.errors.otp);
             return;
         }
 
