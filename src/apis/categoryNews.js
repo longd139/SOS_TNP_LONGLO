@@ -16,7 +16,7 @@ const createCategory = async (categoryData) => {
 const getAllCategories = async (isRemoved) => {
     try {
         const response = await apiClient.get("/api/danh-muc-tin-tuc", {
-            params: { isRemoved }
+            params: { isActive: !isRemoved }
         });
         if (response.data.success) return response.data.data;
         else throw new Error(response.data.message || "Lấy danh sách danh mục thất bại");

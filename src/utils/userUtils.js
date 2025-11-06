@@ -1,6 +1,6 @@
 
 export const validatePhoneNumber = (phone) => {
-    if (!phone) return true; // Phone is optional
+    if (!phone) return true;
     
     const cleanPhone = phone.replace(/[\s\-()]/g, '');
     

@@ -6,6 +6,7 @@ import { useSchedule } from "../../hooks/useSchedule";
 import MonthCalendar from "../../components/workSchedule/MonthCalendar";
 import ScheduleList from "../../components/workSchedule/ScheduleList";
 import dayjs from "dayjs";
+import { validateFileImport } from "../../validator/fileValidator";
 
 export default function WorkSchedule() {
     const {
@@ -34,14 +35,12 @@ export default function WorkSchedule() {
     });
 
     const [selectedDate, setSelectedDate] = useState(null);
-    const [activeFilter, setActiveFilter] = useState("all"); // "all", "active", "inactive"
+    const [activeFilter, setActiveFilter] = useState("all"); 
 
-    // Fetch schedules on component mount
     useEffect(() => {
         fetchSchedules();
     }, [fetchSchedules]);
 
-    // Clear error on unmount
     useEffect(() => {
         return () => {
             if (error) {
@@ -56,7 +55,7 @@ export default function WorkSchedule() {
 
     const handleMonthChange = (newMonth) => {
         setSelectedMonth(newMonth);
-        setSelectedDate(null); // Reset selected date when changing month
+        setSelectedDate(null);
         fetchSchedules({ monthYear: `${newMonth}/${selectedYear}` });
     };
 
@@ -114,47 +113,32 @@ export default function WorkSchedule() {
         input.accept = ".xlsx,.xls,.csv";
         input.onchange = async (event) => {
             const file = event.target.files[0];
-            if (file) {
-                const maxSize = 10 * 1024 * 1024;
-                if (file.size > maxSize) {
-                    showToast.error("File quá lớn. Vui lòng chọn file nhỏ hơn 10MB.");
-                    return;
-                }
+            if (!file) return;
 
-                const allowedTypes = [
-                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", // .xlsx
-                    "application/vnd.ms-excel",
-                    "text/csv",
-                ];
+            const validation = await validateFileImport({ file });
+            if (!validation.isValid) {
+                showToast.error(validation.errors.file);
+                return;
+            }
 
-                if (!allowedTypes.includes(file.type)) {
-                    showToast.error(
-                        "Định dạng file không hỗ trợ. Vui lòng chọn file .xlsx, .xls hoặc .csv"
+            try {
+                showToast.info(`Đang import file ${file.name}...`);
+                const result = await importSchedule(file);
+
+                if (result.success) {
+                    showToast.success(
+                        `Import thành công! Đã import ${result.data?.importedCount || 0} lịch tiếp dân.`
                     );
-                    return;
-                }
-
-                try {
-                    showToast.info(`Đang import file ${file.name}...`);
-                    const result = await importSchedule(file);
-
-                    if (result.success) {
-                        showToast.success(
-                            `Import thành công! Đã import ${result.data?.importedCount || 0
-                            } lịch tiếp dân.`
-                        );
-                        fetchSchedules();
-                    } else {
-                        showToast.error(
-                            result.error ||
-                            "Import lịch tiếp dân thất bại. Vui lòng kiểm tra định dạng file."
-                        );
-                    }
-                } catch (error) {
+                    fetchSchedules();
+                } else {
                     showToast.error(
-                        "Có lỗi xảy ra khi import. Vui lòng thử lại hoặc kiểm tra định dạng file."
+                        result.error || "Import lịch tiếp dân thất bại. Vui lòng kiểm tra định dạng file."
                     );
                 }
+            } catch (error) {
+                showToast.error(
+                    "Có lỗi xảy ra khi import. Vui lòng thử lại hoặc kiểm tra định dạng file."
+                );
             }
         };
         input.click();

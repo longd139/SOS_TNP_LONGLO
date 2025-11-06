@@ -52,7 +52,6 @@ const trinhTuThucHienSchema = yup.object().shape({
     thu_tu_buoc: yup
         .number()
         .nullable()
-        // .min(1, "Thứ tự bước phải lớn hơn hoặc bằng 1")
 });
 
 export const createFormalitySchema = yup.object().shape({

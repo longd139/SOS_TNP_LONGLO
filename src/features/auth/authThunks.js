@@ -112,7 +112,6 @@ export const changePassword = createAsyncThunk(
                 throw new Error('Mật khẩu mới phải khác mật khẩu cũ');
             }
 
-            // Pass backend-aligned keys directly
             const response = await AUTH_API.changePassword({
                 matKhauHienTai: passwordData.matKhauHienTai,
                 matKhauMoi: passwordData.matKhauMoi,

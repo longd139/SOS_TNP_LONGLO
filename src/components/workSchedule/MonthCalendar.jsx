@@ -30,11 +30,9 @@ export default function MonthCalendar({
     const startDayOfWeek = firstDay.getDay();
 
     const daysArray = [];
-    // Add empty cells for days before the first day of the month
     for (let i = 0; i < startDayOfWeek; i++) {
       daysArray.push(null);
     }
-    // Add days of the month
     for (let i = 1; i <= daysInMonth; i++) {
       daysArray.push(i);
     }

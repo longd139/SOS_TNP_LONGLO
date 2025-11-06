@@ -2,7 +2,6 @@ import { createSelector } from '@reduxjs/toolkit';
 
 const selectWorkScheduleState = (state) => state.workSchedule;
 
-// Helper function to get date field value
 const getScheduleDateField = (schedule) => {
     return schedule.ngay_tiep_dan || schedule.date;
 };
@@ -42,12 +41,6 @@ export const selectSelectedYear = createSelector(
     (workSchedule) => workSchedule.selectedYear
 );
 
-// export const selectShowActive = createSelector(
-//     [selectWorkScheduleState],
-//     (workSchedule) => workSchedule.showActive
-// );
-
-// Computed selectors
 export const selectSchedulesForDisplay = createSelector(
     [selectSchedulesList],
     (schedules) => {
@@ -90,7 +83,6 @@ export const selectHasScheduleForDay = createSelector(
     }
 );
 
-// Selector for schedules on a specific date
 export const selectSchedulesForDate = createSelector(
     [selectSchedulesList, (state, date) => date],
     (schedules, date) => {
