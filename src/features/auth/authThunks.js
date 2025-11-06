@@ -91,3 +91,41 @@ export const verifyOtpUser = createAsyncThunk(
         }
     }
 );
+
+export const changePassword = createAsyncThunk(
+    'auth/changePassword',
+    async (passwordData, { rejectWithValue }) => {
+        try {
+            if (!passwordData.matKhauHienTai || !passwordData.matKhauMoi || !passwordData.confirmMatKhauMoi) {
+                throw new Error('Vui lòng điền đầy đủ thông tin');
+            }
+
+            if (passwordData.matKhauMoi !== passwordData.confirmMatKhauMoi) {
+                throw new Error('Mật khẩu mới không khớp');
+            }
+
+            if (passwordData.matKhauMoi.length < 6) {
+                throw new Error('Mật khẩu mới phải có ít nhất 6 ký tự');
+            }
+
+            if (passwordData.matKhauHienTai === passwordData.matKhauMoi) {
+                throw new Error('Mật khẩu mới phải khác mật khẩu cũ');
+            }
+
+            // Pass backend-aligned keys directly
+            const response = await AUTH_API.changePassword({
+                matKhauHienTai: passwordData.matKhauHienTai,
+                matKhauMoi: passwordData.matKhauMoi,
+            });
+
+            return {
+                message: 'Đổi mật khẩu thành công',
+                data: response,
+            };
+        } catch (error) {
+            return rejectWithValue({ 
+                message: error.message || 'Đổi mật khẩu thất bại' 
+            });
+        }
+    }
+);
