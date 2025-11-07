@@ -100,7 +100,7 @@ const ProcedureAreasSelector = ({ formData, errors, areas: propAreas, toggleArea
             
             setIsAreaModalOpen(false);
         } catch (error) {
-            showToast.error(error.message || 'Tạo lĩnh vực thất bại!');
+            showToast.error(error.message || 'Tạo lĩnh vực thất bại!' || error);
             throw error;
         }
     };

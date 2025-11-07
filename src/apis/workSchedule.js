@@ -86,9 +86,43 @@ const deleteWorkSchedule = async (scheduleId) => {
     }
 }
 
+const getTemplateWorkSchedule = async () => {
+    try {
+        const response = await apiFormClient.get('/api/lich-tiep-dan/template');
+        if (response.data.success) {
+            return response.data;
+        } else {
+            throw new Error(response.data.message || "Lấy template lịch tiếp dân thất bại");
+        }
+    } catch (error) {
+        if (error.response?.data?.message) {
+            throw new Error(error.response.data.message);
+        }
+        throw error;
+    }
+}
+
+const getWorkScheduleById = async (scheduleId) => {
+    try {
+        const response = await apiFormClient.get(`/api/lich-tiep-dan/${scheduleId}`);
+        if (response.data.success) {
+            return response.data.data;
+        }
+        else {
+            throw new Error(response.data.message || "Lấy lịch tiếp dân thất bại");
+        }
+    } catch (error) {
+        if (error.response?.data?.message) {
+            throw new Error(error.response.data.message);
+        }
+        throw error;
+    }
+}
 export const WORK_SCHEDULE_API = {
     importWorkSchedule,
     getWorkSchedules,
     updateWorkScheduleStatus,
-    deleteWorkSchedule
+    deleteWorkSchedule,
+    getTemplateWorkSchedule,
+    getWorkScheduleById
 };

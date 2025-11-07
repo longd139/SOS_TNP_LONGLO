@@ -73,7 +73,7 @@ export default function AdminManager() {
             setUserModal({ isOpen: false, user: null });
 
         } catch (error) {
-            showToast.error(error.message || 'Có lỗi xảy ra!');
+            showToast.error(error.message || 'Có lỗi xảy ra!' || error);
         } finally {
             setModalLoading(false);
         }
@@ -90,7 +90,7 @@ export default function AdminManager() {
             setDeleteModal({ isOpen: false, user: null });
 
         } catch (error) {
-            showToast.error(error.message || 'Có lỗi xảy ra khi xóa tài khoản!');
+            showToast.error(error.message || 'Có lỗi xảy ra khi xóa tài khoản!' || error);
         }
     };
 
@@ -103,7 +103,7 @@ export default function AdminManager() {
             await updateStatus(user.id, !user.active);
             showToast.success(`Tài khoản đã được ${!user.active ? 'kích hoạt' : 'vô hiệu hóa'} thành công!`);
         } catch (error) {
-            showToast.error(error.message || 'Có lỗi xảy ra khi cập nhật trạng thái tài khoản!');
+            showToast.error(error.message || 'Có lỗi xảy ra khi cập nhật trạng thái tài khoản!' || error);
         }
     };
 

@@ -20,6 +20,7 @@ import {
     selectShowRemoved
 } from '../../features/templates/templatesSelectors';
 import { setShowRemoved } from '../../features/templates/templatesSlice';
+import { downloadUtils } from '../../utils/downLoadUtils';
 
 dayjs.locale('vi');
 
@@ -42,10 +43,7 @@ export default function TemplateManager() {
     }, [dispatch, showRemoved]);
 
     const handleView = (template) => {
-        const baseUrl = process.env.REACT_APP_API_URL || '';
-        const filePath = template?.urlFilePdf ?? template?.url_file_pdf ?? '';
-        const fileUrl = `${baseUrl}${filePath}`;
-        window.open(fileUrl, '_blank');
+        downloadUtils.handleDownload(template);
     };
 
     const handleEdit = (template) => {

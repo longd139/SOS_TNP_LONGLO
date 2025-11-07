@@ -1,5 +1,19 @@
 const ROUTE_PATH = {
     LOGIN: '/',
-    DASHBOARD: '/dashboard'
+    DASHBOARD: '/dashboard',
+    REPORT: '/reports',
+    REPORT_DETAIL: '/reports/:id',
+    REPORT_UPDATE: '/reports/update',
+    REPORT_STATISTICS: '/reports/statistics',
+    REPORT_USERS: '/reports/users',
+    REPORT_EXPORT: '/reports/export',
+    NEWS: '/news',
+    PROCEDURES: '/procedures',
+    TEMPLATES: '/templates',
+    CONTACT: '/contact',
+    SCHEDULES: '/schedules',
+    STATISTICS: '/statistics',
+    ACCOUNTS: '/accounts',
+    NOT_FOUND: '*',
 }
 export default ROUTE_PATH;

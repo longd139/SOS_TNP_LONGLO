@@ -20,9 +20,7 @@ export default function ScheduleList({
     formatDate,
     selectedDate,
 }) {
-    // Helper function to get field value with fallback
     const getFieldValue = (schedule, field, fallback = "N/A") => {
-        // Try different possible field names
         const possibleFields = {
             date: ["ngay_tiep_dan", "date"],
             time: ["thoi_gian", "time"],
@@ -42,7 +40,6 @@ export default function ScheduleList({
         return schedule[field] || fallback;
     };
 
-    // Determine display message based on state
     const getDisplayMessage = () => {
         if (selectedDate) {
             const selectedSchedules = schedules.filter(

@@ -76,7 +76,7 @@ const GovernmentFormModal = ({ isOpen, onClose, onCreate }) => {
             setForm(initialState);
             onClose();
         } catch (err) {
-            showToast.error('Có lỗi khi tạo cơ sở. Vui lòng thử lại.');
+            showToast.error(err || 'Có lỗi khi tạo cơ sở. Vui lòng thử lại.');
         } finally {
             setLoading(false);
         }

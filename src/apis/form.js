@@ -41,10 +41,10 @@ const updateForm = async (formId, formData, options = {}) => {
     }
 }
 
-const getAllForms = async (isRemoved = false) => {
+const getAllForms = async (isRemoved = false, search = '') => {
     try {
         const response = await apiFormClient.get('/api/mau-don', {
-            params: { isActive: !isRemoved }
+            params: { isActive: !isRemoved, search }
         });
         if (response.data.success) return keysToCamel(response.data.data);
         else throw new Error("Lấy tất cả biểu mẫu thất bại");
@@ -90,10 +90,34 @@ export const updateMauDonStatus = async (mauDonId, isActive, options = {}) => {
   }
 };
 
+const getFormById = async (formId) => {
+    try {
+        const response = await apiFormClient.get(`/api/mau-don/${formId}`);
+        if (response.data.success) return keysToCamel(response.data.data);
+        else throw new Error("Lấy biểu mẫu thất bại");
+    } catch (error) {
+        throw error;
+    }
+};
+
+const getAllFromPaging = async (pageIndex, pageSize, isRemoved = false, search = '') => {
+    try {
+        const response = await apiFormClient.get('/api/mau-don/paging', {
+            params: { pageIndex, pageSize, isActive: !isRemoved, search }
+        });
+        if (response.data.success) return keysToCamel(response.data.data);
+        else throw new Error("Lấy biểu mẫu phân trang thất bại");
+    } catch (error) {
+        throw error;
+    }
+};
+
 export const FORM_API = {
     createForm,
     updateForm,
     getAllForms,
     deleteForm,
-    updateMauDonStatus
+    updateMauDonStatus,
+    getFormById,
+    getAllFromPaging
 }

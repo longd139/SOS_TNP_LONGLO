@@ -85,10 +85,24 @@ const deleteGovernment = async (id) => {
     }
 }
 
+const updateStatusGovernment = async (id, isActive) => {
+    try {
+        const response = await apiClient.put(`/api/co-so-dich-vu-cong/update-status/${id}`, { isActive });
+        if (!response.data.success) throw new Error(response.data.message || 'Failed to update government status');
+        return response.data.data;
+    } catch (error) {
+        if (error.response?.data?.message) {
+            throw new Error(error.response.data.message);
+        }
+        throw error;
+    }
+}
+
 export const GOVERNMENT_API = {
     getGovernment,
     createGovernment,
     getGovernmentById,
     updateGovernment,
-    deleteGovernment
+    deleteGovernment,
+    updateStatusGovernment
 }

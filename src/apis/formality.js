@@ -129,6 +129,19 @@ const updateStatus = async (userProcedureId, isActive) => {
     }
 }
 
+const getComponentByFormalityId = async (formalityId) => {
+    try {
+        const response = await apiClient.get(`/api/thu-tuc/${formalityId}/thanh-phan`);
+        if (response.data.success) return response.data.data;
+        else throw new Error(response.data.message || "Lấy thành phần theo thủ tục hành chính thất bại");
+    } catch (error) {
+        if (error.response?.data?.message) {
+            throw new Error(error.response.data.message);
+        }
+        throw error;
+    }
+}
+
 export const FORMALITY_API = {
     getFormalityApi,
     createFormality,
@@ -136,5 +149,6 @@ export const FORMALITY_API = {
     getFormByFormalityId,
     updateFormality,
     deleteFormality,
-    updateStatus
+    updateStatus,
+    getComponentByFormalityId
 }

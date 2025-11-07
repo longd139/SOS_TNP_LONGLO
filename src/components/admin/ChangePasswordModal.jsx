@@ -110,8 +110,8 @@ const ChangePasswordModal = ({ isOpen, onClose }) => {
                 )}
 
                 <div>
-                    <label className="block text-xs md:text-sm font-medium text-gray-700 mb-1.5">
-                        Mật khẩu cũ <span className="text-red-500">*</span>
+                    <label className="block text-xs md:text-sm font-medium text-gray-700 mb-1.5 required-label">
+                        Mật khẩu cũ
                     </label>
                     <div className="relative">
                         <input
@@ -140,8 +140,8 @@ const ChangePasswordModal = ({ isOpen, onClose }) => {
                 </div>
 
                 <div>
-                    <label className="block text-xs md:text-sm font-medium text-gray-700 mb-1.5">
-                        Mật khẩu mới <span className="text-red-500">*</span>
+                    <label className="block text-xs md:text-sm font-medium text-gray-700 mb-1.5 required-label">
+                        Mật khẩu mới
                     </label>
                     <div className="relative">
                         <input
@@ -172,7 +172,7 @@ const ChangePasswordModal = ({ isOpen, onClose }) => {
 
                 <div>
                     <label className="block text-xs md:text-sm font-medium text-gray-700 mb-1.5">
-                        Xác nhận mật khẩu mới <span className="text-red-500">*</span>
+                        Xác nhận mật khẩu mới
                     </label>
                     <div className="relative">
                         <input

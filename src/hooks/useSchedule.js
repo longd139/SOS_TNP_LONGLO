@@ -4,7 +4,8 @@ import {
     fetchWorkSchedules, 
     importWorkSchedule, 
     updateWorkScheduleStatus, 
-    deleteWorkSchedule 
+    deleteWorkSchedule, 
+    getTemplateWorkSchedule
 } from '../features/workSchedule/workScheduleThunks';
 import { 
     clearError,
@@ -89,6 +90,19 @@ export const useSchedule = () => {
             return { success: false, error: error.message || 'Import lịch tiếp dân thất bại!' };
         }
     }, [dispatch, fetchSchedules]);
+
+    const getTemplate = useCallback(async () => {
+        try {
+            const result = await dispatch(getTemplateWorkSchedule());
+            if (getTemplateWorkSchedule.fulfilled.match(result)) {
+                return { success: true, data: result.payload };
+            } else {
+                return { success: false, error: result.payload?.message || result.payload || 'Lấy template lịch tiếp dân thất bại!' };
+            }
+        } catch (error) {
+            return { success: false, error: error.message || 'Lấy template lịch tiếp dân thất bại!' };
+        }
+    }, [dispatch]);
 
     const updateStatus = useCallback(async (schedule) => {
         const newStatus = !(schedule.isActive || schedule.is_active);
@@ -190,7 +204,7 @@ export const useSchedule = () => {
         importSchedule,
         updateStatus,
         deleteSchedule: deleteScheduleItem,
-        
+        getTemplate: getTemplate,
         addNewSchedule,
         updateExistingSchedule,
         removeScheduleLocal,

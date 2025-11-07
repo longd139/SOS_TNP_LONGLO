@@ -153,7 +153,6 @@ export const AUTH_API = {
     sendOtp: sendOtpApi,
     resetPassword: resetPasswordApi,
     verifiedStatus2FA: verifiedStatus2FAApi,
-    
 }
 
 

@@ -109,7 +109,7 @@ const TemplateFormModal = ({
             if (error.response?.data?.message) {
                 showToast.error(error.response.data.message);
             } else {
-                showToast.error('Có lỗi xảy ra khi lưu biểu mẫu!');
+                showToast.error('Có lỗi xảy ra khi lưu biểu mẫu!' || error || error.message);
             }
         } finally {
             setIsSubmitting(false);
@@ -171,8 +171,8 @@ const TemplateFormModal = ({
         >
             <div className="space-y-4">
                 <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Tên biểu mẫu <span className="text-red-500">*</span>
+                    <label className="block text-sm font-medium text-gray-700 mb-2 required-label">
+                        Tên biểu mẫu
                     </label>
                     <input
                         type="text"
@@ -188,8 +188,8 @@ const TemplateFormModal = ({
                 </div>
 
                 <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Mã biểu mẫu <span className="text-red-500">*</span>
+                    <label className="block text-sm font-medium text-gray-700 mb-2 required-label">
+                        Mã biểu mẫu
                     </label>
                     <input
                         type="text"
@@ -218,8 +218,8 @@ const TemplateFormModal = ({
                 </div>
 
                 <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                        File PDF {mode === 'create' && <span className="text-red-500">*</span>}
+                    <label className="block text-sm font-medium text-gray-700 mb-2 required-label">
+                        File PDF
                     </label>
 
                     {mode === 'edit' && (initialData?.urlFilePdf ?? initialData?.url_file_pdf) && !fileName && (
