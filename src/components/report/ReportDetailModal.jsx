@@ -16,6 +16,7 @@ import {
 } from "../../utils/badgeUtils";
 import { useReports } from "../../hooks/useReports";
 import { showToast } from "../../utils/toastNotification";
+import { validateReport } from "../../validator/reportValidator";
 
 const ReportDetailModal = ({ isOpen, onClose, report, loading = false, onStatusUpdated, mode = "view" }) => {
     const { statusReport, updateStatus, clearError } = useReports();
@@ -40,19 +41,25 @@ const ReportDetailModal = ({ isOpen, onClose, report, loading = false, onStatusU
     }, [report?.id, statusReport, isOpen]);
 
     const handleUpdateStatus = async () => {
-        if (!selectedStatus) {
-            showToast.error("Vui lòng chọn trạng thái");
-            return;
-        }
-
-        if (!responseContent.trim()) {
-            showToast.error("Vui lòng nhập nội dung phản hồi");
-            return;
-        }
-
         try {
             setIsSubmitting(true);
             clearError();
+
+            const formData = {
+                selectedStatus,
+                responseContent,
+                expectedResponseDate: expectedResponseDate ? new Date(expectedResponseDate) : null,
+                expectedCompletionDate: expectedCompletionDate ? new Date(expectedCompletionDate) : null,
+            };
+
+            const { isValid, errors } = await validateReport(formData);
+
+            if (!isValid) {
+                const firstError = Object.values(errors)[0];
+                showToast.error(firstError);
+                setIsSubmitting(false);
+                return;
+            }
 
             const statusData = {
                 trangThai: selectedStatus,
@@ -227,7 +234,7 @@ const ReportDetailModal = ({ isOpen, onClose, report, loading = false, onStatusU
                                     </div>
 
                                     <div className="mt-0">
-                                        <h4 className="text-sm font-semibold text-gray-900 mb-3">
+                                        <h4 className="text-sm font-semibold text-gray-900 mb-3 required-label">
                                             {isEditMode ? "Cập nhật trạng thái" : "Trạng thái"}
                                         </h4>
                                         <div className="space-y-3">
@@ -250,7 +257,7 @@ const ReportDetailModal = ({ isOpen, onClose, report, loading = false, onStatusU
                                             {isEditMode && (
                                                 <>
                                                     <div>
-                                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                        <label className="block text-sm font-medium text-gray-700 mb-2 required-label">
                                                             Thời gian phản hồi dự kiến
                                                         </label>
                                                         <input
@@ -262,7 +269,7 @@ const ReportDetailModal = ({ isOpen, onClose, report, loading = false, onStatusU
                                                     </div>
 
                                                     <div>
-                                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                        <label className="block text-sm font-medium text-gray-700 mb-2 required-label">
                                                             Ngày dự kiến hoàn thành
                                                         </label>
                                                         <input
