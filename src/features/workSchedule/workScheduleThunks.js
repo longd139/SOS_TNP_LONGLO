@@ -56,3 +56,17 @@ export const deleteWorkSchedule = createAsyncThunk(
         }
     }
 );
+
+export const getTemplateWorkSchedule = createAsyncThunk(
+    'workSchedule/getTemplateWorkSchedule',
+    async (_, { rejectWithValue }) => {
+        try {
+            const response = await WORK_SCHEDULE_API.getTemplateWorkSchedule();
+            return response;
+        } catch (error) {
+            return rejectWithValue({
+                message: error.response?.data?.message || error.message || 'Lấy template lịch tiếp dân thất bại'
+            });
+        }
+    }
+);

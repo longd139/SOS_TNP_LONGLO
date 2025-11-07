@@ -1,31 +1,10 @@
-const getReportPagination = async (
-    idLinhVucPhanAnh,
-    trangThai,
-    mucDo,
-    page,
-    size,
-    maPhanAnh
-) => {
+import apiClient from "../utils/apiClient";
+
+const getReportPagination = async (params) => {
     try {
-        const params = new URLSearchParams({
-            page,
-            size
-        });
-        if (idLinhVucPhanAnh) {
-            params.append('idLinhVucPhanAnh', idLinhVucPhanAnh);
-        }
-        if (trangThai) {
-            params.append('trangThai', trangThai);
-        }
-        if (mucDo) {
-            params.append('mucDo', mucDo);
-        }
-        if (maPhanAnh) {
-            params.append('maPhanAnh', maPhanAnh);
-        }
         const response = await apiClient.get("/api/phan-anh", { params });
         if (response.data.success) {
-            return response.data.data;
+            return response.data;
         } else {
             throw new Error(response.data.message || "Lấy danh sách phản ánh thất bại");
         }
