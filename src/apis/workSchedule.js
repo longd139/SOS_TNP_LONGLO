@@ -90,7 +90,7 @@ const getTemplateWorkSchedule = async () => {
     try {
         const response = await apiFormClient.get('/api/lich-tiep-dan/template');
         if (response.data.success) {
-            return response.data.data;
+            return response.data;
         } else {
             throw new Error(response.data.message || "Lấy template lịch tiếp dân thất bại");
         }

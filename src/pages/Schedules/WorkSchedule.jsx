@@ -7,6 +7,7 @@ import MonthCalendar from "../../components/workSchedule/MonthCalendar";
 import ScheduleList from "../../components/workSchedule/ScheduleList";
 import dayjs from "dayjs";
 import { validateFileImport } from "../../validator/fileValidator";
+import { downloadUtils } from "../../utils/downLoadUtils";
 
 export default function WorkSchedule() {
     const {
@@ -27,6 +28,7 @@ export default function WorkSchedule() {
         setSelectedMonth,
         setSelectedYear,
         setShowActive,
+        getTemplate,
     } = useSchedule();
 
     const [deleteConfirm, setDeleteConfirm] = useState({
@@ -103,8 +105,18 @@ export default function WorkSchedule() {
         }
     };
 
-    const handleExport = () => {
-        showToast.info("Tính năng xuất Excel đang được phát triển.");
+    const handleDownload = async () => {
+        try {
+            const result = await getTemplate();
+            if (result.success) {
+                downloadUtils.handleDownloadExcel(result.data.data);
+                showToast.success(result.message || "Đã tải xuống template lịch tiếp dân.");
+            } else {
+                showToast.error(result.error || "Lấy template lịch tiếp dân thất bại.");
+            }
+        } catch (error) {
+            showToast.error("Có lỗi xảy ra khi tải template lịch tiếp dân.");
+        }
     };
 
     const handleImport = async () => {
@@ -183,11 +195,11 @@ export default function WorkSchedule() {
 
                 <div className="flex gap-2 md:gap-3 flex-wrap">
                     <button
-                        onClick={handleExport}
+                        onClick={handleDownload}
                         className="px-3 md:px-4 py-2 bg-white border border-gray-300 text-gray-700 text-sm md:text-base rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center justify-center gap-2"
                     >
                         <Download className="w-4 h-4" />
-                        <span className="hidden sm:inline">Xuất Excel</span>
+                        <span className="hidden sm:inline">Download Template</span>
                         <span className="sm:hidden">Excel</span>
                     </button>
                     <button

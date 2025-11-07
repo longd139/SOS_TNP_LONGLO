@@ -3,7 +3,8 @@ import {
     fetchWorkSchedules, 
     importWorkSchedule, 
     updateWorkScheduleStatus, 
-    deleteWorkSchedule 
+    deleteWorkSchedule, 
+    getTemplateWorkSchedule
 } from './workScheduleThunks';
 
 const initialState = {
@@ -123,6 +124,19 @@ const workScheduleSlice = createSlice({
             .addCase(deleteWorkSchedule.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload?.message || 'Xóa lịch tiếp dân thất bại';
+            })
+
+            .addCase(getTemplateWorkSchedule.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(getTemplateWorkSchedule.fulfilled, (state, action) => {
+                state.loading = false;
+                state.template = action.payload.data;
+            })
+            .addCase(getTemplateWorkSchedule.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload?.message || 'Lấy template lịch tiếp dân thất bại';
             });
     }
 });

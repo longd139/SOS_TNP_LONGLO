@@ -31,12 +31,12 @@ const getAllReportAreas = async (
         if (typeof isActive === 'boolean') {
             params.append('isActive', isActive);
         }
-        if (typeof search === 'string') {
+        if (search) {
             params.append('search', search);
         }
         const response = await apiClient.get("/api/linh-vuc-phan-anh", { params });
         if (response.data.success) {
-            return response.data.data;
+            return response.data;
         } else {
             throw new Error(response.data.message || "Lấy danh sách lĩnh vực báo cáo thất bại");
         }
