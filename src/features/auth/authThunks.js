@@ -2,6 +2,7 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import { jwtDecode } from 'jwt-decode';
 import { AUTH_API } from '../../apis/auth';
 import { validateAuth } from '../../validator/loginValidator';
+import { showToast } from '../../utils/toastNotification';
 
 const decodeToken = (token) => {
     try {
@@ -56,6 +57,7 @@ export const loginUser = createAsyncThunk(
                 },
             };
         } catch (error) {
+            showToast.error(error.message);
             return rejectWithValue({ message: error.message });
         }
     }

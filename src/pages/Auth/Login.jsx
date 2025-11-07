@@ -32,7 +32,6 @@ export default function Login() {
 
         const credentials = { tenDangNhap, matKhau };
         const result = await login(credentials);
-    
         if (result?.requiresTwoFactorAuth) {
             setShow2FAModal(true);
             return;
