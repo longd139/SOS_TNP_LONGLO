@@ -19,12 +19,13 @@ import WorkSchedule from "../pages/Schedules/WorkSchedule";
 import AdminManager from "../pages/AdminAccounts/AdminManager";
 import NotFound from "../pages/NotFound";
 import Statistics from "../pages/Statistic/Statistic";
+import ROUTE_PATH from "../constants/routes";
 
 function AppRoutes() {
     return (
         <Routes>
             <Route element={<AuthLayout />}>
-                <Route path="/" element={<Login />} />
+                <Route path={ROUTE_PATH.LOGIN} element={<Login />} />
             </Route>
 
             <Route element={
@@ -32,24 +33,23 @@ function AppRoutes() {
                     <AdminLayout />
                 </ProtectedRoute>
             }>
-                <Route path="/dashboard" element={<Dashboard />} />
-                <Route path="/reports" element={<ReportList />} />
-                <Route path="/reports/:id" element={<ReportDetail />} />
-                <Route path="/reports/update" element={<UpdateStatus />} />
-                <Route path="/reports/statistics" element={<ReportsStatistic />} />
-                <Route path="/reports/users" element={<ReportsUserStat />} />
-                <Route path="/reports/export" element={<ExportReport />} />
-                <Route path="/news" element={<NewsManager />} />
-                <Route path="/procedures" element={<ProceduresManager />} />
-                <Route path="/templates" element={<TemplateManager />} />
-                <Route path="/contact" element={<ContactInfo />} />
-                <Route path="/schedules" element={<WorkSchedule />} />
-                <Route path="/statistics" element={<Statistics />} />
-                <Route path="/accounts" element={<AdminManager />} />
+                <Route path={ROUTE_PATH.DASHBOARD} element={<Dashboard />} />
+                <Route path={ROUTE_PATH.REPORT} element={<ReportList />} />
+                <Route path={ROUTE_PATH.REPORT_DETAIL} element={<ReportDetail />} />
+                <Route path={ROUTE_PATH.REPORT_UPDATE} element={<UpdateStatus />} />
+                <Route path={ROUTE_PATH.REPORT_STATISTICS} element={<ReportsStatistic />} />
+                <Route path={ROUTE_PATH.REPORT_USERS} element={<ReportsUserStat />} />
+                <Route path={ROUTE_PATH.REPORT_EXPORT} element={<ExportReport />} />
+                <Route path={ROUTE_PATH.NEWS} element={<NewsManager />} />
+                <Route path={ROUTE_PATH.PROCEDURES} element={<ProceduresManager />} />
+                <Route path={ROUTE_PATH.TEMPLATES} element={<TemplateManager />} />
+                <Route path={ROUTE_PATH.CONTACT} element={<ContactInfo />} />
+                <Route path={ROUTE_PATH.SCHEDULES} element={<WorkSchedule />} />
+                <Route path={ROUTE_PATH.STATISTICS} element={<Statistics />} />
+                <Route path={ROUTE_PATH.ACCOUNTS} element={<AdminManager />} />
             </Route>
 
-            {/* 404 */}
-            <Route path="*" element={<NotFound />} />
+            <Route path={ROUTE_PATH.NOT_FOUND} element={<NotFound />} />
         </Routes>
     );
 }
