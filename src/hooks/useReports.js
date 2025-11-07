@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from 'react-redux';
-import { useCallback, useEffect } from 'react';
+import { useCallback } from 'react';
 import {
     fetchReportPagination,
     fetchHistoryStatus,
@@ -39,16 +39,6 @@ export const useReports = ({ autoFetch = false, filters = {} } = {}) => {
     const pagination = useSelector(selectReportPagination);
     const currentFilters = useSelector(selectReportFilters);
 
-    useEffect(() => {
-        if (autoFetch) {
-            loadReports({
-                page: pagination.currentPage,
-                size: pagination.pageSize,
-                ...filters
-            });
-        }
-    }, [autoFetch]);
-
     const loadReports = useCallback((params = {}) => {
         const requestParams = {
             page: params.page || pagination.currentPage,
@@ -60,7 +50,7 @@ export const useReports = ({ autoFetch = false, filters = {} } = {}) => {
         };
 
         return dispatch(fetchReportPagination(requestParams)).unwrap();
-    }, [dispatch, pagination, currentFilters]);
+    }, [dispatch, pagination.currentPage, pagination.pageSize, currentFilters.idLinhVucPhanAnh, currentFilters.trangThai, currentFilters.mucDo, currentFilters.maPhanAnh]);
 
     const loadReportById = useCallback((reportId) => {
         return dispatch(fetchReportById(reportId)).unwrap();
