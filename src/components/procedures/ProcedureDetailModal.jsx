@@ -13,7 +13,6 @@ const ProcedureDetailModal = ({ isOpen, onClose, procedure }) => {
         }).format(value);
     };
 
-    console.log('procedure', procedure);
     return (
         <BaseModal
             isOpen={isOpen}

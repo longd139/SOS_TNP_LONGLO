@@ -50,7 +50,7 @@ export const useProcedureForm = ({ initialData, mode, isOpen, onSubmit }) => {
             {
                 ten_buoc: '',
                 mo_ta_buoc: '',
-                thu_tu_buoc: formData.trinhTuThucHien.length + 1
+                thu_tu_buoc: null
             }
         ];
         updateField('trinhTuThucHien', newSteps);
@@ -130,8 +130,8 @@ export const useProcedureForm = ({ initialData, mode, isOpen, onSubmit }) => {
             ...formData.danhSachMauDon,
             {
                 id: '',
-                so_luong_ban_chinh: 0,
-                so_luong_ban_sao: 0,
+                so_luong_ban_chinh: null,
+                so_luong_ban_sao: null,
                 ghi_chu: ''
             }
         ];
@@ -155,7 +155,7 @@ export const useProcedureForm = ({ initialData, mode, isOpen, onSubmit }) => {
             {
                 ten_truong_hop: '',
                 mo_ta: '',
-                thu_tu: formData.truongHopThuTuc.length + 1,
+                thu_tu: null,
                 thanh_phan_ho_so: []
             }
         ];
@@ -183,8 +183,8 @@ export const useProcedureForm = ({ initialData, mode, isOpen, onSubmit }) => {
         newTruongHop[caseIndex].thanh_phan_ho_so.push({
             ten_thanh_phan: '',
             mo_ta_chi_tiet: '',
-            so_luong_ban_chinh: 0,
-            so_luong_ban_sao: 0,
+            so_luong_ban_chinh: null,
+            so_luong_ban_sao: null,
             ghi_chu: ''
         });
         updateField('truongHopThuTuc', newTruongHop);
