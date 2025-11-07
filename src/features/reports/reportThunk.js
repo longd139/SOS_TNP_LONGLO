@@ -85,3 +85,14 @@ export const fetchReportById = createAsyncThunk(
     }
 )
 
+export const updateReportStatus = createAsyncThunk(
+    'report/updateReportStatus',
+    async ({ reportId, statusData }, { rejectWithValue }) => {
+        try {
+            const response = await REPORT_API.updateStatusReport(reportId, statusData);
+            return { reportId, updatedData: response };
+        } catch (error) {
+            return rejectWithValue(error.message || 'Failed to update report status');
+        }
+    }
+)

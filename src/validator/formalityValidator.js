@@ -1,6 +1,5 @@
 import * as yup from "yup";
 import { validateSchema } from "../utils/validationUtils";
-import { act } from "react";
 
 const mauDonSchema = yup.object().shape({
     id: yup
@@ -61,7 +60,6 @@ const trinhTuThucHienSchema = yup.object().shape({
     thu_tu_buoc: yup
         .number()
         .nullable()
-    // .min(1, "Thứ tự bước phải lớn hơn hoặc bằng 1")
 });
 
 const thanhPhanHoSoSchema = yup.object().shape({

@@ -355,8 +355,8 @@ const NewsFormModal = ({ isOpen, onClose, onSubmit, initialData = null, isLoadin
                 </div>
 
                 <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Ảnh đại diện {!initialData && <span className="text-red-500">*</span>}
+                    <label className="block text-sm font-medium text-gray-700 mb-1 required-label">
+                        Ảnh đại diện
                     </label>
                     <div className="border-2 border-dashed border-gray-300 rounded-lg p-4">
                         {filePreview ? (
@@ -422,8 +422,8 @@ const NewsFormModal = ({ isOpen, onClose, onSubmit, initialData = null, isLoadin
                 </div>
 
                 <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Nội dung <span className="text-red-500">*</span>
+                    <label className="block text-sm font-medium text-gray-700 mb-1 required-label">
+                        Nội dung
                     </label>
                     <style>{`
                         .ql-toolbar.ql-snow {

@@ -80,10 +80,27 @@ const getReportById = async (reportId) => {
     }
 }
 
+const updateStatusReport = async (reportId, statusData) => {
+    try {
+        const response = await apiClient.put(`/api/phan-anh/update-status/${reportId}`, statusData);
+        if (response.data.success) {
+            return response.data.data;
+        } else {
+            throw new Error(response.data.message || "Cập nhật trạng thái phản ánh thất bại");
+        }
+    } catch (error) {
+        if (error.response?.data?.message) {
+            throw new Error(error.response.data.message);
+        }
+        throw error;
+    }
+}
+
 export const REPORT_API = {
     getReportPagination,
     getHistoryStatus,
     getExtent,
     getStatusReport,
-    getReportById
+    getReportById,
+    updateStatusReport,
 };

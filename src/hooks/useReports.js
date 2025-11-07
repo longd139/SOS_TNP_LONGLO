@@ -5,7 +5,8 @@ import {
     fetchHistoryStatus,
     fetchExtent,
     fetchStatusReport,
-    fetchReportById
+    fetchReportById,
+    updateReportStatus
 } from '../features/reports/reportThunk';
 import {
     selectReports,
@@ -88,6 +89,10 @@ export const useReports = ({ autoFetch = false, filters = {} } = {}) => {
         dispatch(clearError());
     }, [dispatch]);
 
+    const updateStatus = useCallback((reportId, statusData) => {
+        return dispatch(updateReportStatus({ reportId, statusData })).unwrap();
+    }, [dispatch]);
+
     return {
         reports,
         currentReport,
@@ -108,6 +113,7 @@ export const useReports = ({ autoFetch = false, filters = {} } = {}) => {
         clearFilters,
         setSelectedReport,
         clearSelectedReport,
-        clearError: clearReportError
+        clearError: clearReportError,
+        updateStatus
     };
 };

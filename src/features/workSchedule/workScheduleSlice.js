@@ -66,7 +66,6 @@ const workScheduleSlice = createSlice({
     },
     extraReducers: (builder) => {
         builder
-            // Fetch work schedules
             .addCase(fetchWorkSchedules.pending, (state) => {
                 state.loading = true;
                 state.error = null;
@@ -80,21 +79,18 @@ const workScheduleSlice = createSlice({
                 state.error = action.payload?.message || 'Lấy danh sách lịch tiếp dân thất bại';
             })
 
-            // Import work schedule
             .addCase(importWorkSchedule.pending, (state) => {
                 state.loading = true;
                 state.error = null;
             })
             .addCase(importWorkSchedule.fulfilled, (state, action) => {
                 state.loading = false;
-                // Import success, will trigger refresh in the component
             })
             .addCase(importWorkSchedule.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload?.message || 'Import lịch tiếp dân thất bại';
             })
 
-            // Update work schedule status
             .addCase(updateWorkScheduleStatus.pending, (state) => {
                 state.loading = true;
                 state.error = null;
@@ -112,7 +108,6 @@ const workScheduleSlice = createSlice({
                 state.error = action.payload?.message || 'Cập nhật trạng thái lịch tiếp dân thất bại';
             })
 
-            // Delete work schedule
             .addCase(deleteWorkSchedule.pending, (state) => {
                 state.loading = true;
                 state.error = null;

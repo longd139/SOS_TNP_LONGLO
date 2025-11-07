@@ -4,7 +4,8 @@ import {
     fetchReportPagination, 
     fetchExtent, 
     fetchStatusReport, 
-    fetchReportById 
+    fetchReportById,
+    updateReportStatus
 } from "./reportThunk";
 
 const DEFAULT_PAGE_SIZE = 10;
@@ -122,6 +123,25 @@ const reportSlice = createSlice({
             .addCase(fetchReportById.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload || 'Lấy phản ánh thất bại';
+            })
+            
+            .addCase(updateReportStatus.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(updateReportStatus.fulfilled, (state, action) => {
+                state.loading = false;
+                if (state.currentReport && state.currentReport.id === action.payload.reportId) {
+                    state.currentReport = { ...state.currentReport, ...action.payload.updatedData };
+                }
+                const reportIndex = state.reports.findIndex(r => r.id === action.payload.reportId);
+                if (reportIndex !== -1) {
+                    state.reports[reportIndex] = { ...state.reports[reportIndex], ...action.payload.updatedData };
+                }
+            })
+            .addCase(updateReportStatus.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload || 'Cập nhật trạng thái phản ánh thất bại';
             });
     }
 })

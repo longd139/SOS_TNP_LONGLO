@@ -1,14 +1,13 @@
 import * as yup from "yup";
 import { validateSchema } from "../utils/validationUtils";
 
-// Allowed file types for import
 const ALLOWED_IMPORT_TYPES = [
-    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", // .xlsx
-    "application/vnd.ms-excel", // .xls
-    "text/csv", // .csv
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", 
+    "application/vnd.ms-excel", 
+    "text/csv", 
 ];
 
-const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+const MAX_FILE_SIZE = 10 * 1024 * 1024; 
 
 export const fileImportSchema = yup.object().shape({
     file: yup
@@ -28,5 +27,4 @@ export async function validateFileImport(data) {
     return await validateSchema(fileImportSchema, data);
 }
 
-// Export constants for reuse
 export { ALLOWED_IMPORT_TYPES, MAX_FILE_SIZE };

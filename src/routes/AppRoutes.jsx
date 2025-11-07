@@ -6,7 +6,6 @@ import { ROLE } from "../constants/role";
 import Login from "../pages/Auth/Login";
 import Dashboard from "../pages/Dashboard/Dashboard";
 import ReportList from "../pages/Reports/ReportList";
-import ReportDetail from "../pages/Reports/ReportDetail";
 import UpdateStatus from "../pages/Reports/UpdateStatus";
 import ReportsStatistic from "../pages/Reports/ReportsStatistic";
 import ReportsUserStat from "../pages/Reports/ReportsUserStat";
@@ -35,7 +34,6 @@ function AppRoutes() {
             }>
                 <Route path={ROUTE_PATH.DASHBOARD} element={<Dashboard />} />
                 <Route path={ROUTE_PATH.REPORT} element={<ReportList />} />
-                <Route path={ROUTE_PATH.REPORT_DETAIL} element={<ReportDetail />} />
                 <Route path={ROUTE_PATH.REPORT_UPDATE} element={<UpdateStatus />} />
                 <Route path={ROUTE_PATH.REPORT_STATISTICS} element={<ReportsStatistic />} />
                 <Route path={ROUTE_PATH.REPORT_USERS} element={<ReportsUserStat />} />
