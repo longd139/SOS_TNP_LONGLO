@@ -1,13 +1,18 @@
 import { createSelector } from "@reduxjs/toolkit";
 
-export const selectReportArea = (state) => state.reportAreas;
-export const selectReportAreaList = (state) => state.reportAreas.reportAreas;
-export const selectReportAreaLoading = (state) => state.reportAreas.loading;
-export const selectReportAreaError = (state) => state.reportAreas.error;
-export const selectReportAreaPagination = (state) => state.reportAreas.pagination;
-export const selectCurrentReportArea = (state) => state.reportAreas.currentReportArea;
-export const selectReportAreaFilters = (state) => state.reportAreas.filters;
-export const selectShowActive = (state) => state.reportAreas.showActive;
+export const selectReportArea = (state) => state.reportArea;
+export const selectReportAreaList = (state) => state.reportArea?.reportAreas || [];
+export const selectReportAreaLoading = (state) => state.reportArea?.loading || false;
+export const selectReportAreaError = (state) => state.reportArea?.error || null;
+export const selectReportAreaPagination = (state) => state.reportArea?.pagination || {
+    currentPage: 1,
+    pageSize: 10,
+    totalPages: 0,
+    totalItems: 0
+};
+export const selectCurrentReportArea = (state) => state.reportArea?.currentReportArea || null;
+export const selectReportAreaFilters = (state) => state.reportArea?.filters || { search: '' };
+export const selectShowActive = (state) => state.reportArea?.showActive ?? true;
 
 export const selectReportAreaStatistics = createSelector(
     [selectReportAreaList],
