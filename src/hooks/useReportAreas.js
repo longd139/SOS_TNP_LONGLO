@@ -9,7 +9,7 @@ import {
     fetchReportAreaById
 } from '../features/reportAreas/reportAreasThunk';
 import {
-    selectReportAreas,
+    selectReportAreaList,
     selectCurrentReportArea,
     selectReportAreaLoading,
     selectReportAreaError,
@@ -29,7 +29,7 @@ import {
 export const useReportAreas = ({ autoFetch = false, filters = {}, isActive } = {}) => {
     const dispatch = useDispatch();
 
-    const reportAreas = useSelector(selectReportAreas);
+    const reportAreas = useSelector(selectReportAreaList);
     const currentReportArea = useSelector(selectCurrentReportArea);
     const loading = useSelector(selectReportAreaLoading);
     const error = useSelector(selectReportAreaError);

@@ -13,26 +13,23 @@ export const fetchReportPagination = createAsyncThunk(
     }, { rejectWithValue }) => {
         try {
             const params = {
-                idLinhVucPhanAnh,
-                trangThai,
-                mucDo,
                 page,
-                size,
-                maPhanAnh,
+                size
             };
 
-            if (idLinhVucPhanAnh) {
-                params.idLinhVucPhanAnh = idLinhVucPhanAnh;
-            }
+            if (idLinhVucPhanAnh) params.idLinhVucPhanAnh = idLinhVucPhanAnh;
+            if (trangThai) params.trangThai = trangThai;
+            if (mucDo) params.mucDo = mucDo;
+            if (maPhanAnh) params.maPhanAnh = maPhanAnh;
 
             const response = await REPORT_API.getReportPagination(params);
 
             return {
-                content: response.data || response.content || [],
-                page: response.pagination?.currentPage || page,
-                size: response.pagination?.pageSize || size,
-                totalElements: response.pagination?.totalItems || response.totalElements || 0,
-                totalPages: response.pagination?.totalPages || response.totalPages || 0
+                content: Array.isArray(response.data) ? response.data : [],
+                page: Number(response.pagination?.currentPage) || page,
+                size: Number(response.pagination?.pageSize) || size,
+                totalElements: Number(response.pagination?.totalItems) || 0,
+                totalPages: Number(response.pagination?.totalPages) || 0
             };
         } catch (error) {
             return rejectWithValue(error.message || 'Failed to fetch procedures');
