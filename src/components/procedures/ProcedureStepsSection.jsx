@@ -17,7 +17,7 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 
-const SortableStepItem = ({ step, index, removeStep, updateStep }) => {
+const SortableStepItem = ({ step, index, removeStep, updateStep, errors }) => {
     const {
         attributes,
         listeners,
@@ -31,6 +31,12 @@ const SortableStepItem = ({ step, index, removeStep, updateStep }) => {
         transform: CSS.Transform.toString(transform),
         transition,
         opacity: isDragging ? 0.5 : 1,
+    };
+
+    const getError = (field) => {
+        const bracketKey = `trinhTuThucHien[${index}].${field}`;
+        const dotKey = `trinhTuThucHien.${index}.${field}`;
+        return errors?.[bracketKey] || errors?.[dotKey];
     };
 
     return (
@@ -66,21 +72,39 @@ const SortableStepItem = ({ step, index, removeStep, updateStep }) => {
                 </button>
             </div>
 
-            <input
-                type="text"
-                value={step.ten_buoc}
-                onChange={(e) => updateStep(index, 'ten_buoc', e.target.value)}
-                placeholder="Tên bước..."
-                className="w-full px-3 py-2 mb-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-            />
+            <div className="mb-2">
+                <input
+                    type="text"
+                    value={step.ten_buoc}
+                    onChange={(e) => updateStep(index, 'ten_buoc', e.target.value)}
+                    placeholder="Tên bước..."
+                    className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 text-sm ${
+                        getError('ten_buoc')
+                            ? 'border-red-500 focus:border-red-500 focus:ring-red-500'
+                            : 'border-gray-300 focus:ring-blue-500'
+                    }`}
+                />
+                {getError('ten_buoc') && (
+                    <p className="text-xs text-red-600 mt-1">{getError('ten_buoc')}</p>
+                )}
+            </div>
 
-            <textarea
-                value={step.mo_ta_buoc}
-                onChange={(e) => updateStep(index, 'mo_ta_buoc', e.target.value)}
-                placeholder="Mô tả chi tiết bước thực hiện..."
-                rows="2"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-            />
+            <div>
+                <textarea
+                    value={step.mo_ta_buoc}
+                    onChange={(e) => updateStep(index, 'mo_ta_buoc', e.target.value)}
+                    placeholder="Mô tả chi tiết bước thực hiện..."
+                    rows="2"
+                    className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 text-sm ${
+                        getError('mo_ta_buoc')
+                            ? 'border-red-500 focus:border-red-500 focus:ring-red-500'
+                            : 'border-gray-300 focus:ring-blue-500'
+                    }`}
+                />
+                {getError('mo_ta_buoc') && (
+                    <p className="text-xs text-red-600 mt-1">{getError('mo_ta_buoc')}</p>
+                )}
+            </div>
         </div>
     );
 };
@@ -89,10 +113,11 @@ SortableStepItem.propTypes = {
     step: PropTypes.object.isRequired,
     index: PropTypes.number.isRequired,
     removeStep: PropTypes.func.isRequired,
-    updateStep: PropTypes.func.isRequired
+    updateStep: PropTypes.func.isRequired,
+    errors: PropTypes.object
 };
 
-const ProcedureStepsSection = ({ steps, addStep, removeStep, updateStep, reorderSteps }) => {
+const ProcedureStepsSection = ({ steps, addStep, removeStep, updateStep, reorderSteps, errors }) => {
     const sensors = useSensors(
         useSensor(PointerSensor, {
             activationConstraint: {
@@ -145,6 +170,7 @@ const ProcedureStepsSection = ({ steps, addStep, removeStep, updateStep, reorder
                                         index={index}
                                         removeStep={removeStep}
                                         updateStep={updateStep}
+                                        errors={errors}
                                     />
                                 ))}
                             </div>
@@ -169,7 +195,8 @@ ProcedureStepsSection.propTypes = {
     addStep: PropTypes.func.isRequired,
     removeStep: PropTypes.func.isRequired,
     updateStep: PropTypes.func.isRequired,
-    reorderSteps: PropTypes.func.isRequired
+    reorderSteps: PropTypes.func.isRequired,
+    errors: PropTypes.object
 };
 
 export default ProcedureStepsSection;

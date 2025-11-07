@@ -109,14 +109,6 @@ export default function ReportList() {
         setCurrentPage(page);
     };
 
-    const calculateDaysOpen = (createdDate) => {
-        const created = new Date(createdDate);
-        const now = new Date();
-        const diffTime = Math.abs(now - created);
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-        return `${diffDays} ngày`;
-    };
-
     const columns = [
         {
             title: "STT",
@@ -175,16 +167,6 @@ export default function ReportList() {
             render: (value) => <span className="text-sm text-gray-600">{dayjs(value).format("HH:mm DD/MM/YYYY")}</span>,
         },
         {
-            title: "Số ngày mở",
-            dataIndex: "thoi_gian_tao",
-            key: "so_ngay_mo",
-            render: (value) => (
-                <span className="text-sm text-gray-600">
-                    {calculateDaysOpen(value)}
-                </span>
-            ),
-        },
-        {
             title: "Thông tin liên hệ",
             key: "thong_tin_lien_he",
             width: "180px",
@@ -195,8 +177,6 @@ export default function ReportList() {
             },
         },
     ];
-
-    console.log("Rendered ReportList", reports);
 
     return (
         <div className="min-h-screen">
@@ -227,7 +207,7 @@ export default function ReportList() {
                             <option value="all">Tất cả</option>
                             {statusReport &&
                                 Object.entries(statusReport).map(([key, value]) => (
-                                    <option key={key} value={key}>
+                                    <option key={key} value={value}>
                                         {value}
                                     </option>
                                 ))}
@@ -280,7 +260,7 @@ export default function ReportList() {
                             <option value="all">Tất cả</option>
                             {extent &&
                                 Object.entries(extent).map(([key, value]) => (
-                                    <option key={key} value={key}>
+                                    <option key={key} value={value}>
                                         {value}
                                     </option>
                                 ))}

@@ -1,8 +1,10 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import BaseFilter from '../base/BaseFilter';
+import { fetchAreas } from '../../features/areas/areasThunks';
+import { selectAreas } from '../../features/areas/areasSelectors';
 
 export default function ProceduresFilter({ 
-    areas = [], 
     filters = {},
     pagination = {},
     showActive = true,
@@ -13,6 +15,13 @@ export default function ProceduresFilter({
     onPageSizeChange,
     onSearchWithFilters
 }) {
+    const dispatch = useDispatch();
+    const areas = useSelector(selectAreas);
+
+    useEffect(() => {
+        dispatch(fetchAreas({ isActive: true }));
+    }, [dispatch]);
+
     const initialFilters = {
         searchKeyword: filters.searchKeyword || '',
         selectedDomain: filters.selectedDomain || '',
@@ -35,7 +44,7 @@ export default function ProceduresFilter({
                 { value: '', label: 'Tất cả lĩnh vực' },
                 ...areas.map(area => ({
                     value: area.id,
-                    label: area.ten_linh_vuc
+                    label: area.ten || area.ten_linh_vuc || area.name
                 }))
             ]
         },
@@ -61,7 +70,7 @@ export default function ProceduresFilter({
         }
     ];
 
-    const handleFilter = (newFilters) => {
+    const handleFilter = (newFilters) => {        
         if (newFilters.searchKeyword !== filters.searchKeyword) {
             onFilterChange?.('searchKeyword', newFilters.searchKeyword);
         }

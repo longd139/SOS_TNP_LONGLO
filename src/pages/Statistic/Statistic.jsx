@@ -6,6 +6,7 @@ import {
     BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
     LineChart, Line
 } from 'recharts';
+import { showToast } from '../../utils/toastNotification';
 
 export default function Statistic() {
     const [activeTab, setActiveTab] = useState('reports');
@@ -16,11 +17,11 @@ export default function Statistic() {
     const [reportType, setReportType] = useState('overview');
 
     const handleExportExcel = () => {
-        console.log('Export to Excel');
+        showToast.info('Chức năng xuất Excel đang được phát triển.');
     };
 
     const handleExportPDF = () => {
-        console.log('Export to PDF');
+        showToast.info('Chức năng xuất PDF đang được phát triển.');
     };
 
     return (

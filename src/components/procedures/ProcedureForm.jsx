@@ -116,6 +116,7 @@ const ProcedureForm = ({
                             addCaseComponent={addThanhPhanHoSo}
                             removeCaseComponent={removeThanhPhanHoSo}
                             updateCaseComponent={updateThanhPhanHoSo}
+                            errors={errors}
                         />
                     </div>
                 </div>
@@ -128,6 +129,7 @@ const ProcedureForm = ({
                             removeStep={removeStep}
                             updateStep={updateStep}
                             reorderSteps={reorderSteps}
+                            errors={errors}
                         />
                     </div>
 
@@ -137,6 +139,7 @@ const ProcedureForm = ({
                             addMethod={addCachThucHien}
                             removeMethod={removeCachThucHien}
                             updateMethod={updateCachThucHien}
+                            errors={errors}
                         />
                     </div>
                 </div>

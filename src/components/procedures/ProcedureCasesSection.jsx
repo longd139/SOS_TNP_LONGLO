@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { ChevronDown, ChevronUp, X } from 'lucide-react';
 
-const ProcedureCasesSection = ({ cases, addCase, removeCase, updateCase, updateCaseComponent, addCaseComponent, removeCaseComponent }) => {
+const ProcedureCasesSection = ({ cases, addCase, removeCase, updateCase, updateCaseComponent, addCaseComponent, removeCaseComponent, errors }) => {
     const [expandedCases, setExpandedCases] = useState({});
 
     const toggleCase = (index) => {
@@ -10,6 +10,18 @@ const ProcedureCasesSection = ({ cases, addCase, removeCase, updateCase, updateC
             ...prev,
             [index]: !prev[index]
         }));
+    };
+
+    const getCaseError = (caseIndex, field) => {
+        const bracketKey = `truongHopThuTuc[${caseIndex}].${field}`;
+        const dotKey = `truongHopThuTuc.${caseIndex}.${field}`;
+        return errors?.[bracketKey] || errors?.[dotKey];
+    };
+
+    const getComponentError = (caseIndex, componentIndex, field) => {
+        const bracketKey = `truongHopThuTuc[${caseIndex}].thanh_phan_ho_so[${componentIndex}].${field}`;
+        const dotKey = `truongHopThuTuc.${caseIndex}.thanh_phan_ho_so.${componentIndex}.${field}`;
+        return errors?.[bracketKey] || errors?.[dotKey];
     };
 
     return (
@@ -53,21 +65,39 @@ const ProcedureCasesSection = ({ cases, addCase, removeCase, updateCase, updateC
                                 </div>
 
                                 <div className="space-y-2">
-                                    <input
-                                        type="text"
-                                        value={caseItem.ten_truong_hop}
-                                        onChange={(e) => updateCase(caseIndex, 'ten_truong_hop', e.target.value)}
-                                        placeholder="Tên trường hợp..."
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-                                    />
+                                    <div>
+                                        <input
+                                            type="text"
+                                            value={caseItem.ten_truong_hop}
+                                            onChange={(e) => updateCase(caseIndex, 'ten_truong_hop', e.target.value)}
+                                            placeholder="Tên trường hợp..."
+                                            className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 text-sm ${
+                                                getCaseError(caseIndex, 'ten_truong_hop')
+                                                    ? 'border-red-500 focus:border-red-500 focus:ring-red-500'
+                                                    : 'border-gray-300 focus:ring-blue-500'
+                                            }`}
+                                        />
+                                        {getCaseError(caseIndex, 'ten_truong_hop') && (
+                                            <p className="text-xs text-red-600 mt-1">{getCaseError(caseIndex, 'ten_truong_hop')}</p>
+                                        )}
+                                    </div>
 
-                                    <textarea
-                                        value={caseItem.mo_ta}
-                                        onChange={(e) => updateCase(caseIndex, 'mo_ta', e.target.value)}
-                                        placeholder="Mô tả trường hợp..."
-                                        rows="2"
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-                                    />
+                                    <div>
+                                        <textarea
+                                            value={caseItem.mo_ta}
+                                            onChange={(e) => updateCase(caseIndex, 'mo_ta', e.target.value)}
+                                            placeholder="Mô tả trường hợp..."
+                                            rows="2"
+                                            className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 text-sm ${
+                                                getCaseError(caseIndex, 'mo_ta')
+                                                    ? 'border-red-500 focus:border-red-500 focus:ring-red-500'
+                                                    : 'border-gray-300 focus:ring-blue-500'
+                                            }`}
+                                        />
+                                        {getCaseError(caseIndex, 'mo_ta') && (
+                                            <p className="text-xs text-red-600 mt-1">{getCaseError(caseIndex, 'mo_ta')}</p>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
 
@@ -108,46 +138,91 @@ const ProcedureCasesSection = ({ cases, addCase, removeCase, updateCase, updateC
                                                     </div>
 
                                                     <div className="space-y-2">
-                                                        <input
-                                                            type="text"
-                                                            value={component.ten_thanh_phan}
-                                                            onChange={(e) => updateCaseComponent(caseIndex, componentIndex, 'ten_thanh_phan', e.target.value)}
-                                                            placeholder="Tên thành phần..."
-                                                            className="w-full px-2 py-1.5 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs"
-                                                        />
-
-                                                        <textarea
-                                                            value={component.mo_ta_chi_tiet}
-                                                            onChange={(e) => updateCaseComponent(caseIndex, componentIndex, 'mo_ta_chi_tiet', e.target.value)}
-                                                            placeholder="Mô tả chi tiết..."
-                                                            rows="2"
-                                                            className="w-full px-2 py-1.5 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs"
-                                                        />
-
-                                                        <div className="grid grid-cols-3 gap-2">
-                                                            <input
-                                                                type="number"
-                                                                min="0"
-                                                                value={component.so_luong_ban_chinh}
-                                                                onChange={(e) => updateCaseComponent(caseIndex, componentIndex, 'so_luong_ban_chinh', e.target.value)}
-                                                                placeholder="Số bản chính..."
-                                                                className="w-full px-2 py-1.5 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs"
-                                                            />
-                                                            <input
-                                                                type="number"
-                                                                min="0"
-                                                                value={component.so_luong_ban_sao}
-                                                                onChange={(e) => updateCaseComponent(caseIndex, componentIndex, 'so_luong_ban_sao', e.target.value)}
-                                                                placeholder="Số bản sao..."
-                                                                className="w-full px-2 py-1.5 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs"
-                                                            />
+                                                        <div>
                                                             <input
                                                                 type="text"
-                                                                value={component.ghi_chu}
-                                                                onChange={(e) => updateCaseComponent(caseIndex, componentIndex, 'ghi_chu', e.target.value)}
-                                                                placeholder="Ghi chú..."
-                                                                className="w-full px-2 py-1.5 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs"
+                                                                value={component.ten_thanh_phan}
+                                                                onChange={(e) => updateCaseComponent(caseIndex, componentIndex, 'ten_thanh_phan', e.target.value)}
+                                                                placeholder="Tên thành phần..."
+                                                                className={`w-full px-2 py-1.5 border rounded focus:outline-none focus:ring-2 text-xs ${
+                                                                    getComponentError(caseIndex, componentIndex, 'ten_thanh_phan')
+                                                                        ? 'border-red-500 focus:border-red-500 focus:ring-red-500'
+                                                                        : 'border-gray-300 focus:ring-blue-500'
+                                                                }`}
                                                             />
+                                                            {getComponentError(caseIndex, componentIndex, 'ten_thanh_phan') && (
+                                                                <p className="text-xs text-red-600 mt-1">{getComponentError(caseIndex, componentIndex, 'ten_thanh_phan')}</p>
+                                                            )}
+                                                        </div>
+
+                                                        <div>
+                                                            <textarea
+                                                                value={component.mo_ta_chi_tiet}
+                                                                onChange={(e) => updateCaseComponent(caseIndex, componentIndex, 'mo_ta_chi_tiet', e.target.value)}
+                                                                placeholder="Mô tả chi tiết..."
+                                                                rows="2"
+                                                                className={`w-full px-2 py-1.5 border rounded focus:outline-none focus:ring-2 text-xs ${
+                                                                    getComponentError(caseIndex, componentIndex, 'mo_ta_chi_tiet')
+                                                                        ? 'border-red-500 focus:border-red-500 focus:ring-red-500'
+                                                                        : 'border-gray-300 focus:ring-blue-500'
+                                                                }`}
+                                                            />
+                                                            {getComponentError(caseIndex, componentIndex, 'mo_ta_chi_tiet') && (
+                                                                <p className="text-xs text-red-600 mt-1">{getComponentError(caseIndex, componentIndex, 'mo_ta_chi_tiet')}</p>
+                                                            )}
+                                                        </div>
+
+                                                        <div className="grid grid-cols-3 gap-2">
+                                                            <div>
+                                                                <input
+                                                                    type="number"
+                                                                    min="0"
+                                                                    value={component.so_luong_ban_chinh}
+                                                                    onChange={(e) => updateCaseComponent(caseIndex, componentIndex, 'so_luong_ban_chinh', e.target.value)}
+                                                                    placeholder="Số bản chính..."
+                                                                    className={`w-full px-2 py-1.5 border rounded focus:outline-none focus:ring-2 text-xs ${
+                                                                        getComponentError(caseIndex, componentIndex, 'so_luong_ban_chinh')
+                                                                            ? 'border-red-500 focus:border-red-500 focus:ring-red-500'
+                                                                            : 'border-gray-300 focus:ring-blue-500'
+                                                                    }`}
+                                                                />
+                                                                {getComponentError(caseIndex, componentIndex, 'so_luong_ban_chinh') && (
+                                                                    <p className="text-xs text-red-600 mt-1">{getComponentError(caseIndex, componentIndex, 'so_luong_ban_chinh')}</p>
+                                                                )}
+                                                            </div>
+                                                            <div>
+                                                                <input
+                                                                    type="number"
+                                                                    min="0"
+                                                                    value={component.so_luong_ban_sao}
+                                                                    onChange={(e) => updateCaseComponent(caseIndex, componentIndex, 'so_luong_ban_sao', e.target.value)}
+                                                                    placeholder="Số bản sao..."
+                                                                    className={`w-full px-2 py-1.5 border rounded focus:outline-none focus:ring-2 text-xs ${
+                                                                        getComponentError(caseIndex, componentIndex, 'so_luong_ban_sao')
+                                                                            ? 'border-red-500 focus:border-red-500 focus:ring-red-500'
+                                                                            : 'border-gray-300 focus:ring-blue-500'
+                                                                    }`}
+                                                                />
+                                                                {getComponentError(caseIndex, componentIndex, 'so_luong_ban_sao') && (
+                                                                    <p className="text-xs text-red-600 mt-1">{getComponentError(caseIndex, componentIndex, 'so_luong_ban_sao')}</p>
+                                                                )}
+                                                            </div>
+                                                            <div>
+                                                                <input
+                                                                    type="text"
+                                                                    value={component.ghi_chu}
+                                                                    onChange={(e) => updateCaseComponent(caseIndex, componentIndex, 'ghi_chu', e.target.value)}
+                                                                    placeholder="Ghi chú..."
+                                                                    className={`w-full px-2 py-1.5 border rounded focus:outline-none focus:ring-2 text-xs ${
+                                                                        getComponentError(caseIndex, componentIndex, 'ghi_chu')
+                                                                            ? 'border-red-500 focus:border-red-500 focus:ring-red-500'
+                                                                            : 'border-gray-300 focus:ring-blue-500'
+                                                                    }`}
+                                                                />
+                                                                {getComponentError(caseIndex, componentIndex, 'ghi_chu') && (
+                                                                    <p className="text-xs text-red-600 mt-1">{getComponentError(caseIndex, componentIndex, 'ghi_chu')}</p>
+                                                                )}
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -178,7 +253,8 @@ ProcedureCasesSection.propTypes = {
     updateCase: PropTypes.func.isRequired,
     updateCaseComponent: PropTypes.func.isRequired,
     addCaseComponent: PropTypes.func.isRequired,
-    removeCaseComponent: PropTypes.func.isRequired
+    removeCaseComponent: PropTypes.func.isRequired,
+    errors: PropTypes.object
 };
 
 export default ProcedureCasesSection;

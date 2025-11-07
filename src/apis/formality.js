@@ -15,8 +15,8 @@ const getFormalityApi = async ({
             isActive
         });
 
-        if (id_linh_vuc) {
-            params.append('id_linh_vuc', id_linh_vuc);
+        if (id_linh_vuc !== undefined && id_linh_vuc !== null && id_linh_vuc !== '') {
+            params.append('idLinhVuc', id_linh_vuc);
         }
 
         const response = await apiClient.get("/api/thu-tuc", { params });
