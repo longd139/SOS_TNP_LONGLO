@@ -93,12 +93,7 @@ const ProcedureMethodsSection = ({ methods, addMethod, removeMethod, updateMetho
                                     <input
                                         type="text"
                                         value={method.le_phi === 0 || method.le_phi === '0' ? '' : method.le_phi}
-                                        onChange={(e) => {
-                                            const value = e.target.value;
-                                            if (value === '' || /^[0-9.,]*$/.test(value)) {
-                                                updateMethod(index, 'le_phi', value);
-                                            }
-                                        }}
+                                        onChange={(e) => updateMethod(index, 'le_phi', e.target.value)}
                                         placeholder="Lệ phí (VND)..."
                                         className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 text-sm ${
                                             getError(index, 'le_phi')
