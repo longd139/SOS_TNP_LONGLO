@@ -6,46 +6,48 @@
 
 /* Global font size reduction */
 @layer base {
-  html {
-    font-size: 14px;
-  }
-  
-  body {
-    font-size: 12px;
-    line-height: 1.5;
-  }
-  
-  h1 {
-    font-size: 18px;
-    font-weight: 700;
-  }
-  
-  h2 {
-    font-size: 16px;
-    font-weight: 600;
-  }
-  
-  h3 {
-    font-size: 14px;
-    font-weight: 600;
-  }
-  
-  h4 {
-    font-size: 13px;
-    font-weight: 600;
-  }
-  
-  label {
-    font-size: 11px;
-  }
-  
-  input, textarea, select {
-    font-size: 12px;
-  }
-  
-  button {
-    font-size: 12px;
-  }
+    html {
+        font-size: 14px;
+    }
+
+    body {
+        font-size: 12px;
+        line-height: 1.5;
+    }
+
+    h1 {
+        font-size: 18px;
+        font-weight: 700;
+    }
+
+    h2 {
+        font-size: 16px;
+        font-weight: 600;
+    }
+
+    h3 {
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+    h4 {
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    label {
+        font-size: 11px;
+    }
+
+    input,
+    textarea,
+    select {
+        font-size: 12px;
+    }
+
+    button {
+        font-size: 12px;
+    }
 }
 
 ::-webkit-scrollbar {
@@ -78,12 +80,12 @@
 }
 
 .sidebar-scroll::-webkit-scrollbar {
-    display: none; 
+    display: none;
 }
 
 .admin-layout-scroll {
-    overflow-x: hidden; 
-    overflow-y: auto; 
+    overflow-x: hidden;
+    overflow-y: auto;
 }
 
 .admin-layout-scroll::-webkit-scrollbar {
@@ -162,7 +164,7 @@
     select {
         border-color: #d1d5db;
     }
-    
+
     select:focus {
         border-color: #3b82f6;
         box-shadow: 0 0 0 2px rgb(191, 219, 254);
@@ -238,3 +240,13 @@
 .ql-toolbar.ql-snow button.ql-active .ql-fill {
     fill: #2563eb;
 }
+
+/* .tree-connector::before {
+    content: "";
+    position: absolute;
+    left: -24px;
+    top: 1.25rem;
+    width: 24px;
+    height: 1px;
+    background-color: #d1d5db;
+} */

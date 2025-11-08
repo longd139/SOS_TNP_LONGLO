@@ -8,13 +8,6 @@ const mauDonSchema = yup.object().shape({
     so_luong_ban_chinh: yup
         .number()
         .nullable()
-        .test('required-if-any', 'Số lượng bản chính là bắt buộc', function (value) {
-            const { id, so_luong_ban_sao, ghi_chu } = this.parent;
-            // Chỉ validate nếu có ID (đã chọn mẫu đơn) hoặc có dữ liệu khác
-            const hasAnyData = id || (so_luong_ban_sao !== null && so_luong_ban_sao !== undefined && so_luong_ban_sao !== '') || ghi_chu;
-            if (hasAnyData && (value === null || value === undefined || value === '')) return false;
-            return true;
-        })
         .test('min-value', 'Số lượng bản chính phải lớn hơn hoặc bằng 0', function (value) {
             if (value === null || value === undefined || value === '') return true;
             return value >= 0;
@@ -22,12 +15,6 @@ const mauDonSchema = yup.object().shape({
     so_luong_ban_sao: yup
         .number()
         .nullable()
-        .test('required-if-any', 'Số lượng bản sao là bắt buộc', function (value) {
-            const { id, so_luong_ban_chinh, ghi_chu } = this.parent;
-            const hasAnyData = id || (so_luong_ban_chinh !== null && so_luong_ban_chinh !== undefined && so_luong_ban_chinh !== '') || ghi_chu;
-            if (hasAnyData && (value === null || value === undefined || value === '')) return false;
-            return true;
-        })
         .test('min-value', 'Số lượng bản sao phải lớn hơn hoặc bằng 0', function (value) {
             if (value === null || value === undefined || value === '') return true;
             return value >= 0;
@@ -43,7 +30,6 @@ const cachThucHienSchema = yup.object().shape({
         .nullable()
         .test('required-if-any', 'Hình thức áp dụng là bắt buộc', function (value) {
             const { mo_ta_chi_tiet, thoi_gian_giai_quyet, le_phi, ghi_chu_le_phi } = this.parent;
-            // Chỉ validate nếu có bất kỳ field nào được fill
             const hasAnyData = (mo_ta_chi_tiet && mo_ta_chi_tiet.trim()) || 
                               (thoi_gian_giai_quyet && thoi_gian_giai_quyet.trim()) || 
                               (le_phi && le_phi.toString().trim()) || 
@@ -85,7 +71,6 @@ const trinhTuThucHienSchema = yup.object().shape({
         .nullable()
         .test('required-if-any', 'Tên bước là bắt buộc', function (value) {
             const { mo_ta_buoc, thu_tu_buoc } = this.parent;
-            // Chỉ validate nếu có data được fill
             const hasAnyData = (mo_ta_buoc && mo_ta_buoc.trim()) || 
                               (thu_tu_buoc !== null && thu_tu_buoc !== undefined);
             if (hasAnyData && (!value || !value.trim())) return false;
@@ -105,7 +90,6 @@ const thanhPhanHoSoSchema = yup.object().shape({
         .nullable()
         .test('required-if-any', 'Tên thành phần là bắt buộc', function (value) {
             const { mo_ta_chi_tiet, so_luong_ban_chinh, so_luong_ban_sao, ghi_chu } = this.parent;
-            // Chỉ validate nếu có data được fill
             const hasAnyData = (mo_ta_chi_tiet && mo_ta_chi_tiet.trim()) || 
                               (so_luong_ban_chinh !== null && so_luong_ban_chinh !== undefined && so_luong_ban_chinh !== '') || 
                               (so_luong_ban_sao !== null && so_luong_ban_sao !== undefined && so_luong_ban_sao !== '') || 
@@ -123,16 +107,6 @@ const thanhPhanHoSoSchema = yup.object().shape({
     so_luong_ban_chinh: yup
         .number()
         .nullable()
-        .test('required-if-any', 'Số lượng bản chính là bắt buộc', function (value) {
-            const { ten_thanh_phan, mo_ta_chi_tiet, so_luong_ban_sao, ghi_chu } = this.parent;
-            // Chỉ validate nếu có data khác được fill
-            const hasAnyData = (ten_thanh_phan && ten_thanh_phan.trim()) || 
-                              (mo_ta_chi_tiet && mo_ta_chi_tiet.trim()) || 
-                              (so_luong_ban_sao !== null && so_luong_ban_sao !== undefined && so_luong_ban_sao !== '') || 
-                              (ghi_chu && ghi_chu.trim());
-            if (hasAnyData && (value === null || value === undefined || value === '')) return false;
-            return true;
-        })
         .test('min-value', 'Số lượng bản chính phải lớn hơn hoặc bằng 0', function (value) {
             if (value === null || value === undefined || value === '') return true;
             return value >= 0;
@@ -140,16 +114,6 @@ const thanhPhanHoSoSchema = yup.object().shape({
     so_luong_ban_sao: yup
         .number()
         .nullable()
-        .test('required-if-any', 'Số lượng bản sao là bắt buộc', function (value) {
-            const { ten_thanh_phan, mo_ta_chi_tiet, so_luong_ban_chinh, ghi_chu } = this.parent;
-            // Chỉ validate nếu có data khác được fill
-            const hasAnyData = (ten_thanh_phan && ten_thanh_phan.trim()) || 
-                              (mo_ta_chi_tiet && mo_ta_chi_tiet.trim()) || 
-                              (so_luong_ban_chinh !== null && so_luong_ban_chinh !== undefined && so_luong_ban_chinh !== '') || 
-                              (ghi_chu && ghi_chu.trim());
-            if (hasAnyData && (value === null || value === undefined || value === '')) return false;
-            return true;
-        })
         .test('min-value', 'Số lượng bản sao phải lớn hơn hoặc bằng 0', function (value) {
             if (value === null || value === undefined || value === '') return true;
             return value >= 0;
@@ -165,11 +129,9 @@ const truongHopThuTucSchema = yup.object().shape({
         .nullable()
         .test('required-if-any', 'Tên trường hợp là bắt buộc', function (value) {
             const { mo_ta, thu_tu, thanh_phan_ho_so } = this.parent;
-            // Chỉ validate nếu có data thực sự được fill
             const hasAnyData = (mo_ta && mo_ta.trim()) || 
                               (thu_tu !== null && thu_tu !== undefined) || 
                               (thanh_phan_ho_so && thanh_phan_ho_so.length > 0 && thanh_phan_ho_so.some(item => {
-                                  // Kiểm tra xem có item nào thực sự có data không
                                   return (item.ten_thanh_phan && item.ten_thanh_phan.trim()) ||
                                          (item.mo_ta_chi_tiet && item.mo_ta_chi_tiet.trim()) ||
                                          (item.so_luong_ban_chinh !== null && item.so_luong_ban_chinh !== undefined && item.so_luong_ban_chinh !== '') ||
@@ -264,15 +226,6 @@ const mauDonUpdateSchema = mauDonSchema.shape({
     soLuongBanChinh: yup
         .number()
         .nullable()
-        .test('required-if-any', 'Số lượng bản chính là bắt buộc', function (value) {
-            const { id, soLuongBanSao, ghiChu } = this.parent;
-            // Chỉ validate nếu có ID hoặc có dữ liệu khác
-            const hasAnyData = id || 
-                              (soLuongBanSao !== null && soLuongBanSao !== undefined && soLuongBanSao !== '') || 
-                              (ghiChu && ghiChu.trim());
-            if (hasAnyData && (value === null || value === undefined || value === '')) return false;
-            return true;
-        })
         .test('min-value', 'Số lượng bản chính phải lớn hơn hoặc bằng 0', function (value) {
             if (value === null || value === undefined || value === '') return true;
             return value >= 0;
@@ -280,14 +233,6 @@ const mauDonUpdateSchema = mauDonSchema.shape({
     soLuongBanSao: yup
         .number()
         .nullable()
-        .test('required-if-any', 'Số lượng bản sao là bắt buộc', function (value) {
-            const { id, soLuongBanChinh, ghiChu } = this.parent;
-            const hasAnyData = id || 
-                              (soLuongBanChinh !== null && soLuongBanChinh !== undefined && soLuongBanChinh !== '') || 
-                              (ghiChu && ghiChu.trim());
-            if (hasAnyData && (value === null || value === undefined || value === '')) return false;
-            return true;
-        })
         .test('min-value', 'Số lượng bản sao phải lớn hơn hoặc bằng 0', function (value) {
             if (value === null || value === undefined || value === '') return true;
             return value >= 0;
@@ -303,7 +248,6 @@ const cachThucHienUpdateSchema = cachThucHienSchema.shape({
         .nullable()
         .test('required-if-any', 'Hình thức áp dụng là bắt buộc', function (value) {
             const { moTaChiTiet, thoiGianGiaiQuyet, lePhi, ghiChuLePhi } = this.parent;
-            // Chỉ validate nếu có bất kỳ field nào được fill với dữ liệu thực sự
             const hasAnyData = (moTaChiTiet && moTaChiTiet.trim()) || 
                               (thoiGianGiaiQuyet && thoiGianGiaiQuyet.trim()) || 
                               (lePhi && lePhi.toString().trim()) || 
@@ -339,7 +283,6 @@ const trinhTuThucHienUpdateSchema = trinhTuThucHienSchema.shape({
         .nullable()
         .test('required-if-any', 'Tên bước là bắt buộc', function (value) {
             const { moTaBuoc, thuTuBuoc } = this.parent;
-            // Chỉ validate nếu có data được fill
             const hasAnyData = (moTaBuoc && moTaBuoc.trim()) || 
                               (thuTuBuoc !== null && thuTuBuoc !== undefined);
             if (hasAnyData && (!value || !value.trim())) return false;
@@ -356,7 +299,6 @@ const thanhPhanHoSoUpdateSchema = thanhPhanHoSoSchema.shape({
         .nullable()
         .test('required-if-any', 'Tên thành phần là bắt buộc', function (value) {
             const { moTaChiTiet, soLuongBanChinh, soLuongBanSao, ghiChu } = this.parent;
-            // Chỉ validate nếu có data được fill
             const hasAnyData = (moTaChiTiet && moTaChiTiet.trim()) || 
                               (soLuongBanChinh !== null && soLuongBanChinh !== undefined && soLuongBanChinh !== '') || 
                               (soLuongBanSao !== null && soLuongBanSao !== undefined && soLuongBanSao !== '') || 
@@ -371,16 +313,6 @@ const thanhPhanHoSoUpdateSchema = thanhPhanHoSoSchema.shape({
     soLuongBanChinh: yup
         .number()
         .nullable()
-        .test('required-if-any', 'Số lượng bản chính là bắt buộc', function (value) {
-            const { tenThanhPhan, moTaChiTiet, soLuongBanSao, ghiChu } = this.parent;
-            // Chỉ validate nếu có data khác được fill
-            const hasAnyData = (tenThanhPhan && tenThanhPhan.trim()) || 
-                              (moTaChiTiet && moTaChiTiet.trim()) || 
-                              (soLuongBanSao !== null && soLuongBanSao !== undefined && soLuongBanSao !== '') || 
-                              (ghiChu && ghiChu.trim());
-            if (hasAnyData && (value === null || value === undefined || value === '')) return false;
-            return true;
-        })
         .test('min-value', 'Số lượng bản chính phải lớn hơn hoặc bằng 0', function (value) {
             if (value === null || value === undefined || value === '') return true;
             return value >= 0;
@@ -388,16 +320,6 @@ const thanhPhanHoSoUpdateSchema = thanhPhanHoSoSchema.shape({
     soLuongBanSao: yup
         .number()
         .nullable()
-        .test('required-if-any', 'Số lượng bản sao là bắt buộc', function (value) {
-            const { tenThanhPhan, moTaChiTiet, soLuongBanChinh, ghiChu } = this.parent;
-            // Chỉ validate nếu có data khác được fill
-            const hasAnyData = (tenThanhPhan && tenThanhPhan.trim()) || 
-                              (moTaChiTiet && moTaChiTiet.trim()) || 
-                              (soLuongBanChinh !== null && soLuongBanChinh !== undefined && soLuongBanChinh !== '') || 
-                              (ghiChu && ghiChu.trim());
-            if (hasAnyData && (value === null || value === undefined || value === '')) return false;
-            return true;
-        })
         .test('min-value', 'Số lượng bản sao phải lớn hơn hoặc bằng 0', function (value) {
             if (value === null || value === undefined || value === '') return true;
             return value >= 0;
@@ -413,7 +335,6 @@ const truongHopThuTucUpdateSchema = truongHopThuTucSchema.shape({
         .nullable()
         .test('required-if-any', 'Tên trường hợp là bắt buộc', function (value) {
             const { moTa, thuTu, thanhPhanHoSo } = this.parent;
-            // Chỉ validate nếu có data thực sự được fill
             const hasAnyData = (moTa && moTa.trim()) || 
                               (thuTu !== null && thuTu !== undefined) || 
                               (thanhPhanHoSo && thanhPhanHoSo.length > 0 && thanhPhanHoSo.some(item => {

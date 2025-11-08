@@ -209,7 +209,6 @@ export const useProcedureForm = ({ initialData, mode, isOpen, onSubmit }) => {
 
     const handleSubmit = async () => {
         const validation = await validateFormalityForm(formData, mode === 'edit');
-
         if (!validation.isValid) {
             setErrors(validation.errors);
             showToast.error('Vui lòng kiểm tra lại các trường bắt buộc!');
