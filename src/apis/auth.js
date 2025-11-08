@@ -5,11 +5,17 @@ const loginApi = async (credentials) => {
         const response = await apiClient.post('/api/auths/login', credentials)
         
         if (response.data.success)  return response.data.data;
-        else throw new Error(response.data.message || "Đăng nhập thất bại");
+        else {
+            const error = new Error(response.data.message || "Đăng nhập thất bại");
+            error.errors = response.data.errors || [];
+            throw error;
+        }
 
     } catch (error) {
-        if (error.response?.data?.message) {
-            throw new Error(error.response.data.message);
+        if (error.response?.data) {
+            const apiError = new Error(error.response.data.message || "Đăng nhập thất bại");
+            apiError.errors = error.response.data.errors || [];
+            throw apiError;
         }
         throw error;
     }

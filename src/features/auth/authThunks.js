@@ -57,8 +57,20 @@ export const loginUser = createAsyncThunk(
                 },
             };
         } catch (error) {
+            const fieldErrors = {};
+            if (error.errors && Array.isArray(error.errors)) {
+                error.errors.forEach(err => {
+                    if (err.field && err.message) {
+                        fieldErrors[err.field] = err.message;
+                    }
+                });
+            }
+            
             showToast.error(error.message);
-            return rejectWithValue({ message: error.message });
+            return rejectWithValue({ 
+                message: error.message,
+                errors: fieldErrors
+            });
         }
     }
 );

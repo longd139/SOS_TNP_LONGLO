@@ -9,11 +9,13 @@ import { fetchMyProfile } from "../../features/userProfile/userProfileThunks";
 import TwoFALoginModal from "../../components/twoFactor/TwoFALoginModal";
 import ROUTE_PATH from "../../constants/routes";
 import { getRedirectPathIfDisabled } from "../../utils/routeRedirectUtils";
+import { validateAuth } from "../../validator/loginValidator";
 
 export default function Login() {
     const [tenDangNhap, setTenDangNhap] = useState("");
     const [matKhau, setMatKhau] = useState("");
     const [show2FAModal, setShow2FAModal] = useState(false);
+    const [validationErrors, setValidationErrors] = useState({});
 
     const { login, loading, errors, apiError, requiresTwoFactorAuth, clearErrors } = useLogin();
     const dispatch = useDispatch();
@@ -25,20 +27,34 @@ export default function Login() {
         if (Object.keys(errors).length > 0 || apiError) {
             clearErrors();
         }
-    }, [tenDangNhap, matKhau, apiError, errors, clearErrors]);
+        if (Object.keys(validationErrors).length > 0) {
+            setValidationErrors({});
+        }
+    }, [tenDangNhap, matKhau]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
 
         const credentials = { tenDangNhap, matKhau };
+
+        // Validate form data before calling API
+        const { valid, errors: validationErrs } = await validateAuth(credentials);
+        
+        if (!valid) {
+            // Set validation errors to display in UI
+            setValidationErrors(validationErrs);
+            return;
+        }
+        
+        // Clear validation errors if form is valid
+        setValidationErrors({});
+        
         const result = await login(credentials);
         if (result?.requiresTwoFactorAuth) {
             setShow2FAModal(true);
             return;
         }
-    };
-
-    const handle2FASuccess = (result) => {
+    };    const handle2FASuccess = (result) => {
         setShow2FAModal(false);
         dispatch(restoreUser());
         dispatch(fetchMyProfile());
@@ -72,7 +88,7 @@ export default function Login() {
 
                 <form onSubmit={handleSubmit} className="space-y-4 text-left">
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label className="block text-sm font-medium text-gray-700 mb-1 required-label">
                             Tên đăng nhập
                         </label>
                         <div className="relative">
@@ -85,18 +101,18 @@ export default function Login() {
                                 value={tenDangNhap}
                                 onChange={(e) => setTenDangNhap(e.target.value)}
                                 placeholder="Nhập tên đăng nhập"
-                                className={`pl-10 w-full border rounded-lg py-2 ${errors.tenDangNhap ? "border-red-400" : "border-gray-300"
+                                className={`pl-10 w-full border rounded-lg py-2 ${validationErrors.tenDangNhap || errors.tenDangNhap ? "border-red-400" : "border-gray-300"
                                     }`}
                                 disabled={loading}
                             />
                         </div>
-                        {errors.tenDangNhap && (
-                            <p className="text-red-500 text-xs mt-1">{errors.tenDangNhap}</p>
+                        {(validationErrors.tenDangNhap || errors.tenDangNhap) && (
+                            <p className="text-red-500 text-xs mt-1">{validationErrors.tenDangNhap || errors.tenDangNhap}</p>
                         )}
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label className="block text-sm font-medium text-gray-700 mb-1 required-label">
                             Mật khẩu
                         </label>
                         <div className="relative">
@@ -109,13 +125,13 @@ export default function Login() {
                                 value={matKhau}
                                 onChange={(e) => setMatKhau(e.target.value)}
                                 placeholder="Nhập mật khẩu"
-                                className={`pl-10 pr-10 w-full border rounded-lg py-2 ${errors.matKhau ? "border-red-400" : "border-gray-300"
+                                className={`pl-10 pr-10 w-full border rounded-lg py-2 ${validationErrors.matKhau || errors.matKhau ? "border-red-400" : "border-gray-300"
                                     }`}
                                 disabled={loading}
                             />
                         </div>
-                        {errors.matKhau && (
-                            <p className="text-red-500 text-xs mt-1">{errors.matKhau}</p>
+                        {(validationErrors.matKhau || errors.matKhau) && (
+                            <p className="text-red-500 text-xs mt-1">{validationErrors.matKhau || errors.matKhau}</p>
                         )}
                     </div>
 
