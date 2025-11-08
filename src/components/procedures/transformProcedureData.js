@@ -109,7 +109,6 @@ export const cleanFormData = (formData) => {
                (item.ghi_chu_le_phi && item.ghi_chu_le_phi.trim());
     };
 
-    // Helper function để kiểm tra xem trinhTu có data thực sự không
     const hasTrinhTuData = (item) => {
         return (item.ten_buoc && item.ten_buoc.trim()) ||
                (item.mo_ta_buoc && item.mo_ta_buoc.trim()) ||

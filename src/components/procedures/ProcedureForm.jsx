@@ -96,30 +96,24 @@ const ProcedureForm = ({
                     </div>
                 </div>
 
-                <div className="flex flex-col md:flex-row gap-3 md:items-start">
-                    <div className="flex-1 min-w-0">
-                        <ProcedureMauDonSection
-                            items={formData.danhSachMauDon}
-                            addItem={addMauDon}
-                            removeItem={removeMauDon}
-                            updateItem={updateMauDon}
-                            errors={errors}
-                        />
-                    </div>
+                <ProcedureMauDonSection
+                    items={formData.danhSachMauDon}
+                    addItem={addMauDon}
+                    removeItem={removeMauDon}
+                    updateItem={updateMauDon}
+                    errors={errors}
+                />
 
-                    <div className="flex-1 min-w-0">
-                        <ProcedureCasesSection
-                            cases={formData.truongHopThuTuc}
-                            addCase={addTruongHop}
-                            removeCase={removeTruongHop}
-                            updateCase={updateTruongHop}
-                            addCaseComponent={addThanhPhanHoSo}
-                            removeCaseComponent={removeThanhPhanHoSo}
-                            updateCaseComponent={updateThanhPhanHoSo}
-                            errors={errors}
-                        />
-                    </div>
-                </div>
+                <ProcedureCasesSection
+                    cases={formData.truongHopThuTuc}
+                    addCase={addTruongHop}
+                    removeCase={removeTruongHop}
+                    updateCase={updateTruongHop}
+                    addCaseComponent={addThanhPhanHoSo}
+                    removeCaseComponent={removeThanhPhanHoSo}
+                    updateCaseComponent={updateThanhPhanHoSo}
+                    errors={errors}
+                />
 
                 <div className="flex flex-col md:flex-row gap-3 md:items-start">
                     <div className="flex-1 min-w-0">

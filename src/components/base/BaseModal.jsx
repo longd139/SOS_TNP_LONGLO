@@ -11,6 +11,10 @@ const BaseModal = ({
     closeOnOverlay = true,
     className = ""
 }) => {
+    const [isDragging, setIsDragging] = React.useState(false);
+
+    const handleMouseDown = () => setIsDragging(false);
+    const handleMouseMove = () => setIsDragging(true);
     useEffect(() => {
         const handleEscape = (e) => {
             if (e.key === 'Escape' && isOpen) {
@@ -41,7 +45,7 @@ const BaseModal = ({
     };
 
     const handleOverlayClick = (e) => {
-        if (closeOnOverlay && e.target === e.currentTarget) {
+        if (closeOnOverlay && e.target === e.currentTarget && !isDragging) {
             onClose();
         }
     };
@@ -50,6 +54,8 @@ const BaseModal = ({
         <div className="fixed inset-0 z-50 overflow-y-auto">
             <div
                 className="flex items-center justify-center min-h-screen pt-3 px-3 pb-16 text-center sm:block sm:p-0"
+                onMouseDown={handleMouseDown}
+                onMouseMove={handleMouseMove}
                 onClick={handleOverlayClick}
             >
                 <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
