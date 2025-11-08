@@ -50,12 +50,6 @@ const cachThucHienSchema = yup.object().shape({
     le_phi: yup
         .mixed()
         .nullable()
-        .test('is-valid-number', 'Lệ phí phải là số hợp lệ', function (value) {
-            if (!value && value !== 0) return true;
-            const cleanedValue = String(value).replace(/,/g, '.').replace(/\s/g, '');
-            const numValue = parseFloat(cleanedValue);
-            return !isNaN(numValue) && numValue >= 0;
-        })
         .test('max-length', 'Lệ phí không được vượt quá 230 ký tự', function (value) {
             if (!value) return true;
             return String(value).length <= 230;
@@ -265,12 +259,6 @@ const cachThucHienUpdateSchema = cachThucHienSchema.shape({
         .test('max-length', 'Lệ phí không được vượt quá 230 ký tự', function(value) {
             if (!value) return true;
             return String(value).length <= 230;
-        })
-        .test('is-valid-number', 'Lệ phí phải là số hợp lệ', function (value) {
-            if (!value && value !== 0) return true;
-            const cleanedValue = String(value).replace(/,/g, '.').replace(/\s/g, '');
-            const numValue = parseFloat(cleanedValue);
-            return !isNaN(numValue) && numValue >= 0;
         })
 });
 
