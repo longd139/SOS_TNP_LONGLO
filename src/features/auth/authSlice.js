@@ -79,6 +79,7 @@ const authSlice = createSlice({
             .addCase(loginUser.rejected, (state, action) => {
                 state.loading = false;
                 state.apiError = action.payload?.message || 'Đăng nhập thất bại';
+                state.errors = action.payload?.errors || {};
             })
 
             .addCase(verifyOtpUser.pending, (state) => {
