@@ -78,7 +78,7 @@ const SortableStepItem = ({ step, index, removeStep, updateStep, errors }) => {
                     value={step.ten_buoc}
                     onChange={(e) => updateStep(index, 'ten_buoc', e.target.value)}
                     placeholder="Tên bước..."
-                    className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 text-sm ${
+                    className={`w-full bg-gray-200 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 text-sm ${
                         getError('ten_buoc')
                             ? 'border-red-500 focus:border-red-500 focus:ring-red-500'
                             : 'border-gray-300 focus:ring-blue-500'
@@ -95,7 +95,7 @@ const SortableStepItem = ({ step, index, removeStep, updateStep, errors }) => {
                     onChange={(e) => updateStep(index, 'mo_ta_buoc', e.target.value)}
                     placeholder="Mô tả chi tiết bước thực hiện..."
                     rows="2"
-                    className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 text-sm ${
+                    className={`w-full  bg-gray-200 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 text-sm ${
                         getError('mo_ta_buoc')
                             ? 'border-red-500 focus:border-red-500 focus:ring-red-500'
                             : 'border-gray-300 focus:ring-blue-500'

@@ -44,7 +44,7 @@ const ProcedureMethodsSection = ({ methods, addMethod, removeMethod, updateMetho
                                     value={method.hinh_thuc_ap_dung}
                                     onChange={(e) => updateMethod(index, 'hinh_thuc_ap_dung', e.target.value)}
                                     placeholder="Hình thức áp dụng..."
-                                    className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 text-sm ${
+                                    className={`w-full bg-gray-200 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 text-sm ${
                                         getError(index, 'hinh_thuc_ap_dung')
                                             ? 'border-red-500 focus:border-red-500 focus:ring-red-500'
                                             : 'border-gray-300 focus:ring-blue-500'
@@ -61,7 +61,7 @@ const ProcedureMethodsSection = ({ methods, addMethod, removeMethod, updateMetho
                                     onChange={(e) => updateMethod(index, 'mo_ta_chi_tiet', e.target.value)}
                                     placeholder="Mô tả chi tiết..."
                                     rows="2"
-                                    className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 text-sm ${
+                                    className={`w-full  bg-gray-200 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 text-sm ${
                                         getError(index, 'mo_ta_chi_tiet')
                                             ? 'border-red-500 focus:border-red-500 focus:ring-red-500'
                                             : 'border-gray-300 focus:ring-blue-500'
@@ -79,7 +79,7 @@ const ProcedureMethodsSection = ({ methods, addMethod, removeMethod, updateMetho
                                         value={method.thoi_gian_giai_quyet}
                                         onChange={(e) => updateMethod(index, 'thoi_gian_giai_quyet', e.target.value)}
                                         placeholder="Thời gian giải quyết..."
-                                        className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 text-sm ${
+                                        className={`w-full bg-gray-200 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 text-sm ${
                                             getError(index, 'thoi_gian_giai_quyet')
                                                 ? 'border-red-500 focus:border-red-500 focus:ring-red-500'
                                                 : 'border-gray-300 focus:ring-blue-500'
@@ -95,7 +95,7 @@ const ProcedureMethodsSection = ({ methods, addMethod, removeMethod, updateMetho
                                         value={method.le_phi === 0 || method.le_phi === '0' ? '' : method.le_phi}
                                         onChange={(e) => updateMethod(index, 'le_phi', e.target.value)}
                                         placeholder="Lệ phí (VND)..."
-                                        className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 text-sm ${
+                                        className={`w-full bg-gray-200 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 text-sm ${
                                             getError(index, 'le_phi')
                                                 ? 'border-red-500 focus:border-red-500 focus:ring-red-500'
                                                 : 'border-gray-300 focus:ring-blue-500'
@@ -113,7 +113,7 @@ const ProcedureMethodsSection = ({ methods, addMethod, removeMethod, updateMetho
                                     value={method.ghi_chu_le_phi}
                                     onChange={(e) => updateMethod(index, 'ghi_chu_le_phi', e.target.value)}
                                     placeholder="Ghi chú lệ phí..."
-                                    className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 text-sm ${
+                                    className={`w-full bg-gray-200 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 text-sm ${
                                         getError(index, 'ghi_chu_le_phi')
                                             ? 'border-red-500 focus:border-red-500 focus:ring-red-500'
                                             : 'border-gray-300 focus:ring-blue-500'

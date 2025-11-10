@@ -112,7 +112,7 @@ const ProcedureBasicInfo = ({ formData, errors, updateField }) => {
                                 }}
                                 onKeyDown={handleKeyDown}
                                 placeholder="Tìm hoặc chọn cơ sở..."
-                                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.idCoSoDichVuCong ? 'border-red-500' : 'border-gray-300'}`}
+                                className={`w-full px-3 bg-gray-200 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.idCoSoDichVuCong ? 'border-red-500' : 'border-gray-300'}`}
                             />
                             {errors.idCoSoDichVuCong && (
                                 <p className="mt-1 text-sm text-red-600">{errors.idCoSoDichVuCong}</p>
@@ -162,7 +162,7 @@ const ProcedureBasicInfo = ({ formData, errors, updateField }) => {
                         value={formData.maThuTuc}
                         onChange={(e) => updateField('maThuTuc', e.target.value)}
                         placeholder="Nhập mã thủ tục..."
-                        className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.maThuTuc ? 'border-red-500' : 'border-gray-300'
+                        className={`w-full px-3 py-2 bg-gray-200 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.maThuTuc ? 'border-red-500' : 'border-gray-300'
                             }`}
                     />
                     {errors.maThuTuc && (
@@ -181,7 +181,7 @@ const ProcedureBasicInfo = ({ formData, errors, updateField }) => {
                         value={formData.tenThuTuc}
                         onChange={(e) => updateField('tenThuTuc', e.target.value)}
                         placeholder="Nhập tên thủ tục..."
-                        className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.tenThuTuc ? 'border-red-500' : 'border-gray-300'
+                        className={`w-full px-3 bg-gray-200 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.tenThuTuc ? 'border-red-500' : 'border-gray-300'
                             }`}
                     />
                     {errors.tenThuTuc && (
@@ -198,7 +198,7 @@ const ProcedureBasicInfo = ({ formData, errors, updateField }) => {
                         value={formData.doiTuongThucHien}
                         onChange={(e) => updateField('doiTuongThucHien', e.target.value)}
                         placeholder="VD: Cá nhân, Tổ chức..."
-                        className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.doiTuongThucHien ? 'border-red-500' : 'border-gray-300'
+                        className={`w-full px-3 py-2 bg-gray-200 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.doiTuongThucHien ? 'border-red-500' : 'border-gray-300'
                             }`}
                     />
                     {errors.doiTuongThucHien && (

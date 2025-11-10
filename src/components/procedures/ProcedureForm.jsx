@@ -58,8 +58,8 @@ const ProcedureForm = ({
             isOpen={isOpen}
             onClose={handleClose}
             title={modalTitle}
-            size="3xl"
-            className="max-w-5xl"
+            size="lg"
+            className="max-w-xl"
             footer={
                 <ModalFooter
                     onCancel={handleClose}
@@ -104,17 +104,6 @@ const ProcedureForm = ({
                     errors={errors}
                 />
 
-                <ProcedureCasesSection
-                    cases={formData.truongHopThuTuc}
-                    addCase={addTruongHop}
-                    removeCase={removeTruongHop}
-                    updateCase={updateTruongHop}
-                    addCaseComponent={addThanhPhanHoSo}
-                    removeCaseComponent={removeThanhPhanHoSo}
-                    updateCaseComponent={updateThanhPhanHoSo}
-                    errors={errors}
-                />
-
                 <div className="flex flex-col md:flex-row gap-3 md:items-start">
                     <div className="flex-1 min-w-0">
                         <ProcedureStepsSection
@@ -137,6 +126,16 @@ const ProcedureForm = ({
                         />
                     </div>
                 </div>
+                <ProcedureCasesSection
+                    cases={formData.truongHopThuTuc}
+                    addCase={addTruongHop}
+                    removeCase={removeTruongHop}
+                    updateCase={updateTruongHop}
+                    addCaseComponent={addThanhPhanHoSo}
+                    removeCaseComponent={removeThanhPhanHoSo}
+                    updateCaseComponent={updateThanhPhanHoSo}
+                    errors={errors}
+                />
             </div>
         </BaseModal>
     );
