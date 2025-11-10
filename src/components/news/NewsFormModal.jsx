@@ -243,8 +243,14 @@ const NewsFormModal = ({ isOpen, onClose, onSubmit, initialData = null, isLoadin
                     const updatedContent = replaceImageUrls(formData.noiDung, uploadedUrls);
                     
                     const updateFormData = new FormData();
+                    updateFormData.append('idDanhMuc', formData.idDanhMuc);
+                    updateFormData.append('tieuDe', formData.tieuDe);
                     updateFormData.append('noiDung', updatedContent);
                     updateFormData.append('isActive', String(formData.isActive));
+                    
+                    if (formData.tacGia) {
+                        updateFormData.append('tacGia', formData.tacGia);
+                    }
                     
                     await onSubmit(updateFormData, null, true);
                 }
@@ -310,29 +316,27 @@ const NewsFormModal = ({ isOpen, onClose, onSubmit, initialData = null, isLoadin
                     )}
                 </div>
 
-                <div className="grid grid-cols-2 gap-3 -mx-1 px-1 relative z-10">
-                    <div className="relative px-1">
-                        <label className="block text-sm font-medium text-gray-700 mb-1 required-label">
-                            Loại bài viết
-                        </label>
-                        <select
-                            name="idDanhMuc"
-                            value={formData.idDanhMuc}
-                            onChange={handleInputChange}
-                            disabled={categoriesLoading}
-                            className={`w-full px-3 py-2 text-sm border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${errors.idDanhMuc ? 'border-red-500' : ''} ${categoriesLoading ? 'bg-gray-100 cursor-not-allowed' : ''}`}
-                        >
-                            <option value="">-- Chọn danh mục --</option>
-                            {activeCategories.map(cat => (
-                                <option key={cat.id} value={cat.id}>
-                                    {cat.ten_danh_muc}
-                                </option>
-                            ))}
-                        </select>
-                        {errors.idDanhMuc && (
-                            <p className="mt-0.5 text-sm text-red-600">{errors.idDanhMuc}</p>
-                        )}
-                    </div>
+                <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1 required-label">
+                        Loại bài viết
+                    </label>
+                    <select
+                        name="idDanhMuc"
+                        value={formData.idDanhMuc}
+                        onChange={handleInputChange}
+                        disabled={categoriesLoading}
+                        className={`w-full px-3 py-2 text-sm border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${errors.idDanhMuc ? 'border-red-500' : ''} ${categoriesLoading ? 'bg-gray-100 cursor-not-allowed' : ''}`}
+                    >
+                        <option value="" className="text-gray-500">-- Chọn danh mục --</option>
+                        {activeCategories.map(cat => (
+                            <option key={cat.id} value={cat.id}>
+                                {cat.ten_danh_muc}
+                            </option>
+                        ))}
+                    </select>
+                    {errors.idDanhMuc && (
+                        <p className="mt-0.5 text-sm text-red-600">{errors.idDanhMuc}</p>
+                    )}
                 </div>
 
                 <div>
@@ -351,8 +355,8 @@ const NewsFormModal = ({ isOpen, onClose, onSubmit, initialData = null, isLoadin
                 </div>
 
                 <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Ảnh đại diện {!initialData && <span className="text-red-500">*</span>}
+                    <label className="block text-sm font-medium text-gray-700 mb-1 required-label">
+                        Ảnh đại diện
                     </label>
                     <div className="border-2 border-dashed border-gray-300 rounded-lg p-4">
                         {filePreview ? (
@@ -418,9 +422,99 @@ const NewsFormModal = ({ isOpen, onClose, onSubmit, initialData = null, isLoadin
                 </div>
 
                 <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Nội dung <span className="text-red-500">*</span>
+                    <label className="block text-sm font-medium text-gray-700 mb-1 required-label">
+                        Nội dung
                     </label>
+                    <style>{`
+                        .ql-toolbar.ql-snow {
+                            display: flex !important;
+                            flex-wrap: wrap !important;
+                            overflow-x: visible !important;
+                            white-space: normal !important;
+                            padding: 8px !important;
+                            border-bottom: 1px solid #ccc !important;
+                        }
+                        .ql-toolbar.ql-snow .ql-formats {
+                            display: inline-flex !important;
+                            margin-right: 8px !important;
+                            margin-bottom: 4px !important;
+                        }
+                        .ql-toolbar .ql-picker {
+                            position: relative !important;
+                        }
+                        .ql-toolbar .ql-picker.ql-header {
+                            width: 95px !important;
+                        }
+                        .ql-toolbar .ql-picker.ql-header .ql-picker-label {
+                            font-size: 13px !important;
+                            padding: 5px 8px !important;
+                            border: 1px solid #ccc !important;
+                            border-radius: 4px !important;
+                            display: flex !important;
+                            align-items: center !important;
+                            justify-content: flex-start !important;
+                            text-align: left !important;
+                        }
+                        .ql-toolbar .ql-picker.ql-header .ql-picker-label::before {
+                            content: 'Định dạng' !important;
+                        }
+                        .ql-toolbar .ql-picker.ql-header .ql-picker-options {
+                            position: absolute !important;
+                            top: 100% !important;
+                            left: 0 !important;
+                            z-index: 9999 !important;
+                            background: white !important;
+                            border: 1px solid #ccc !important;
+                            border-radius: 4px !important;
+                            box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
+                            margin-top: 2px !important;
+                            width: 160px !important;
+                            max-height: 200px !important;
+                            overflow-y: auto !important;
+                            display: none !important;
+                        }
+                        .ql-toolbar .ql-picker.ql-header.ql-expanded .ql-picker-options {
+                            display: block !important;
+                        }
+                        .ql-toolbar .ql-picker.ql-header .ql-picker-item {
+                            font-size: 14px !important;
+                            padding: 8px 12px !important;
+                            cursor: pointer !important;
+                            border-bottom: 1px solid #f0f0f0 !important;
+                        }
+                        .ql-toolbar .ql-picker.ql-header .ql-picker-item:last-child {
+                            border-bottom: none !important;
+                        }
+                        .ql-toolbar .ql-picker.ql-header .ql-picker-item:hover {
+                            background-color: #e8f4ff !important;
+                        }
+                        .ql-toolbar .ql-picker.ql-header .ql-picker-item.ql-selected {
+                            background-color: #d4edff !important;
+                        }
+                        .ql-toolbar .ql-picker.ql-header .ql-picker-item[data-value="1"]::before {
+                            content: 'Tiêu đề 1' !important;
+                            font-size: 18px !important;
+                            font-weight: bold !important;
+                            display: block !important;
+                        }
+                        .ql-toolbar .ql-picker.ql-header .ql-picker-item[data-value="2"]::before {
+                            content: 'Tiêu đề 2' !important;
+                            font-size: 16px !important;
+                            font-weight: bold !important;
+                            display: block !important;
+                        }
+                        .ql-toolbar .ql-picker.ql-header .ql-picker-item[data-value="3"]::before {
+                            content: 'Tiêu đề 3' !important;
+                            font-size: 14px !important;
+                            font-weight: bold !important;
+                            display: block !important;
+                        }
+                        .ql-toolbar .ql-picker.ql-header .ql-picker-item:not([data-value])::before {
+                            content: 'Đoạn văn' !important;
+                            font-size: 14px !important;
+                            display: block !important;
+                        }
+                    `}</style>
                     <div className={`border rounded-md ${errors.noiDung ? 'border-red-500' : 'border-gray-300'}`}>
                         <ReactQuill
                             theme="snow"

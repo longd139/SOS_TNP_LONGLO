@@ -167,8 +167,8 @@ const UserModal = ({
                 {!isEditMode && (
                     <>
                         <div>
-                            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-                                Mật khẩu <span className="text-red-500">*</span>
+                            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1 required-label">
+                                Mật khẩu
                             </label>
                             <input
                                 type="password"
@@ -187,8 +187,8 @@ const UserModal = ({
                         </div>
 
                         <div>
-                            <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">
-                                Xác nhận mật khẩu <span className="text-red-500">*</span>
+                            <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1 required-label">
+                                Xác nhận mật khẩu
                             </label>
                             <input
                                 type="password"

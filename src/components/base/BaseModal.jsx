@@ -11,6 +11,10 @@ const BaseModal = ({
     closeOnOverlay = true,
     className = ""
 }) => {
+    const [isDragging, setIsDragging] = React.useState(false);
+
+    const handleMouseDown = () => setIsDragging(false);
+    const handleMouseMove = () => setIsDragging(true);
     useEffect(() => {
         const handleEscape = (e) => {
             if (e.key === 'Escape' && isOpen) {
@@ -41,7 +45,7 @@ const BaseModal = ({
     };
 
     const handleOverlayClick = (e) => {
-        if (closeOnOverlay && e.target === e.currentTarget) {
+        if (closeOnOverlay && e.target === e.currentTarget && !isDragging) {
             onClose();
         }
     };
@@ -50,19 +54,21 @@ const BaseModal = ({
         <div className="fixed inset-0 z-50 overflow-y-auto">
             <div
                 className="flex items-center justify-center min-h-screen pt-3 px-3 pb-16 text-center sm:block sm:p-0"
+                onMouseDown={handleMouseDown}
+                onMouseMove={handleMouseMove}
                 onClick={handleOverlayClick}
             >
                 <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
 
                 <div className={`
-          inline-block align-bottom bg-white rounded-xl text-left shadow-xl transform transition-all overflow-visible
+          inline-block align-bottom bg-white text-left shadow-xl transform transition-all overflow-hidden
           sm:my-8 sm:align-middle sm:w-full ${sizeClasses[size]} ${className}
-        `}>
+        `} style={{ borderRadius: '12px' }}>
                     {(title || showCloseButton) && (
-                        <div className="bg-white px-3 pt-4 pb-3 sm:p-4 sm:pb-3 border-b border-gray-200">
+                        <div className="bg-white px-3 md:px-4 py-3 border-b border-gray-200" style={{ borderTopLeftRadius: '12px', borderTopRightRadius: '12px' }}>
                             <div className="flex items-center justify-between">
                                 {title && (
-                                    <h3 className="text-lg leading-6 font-medium text-gray-900">
+                                    <h3 className="text-lg font-medium text-gray-900">
                                         {title}
                                     </h3>
                                 )}
@@ -85,7 +91,7 @@ const BaseModal = ({
                     </div>
 
                     {footer && (
-                        <div className="bg-gray-50 px-3 py-2 sm:px-4 sm:flex sm:flex-row-reverse border-t border-gray-200">
+                        <div className="bg-gray-50 px-3 py-2 sm:px-4 sm:flex sm:flex-row-reverse border-t border-gray-200" style={{ borderBottomLeftRadius: '12px', borderBottomRightRadius: '12px' }}>
                             {footer}
                         </div>
                     )}

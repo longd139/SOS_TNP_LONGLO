@@ -50,7 +50,7 @@ export const useProcedureForm = ({ initialData, mode, isOpen, onSubmit }) => {
             {
                 ten_buoc: '',
                 mo_ta_buoc: '',
-                thu_tu_buoc: formData.trinhTuThucHien.length + 1
+                thu_tu_buoc: null
             }
         ];
         updateField('trinhTuThucHien', newSteps);
@@ -130,8 +130,8 @@ export const useProcedureForm = ({ initialData, mode, isOpen, onSubmit }) => {
             ...formData.danhSachMauDon,
             {
                 id: '',
-                so_luong_ban_chinh: 0,
-                so_luong_ban_sao: 0,
+                so_luong_ban_chinh: null,
+                so_luong_ban_sao: null,
                 ghi_chu: ''
             }
         ];
@@ -149,9 +149,83 @@ export const useProcedureForm = ({ initialData, mode, isOpen, onSubmit }) => {
         updateField('danhSachMauDon', newMauDon);
     };
 
+    const addTruongHop = (initialValues = {}) => {
+        const current = formData.truongHopThuTuc || [];
+        const newIndex = current.length;
+        const defaultItem = {
+            ten_truong_hop: '',
+            mo_ta: '',
+            thu_tu: newIndex + 1,
+            thanh_phan_ho_so: []
+        };
+
+        const newItem = {
+            ...defaultItem,
+            ...(initialValues || {})
+        };
+
+        const newTruongHop = [...current, newItem];
+        updateField('truongHopThuTuc', newTruongHop);
+    };
+
+    const removeTruongHop = (index) => {
+        const newTruongHop = formData.truongHopThuTuc
+            .filter((_, i) => i !== index)
+            .map((item, i) => ({ ...item, thu_tu: i + 1 }));
+        updateField('truongHopThuTuc', newTruongHop);
+    };
+
+    const updateTruongHop = (index, field, value) => {
+        const newTruongHop = [...formData.truongHopThuTuc];
+        newTruongHop[index] = { ...newTruongHop[index], [field]: value };
+        updateField('truongHopThuTuc', newTruongHop);
+    };
+
+    const addThanhPhanHoSo = (caseIndex, initialValues = {}) => {
+        const newTruongHop = [...formData.truongHopThuTuc];
+        if (!newTruongHop[caseIndex]) {
+            return;
+        }
+        if (!newTruongHop[caseIndex].thanh_phan_ho_so) {
+            newTruongHop[caseIndex].thanh_phan_ho_so = [];
+        }
+
+        const defaultComponent = {
+            ten_thanh_phan: '',
+            mo_ta_chi_tiet: '',
+            so_luong_ban_chinh: null,
+            so_luong_ban_sao: null,
+            ghi_chu: ''
+        };
+
+        const newComponent = {
+            ...defaultComponent,
+            ...(initialValues || {})
+        };
+
+        newTruongHop[caseIndex].thanh_phan_ho_so.push(newComponent);
+        updateField('truongHopThuTuc', newTruongHop);
+    };
+
+    const removeThanhPhanHoSo = (caseIndex, componentIndex) => {
+        const newTruongHop = [...formData.truongHopThuTuc];
+        newTruongHop[caseIndex].thanh_phan_ho_so = newTruongHop[caseIndex].thanh_phan_ho_so.filter(
+            (_, i) => i !== componentIndex
+        );
+        updateField('truongHopThuTuc', newTruongHop);
+    };
+
+    const updateThanhPhanHoSo = (caseIndex, componentIndex, field, value) => {
+        const newTruongHop = [...formData.truongHopThuTuc];
+        newTruongHop[caseIndex].thanh_phan_ho_so[componentIndex] = {
+            ...newTruongHop[caseIndex].thanh_phan_ho_so[componentIndex],
+            [field]: value
+        };
+        updateField('truongHopThuTuc', newTruongHop);
+    };
+
     const handleSubmit = async () => {
         const validation = await validateFormalityForm(formData, mode === 'edit');
-
         if (!validation.isValid) {
             setErrors(validation.errors);
             showToast.error('Vui lòng kiểm tra lại các trường bắt buộc!');
@@ -191,6 +265,12 @@ export const useProcedureForm = ({ initialData, mode, isOpen, onSubmit }) => {
         addCachThucHien,
         removeCachThucHien,
         updateCachThucHien,
+        addTruongHop,
+        removeTruongHop,
+        updateTruongHop,
+        addThanhPhanHoSo,
+        removeThanhPhanHoSo,
+        updateThanhPhanHoSo,
         handleSubmit,
         resetForm
     };

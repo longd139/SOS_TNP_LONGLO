@@ -16,7 +16,7 @@ const createCategory = async (categoryData) => {
 const getAllCategories = async (isRemoved) => {
     try {
         const response = await apiClient.get("/api/danh-muc-tin-tuc", {
-            params: { isRemoved }
+            params: { isActive: !isRemoved }
         });
         if (response.data.success) return response.data.data;
         else throw new Error(response.data.message || "Lấy danh sách danh mục thất bại");
@@ -67,10 +67,24 @@ const deleteCategory = async (categoryId) => {
     }
 }
 
+const updateStatusCategory = async (categoryId, isActive) => {
+    try {
+        const response = await apiClient.put(`/api/danh-muc-tin-tuc/update-status/${categoryId}`, { isActive });
+        if (response.data.success) return response.data.data;
+        else throw new Error(response.data.message || "Cập nhật trạng thái danh mục thất bại");
+    } catch (error) {
+        if (error.response?.data?.message) {
+            throw new Error(error.response.data.message);
+        }
+        throw error;
+    }
+}
+
 export const CATEGORY_API = {
     createCategory,
     getAllCategories,
     updateCategory,
     getCategoryById,
-    deleteCategory
+    deleteCategory,
+    updateStatusCategory
 }

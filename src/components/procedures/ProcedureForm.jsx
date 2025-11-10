@@ -8,6 +8,7 @@ import ProcedureAdditionalInfo from './ProcedureAdditionalInfo';
 import ProcedureStepsSection from './ProcedureStepsSection';
 import ProcedureMethodsSection from './ProcedureMethodsSection';
 import ProcedureMauDonSection from './ProcedureMauDonSection';
+import ProcedureCasesSection from './ProcedureCasesSection';
 
 const ProcedureForm = ({
     isOpen,
@@ -34,6 +35,12 @@ const ProcedureForm = ({
         addCachThucHien,
         removeCachThucHien,
         updateCachThucHien,
+        addTruongHop,
+        removeTruongHop,
+        updateTruongHop,
+        addThanhPhanHoSo,
+        removeThanhPhanHoSo,
+        updateThanhPhanHoSo,
         handleSubmit,
         resetForm
     } = useProcedureForm({ initialData, mode, isOpen, onSubmit });
@@ -51,8 +58,8 @@ const ProcedureForm = ({
             isOpen={isOpen}
             onClose={handleClose}
             title={modalTitle}
-            size="3xl"
-            className="max-w-5xl"
+            size="lg"
+            className="max-w-xl"
             footer={
                 <ModalFooter
                     onCancel={handleClose}
@@ -105,6 +112,7 @@ const ProcedureForm = ({
                             removeStep={removeStep}
                             updateStep={updateStep}
                             reorderSteps={reorderSteps}
+                            errors={errors}
                         />
                     </div>
 
@@ -114,9 +122,20 @@ const ProcedureForm = ({
                             addMethod={addCachThucHien}
                             removeMethod={removeCachThucHien}
                             updateMethod={updateCachThucHien}
+                            errors={errors}
                         />
                     </div>
                 </div>
+                <ProcedureCasesSection
+                    cases={formData.truongHopThuTuc}
+                    addCase={addTruongHop}
+                    removeCase={removeTruongHop}
+                    updateCase={updateTruongHop}
+                    addCaseComponent={addThanhPhanHoSo}
+                    removeCaseComponent={removeThanhPhanHoSo}
+                    updateCaseComponent={updateThanhPhanHoSo}
+                    errors={errors}
+                />
             </div>
         </BaseModal>
     );

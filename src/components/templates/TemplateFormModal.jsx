@@ -87,12 +87,6 @@ const TemplateFormModal = ({
                 formDataToSubmit.append('moTa', formData.moTa.trim());
             }
 
-            if (mode === 'edit') {
-                formDataToSubmit.append('isRemoved', formData.isRemoved);
-                formDataToSubmit.append('is_removed', formData.isRemoved);
-                formDataToSubmit.append('is_delete', formData.isRemoved);
-            }
-
             if (formData.file) {
                 formDataToSubmit.append('file', formData.file);
             }
@@ -115,7 +109,7 @@ const TemplateFormModal = ({
             if (error.response?.data?.message) {
                 showToast.error(error.response.data.message);
             } else {
-                showToast.error('Có lỗi xảy ra khi lưu biểu mẫu!');
+                showToast.error('Có lỗi xảy ra khi lưu biểu mẫu!' || error || error.message);
             }
         } finally {
             setIsSubmitting(false);
@@ -177,8 +171,8 @@ const TemplateFormModal = ({
         >
             <div className="space-y-4">
                 <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Tên biểu mẫu <span className="text-red-500">*</span>
+                    <label className="block text-sm font-medium text-gray-700 mb-2 required-label">
+                        Tên biểu mẫu
                     </label>
                     <input
                         type="text"
@@ -194,8 +188,8 @@ const TemplateFormModal = ({
                 </div>
 
                 <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Mã biểu mẫu <span className="text-red-500">*</span>
+                    <label className="block text-sm font-medium text-gray-700 mb-2 required-label">
+                        Mã biểu mẫu
                     </label>
                     <input
                         type="text"
@@ -224,8 +218,8 @@ const TemplateFormModal = ({
                 </div>
 
                 <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                        File PDF {mode === 'create' && <span className="text-red-500">*</span>}
+                    <label className="block text-sm font-medium text-gray-700 mb-2 required-label">
+                        File PDF
                     </label>
 
                     {mode === 'edit' && (initialData?.urlFilePdf ?? initialData?.url_file_pdf) && !fileName && (
@@ -331,27 +325,6 @@ const TemplateFormModal = ({
                             style={{ width: `${uploadProgress}%`, transition: 'width 200ms linear' }}
                         />
                         <div className="text-xs text-gray-600 mt-1">Đang tải lên: {uploadProgress}%</div>
-                    </div>
-                )}
-
-                {mode === 'edit' && (
-                    <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
-                        <label className="flex items-center gap-3 cursor-pointer">
-                            <div className="relative inline-block w-12 h-6">
-                                <input
-                                    type="checkbox"
-                                    checked={formData.isRemoved}
-                                    onChange={(e) => updateField('isRemoved', e.target.checked)}
-                                    className="sr-only peer"
-                                />
-                                <div className="w-12 h-6 bg-gray-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-yellow-300 rounded-full peer peer-checked:after:translate-x-6 peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-500"></div>
-                            </div>
-                            <div className="flex-1">
-                                <span className="text-sm font-medium text-gray-900">
-                                    Đánh dấu xóa biểu mẫu
-                                </span>
-                            </div>
-                        </label>
                     </div>
                 )}
             </div>

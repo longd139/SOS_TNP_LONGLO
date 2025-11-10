@@ -27,8 +27,8 @@ const TemplateSelector = ({
         if (!searchTerm) return true;
         const searchLower = searchTerm.toLowerCase();
         return (
-            (template.ma_mau_don && template.ma_mau_don.toLowerCase().includes(searchLower)) ||
-            (template.ten_mau_don && template.ten_mau_don.toLowerCase().includes(searchLower))
+            (template.maMauDon && template.maMauDon.toLowerCase().includes(searchLower)) ||
+            (template.tenMauDon && template.tenMauDon.toLowerCase().includes(searchLower))
         );
     });
 
@@ -39,8 +39,8 @@ const TemplateSelector = ({
 
     const getDisplayText = () => {
         if (!selectedTemplate) return '';
-        const prefix = selectedTemplate.ma_mau_don ? `[${selectedTemplate.ma_mau_don}] ` : '';
-        return prefix + truncateText(selectedTemplate.ten_mau_don, 50);
+        const prefix = selectedTemplate.maMauDon ? `[${selectedTemplate.maMauDon}] ` : '';
+        return prefix + truncateText(selectedTemplate.tenMauDon, 50);
     };
 
     useEffect(() => {
@@ -93,12 +93,12 @@ const TemplateSelector = ({
         <div ref={dropdownRef} className="relative">
             <div
                 onClick={() => setIsOpen(!isOpen)}
-                className={`w-full px-3 py-2 pr-8 text-sm border rounded-lg bg-white cursor-pointer ${
+                className={`w-full px-3 bg-gray-200 bg-gray-200 py-2 pr-8 text-sm border rounded-lg bg-white cursor-pointer ${
                     error 
                         ? 'border-red-500 focus-within:border-red-500 focus-within:ring-red-500' 
                         : 'border-gray-300 focus-within:border-blue-500 hover:border-gray-400'
                 } focus-within:outline-none focus-within:ring-2 focus-within:ring-blue-500 focus-within:ring-opacity-50 transition-colors`}
-                title={selectedTemplate?.ten_mau_don || ''}
+                title={selectedTemplate?.tenMauDon || ''}
             >
                 {selectedTemplate ? (
                     <div className="flex items-center justify-between gap-2">
@@ -142,16 +142,16 @@ const TemplateSelector = ({
                             }}
                             onKeyDown={handleKeyDown}
                             placeholder="Tìm kiếm biểu mẫu..."
-                            className="w-full px-3 py-2 text-sm border border-gray-300 rounded focus:outline-none focus:border-blue-500"
+                            className="w-full bg-gray-200 px-3 py-2 text-sm border border-gray-300 rounded focus:outline-none focus:border-blue-500"
                         />
                     </div>
 
                     <div className="overflow-y-auto max-h-48">
                         {filteredTemplates.length > 0 ? (
                             filteredTemplates.map((template, index) => {
-                                const displayText = template.ma_mau_don 
-                                    ? `[${template.ma_mau_don}] ${truncateText(template.ten_mau_don, 50)}`
-                                    : truncateText(template.ten_mau_don, 50);
+                                const displayText = template.maMauDon 
+                                    ? `[${template.maMauDon}] ${truncateText(template.tenMauDon, 50)}`
+                                    : truncateText(template.tenMauDon, 50);
 
                                 return (
                                     <div
@@ -163,7 +163,7 @@ const TemplateSelector = ({
                                                 ? 'bg-blue-50 border-blue-500 text-blue-900'
                                                 : 'border-transparent hover:bg-gray-50'
                                         }`}
-                                        title={template.ten_mau_don}
+                                        title={template.tenMauDon}
                                     >
                                         {displayText}
                                     </div>

@@ -22,7 +22,6 @@ const userProfileSlice = createSlice({
     },
     extraReducers: (builder) => {
         builder
-            // Fetch Profile
             .addCase(fetchMyProfile.pending, (state) => {
                 state.loading = true;
                 state.error = null;
@@ -36,7 +35,6 @@ const userProfileSlice = createSlice({
                 state.error = action.payload || 'Lấy thông tin cá nhân thất bại';
             })
 
-            // Update Profile
             .addCase(updateProfileData.pending, (state) => {
                 state.updating = true;
                 state.updateError = null;

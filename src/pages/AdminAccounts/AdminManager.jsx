@@ -51,6 +51,10 @@ export default function AdminManager() {
         });
     };
 
+    const canDelete = (user) => {
+        return !user.active;
+    };
+
     const handleUserModalSubmit = async (userData) => {
         try {
             setModalLoading(true);
@@ -69,7 +73,7 @@ export default function AdminManager() {
             setUserModal({ isOpen: false, user: null });
 
         } catch (error) {
-            showToast.error(error.message || 'Có lỗi xảy ra!');
+            showToast.error(error.message || 'Có lỗi xảy ra!' || error);
         } finally {
             setModalLoading(false);
         }
@@ -86,7 +90,7 @@ export default function AdminManager() {
             setDeleteModal({ isOpen: false, user: null });
 
         } catch (error) {
-            showToast.error(error.message || 'Có lỗi xảy ra khi xóa tài khoản!');
+            showToast.error(error.message || 'Có lỗi xảy ra khi xóa tài khoản!' || error);
         }
     };
 
@@ -99,7 +103,7 @@ export default function AdminManager() {
             await updateStatus(user.id, !user.active);
             showToast.success(`Tài khoản đã được ${!user.active ? 'kích hoạt' : 'vô hiệu hóa'} thành công!`);
         } catch (error) {
-            showToast.error(error.message || 'Có lỗi xảy ra khi cập nhật trạng thái tài khoản!');
+            showToast.error(error.message || 'Có lỗi xảy ra khi cập nhật trạng thái tài khoản!' || error);
         }
     };
 
@@ -323,6 +327,7 @@ export default function AdminManager() {
                 onPageChange={handlePageChange}
                 onEdit={handleEditUser}
                 onDelete={handleDeleteUser}
+                canDelete={canDelete}
                 onUpdateStatus={handleUpdateStatus}
                 emptyMessage="Không có tài khoản nào"
             />

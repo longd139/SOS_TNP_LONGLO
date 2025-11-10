@@ -2,6 +2,7 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import { jwtDecode } from 'jwt-decode';
 import { AUTH_API } from '../../apis/auth';
 import { validateAuth } from '../../validator/loginValidator';
+import { showToast } from '../../utils/toastNotification';
 
 const decodeToken = (token) => {
     try {
@@ -27,7 +28,7 @@ export const loginUser = createAsyncThunk(
             const res = await AUTH_API.login(credentials);
             const response = res?.data || res;
 
-            if (response.requiresTwoFactorAuth) {
+            if (response.requiresTwoFactorAuth || response.requires_two_factor_auth) {
                 return {
                     requiresTwoFactorAuth: true,
                     tenDangNhap: credentials.tenDangNhap,
@@ -56,7 +57,20 @@ export const loginUser = createAsyncThunk(
                 },
             };
         } catch (error) {
-            return rejectWithValue({ message: error.message });
+            const fieldErrors = {};
+            if (error.errors && Array.isArray(error.errors)) {
+                error.errors.forEach(err => {
+                    if (err.field && err.message) {
+                        fieldErrors[err.field] = err.message;
+                    }
+                });
+            }
+            
+            showToast.error(error.message);
+            return rejectWithValue({ 
+                message: error.message,
+                errors: fieldErrors
+            });
         }
     }
 );
@@ -112,7 +126,6 @@ export const changePassword = createAsyncThunk(
                 throw new Error('Mật khẩu mới phải khác mật khẩu cũ');
             }
 
-            // Pass backend-aligned keys directly
             const response = await AUTH_API.changePassword({
                 matKhauHienTai: passwordData.matKhauHienTai,
                 matKhauMoi: passwordData.matKhauMoi,

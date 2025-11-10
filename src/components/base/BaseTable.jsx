@@ -9,6 +9,7 @@ const BaseTable = ({
     onDelete,
     onView,
     onUpdateStatus,
+    canDelete,
     viewIcon = null,
     pagination = null,
     onPageChange,
@@ -108,7 +109,7 @@ const BaseTable = ({
                                                         <Pencil className="w-4 h-4" />
                                                     </button>
                                                 )}
-                                                {onDelete && (
+                                                {onDelete && (!canDelete || canDelete(item)) && (
                                                     <button
                                                         onClick={() => onDelete(item)}
                                                         className="text-red-600 hover:text-red-900 p-1 rounded hover:bg-red-100"
@@ -158,15 +159,30 @@ const BaseTable = ({
                     <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
                         <div>
                             <p className="text-sm text-gray-700">
-                                Hiển thị{' '}
-                                <span className="font-medium">{(((pagination.current || pagination.currentPage) - 1) * pagination.pageSize) + 1}</span>
-                                {' '}đến{' '}
-                                <span className="font-medium">
-                                    {Math.min((pagination.current || pagination.currentPage) * pagination.pageSize, pagination.total || pagination.totalItems)}
-                                </span>
-                                {' '}trong{' '}
-                                <span className="font-medium">{pagination.total || pagination.totalItems}</span>
-                                {' '}kết quả
+                                {(() => {
+                                    const currentPage = pagination.current || pagination.currentPage || 1;
+                                    const pageSize = pagination.pageSize || 10;
+                                    const totalItems = pagination.total || pagination.totalItems || 0;
+                                    
+                                    if (totalItems === 0) {
+                                        return <>Không có kết quả nào</>;
+                                    }
+                                    
+                                    const startItem = ((currentPage - 1) * pageSize) + 1;
+                                    const endItem = Math.min(currentPage * pageSize, totalItems);
+                                    
+                                    return (
+                                        <>
+                                            Hiển thị{' '}
+                                            <span className="font-medium">{startItem}</span>
+                                            {' '}đến{' '}
+                                            <span className="font-medium">{endItem}</span>
+                                            {' '}trong{' '}
+                                            <span className="font-medium">{totalItems}</span>
+                                            {' '}kết quả
+                                        </>
+                                    );
+                                })()}
                             </p>
                         </div>
                         <div>

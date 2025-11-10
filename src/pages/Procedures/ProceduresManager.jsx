@@ -155,7 +155,7 @@ export default function ProceduresManager() {
         }
     };
 
-    const handleSearchWithFilters = (newFilters) => {
+    const handleSearchWithFilters = (newFilters) => {        
         updateFilters({
             searchKeyword: newFilters.searchKeyword,
             selectedDomain: newFilters.selectedDomain,
@@ -169,12 +169,14 @@ export default function ProceduresManager() {
             changePageSize(newFilters.pageSize);
         }
 
+        const id_linh_vuc = newFilters.selectedDomain === '' ? undefined : newFilters.selectedDomain;
+        
         dispatch(
             fetchProcedures({
                 page: 1,
                 size: newFilters.pageSize,
                 search: newFilters.searchKeyword,
-                id_linh_vuc: newFilters.selectedDomain,
+                id_linh_vuc: id_linh_vuc,
                 isActive: newFilters.showActive,
             })
         );
@@ -192,7 +194,6 @@ export default function ProceduresManager() {
             </div>
 
             <ProceduresFilter
-                areas={areas}
                 filters={filters}
                 pagination={pagination}
                 showActive={showActive}

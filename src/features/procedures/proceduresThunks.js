@@ -4,7 +4,7 @@ import { AREAS_API } from '../../apis/areas';
 
 export const fetchProcedures = createAsyncThunk(
     'procedures/fetchProcedures',
-    async ({ page = 1, size = 10, search = '', id_linh_vuc = '', isActive = true }, { rejectWithValue }) => {
+    async ({ page = 1, size = 10, search = '', id_linh_vuc, isActive = true }, { rejectWithValue }) => {
         try {
             const params = {
                 page,
@@ -13,7 +13,7 @@ export const fetchProcedures = createAsyncThunk(
                 isActive
             };
 
-            if (id_linh_vuc) {
+            if (id_linh_vuc !== undefined && id_linh_vuc !== null && id_linh_vuc !== '') {
                 params.id_linh_vuc = id_linh_vuc;
             }
 

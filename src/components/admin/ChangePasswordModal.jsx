@@ -4,6 +4,7 @@ import { Eye, EyeOff } from 'lucide-react';
 import BaseModal from '../base/BaseModal';
 import { changePassword } from '../../features/auth/authThunks';
 import { clearChangePasswordSuccess, clearErrors } from '../../features/auth/authSlice';
+import { validateChangePassword } from '../../validator/changePasswordValidator';
 
 const ChangePasswordModal = ({ isOpen, onClose }) => {
     const dispatch = useDispatch();
@@ -54,44 +55,18 @@ const ChangePasswordModal = ({ isOpen, onClose }) => {
         }
     }, [successMessage]);
 
-    const validateForm = () => {
-        const errors = {};
-
-        if (!formData.matKhauHienTai) {
-            errors.matKhauHienTai = 'Vui lòng nhập mật khẩu cũ';
-        }
-
-        if (!formData.matKhauMoi) {
-            errors.matKhauMoi = 'Vui lòng nhập mật khẩu mới';
-        } else if (formData.matKhauMoi.length < 6) {
-            errors.matKhauMoi = 'Mật khẩu mới phải có ít nhất 6 ký tự';
-        }
-
-        if (!formData.confirmMatKhauMoi) {
-            errors.confirmMatKhauMoi = 'Vui lòng xác nhận mật khẩu mới';
-        } else if (formData.matKhauMoi !== formData.confirmMatKhauMoi) {
-            errors.confirmMatKhauMoi = 'Mật khẩu xác nhận không khớp';
-        }
-
-        if (formData.matKhauHienTai && formData.matKhauMoi && formData.matKhauHienTai === formData.matKhauMoi) {
-            errors.matKhauMoi = 'Mật khẩu mới phải khác mật khẩu cũ';
-        }
-
-        setLocalErrors(errors);
-        return Object.keys(errors).length === 0;
-    };
-
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        if (!validateForm()) {
+        const validation = await validateChangePassword(formData);
+        if (!validation.isValid) {
+            setLocalErrors(validation.errors);
             return;
         }
 
         try {
             await dispatch(changePassword(formData)).unwrap();
         } catch (error) {
-
         }
     };
 
@@ -135,8 +110,8 @@ const ChangePasswordModal = ({ isOpen, onClose }) => {
                 )}
 
                 <div>
-                    <label className="block text-xs md:text-sm font-medium text-gray-700 mb-1.5">
-                        Mật khẩu cũ <span className="text-red-500">*</span>
+                    <label className="block text-xs md:text-sm font-medium text-gray-700 mb-1.5 required-label">
+                        Mật khẩu cũ
                     </label>
                     <div className="relative">
                         <input
@@ -165,8 +140,8 @@ const ChangePasswordModal = ({ isOpen, onClose }) => {
                 </div>
 
                 <div>
-                    <label className="block text-xs md:text-sm font-medium text-gray-700 mb-1.5">
-                        Mật khẩu mới <span className="text-red-500">*</span>
+                    <label className="block text-xs md:text-sm font-medium text-gray-700 mb-1.5 required-label">
+                        Mật khẩu mới
                     </label>
                     <div className="relative">
                         <input
@@ -197,7 +172,7 @@ const ChangePasswordModal = ({ isOpen, onClose }) => {
 
                 <div>
                     <label className="block text-xs md:text-sm font-medium text-gray-700 mb-1.5">
-                        Xác nhận mật khẩu mới <span className="text-red-500">*</span>
+                        Xác nhận mật khẩu mới
                     </label>
                     <div className="relative">
                         <input

@@ -123,7 +123,6 @@ const proceduresSlice = createSlice({
                 state.error = action.payload || 'Failed to delete procedure';
             })
 
-            // Fetch Procedure By ID
             .addCase(fetchProcedureById.pending, (state) => {
                 state.loading = true;
                 state.error = null;
