@@ -149,16 +149,22 @@ export const useProcedureForm = ({ initialData, mode, isOpen, onSubmit }) => {
         updateField('danhSachMauDon', newMauDon);
     };
 
-    const addTruongHop = () => {
-        const newTruongHop = [
-            ...formData.truongHopThuTuc,
-            {
-                ten_truong_hop: '',
-                mo_ta: '',
-                thu_tu: null,
-                thanh_phan_ho_so: []
-            }
-        ];
+    const addTruongHop = (initialValues = {}) => {
+        const current = formData.truongHopThuTuc || [];
+        const newIndex = current.length;
+        const defaultItem = {
+            ten_truong_hop: '',
+            mo_ta: '',
+            thu_tu: newIndex + 1,
+            thanh_phan_ho_so: []
+        };
+
+        const newItem = {
+            ...defaultItem,
+            ...(initialValues || {})
+        };
+
+        const newTruongHop = [...current, newItem];
         updateField('truongHopThuTuc', newTruongHop);
     };
 
@@ -175,18 +181,29 @@ export const useProcedureForm = ({ initialData, mode, isOpen, onSubmit }) => {
         updateField('truongHopThuTuc', newTruongHop);
     };
 
-    const addThanhPhanHoSo = (caseIndex) => {
+    const addThanhPhanHoSo = (caseIndex, initialValues = {}) => {
         const newTruongHop = [...formData.truongHopThuTuc];
+        if (!newTruongHop[caseIndex]) {
+            return;
+        }
         if (!newTruongHop[caseIndex].thanh_phan_ho_so) {
             newTruongHop[caseIndex].thanh_phan_ho_so = [];
         }
-        newTruongHop[caseIndex].thanh_phan_ho_so.push({
+
+        const defaultComponent = {
             ten_thanh_phan: '',
             mo_ta_chi_tiet: '',
             so_luong_ban_chinh: null,
             so_luong_ban_sao: null,
             ghi_chu: ''
-        });
+        };
+
+        const newComponent = {
+            ...defaultComponent,
+            ...(initialValues || {})
+        };
+
+        newTruongHop[caseIndex].thanh_phan_ho_so.push(newComponent);
         updateField('truongHopThuTuc', newTruongHop);
     };
 

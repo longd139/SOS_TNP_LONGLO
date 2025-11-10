@@ -76,7 +76,7 @@ const ProcedureMauDonSection = ({ items, addItem, removeItem, updateItem, errors
                                     min="0"
                                     value={item.so_luong_ban_chinh ?? 0}
                                     onChange={(e) => updateItem(idx, 'so_luong_ban_chinh', Number(e.target.value))}
-                                    className={`w-full px-3 py-2 text-sm border rounded-lg ${getError(idx, 'so_luong_ban_chinh')
+                                    className={`w-full bg-gray-200 px-3 py-2 text-sm border rounded-lg ${getError(idx, 'so_luong_ban_chinh')
                                             ? 'border-red-500 focus:border-red-500 focus:ring-red-500'
                                             : 'border-gray-300 focus:border-blue-500 hover:border-gray-400'
                                         } focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition-colors`}
@@ -91,7 +91,7 @@ const ProcedureMauDonSection = ({ items, addItem, removeItem, updateItem, errors
                                     min="0"
                                     value={item.so_luong_ban_sao ?? 0}
                                     onChange={(e) => updateItem(idx, 'so_luong_ban_sao', Number(e.target.value))}
-                                    className={`w-full px-3 py-2 text-sm border rounded-lg ${getError(idx, 'so_luong_ban_sao')
+                                    className={`w-full px-3 bg-gray-200 py-2 text-sm border rounded-lg ${getError(idx, 'so_luong_ban_sao')
                                             ? 'border-red-500 focus:border-red-500 focus:ring-red-500'
                                             : 'border-gray-300 focus:border-blue-500 hover:border-gray-400'
                                         } focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition-colors`}
@@ -106,7 +106,7 @@ const ProcedureMauDonSection = ({ items, addItem, removeItem, updateItem, errors
                                     value={item.ghi_chu || ''}
                                     onChange={(e) => updateItem(idx, 'ghi_chu', e.target.value)}
                                     placeholder="Ghi chú..."
-                                    className={`w-full px-3 py-2 text-sm border rounded-lg ${getError(idx, 'ghi_chu')
+                                    className={`w-full px-3 py-2 bg-gray-200 text-sm border rounded-lg ${getError(idx, 'ghi_chu')
                                             ? 'border-red-500 focus:border-red-500 focus:ring-red-500'
                                             : 'border-gray-300 focus:border-blue-500 hover:border-gray-400'
                                         } focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition-colors`}

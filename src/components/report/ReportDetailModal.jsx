@@ -17,6 +17,7 @@ import {
 import { useReports } from "../../hooks/useReports";
 import { showToast } from "../../utils/toastNotification";
 import { validateReport } from "../../validator/reportValidator";
+import dayjs from "dayjs";
 
 const ReportDetailModal = ({ isOpen, onClose, report, loading = false, onStatusUpdated, mode = "view" }) => {
     const { statusReport, updateStatus, clearError } = useReports();
@@ -30,10 +31,17 @@ const ReportDetailModal = ({ isOpen, onClose, report, loading = false, onStatusU
 
     useEffect(() => {
         if (isOpen && report && report.lich_su_trang_thai && report.lich_su_trang_thai.length > 0) {
-            const currentStatusKey = Object.keys(statusReport || {}).find(
-                key => statusReport[key] === report.lich_su_trang_thai[report.lich_su_trang_thai.length - 1].ten
-            );
-            setSelectedStatus(currentStatusKey || "");
+            const latest = report.lich_su_trang_thai.reduce((prev, curr) => {
+                try {
+                    return dayjs(prev.thoi_gian_tao).isSameOrAfter(dayjs(curr.thoi_gian_tao)) ? curr : prev;
+                } catch (e) {
+                    return prev;
+                }
+            }, report.lich_su_trang_thai[0]);
+
+            const latestName = (latest && latest.ten) ? latest.ten : "";
+            
+            setSelectedStatus(latestName);
             setResponseContent("");
             setExpectedResponseDate("");
             setExpectedCompletionDate("");
