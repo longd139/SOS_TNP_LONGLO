@@ -100,12 +100,17 @@ const getFormById = async (formId) => {
     }
 };
 
-const getAllFromPaging = async (pageIndex, pageSize, isRemoved = false, search = '') => {
+const getAllFormPaging = async (page, pageSize, isRemoved = false, search = '') => {
     try {
         const response = await apiFormClient.get('/api/mau-don/paging', {
-            params: { pageIndex, pageSize, isActive: !isRemoved, search }
+            params: { page, size: pageSize, isActive: !isRemoved, search }
         });
-        if (response.data.success) return keysToCamel(response.data.data);
+        if (response.data.success) {
+            return {
+                data: keysToCamel(response.data.data),
+                pagination: response.data.pagination
+            };
+        }
         else throw new Error("Lấy biểu mẫu phân trang thất bại");
     } catch (error) {
         throw error;
@@ -119,5 +124,5 @@ export const FORM_API = {
     deleteForm,
     updateMauDonStatus,
     getFormById,
-    getAllFromPaging
+    getAllFormPaging
 }

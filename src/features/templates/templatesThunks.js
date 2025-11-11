@@ -36,6 +36,36 @@ export const fetchTemplates = createAsyncThunk(
     }
 );
 
+export const fetchTemplatesPaging = createAsyncThunk(
+    'templates/fetchTemplatesPaging',
+    async ({ page = 1, pageSize = 10, isRemoved = false, search = '' }, { rejectWithValue }) => {
+        try {
+            const response = await FORM_API.getAllFormPaging(page, pageSize, isRemoved, search);
+            
+            const templates = response.data || [];
+            const paginationInfo = response.pagination || {};
+            
+            const normalizedData = templates.map(item => ({
+                ...item,
+                isActive: toBoolean(item.isActive ?? item.is_active),
+                isDelete: toBoolean(item.isDelete ?? item.is_deleted ?? item.is_delete)
+            }));
+
+            return {
+                content: normalizedData,
+                page: parseInt(paginationInfo.currentPage) || page,
+                size: parseInt(paginationInfo.pageSize) || pageSize,
+                totalElements: parseInt(paginationInfo.totalItems) || 0,
+                totalPages: parseInt(paginationInfo.totalPages) || 0
+            };
+        } catch (error) {
+            return rejectWithValue({
+                message: error.response?.data?.message || error.message || 'Lấy danh sách biểu mẫu thất bại'
+            });
+        }
+    }
+);
+
 export const createTemplate = createAsyncThunk(
     'templates/createTemplate',
     async (payload, { rejectWithValue }) => {
