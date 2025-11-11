@@ -3,7 +3,7 @@ import { WORK_SCHEDULE_API } from '../../apis/workSchedule';
 
 export const fetchWorkSchedules = createAsyncThunk(
     'workSchedule/fetchWorkSchedules',
-    async ({ weekYear = null, monthYear = null, date = null, isActive = true } = {}, { rejectWithValue }) => {
+    async ({ weekYear = null, monthYear = null, date = null, isActive = null } = {}, { rejectWithValue }) => {
         try {
             const response = await WORK_SCHEDULE_API.getWorkSchedules(weekYear, monthYear, date, isActive);
             return response || [];

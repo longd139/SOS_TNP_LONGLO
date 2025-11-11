@@ -18,7 +18,7 @@ const initialState = {
         weekYear: null,
         monthYear: null,
         date: null,
-        isActive: true
+        isActive: null 
     },
     selectedMonth: new Date().getMonth() + 1,
     selectedYear: new Date().getFullYear(),
