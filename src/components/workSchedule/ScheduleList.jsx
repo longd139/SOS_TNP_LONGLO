@@ -1,15 +1,5 @@
-import { Clock, MapPin, User, FileText, Pencil, Trash2, ToggleLeft } from "lucide-react";
+import { Clock, MapPin, User, FileText, Pencil, Trash2, ToggleLeft, Calendar } from "lucide-react";
 
-/**
- * ScheduleList - Component hiển thị danh sách lịch tiếp dân
- * @param {Array} schedules - Danh sách lịch tiếp dân
- * @param {boolean} loading - Trạng thái đang tải
- * @param {string} error - Thông báo lỗi
- * @param {function} onEdit - Callback khi chỉnh sửa lịch
- * @param {function} onDelete - Callback khi xóa lịch
- * @param {function} formatDate - Function format ngày
- * @param {string} selectedDate - Ngày được chọn để hiển thị thông tin
- */
 export default function ScheduleList({
     schedules,
     loading,
@@ -50,7 +40,7 @@ export default function ScheduleList({
                     ? formatDate(selectedDate)
                     : selectedDate;
                 return {
-                    icon: "📅",
+                    icon: <Calendar className="w-12 h-12 text-gray-300 mx-auto" />,
                     title: "Không có lịch tiếp dân",
                     message: `Ngày ${formattedDate} chưa có lịch tiếp dân nào`,
                 };
@@ -58,7 +48,7 @@ export default function ScheduleList({
         }
 
         return {
-            icon: "📅",
+            icon: <Calendar className="w-12 h-12 text-gray-300 mx-auto" />,
             title: "Chưa có lịch tiếp dân nào",
             message: "Hãy thêm lịch mới hoặc import từ file Excel",
         };
@@ -66,6 +56,7 @@ export default function ScheduleList({
 
     const displayMessage = getDisplayMessage();
 
+    console.log("Rendered ScheduleList with schedules:", schedules);
     return (
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3 md:p-4">
             <div className="flex items-center justify-between mb-2 md:mb-3">

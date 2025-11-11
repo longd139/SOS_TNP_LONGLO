@@ -76,6 +76,15 @@ export const selectHasScheduleForDay = createSelector(
     [selectSchedulesForMonth],
     (monthSchedules) => (day) => {
         if (!day) return false;
+
+        if (typeof day === 'string') {
+            return monthSchedules.some(schedule => {
+                const scheduleDate = new Date(getScheduleDateField(schedule));
+                const dStr = `${scheduleDate.getFullYear()}-${String(scheduleDate.getMonth() + 1).padStart(2, '0')}-${String(scheduleDate.getDate()).padStart(2, '0')}`;
+                return dStr === day;
+            });
+        }
+
         return monthSchedules.some(schedule => {
             const scheduleDate = new Date(getScheduleDateField(schedule));
             return scheduleDate.getDate() === day;

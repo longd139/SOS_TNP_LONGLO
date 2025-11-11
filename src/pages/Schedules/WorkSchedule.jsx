@@ -40,7 +40,7 @@ export default function WorkSchedule() {
     const [activeFilter, setActiveFilter] = useState("all"); 
 
     useEffect(() => {
-        fetchSchedules();
+        fetchSchedules({ monthYear: `${selectedMonth}/${selectedYear}` });
     }, [fetchSchedules]);
 
     useEffect(() => {
@@ -128,7 +128,7 @@ export default function WorkSchedule() {
             if (!file) return;
 
             const validation = await validateFileImport({ file });
-            if (!validation.isValid) {
+            if (!validation.valid) {
                 showToast.error(validation.errors.file);
                 return;
             }
@@ -180,6 +180,7 @@ export default function WorkSchedule() {
     const handleActiveFilterChange = (filter) => {
         setActiveFilter(filter);
     };
+
 
     return (
         <div className="min-h-screen relative">
