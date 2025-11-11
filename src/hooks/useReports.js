@@ -47,11 +47,12 @@ export const useReports = ({ autoFetch = false, filters = {} } = {}) => {
             idLinhVucPhanAnh: params.idLinhVucPhanAnh || currentFilters.idLinhVucPhanAnh || '',
             trangThai: params.trangThai || currentFilters.trangThai || '',
             mucDo: params.mucDo || currentFilters.mucDo || '',
-            maPhanAnh: params.maPhanAnh || currentFilters.maPhanAnh || ''
+            maPhanAnh: params.maPhanAnh || currentFilters.maPhanAnh || '',
+            sortTime: params.sortTime || currentFilters.sortTime || 'desc'
         };
 
         return dispatch(fetchReportPagination(requestParams)).unwrap();
-    }, [dispatch, pagination.currentPage, pagination.pageSize, currentFilters.idLinhVucPhanAnh, currentFilters.trangThai, currentFilters.mucDo, currentFilters.maPhanAnh]);
+    }, [dispatch, pagination.currentPage, pagination.pageSize, currentFilters.idLinhVucPhanAnh, currentFilters.trangThai, currentFilters.mucDo, currentFilters.maPhanAnh, currentFilters.sortTime]);
 
     const loadReportById = useCallback((reportId) => {
         return dispatch(fetchReportById(reportId)).unwrap();

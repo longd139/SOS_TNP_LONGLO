@@ -28,7 +28,8 @@ const initialState = {
         maPhanAnh: '',
         idLinhVucPhanAnh: '',
         trangThai: '',
-        mucDo: ''
+        mucDo: '',
+        sortTime: 'desc'
     }
 }
 
