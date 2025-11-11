@@ -37,16 +37,13 @@ export default function Login() {
 
         const credentials = { tenDangNhap, matKhau };
 
-        // Validate form data before calling API
         const { valid, errors: validationErrs } = await validateAuth(credentials);
         
         if (!valid) {
-            // Set validation errors to display in UI
             setValidationErrors(validationErrs);
             return;
         }
         
-        // Clear validation errors if form is valid
         setValidationErrors({});
         
         const result = await login(credentials);

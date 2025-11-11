@@ -352,7 +352,6 @@ const ProcedureCasesSection = ({ cases, addCase, removeCase, updateCase, updateC
                                         <button
                                             type="button"
                                             onClick={() => {
-                                                // open modal for adding component to this case
                                                 setActiveCaseIndex(caseIndex);
                                                 setNewComponentName('');
                                                 setNewComponentDesc('');
