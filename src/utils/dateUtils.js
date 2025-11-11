@@ -72,7 +72,11 @@ export const isSameDate = (date1, date2) => {
     return normalized1 === normalized2;
 };
 
-export const hourFormatted = (hourStr) => {
+export const hourFormat = (hourStr) => {
     if (!hourStr) return '';
-    
+    const [start, end] = hourStr.split(' - ').map(t => t.trim());
+    return {
+        start,
+        end
+    };
 };

@@ -199,6 +199,7 @@ export default function WorkSchedule() {
         result = await createScheduleItem(scheduleData);
       } else {
         result = await updateScheduleItem(modalState.data.id, scheduleData);
+        console.log("Update result:", result);
       }
 
       if (result.success) {

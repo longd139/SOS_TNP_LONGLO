@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 import BaseModal, { ModalFooter } from "../base/BaseModal";
 import { validateCreateWorkScheduleForm } from "../../validator/workScheduleValidator";
 import dayjs from "dayjs";
+import { hourFormat } from "../../utils/dateUtils";
 
 const WorkScheduleModal = ({
   isOpen,
@@ -30,12 +31,13 @@ const WorkScheduleModal = ({
         const formattedDate = dateValue
           ? dayjs(dateValue).format("YYYY-MM-DD")
           : "";
+        const { start, end } = hourFormat(initialData.thoi_gian || "");
 
         setFormData({
           diaDiem: initialData.dia_diem || initialData.diaDiem || "",
           tenCanBo: initialData.ten_can_bo || initialData.tenCanBo || "",
-          batDau: initialData.bat_dau || initialData.batDau || "",
-          ketThuc: initialData.ket_thuc || initialData.ketThuc || "",
+          batDau: initialData.batDau || start || "",
+          ketThuc: initialData.ketThuc || end || "",
           ngayTiepDan: formattedDate,
           ghiChu: initialData.ghi_chu || initialData.ghiChu || "",
         });
@@ -77,10 +79,10 @@ const WorkScheduleModal = ({
         return;
       }
 
-      // Convert date to ISO format for API
+      // Keep date format without timezone conversion
       const submitData = {
         ...formData,
-        ngayTiepDan: dayjs(formData.ngayTiepDan).toISOString(),
+        ngayTiepDan: formData.ngayTiepDan,
       };
 
       const success = await onSubmit(submitData, mode);
@@ -195,7 +197,7 @@ const WorkScheduleModal = ({
         {/* Tên cán bộ */}
         <div>
           <label className="block required-label text-sm font-medium text-gray-700 mb-1">
-            Cán bộ tiếp dân 
+            Cán bộ tiếp dân
           </label>
           <input
             type="text"
@@ -214,7 +216,7 @@ const WorkScheduleModal = ({
         {/* Địa điểm */}
         <div>
           <label className="block required-label text-sm font-medium text-gray-700 mb-1">
-            Địa điểm 
+            Địa điểm
           </label>
           <input
             type="text"
