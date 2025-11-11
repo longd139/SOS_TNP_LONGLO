@@ -42,18 +42,15 @@ export const fetchTemplatesPaging = createAsyncThunk(
         try {
             const response = await FORM_API.getAllFormPaging(page, pageSize, isRemoved, search);
             
-            // Response structure: { data: [...], pagination: {...} }
             const templates = response.data || [];
             const paginationInfo = response.pagination || {};
             
-            // Normalize the templates array
             const normalizedData = templates.map(item => ({
                 ...item,
                 isActive: toBoolean(item.isActive ?? item.is_active),
                 isDelete: toBoolean(item.isDelete ?? item.is_deleted ?? item.is_delete)
             }));
 
-            // Return pagination structure
             return {
                 content: normalizedData,
                 page: parseInt(paginationInfo.currentPage) || page,

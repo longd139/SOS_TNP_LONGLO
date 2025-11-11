@@ -106,7 +106,6 @@ const getAllFormPaging = async (page, pageSize, isRemoved = false, search = '') 
             params: { page, size: pageSize, isActive: !isRemoved, search }
         });
         if (response.data.success) {
-            // Return full response structure with pagination
             return {
                 data: keysToCamel(response.data.data),
                 pagination: response.data.pagination

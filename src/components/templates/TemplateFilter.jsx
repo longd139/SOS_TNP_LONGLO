@@ -51,17 +51,14 @@ export default function TemplateFilter({
   ];
 
   const handleFilter = (newFilters) => {
-    // Update search keyword if changed
     if (newFilters.searchKeyword !== filters.searchKeyword) {
       onFilterChange?.("searchKeyword", newFilters.searchKeyword);
     }
 
-    // Toggle removed status if changed
     if (newFilters.showRemoved !== showRemoved) {
       onToggleRemoved?.(newFilters.showRemoved);
     }
 
-    // Use the combined search callback if provided
     if (onSearchWithFilters) {
       onSearchWithFilters({
         searchKeyword: newFilters.searchKeyword,
@@ -69,7 +66,6 @@ export default function TemplateFilter({
         pageSize: Number(newFilters.pageSize),
       });
     } else {
-      // Otherwise use individual callbacks
       if (newFilters.pageSize !== pagination.pageSize) {
         onPageSizeChange?.(Number(newFilters.pageSize));
       }

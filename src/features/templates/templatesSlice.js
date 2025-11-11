@@ -60,7 +60,6 @@ const templatesSlice = createSlice({
                 state.error = action.payload?.message || 'Lấy danh sách biểu mẫu thất bại';
             })
 
-            // Fetch templates with pagination
             .addCase(fetchTemplatesPaging.pending, (state) => {
                 state.loading = true;
                 state.error = null;
