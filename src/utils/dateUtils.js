@@ -71,3 +71,8 @@ export const isSameDate = (date1, date2) => {
     const normalized2 = normalizeDate(date2);
     return normalized1 === normalized2;
 };
+
+export const hourFormatted = (hourStr) => {
+    if (!hourStr) return '';
+    
+};
