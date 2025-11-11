@@ -40,7 +40,7 @@ export default function WorkSchedule() {
     const [activeFilter, setActiveFilter] = useState("all"); 
 
     useEffect(() => {
-        fetchSchedules();
+        fetchSchedules({ monthYear: `${selectedMonth}/${selectedYear}` });
     }, [fetchSchedules]);
 
     useEffect(() => {
@@ -180,6 +180,7 @@ export default function WorkSchedule() {
     const handleActiveFilterChange = (filter) => {
         setActiveFilter(filter);
     };
+
 
     return (
         <div className="min-h-screen relative">
