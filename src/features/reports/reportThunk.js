@@ -10,6 +10,7 @@ export const fetchReportPagination = createAsyncThunk(
         page = 1,
         size = 10,
         maPhanAnh = '',
+        sortTime = 'desc',
     }, { rejectWithValue }) => {
         try {
             const params = {
@@ -21,6 +22,7 @@ export const fetchReportPagination = createAsyncThunk(
             if (trangThai) params.trangThai = trangThai;
             if (mucDo) params.mucDo = mucDo;
             if (maPhanAnh) params.maPhanAnh = maPhanAnh;
+            if (sortTime) params.sortTime = sortTime;
 
             const response = await REPORT_API.getReportPagination(params);
 

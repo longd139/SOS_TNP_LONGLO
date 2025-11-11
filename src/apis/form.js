@@ -22,7 +22,7 @@ const createForm = async (formData, options = {}) => {
 
         const response = await apiFormClient.post('/api/mau-don', formData, config);
         if (response.data.success) return keysToCamel(response.data.data);
-        else throw new Error("Tạo biểu mẫu thất bại");
+        else throw new Error(response.data.message || "Tạo biểu mẫu thất bại");
     } catch (error) {
         throw error;
     }
@@ -35,7 +35,7 @@ const updateForm = async (formId, formData, options = {}) => {
 
         const response = await apiFormClient.put(`/api/mau-don/${formId}`, formData, config);
         if (response.data.success) return keysToCamel(response.data.data);
-        else throw new Error("Cập nhật biểu mẫu thất bại");
+        else throw new Error(response.data.message || "Cập nhật biểu mẫu thất bại");
     } catch (error) {
         throw error;
     }
@@ -47,8 +47,11 @@ const getAllForms = async (isRemoved = false, search = '') => {
             params: { isActive: !isRemoved, search }
         });
         if (response.data.success) return keysToCamel(response.data.data);
-        else throw new Error("Lấy tất cả biểu mẫu thất bại");
+        else throw new Error(response.data.message || "Lấy tất cả biểu mẫu thất bại");
     } catch (error) {
+        if (error.response?.data?.message) {
+            throw new Error(error.response.data.message);
+        }
         throw error;
     }
 }
@@ -66,8 +69,11 @@ const deleteForm = async (formId) => {
         } catch (fbErr) {
         }
 
-        throw new Error("Xóa biểu mẫu thất bại");
+        throw new Error(response.data.message || "Xóa biểu mẫu thất bại");
     } catch (error) {
+        if (error.response?.data?.message) {
+            throw new Error(error.response.data.message);
+        }
         throw error;
     }
 }
@@ -86,7 +92,10 @@ export const updateMauDonStatus = async (mauDonId, isActive, options = {}) => {
 
     throw new Error(response?.data?.message || 'Cập nhật trạng thái mẫu đơn thất bại');
   } catch (error) {
-    throw error;
+    if (error.response?.data?.message) {
+            throw new Error(error.response.data.message);
+        }
+        throw error;
   }
 };
 
@@ -94,20 +103,31 @@ const getFormById = async (formId) => {
     try {
         const response = await apiFormClient.get(`/api/mau-don/${formId}`);
         if (response.data.success) return keysToCamel(response.data.data);
-        else throw new Error("Lấy biểu mẫu thất bại");
+        else throw new Error(response.data.message || "Lấy biểu mẫu thất bại");
     } catch (error) {
+        if (error.response?.data?.message) {
+            throw new Error(error.response.data.message);
+        }
         throw error;
     }
 };
 
-const getAllFromPaging = async (pageIndex, pageSize, isRemoved = false, search = '') => {
+const getAllFormPaging = async (page, pageSize, isRemoved = false, search = '') => {
     try {
         const response = await apiFormClient.get('/api/mau-don/paging', {
-            params: { pageIndex, pageSize, isActive: !isRemoved, search }
+            params: { page, size: pageSize, isActive: !isRemoved, search }
         });
-        if (response.data.success) return keysToCamel(response.data.data);
-        else throw new Error("Lấy biểu mẫu phân trang thất bại");
+        if (response.data.success) {
+            return {
+                data: keysToCamel(response.data.data),
+                pagination: response.data.pagination
+            };
+        }
+        else throw new Error(response.data.message || "Lấy biểu mẫu phân trang thất bại");
     } catch (error) {
+        if (error.response?.data?.message) {
+            throw new Error(error.response.data.message);
+        }
         throw error;
     }
 };
@@ -119,5 +139,5 @@ export const FORM_API = {
     deleteForm,
     updateMauDonStatus,
     getFormById,
-    getAllFromPaging
+    getAllFormPaging
 }

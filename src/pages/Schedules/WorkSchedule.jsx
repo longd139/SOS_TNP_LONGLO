@@ -5,6 +5,7 @@ import { ConfirmModal } from "../../components/base/BaseModal";
 import { useSchedule } from "../../hooks/useSchedule";
 import MonthCalendar from "../../components/workSchedule/MonthCalendar";
 import ScheduleList from "../../components/workSchedule/ScheduleList";
+import WorkScheduleModal from "../../components/workSchedule/WorkScheduleModal";
 import dayjs from "dayjs";
 import { validateFileImport } from "../../validator/fileValidator";
 import { downloadUtils } from "../../utils/downLoadUtils";
@@ -27,8 +28,9 @@ export default function WorkSchedule() {
         clearError,
         setSelectedMonth,
         setSelectedYear,
-        setShowActive,
         getTemplate,
+        createScheduleItem,
+        updateScheduleItem,
     } = useSchedule();
 
     const [deleteConfirm, setDeleteConfirm] = useState({
@@ -36,12 +38,21 @@ export default function WorkSchedule() {
         schedule: null,
     });
 
+    const [modalState, setModalState] = useState({
+        isOpen: false,
+        mode: "create",
+        data: null,
+    });
+
     const [selectedDate, setSelectedDate] = useState(null);
-    const [activeFilter, setActiveFilter] = useState("all"); 
+    const [activeFilter, setActiveFilter] = useState("all");
 
     useEffect(() => {
-        fetchSchedules();
-    }, [fetchSchedules]);
+        fetchSchedules({
+            monthYear: `${selectedMonth}/${selectedYear}`,
+            isActive: null
+        });
+    }, [fetchSchedules, selectedMonth, selectedYear]);
 
     useEffect(() => {
         return () => {
@@ -58,17 +69,27 @@ export default function WorkSchedule() {
     const handleMonthChange = (newMonth) => {
         setSelectedMonth(newMonth);
         setSelectedDate(null);
-        fetchSchedules({ monthYear: `${newMonth}/${selectedYear}` });
+        fetchSchedules({
+            monthYear: `${newMonth}/${selectedYear}`,
+            isActive: null
+        });
     };
 
     const handleYearChange = (newYear) => {
         setSelectedYear(newYear);
         setSelectedDate(null);
-        fetchSchedules({ monthYear: `${selectedMonth}/${newYear}` });
+        fetchSchedules({
+            monthYear: `${selectedMonth}/${newYear}`,
+            isActive: null
+        });
     };
 
     const handleEdit = (schedule) => {
-        showToast.showInfo("Tính năng chỉnh sửa lịch đang được phát triển.");
+        setModalState({
+            isOpen: true,
+            mode: "edit",
+            data: schedule,
+        });
     };
 
     const handleDelete = (schedule) => {
@@ -80,8 +101,14 @@ export default function WorkSchedule() {
             const res = await updateStatus(schedule);
             if (res.success) {
                 showToast.success("Cập nhật trạng thái lịch tiếp dân thành công.");
+                fetchSchedules({
+                    monthYear: `${selectedMonth}/${selectedYear}`,
+                    isActive: null
+                });
             } else {
-                showToast.error(res.error || "Cập nhật trạng thái lịch tiếp dân thất bại.");
+                showToast.error(
+                    res.error || "Cập nhật trạng thái lịch tiếp dân thất bại."
+                );
             }
         } catch (error) {
             showToast.error("Có lỗi xảy ra khi cập nhật trạng thái lịch tiếp dân.");
@@ -110,7 +137,9 @@ export default function WorkSchedule() {
             const result = await getTemplate();
             if (result.success) {
                 downloadUtils.handleDownloadExcel(result.data.data);
-                showToast.success(result.message || "Đã tải xuống template lịch tiếp dân.");
+                showToast.success(
+                    result.message || "Đã tải xuống template lịch tiếp dân."
+                );
             } else {
                 showToast.error(result.error || "Lấy template lịch tiếp dân thất bại.");
             }
@@ -128,7 +157,7 @@ export default function WorkSchedule() {
             if (!file) return;
 
             const validation = await validateFileImport({ file });
-            if (!validation.isValid) {
+            if (!validation.valid) {
                 showToast.error(validation.errors.file);
                 return;
             }
@@ -139,12 +168,17 @@ export default function WorkSchedule() {
 
                 if (result.success) {
                     showToast.success(
-                        `Import thành công! Đã import ${result.data?.importedCount || 0} lịch tiếp dân.`
+                        `Import thành công! Đã import ${result.data?.importedCount || 0
+                        } lịch tiếp dân.`
                     );
-                    fetchSchedules();
+                    fetchSchedules({
+                        monthYear: `${selectedMonth}/${selectedYear}`,
+                        isActive: null
+                    });
                 } else {
                     showToast.error(
-                        result.error || "Import lịch tiếp dân thất bại. Vui lòng kiểm tra định dạng file."
+                        result.error ||
+                        "Import lịch tiếp dân thất bại. Vui lòng kiểm tra định dạng file."
                     );
                 }
             } catch (error) {
@@ -157,24 +191,70 @@ export default function WorkSchedule() {
     };
 
     const handleAddSchedule = () => {
-        showToast.info("Tính năng thêm lịch đang được phát triển.");
+        setModalState({
+            isOpen: true,
+            mode: "create",
+            data: null,
+        });
+    };
+
+    const handleCloseModal = () => {
+        setModalState({
+            isOpen: false,
+            mode: "create",
+            data: null,
+        });
+    };
+
+    const handleSubmitSchedule = async (scheduleData, mode) => {
+        try {
+            let result;
+
+            if (mode === "create") {
+                result = await createScheduleItem(scheduleData);
+            } else {
+                result = await updateScheduleItem(modalState.data.id, scheduleData);
+                console.log("Update result:", result);
+            }
+
+            if (result.success) {
+                showToast.success(
+                    mode === "create"
+                        ? "Tạo lịch tiếp dân thành công!"
+                        : "Cập nhật lịch tiếp dân thành công!"
+                );
+                fetchSchedules({
+                    monthYear: `${selectedMonth}/${selectedYear}`,
+                    isActive: null
+                });
+                return true;
+            } else {
+                showToast.error(result.error || "Có lỗi xảy ra!");
+                return false;
+            }
+        } catch (error) {
+            showToast.error("Có lỗi xảy ra khi xử lý lịch tiếp dân!");
+            return false;
+        }
     };
 
     const filterByActive = (scheduleList) => {
         if (activeFilter === "all") return scheduleList;
         if (activeFilter === "active") {
-            return scheduleList.filter(s => s.is_active === true || s.isActive === true);
+            return scheduleList.filter(
+                (s) => s.is_active === true || s.isActive === true
+            );
         }
         if (activeFilter === "inactive") {
-            return scheduleList.filter(s => s.is_active === false || s.isActive === false);
+            return scheduleList.filter(
+                (s) => s.is_active === false || s.isActive === false
+            );
         }
         return scheduleList;
     };
 
     const displaySchedules = filterByActive(
-        selectedDate
-            ? getSchedulesForDate(selectedDate)
-            : getSchedulesForDisplay()
+        selectedDate ? getSchedulesForDate(selectedDate) : getSchedulesForDisplay()
     );
 
     const handleActiveFilterChange = (filter) => {
@@ -223,7 +303,9 @@ export default function WorkSchedule() {
 
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3 md:p-4 mb-4">
                 <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-                    <span className="text-sm font-medium text-gray-700">Lọc theo trạng thái:</span>
+                    <span className="text-sm font-medium text-gray-700">
+                        Lọc theo trạng thái:
+                    </span>
                     <div className="flex flex-wrap gap-2">
                         <button
                             onClick={() => handleActiveFilterChange("all")}
@@ -241,7 +323,13 @@ export default function WorkSchedule() {
                                     : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                                 }`}
                         >
-                            Hoạt động ({schedules.filter(s => s.is_active === true || s.isActive === true).length})
+                            Hoạt động (
+                            {
+                                schedules.filter(
+                                    (s) => s.is_active === true || s.isActive === true
+                                ).length
+                            }
+                            )
                         </button>
                         <button
                             onClick={() => handleActiveFilterChange("inactive")}
@@ -250,7 +338,13 @@ export default function WorkSchedule() {
                                     : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                                 }`}
                         >
-                            Đã khóa ({schedules.filter(s => s.is_active === false || s.isActive === false).length})
+                            Đã khóa (
+                            {
+                                schedules.filter(
+                                    (s) => s.is_active === false || s.isActive === false
+                                ).length
+                            }
+                            )
                         </button>
                     </div>
                 </div>
@@ -288,10 +382,20 @@ export default function WorkSchedule() {
                 onClose={() => setDeleteConfirm({ isOpen: false, schedule: null })}
                 onConfirm={handleDeleteConfirm}
                 title="Xác nhận xóa"
-                message={`Bạn có chắc chắn muốn xóa lịch tiếp dân ngày ${dayjs(deleteConfirm.schedule?.ngay_tiep_dan).format("DD/MM/YYYY")} ?`}
+                message={`Bạn có chắc chắn muốn xóa lịch tiếp dân ngày ${dayjs(
+                    deleteConfirm.schedule?.ngay_tiep_dan
+                ).format("DD/MM/YYYY")} ?`}
                 confirmText="Xóa"
                 cancelText="Hủy"
                 type="danger"
+            />
+
+            <WorkScheduleModal
+                isOpen={modalState.isOpen}
+                onClose={handleCloseModal}
+                onSubmit={handleSubmitSchedule}
+                initialData={modalState.data}
+                mode={modalState.mode}
             />
         </div>
     );

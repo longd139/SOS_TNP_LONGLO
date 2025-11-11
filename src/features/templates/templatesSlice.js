@@ -1,12 +1,23 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { fetchTemplates, createTemplate, updateTemplate, deleteTemplate } from './templatesThunks';
+import { fetchTemplates, fetchTemplatesPaging, createTemplate, updateTemplate, deleteTemplate } from './templatesThunks';
+
+const DEFAULT_PAGE_SIZE = 10;
 
 const initialState = {
     templates: [],
     currentTemplate: null,
     loading: false,
     error: null,
-    showRemoved: false
+    showRemoved: false,
+    pagination: {
+        current: 1,
+        pageSize: DEFAULT_PAGE_SIZE,
+        total: 0,
+        totalPages: 0
+    },
+    filters: {
+        searchKeyword: ''
+    }
 };
 
 const templatesSlice = createSlice({
@@ -24,6 +35,14 @@ const templatesSlice = createSlice({
         },
         setShowRemoved: (state, action) => {
             state.showRemoved = action.payload;
+        },
+        setFilters: (state, action) => {
+            state.filters = { ...state.filters, ...action.payload };
+        },
+        resetFilters: (state) => {
+            state.filters = {
+                searchKeyword: ''
+            };
         }
     },
     extraReducers: (builder) => {
@@ -39,6 +58,26 @@ const templatesSlice = createSlice({
             .addCase(fetchTemplates.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload?.message || 'Lấy danh sách biểu mẫu thất bại';
+            })
+
+            .addCase(fetchTemplatesPaging.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(fetchTemplatesPaging.fulfilled, (state, action) => {
+                state.loading = false;
+                state.templates = action.payload.content || [];
+                state.pagination = {
+                    current: action.payload.page,
+                    pageSize: action.payload.size,
+                    total: action.payload.totalElements || 0,
+                    totalPages: action.payload.totalPages || 0
+                };
+            })
+            .addCase(fetchTemplatesPaging.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload?.message || 'Lấy danh sách biểu mẫu thất bại';
+                state.templates = [];
             })
 
             .addCase(createTemplate.pending, (state) => {
@@ -107,5 +146,5 @@ const templatesSlice = createSlice({
     }
 });
 
-export const { clearError, setCurrentTemplate, clearCurrentTemplate, setShowRemoved } = templatesSlice.actions;
+export const { clearError, setCurrentTemplate, clearCurrentTemplate, setShowRemoved, setFilters, resetFilters } = templatesSlice.actions;
 export default templatesSlice.reducer;

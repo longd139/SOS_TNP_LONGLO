@@ -42,7 +42,7 @@ export const renderStatusBadge = (lichSuTrangThai) => {
         );
     }
 
-    const currentStatus = lichSuTrangThai[lichSuTrangThai.length - 1].ten;
+    const currentStatus = lichSuTrangThai[0].ten;
     const style = getStatusStyle(currentStatus);
 
     return (

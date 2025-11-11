@@ -145,8 +145,11 @@ export default function ContactInfo() {
                                 value={formData.tenDonVi}
                                 onChange={(e) => handleChange("tenDonVi", e.target.value)}
                                 disabled={!isEditing}
-                                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg bg-gray-50 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50"
+                                className={`w-full px-3 py-2 text-sm border rounded-lg bg-gray-50 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50 ${errors['tenDonVi'] ? 'border-red-500' : 'border-gray-300'}`}
                             />
+                            {errors['tenDonVi'] && (
+                                <p className="mt-1 text-xs text-red-600">{errors['tenDonVi']}</p>
+                            )}
                         </div>
                     </div>                    
                     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3">
@@ -167,8 +170,11 @@ export default function ContactInfo() {
                                     value={formData.diaChi}
                                     onChange={(e) => handleChange("diaChi", e.target.value)}
                                     disabled={!isEditing}
-                                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg bg-gray-50 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50"
+                                    className={`w-full px-3 py-2 text-sm border rounded-lg bg-gray-50 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50 ${errors['diaChi'] ? 'border-red-500' : 'border-gray-300'}`}
                                 />
+                                {errors['diaChi'] && (
+                                    <p className="mt-1 text-xs text-red-600">{errors['diaChi']}</p>
+                                )}
                             </div>
 
                             <div>
@@ -180,9 +186,12 @@ export default function ContactInfo() {
                                     value={formData.linkGoogleMap}
                                     onChange={(e) => handleChange("linkGoogleMap", e.target.value)}
                                     disabled={!isEditing}
-                                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg bg-gray-50 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50"
+                                    className={`w-full px-3 py-2 text-sm border rounded-lg bg-gray-50 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50 ${errors['linkGoogleMap'] ? 'border-red-500' : 'border-gray-300'}`}
                                     placeholder="https://maps.google.com/?q=10.8231,106.6297"
                                 />
+                                {errors['linkGoogleMap'] && (
+                                    <p className="mt-1 text-xs text-red-600">{errors['linkGoogleMap']}</p>
+                                )}
                             </div>
                         </div>
                     </div>
@@ -205,9 +214,12 @@ export default function ContactInfo() {
                                     value={formData.soDienThoai}
                                     onChange={(e) => handleChange("soDienThoai", e.target.value)}
                                     disabled={!isEditing}
-                                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg bg-gray-50 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50"
+                                    className={`w-full px-3 py-2 text-sm border rounded-lg bg-gray-50 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50 ${errors['soDienThoai'] ? 'border-red-500' : 'border-gray-300'}`}
                                     placeholder="0813241516540"
                                 />
+                                {errors['soDienThoai'] && (
+                                    <p className="mt-1 text-xs text-red-600">{errors['soDienThoai']}</p>
+                                )}
                             </div>
 
                             <div>
@@ -219,9 +231,12 @@ export default function ContactInfo() {
                                     value={formData.email}
                                     onChange={(e) => handleChange("email", e.target.value)}
                                     disabled={!isEditing}
-                                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg bg-gray-50 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50"
+                                    className={`w-full px-3 py-2 text-sm border rounded-lg bg-gray-50 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50 ${errors['email'] ? 'border-red-500' : 'border-gray-300'}`}
                                     placeholder="user@example.com"
                                 />
+                                {errors['email'] && (
+                                    <p className="mt-1 text-xs text-red-600">{errors['email']}</p>
+                                )}
                             </div>
                         </div>
                     </div>                    

@@ -3,7 +3,7 @@ import { WORK_SCHEDULE_API } from '../../apis/workSchedule';
 
 export const fetchWorkSchedules = createAsyncThunk(
     'workSchedule/fetchWorkSchedules',
-    async ({ weekYear = null, monthYear = null, date = null, isActive = true } = {}, { rejectWithValue }) => {
+    async ({ weekYear = null, monthYear = null, date = null, isActive = null } = {}, { rejectWithValue }) => {
         try {
             const response = await WORK_SCHEDULE_API.getWorkSchedules(weekYear, monthYear, date, isActive);
             return response || [];
@@ -66,6 +66,34 @@ export const getTemplateWorkSchedule = createAsyncThunk(
         } catch (error) {
             return rejectWithValue({
                 message: error.response?.data?.message || error.message || 'Lấy template lịch tiếp dân thất bại'
+            });
+        }
+    }
+);
+
+export const createWorkSchedule = createAsyncThunk(
+    'workSchedule/createWorkSchedule',
+    async (scheduleData, { rejectWithValue }) => {
+        try {
+            const response = await WORK_SCHEDULE_API.createWorkSchedule(scheduleData);
+            return response;
+        } catch (error) {
+            return rejectWithValue({
+                message: error.response?.data?.message || error.message || 'Tạo lịch tiếp dân thất bại'
+            });
+        }
+    }
+);
+
+export const updateWorkSchedule = createAsyncThunk(
+    'workSchedule/updateWorkSchedule',
+    async ({ scheduleId, scheduleData }, { rejectWithValue }) => {
+        try {
+            const response = await WORK_SCHEDULE_API.updateWorkSchedule(scheduleId, scheduleData);
+            return response;
+        } catch (error) {
+            return rejectWithValue({
+                message: error.response?.data?.message || error.message || 'Cập nhật lịch tiếp dân thất bại'
             });
         }
     }

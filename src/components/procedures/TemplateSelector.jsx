@@ -93,7 +93,7 @@ const TemplateSelector = ({
         <div ref={dropdownRef} className="relative">
             <div
                 onClick={() => setIsOpen(!isOpen)}
-                className={`w-full px-3 py-2 pr-8 text-sm border rounded-lg bg-white cursor-pointer ${
+                className={`w-full px-3 bg-gray-200 bg-gray-200 py-2 pr-8 text-sm border rounded-lg bg-white cursor-pointer ${
                     error 
                         ? 'border-red-500 focus-within:border-red-500 focus-within:ring-red-500' 
                         : 'border-gray-300 focus-within:border-blue-500 hover:border-gray-400'
@@ -142,7 +142,7 @@ const TemplateSelector = ({
                             }}
                             onKeyDown={handleKeyDown}
                             placeholder="Tìm kiếm biểu mẫu..."
-                            className="w-full px-3 py-2 text-sm border border-gray-300 rounded focus:outline-none focus:border-blue-500"
+                            className="w-full bg-gray-200 px-3 py-2 text-sm border border-gray-300 rounded focus:outline-none focus:border-blue-500"
                         />
                     </div>
 

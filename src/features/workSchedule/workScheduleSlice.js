@@ -4,7 +4,9 @@ import {
     importWorkSchedule, 
     updateWorkScheduleStatus, 
     deleteWorkSchedule, 
-    getTemplateWorkSchedule
+    getTemplateWorkSchedule,
+    createWorkSchedule,
+    updateWorkSchedule
 } from './workScheduleThunks';
 
 const initialState = {
@@ -16,7 +18,7 @@ const initialState = {
         weekYear: null,
         monthYear: null,
         date: null,
-        isActive: true
+        isActive: null 
     },
     selectedMonth: new Date().getMonth() + 1,
     selectedYear: new Date().getFullYear(),
@@ -132,6 +134,33 @@ const workScheduleSlice = createSlice({
             .addCase(getTemplateWorkSchedule.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload?.message || 'Lấy template lịch tiếp dân thất bại';
+            })
+            .addCase(createWorkSchedule.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(createWorkSchedule.fulfilled, (state, action) => {
+                state.loading = false;
+                state.schedules.unshift(action.payload);
+            })
+            .addCase(createWorkSchedule.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload?.message || 'Tạo lịch tiếp dân thất bại';
+            })
+            .addCase(updateWorkSchedule.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(updateWorkSchedule.fulfilled, (state, action) => {
+                state.loading = false;
+                const index = state.schedules.findIndex(schedule => schedule.id === action.payload.id);
+                if (index !== -1) {
+                    state.schedules[index] = action.payload;
+                }
+            })
+            .addCase(updateWorkSchedule.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload?.message || 'Cập nhật lịch tiếp dân thất bại';
             });
     }
 });
