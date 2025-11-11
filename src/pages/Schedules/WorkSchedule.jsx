@@ -128,7 +128,7 @@ export default function WorkSchedule() {
             if (!file) return;
 
             const validation = await validateFileImport({ file });
-            if (!validation.isValid) {
+            if (!validation.valid) {
                 showToast.error(validation.errors.file);
                 return;
             }

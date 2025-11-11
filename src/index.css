@@ -4,7 +4,6 @@
 
 @import 'react-quill/dist/quill.snow.css';
 
-/* Global font size reduction */
 @layer base {
     html {
         font-size: 14px;
