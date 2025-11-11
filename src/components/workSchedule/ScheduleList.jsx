@@ -71,10 +71,6 @@ export default function ScheduleList({
                     <div className="flex justify-center items-center py-8">
                         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
                     </div>
-                ) : error ? (
-                    <div className="text-center py-8 text-red-600">
-                        <p>{error}</p>
-                    </div>
                 ) : schedules.length === 0 ? (
                     <div className="text-center py-12 text-gray-500">
                         <div className="mb-4 text-4xl">{displayMessage.icon}</div>

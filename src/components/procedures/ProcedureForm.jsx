@@ -58,8 +58,8 @@ const ProcedureForm = ({
             isOpen={isOpen}
             onClose={handleClose}
             title={modalTitle}
-            size="lg"
-            className="max-w-xl"
+            size="3xl"
+            className="max-w-5xl"
             footer={
                 <ModalFooter
                     onCancel={handleClose}

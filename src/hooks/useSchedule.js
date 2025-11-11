@@ -5,7 +5,9 @@ import {
     importWorkSchedule, 
     updateWorkScheduleStatus, 
     deleteWorkSchedule, 
-    getTemplateWorkSchedule
+    getTemplateWorkSchedule,
+    createWorkSchedule,
+    updateWorkSchedule
 } from '../features/workSchedule/workScheduleThunks';
 import { 
     clearError,
@@ -127,6 +129,32 @@ export const useSchedule = () => {
         }
     }, [dispatch]);
 
+    const createScheduleItem = useCallback(async (scheduleData) => {
+        try {
+            const result = await dispatch(createWorkSchedule(scheduleData));
+            if (createWorkSchedule.fulfilled.match(result)) {
+                return { success: true, data: result.payload };
+            } else {
+                return { success: false, error: result.payload?.message || result.payload || 'Tạo lịch tiếp dân thất bại!' };
+            }
+        } catch (error) {
+            return { success: false, error: error.message || 'Tạo lịch tiếp dân thất bại!' };
+        }
+    }, [dispatch]);
+
+    const updateScheduleItem = useCallback(async (scheduleId, scheduleData) => {
+        try {
+            const result = await dispatch(updateWorkSchedule({ scheduleId, scheduleData }));
+            if (updateWorkSchedule.fulfilled.match(result)) {
+                return { success: true, data: result.payload };
+            } else {
+                return { success: false, error: result.payload?.message || result.payload || 'Cập nhật lịch tiếp dân thất bại!' };
+            }
+        } catch (error) {
+            return { success: false, error: error.message || 'Cập nhật lịch tiếp dân thất bại!' };
+        }
+    }, [dispatch]);
+
     const addNewSchedule = useCallback((scheduleData) => {
         dispatch(addSchedule(scheduleData));
     }, [dispatch]);
@@ -222,6 +250,8 @@ export const useSchedule = () => {
         hasSchedule,
         getSchedulesForDisplay,
         getSchedulesForDate,
-        formatDate
+        formatDate,
+        createScheduleItem,
+        updateScheduleItem
     };
 };
