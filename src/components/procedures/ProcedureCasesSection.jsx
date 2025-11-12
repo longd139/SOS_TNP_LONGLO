@@ -3,22 +3,8 @@ import PropTypes from "prop-types";
 import { ChevronDown, ChevronUp, X, Edit2 } from "lucide-react";
 import BaseModal, { ModalFooter } from "../base/BaseModal";
 import PortalModal from "../base/PortalModal";
+import { validateSchema } from "../../utils/validationUtils";
 import { truongHopThuTucSchema, thanhPhanHoSoSchema } from "../../validator/formalityValidator";
-
-const convertCasesToCamelCase = (cases) => {
-  return cases.map(caseItem => ({
-    tenTruongHop: caseItem.ten_truong_hop,
-    moTa: caseItem.mo_ta,
-    thuTu: caseItem.thu_tu,
-    thanhPhanHoSo: (caseItem.thanh_phan_ho_so || []).map(component => ({
-      tenThanhPhan: component.ten_thanh_phan,
-      moTaChiTiet: component.mo_ta_chi_tiet,
-      soLuongBanChinh: component.so_luong_ban_chinh,
-      soLuongBanSao: component.so_luong_ban_sao,
-      ghiChu: component.ghi_chu
-    }))
-  }));
-};
 
 const ProcedureCasesSection = ({
   cases = [],
@@ -30,58 +16,143 @@ const ProcedureCasesSection = ({
   updateCaseComponent,
   errors = {},
 }) => {
-  const validateCaseForm = async (data, isEdit = false) => {
-    try {
-      await truongHopThuTucSchema.validate(data, { abortEarly: false });
-      return { isValid: true, errors: {} };
-    } catch (error) {
-      const validationErrors = {};
-      if (error.inner) {
-        error.inner.forEach((err) => {
-          validationErrors[err.path] = err.message;
-        });
-      } else {
-        validationErrors.general = error.message;
-      }
-      return { isValid: false, errors: validationErrors };
-    }
-  };
-
-  const validateComponentForm = async (data, isEdit = false) => {
-    try {
-      await thanhPhanHoSoSchema.validate(data, { abortEarly: false });
-      return { isValid: true, errors: {} };
-    } catch (error) {
-      const validationErrors = {};
-      if (error.inner) {
-        error.inner.forEach((err) => {
-          validationErrors[err.path] = err.message;
-        });
-      } else {
-        validationErrors.general = error.message;
-      }
-      return { isValid: false, errors: validationErrors };
-    }
-  };
   const [expandedCases, setExpandedCases] = useState({});
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [editingCaseIndex, setEditingCaseIndex] = useState(null);
-  const [newCaseName, setNewCaseName] = useState("");
-  const [newCaseDesc, setNewCaseDesc] = useState("");
-  const [localError, setLocalError] = useState(null);
-  const [caseFieldErrors, setCaseFieldErrors] = useState({});
+  const [isAddCaseModalOpen, setIsAddCaseModalOpen] = useState(false);
   const [isAddComponentModalOpen, setIsAddComponentModalOpen] = useState(false);
+  const [editingCaseIndex, setEditingCaseIndex] = useState(null);
   const [activeCaseIndex, setActiveCaseIndex] = useState(null);
   const [selectedCaseIndex, setSelectedCaseIndex] = useState(
     cases && cases.length > 0 ? 0 : null
   );
-  const [newComponentName, setNewComponentName] = useState("");
-  const [newComponentDesc, setNewComponentDesc] = useState("");
-  const [newComponentSoLuongChinh, setNewComponentSoLuongChinh] = useState("");
-  const [newComponentSoLuongSao, setNewComponentSoLuongSao] = useState("");
-  const [newComponentGhiChu, setNewComponentGhiChu] = useState("");
-  const [componentLocalError, setComponentLocalError] = useState(null);
-  const [componentFieldErrors, setComponentFieldErrors] = useState({});
+
+  const [caseForm, setCaseForm] = useState({
+    ten_truong_hop: "",
+    mo_ta: ""
+  });
+  const [caseErrors, setCaseErrors] = useState({});
+
+  const [componentForm, setComponentForm] = useState({
+    ten_thanh_phan: "",
+    mo_ta_chi_tiet: "",
+    so_luong_ban_chinh: "",
+    so_luong_ban_sao: "",
+    ghi_chu: ""
+  });
+  const [componentErrors, setComponentErrors] = useState({});
+  const validateCase = async (data) => {
+    const result = await validateSchema(truongHopThuTucSchema, data);
+    return { isValid: result.valid, errors: result.errors };
+  };
+
+  const validateComponent = async (data) => {
+    const result = await validateSchema(thanhPhanHoSoSchema, data);
+    return { isValid: result.valid, errors: result.errors };
+  };
+  const resetCaseForm = () => {
+    setCaseForm({ ten_truong_hop: "", mo_ta: "" });
+    setCaseErrors({});
+    setEditingCaseIndex(null);
+  };
+
+  const resetComponentForm = () => {
+    setComponentForm({
+      ten_thanh_phan: "",
+      mo_ta_chi_tiet: "",
+      so_luong_ban_chinh: "",
+      so_luong_ban_sao: "",
+      ghi_chu: ""
+    });
+    setComponentErrors({});
+    setActiveCaseIndex(null);
+  };
+  const handleCaseSubmit = async () => {
+    try {
+      const validation = await validateCase(caseForm);
+
+      if (!validation.isValid) {
+        setCaseErrors(validation.errors);
+        return;
+      }
+
+      setCaseErrors({});
+      const isEdit = editingCaseIndex !== null;
+
+      if (isEdit) {
+        updateCase(editingCaseIndex, "ten_truong_hop", caseForm.ten_truong_hop);
+        updateCase(editingCaseIndex, "mo_ta", caseForm.mo_ta);
+        setExpandedCases(prev => ({ ...prev, [editingCaseIndex]: true }));
+      } else {
+        const newIndex = cases.length;
+        const maxThuTu = cases.length > 0 ? Math.max(...cases.map(c => c.thu_tu || 0)) : 0;
+
+        addCase({
+          ten_truong_hop: caseForm.ten_truong_hop,
+          mo_ta: caseForm.mo_ta,
+          thu_tu: maxThuTu + 1,
+          thanh_phan_ho_so: [],
+        });
+
+        setExpandedCases(prev => ({ ...prev, [newIndex]: true }));
+        setTimeout(() => {
+          const el = document.querySelector(`[data-case-index="${newIndex}"]`);
+          el?.scrollIntoView({ behavior: "smooth", block: "center" });
+        }, 50);
+      }
+
+      setIsAddCaseModalOpen(false);
+      resetCaseForm();
+    } catch (error) {
+      console.error("Error in case submission:", error);
+      setCaseErrors({ general: "Có lỗi xảy ra. Vui lòng thử lại." });
+    }
+  };
+
+  const handleComponentSubmit = async () => {
+    try {
+      let caseIndex = activeCaseIndex;
+      if (caseIndex === null || caseIndex === undefined) {
+        caseIndex = selectedCaseIndex !== null ? selectedCaseIndex : 0;
+      }
+
+      if (caseIndex === null || caseIndex === undefined || !cases || caseIndex >= cases.length) {
+        return;
+      }
+
+      const dataForValidation = {
+        ten_thanh_phan: componentForm.ten_thanh_phan?.trim() || "",
+        mo_ta_chi_tiet: componentForm.mo_ta_chi_tiet?.trim() || "",
+        so_luong_ban_chinh: componentForm.so_luong_ban_chinh ? Number(componentForm.so_luong_ban_chinh) : null,
+        so_luong_ban_sao: componentForm.so_luong_ban_sao ? Number(componentForm.so_luong_ban_sao) : null,
+        ghi_chu: componentForm.ghi_chu?.trim() || ""
+      };
+
+      if (!dataForValidation.ten_thanh_phan) {
+        setComponentErrors({ ten_thanh_phan: "Tên thành phần là bắt buộc" });
+        return;
+      }
+
+      const validation = await validateComponent(dataForValidation);
+      if (!validation.isValid) {
+        setComponentErrors(validation.errors);
+        return;
+      }
+
+      setComponentErrors({});
+      addCaseComponent(caseIndex, dataForValidation);
+      setExpandedCases(prev => ({ ...prev, [caseIndex]: true }));
+      setIsAddComponentModalOpen(false);
+      resetComponentForm();
+
+      setTimeout(() => {
+        const el = document.querySelector(`[data-case-index="${caseIndex}"]`);
+        el?.scrollIntoView({ behavior: "smooth", block: "center" });
+      }, 50);
+
+    } catch (error) {
+      console.error("Error in component submission:", error);
+      setComponentErrors({ general: "Có lỗi xảy ra. Vui lòng thử lại." });
+    }
+  };
 
   const toggleCase = (index) => {
     setExpandedCases((prev) => ({
@@ -100,14 +171,10 @@ const ProcedureCasesSection = ({
           <button
             type="button"
             onClick={() => {
-              setLocalError(null);
-              setCaseFieldErrors({});
-              setNewCaseName("");
-              setNewCaseDesc("");
-              setEditingCaseIndex(null);
-              setIsAddModalOpen(true);
+              resetCaseForm();
+              setIsAddCaseModalOpen(true);
             }}
-            className=" py-2 px-4 text-sm text-blue-600 hover:text-blue-700 hover:bg-blue-50 border border-blue-200 rounded-lg font-medium transition-colors"
+            className="py-2 px-4 text-sm text-blue-600 hover:text-blue-700 hover:bg-blue-50 border border-blue-200 rounded-lg font-medium transition-colors"
           >
             + Thêm trường hợp
           </button>
@@ -119,91 +186,20 @@ const ProcedureCasesSection = ({
         </div>
       )}
       <BaseModal
-        isOpen={isAddModalOpen}
+        isOpen={isAddCaseModalOpen}
         onClose={() => {
-          setIsAddModalOpen(false);
-          setCaseFieldErrors({});
-          setLocalError(null);
+          setIsAddCaseModalOpen(false);
+          resetCaseForm();
         }}
         title={editingCaseIndex !== null ? "Chỉnh sửa trường hợp" : "Thêm trường hợp mới"}
         size="md"
         footer={
           <ModalFooter
-            onCancel={() => setIsAddModalOpen(false)}
-            onSubmit={async () => {
-              // Chuyển data về snake_case để validate với formalityValidator
-              const caseDataForValidation = {
-                ten_truong_hop: newCaseName,
-                mo_ta: newCaseDesc,
-                thu_tu: null,
-                thanh_phan_ho_so: []
-              };
-
-              const isEdit = editingCaseIndex !== null && editingCaseIndex !== undefined;
-              const validation = await validateCaseForm(caseDataForValidation, isEdit);
-
-              if (!validation.isValid) {
-                // Chuyển error keys về camelCase để hiển thị
-                const camelCaseErrors = {};
-                Object.keys(validation.errors).forEach(key => {
-                  if (key === 'ten_truong_hop') camelCaseErrors.tenTruongHop = validation.errors[key];
-                  else camelCaseErrors[key] = validation.errors[key];
-                });
-                setCaseFieldErrors(camelCaseErrors);
-                setLocalError(Object.values(validation.errors)[0] || "Có lỗi xảy ra");
-                return;
-              }
-
-              setCaseFieldErrors({});
-              setLocalError(null);
-
-              if (isEdit) {
-                updateCase(editingCaseIndex, "ten_truong_hop", newCaseName);
-                updateCase(editingCaseIndex, "mo_ta", newCaseDesc);
-                // Giữ nguyên thứ tự hiện tại khi edit
-                setExpandedCases((prev) => ({
-                  ...prev,
-                  [editingCaseIndex]: true,
-                }));
-                setIsAddModalOpen(false);
-                setEditingCaseIndex(null);
-                setNewCaseName("");
-                setNewCaseDesc("");
-                setCaseFieldErrors({});
-                setLocalError(null);
-                return;
-              }
-
-              const newIndex = cases.length;
-              // Tự động tính thứ tự: lấy thứ tự lớn nhất hiện có + 1
-              const maxThuTu = cases.length > 0 ? Math.max(...cases.map(c => c.thu_tu || 0)) : 0;
-
-              // Submit data với snake_case format để consistency
-              addCase({
-                ten_truong_hop: newCaseName,
-                mo_ta: newCaseDesc,
-                thu_tu: maxThuTu + 1,
-                thanh_phan_ho_so: [],
-              });
-
-              setExpandedCases((prev) => ({ ...prev, [newIndex]: true }));
-              setTimeout(() => {
-                try {
-                  const el = document.querySelector(
-                    `[data-case-index="${newIndex}"]`
-                  );
-                  if (el && typeof el.scrollIntoView === "function") {
-                    el.scrollIntoView({ behavior: "smooth", block: "center" });
-                  }
-                } catch (e) {}
-              }, 50);
-
-              setIsAddModalOpen(false);
-              setNewCaseName("");
-              setNewCaseDesc("");
-              setCaseFieldErrors({});
-              setLocalError(null);
+            onCancel={() => {
+              setIsAddCaseModalOpen(false);
+              resetCaseForm();
             }}
+            onSubmit={handleCaseSubmit}
             cancelText="Hủy"
             submitText={editingCaseIndex !== null ? "Cập nhật" : "Lưu"}
             submitType="primary"
@@ -217,26 +213,23 @@ const ProcedureCasesSection = ({
             </label>
             <input
               type="text"
-              value={newCaseName}
+              value={caseForm.ten_truong_hop}
               onChange={(e) => {
-                setNewCaseName(e.target.value);
-                if (localError) setLocalError(null);
-                if (caseFieldErrors.tenTruongHop) {
-                  setCaseFieldErrors(prev => ({...prev, tenTruongHop: null}));
+                setCaseForm(prev => ({...prev, ten_truong_hop: e.target.value}));
+                if (caseErrors.ten_truong_hop) {
+                  setCaseErrors(prev => ({...prev, ten_truong_hop: null}));
                 }
               }}
               placeholder="Nhập tên trường hợp..."
               maxLength={230}
               className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 text-sm ${
-                localError || caseFieldErrors.tenTruongHop
+                caseErrors.ten_truong_hop
                   ? "border-red-500 focus:border-red-500 focus:ring-red-500"
                   : "border-gray-300 focus:ring-blue-500"
               }`}
             />
-            {(localError || caseFieldErrors.tenTruongHop) && (
-              <p className="text-xs text-red-600 mt-1">
-                {caseFieldErrors.tenTruongHop || localError}
-              </p>
+            {caseErrors.ten_truong_hop && (
+              <p className="text-xs text-red-600 mt-1">{caseErrors.ten_truong_hop}</p>
             )}
           </div>
 
@@ -245,8 +238,8 @@ const ProcedureCasesSection = ({
               Mô tả trường hợp
             </label>
             <textarea
-              value={newCaseDesc}
-              onChange={(e) => setNewCaseDesc(e.target.value)}
+              value={caseForm.mo_ta}
+              onChange={(e) => setCaseForm(prev => ({...prev, mo_ta: e.target.value}))}
               placeholder="Nhập mô tả trường hợp..."
               rows="4"
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
@@ -258,14 +251,7 @@ const ProcedureCasesSection = ({
         isOpen={isAddComponentModalOpen}
         onClose={() => {
           setIsAddComponentModalOpen(false);
-          setActiveCaseIndex(null);
-          setNewComponentName("");
-          setNewComponentDesc("");
-          setNewComponentSoLuongChinh("");
-          setNewComponentSoLuongSao("");
-          setNewComponentGhiChu("");
-          setComponentLocalError(null);
-          setComponentFieldErrors({});
+          resetComponentForm();
         }}
         title="Thêm thành phần hồ sơ"
         size="lg"
@@ -273,86 +259,11 @@ const ProcedureCasesSection = ({
         contentClassName="bg-white overflow-hidden"
         footer={
           <ModalFooter
-            onCancel={() => setIsAddComponentModalOpen(false)}
-            onSubmit={async () => {
-              // Chuyển data về snake_case để validate với formalityValidator
-              const componentDataForValidation = {
-                ten_thanh_phan: newComponentName,
-                mo_ta_chi_tiet: newComponentDesc,
-                so_luong_ban_chinh: newComponentSoLuongChinh ? Number(newComponentSoLuongChinh) : null,
-                so_luong_ban_sao: newComponentSoLuongSao ? Number(newComponentSoLuongSao) : null,
-                ghi_chu: newComponentGhiChu,
-              };
-
-              const validation = await validateComponentForm(componentDataForValidation, false);
-
-              if (!validation.isValid) {
-                // Chuyển error keys về camelCase để hiển thị
-                const camelCaseErrors = {};
-                Object.keys(validation.errors).forEach(key => {
-                  switch(key) {
-                    case 'ten_thanh_phan': 
-                      camelCaseErrors.tenThanhPhan = validation.errors[key];
-                      break;
-                    case 'so_luong_ban_chinh':
-                      camelCaseErrors.soLuongBanChinh = validation.errors[key];
-                      break;
-                    case 'so_luong_ban_sao':
-                      camelCaseErrors.soLuongBanSao = validation.errors[key];
-                      break;
-                    default:
-                      camelCaseErrors[key] = validation.errors[key];
-                  }
-                });
-                setComponentFieldErrors(camelCaseErrors);
-                setComponentLocalError(Object.values(validation.errors)[0] || "Có lỗi xảy ra");
-                return;
-              }
-
-              setComponentFieldErrors({});
-              setComponentLocalError(null);
-
-              if (activeCaseIndex === null || activeCaseIndex === undefined) {
-                return;
-              }
-
-              // Convert back to snake_case for consistency with parent
-              const componentDataSnakeCase = {
-                ten_thanh_phan: newComponentName,
-                mo_ta_chi_tiet: newComponentDesc,
-                so_luong_ban_chinh: newComponentSoLuongChinh ? Number(newComponentSoLuongChinh) : null,
-                so_luong_ban_sao: newComponentSoLuongSao ? Number(newComponentSoLuongSao) : null,
-                ghi_chu: newComponentGhiChu,
-              };
-
-              addCaseComponent(activeCaseIndex, componentDataSnakeCase);
-
-              // Force re-render by updating a different state
-              setExpandedCases((prev) => ({
-                ...prev,
-                [activeCaseIndex]: true,
-              }));
-              setTimeout(() => {
-                try {
-                  const el = document.querySelector(
-                    `[data-case-index="${activeCaseIndex}"]`
-                  );
-                  if (el && typeof el.scrollIntoView === "function") {
-                    el.scrollIntoView({ behavior: "smooth", block: "center" });
-                  }
-                } catch (e) {}
-              }, 50);
-
+            onCancel={() => {
               setIsAddComponentModalOpen(false);
-              setActiveCaseIndex(null);
-              setNewComponentName("");
-              setNewComponentDesc("");
-              setNewComponentSoLuongChinh("");
-              setNewComponentSoLuongSao("");
-              setNewComponentGhiChu("");
-              setComponentFieldErrors({});
-              setComponentLocalError(null);
+              resetComponentForm();
             }}
+            onSubmit={handleComponentSubmit}
             cancelText="Hủy"
             submitText="Lưu"
             submitType="primary"
@@ -366,26 +277,23 @@ const ProcedureCasesSection = ({
             </label>
             <input
               type="text"
-              value={newComponentName}
+              value={componentForm.ten_thanh_phan}
               onChange={(e) => {
-                setNewComponentName(e.target.value);
-                if (componentLocalError) setComponentLocalError(null);
-                if (componentFieldErrors.tenThanhPhan) {
-                  setComponentFieldErrors(prev => ({...prev, tenThanhPhan: null}));
+                setComponentForm(prev => ({...prev, ten_thanh_phan: e.target.value}));
+                if (componentErrors.ten_thanh_phan) {
+                  setComponentErrors(prev => ({...prev, ten_thanh_phan: null}));
                 }
               }}
               placeholder="Nhập tên thành phần..."
               maxLength={230}
               className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 text-sm ${
-                componentLocalError || componentFieldErrors.tenThanhPhan
+                componentErrors.ten_thanh_phan
                   ? "border-red-500 focus:border-red-500 focus:ring-red-500"
                   : "border-gray-300 focus:ring-blue-500"
               }`}
             />
-            {(componentLocalError || componentFieldErrors.tenThanhPhan) && (
-              <p className="text-xs text-red-600 mt-1">
-                {componentFieldErrors.tenThanhPhan || componentLocalError}
-              </p>
+            {componentErrors.ten_thanh_phan && (
+              <p className="text-xs text-red-600 mt-1">{componentErrors.ten_thanh_phan}</p>
             )}
           </div>
 
@@ -394,8 +302,8 @@ const ProcedureCasesSection = ({
               Mô tả chi tiết
             </label>
             <textarea
-              value={newComponentDesc}
-              onChange={(e) => setNewComponentDesc(e.target.value)}
+              value={componentForm.mo_ta_chi_tiet}
+              onChange={(e) => setComponentForm(prev => ({...prev, mo_ta_chi_tiet: e.target.value}))}
               placeholder="Nhập mô tả chi tiết..."
               rows="3"
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
@@ -410,18 +318,18 @@ const ProcedureCasesSection = ({
               <input
                 type="number"
                 min="0"
-                value={newComponentSoLuongChinh}
+                value={componentForm.so_luong_ban_chinh}
                 onChange={(e) => {
-                  setNewComponentSoLuongChinh(e.target.value);
-                  if (componentFieldErrors.soLuongBanChinh) {
-                    setComponentFieldErrors(prev => ({...prev, soLuongBanChinh: null}));
+                  setComponentForm(prev => ({...prev, so_luong_ban_chinh: e.target.value}));
+                  if (componentErrors.so_luong_ban_chinh) {
+                    setComponentErrors(prev => ({...prev, so_luong_ban_chinh: null}));
                   }
                 }}
                 placeholder="0"
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
               />
-              {componentFieldErrors.soLuongBanChinh && (
-                <p className="text-xs text-red-600 mt-1">{componentFieldErrors.soLuongBanChinh}</p>
+              {componentErrors.so_luong_ban_chinh && (
+                <p className="text-xs text-red-600 mt-1">{componentErrors.so_luong_ban_chinh}</p>
               )}
             </div>
 
@@ -432,18 +340,18 @@ const ProcedureCasesSection = ({
               <input
                 type="number"
                 min="0"
-                value={newComponentSoLuongSao}
+                value={componentForm.so_luong_ban_sao}
                 onChange={(e) => {
-                  setNewComponentSoLuongSao(e.target.value);
-                  if (componentFieldErrors.soLuongBanSao) {
-                    setComponentFieldErrors(prev => ({...prev, soLuongBanSao: null}));
+                  setComponentForm(prev => ({...prev, so_luong_ban_sao: e.target.value}));
+                  if (componentErrors.so_luong_ban_sao) {
+                    setComponentErrors(prev => ({...prev, so_luong_ban_sao: null}));
                   }
                 }}
                 placeholder="0"
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
               />
-              {componentFieldErrors.soLuongBanSao && (
-                <p className="text-xs text-red-600 mt-1">{componentFieldErrors.soLuongBanSao}</p>
+              {componentErrors.so_luong_ban_sao && (
+                <p className="text-xs text-red-600 mt-1">{componentErrors.so_luong_ban_sao}</p>
               )}
             </div>
 
@@ -453,8 +361,8 @@ const ProcedureCasesSection = ({
               </label>
               <input
                 type="text"
-                value={newComponentGhiChu}
-                onChange={(e) => setNewComponentGhiChu(e.target.value)}
+                value={componentForm.ghi_chu}
+                onChange={(e) => setComponentForm(prev => ({...prev, ghi_chu: e.target.value}))}
                 placeholder="Ghi chú..."
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
               />
@@ -507,9 +415,11 @@ const ProcedureCasesSection = ({
                         onClick={(e) => {
                           e.stopPropagation();
                           setEditingCaseIndex(caseIndex);
-                          setNewCaseName(caseItem.ten_truong_hop || "");
-                          setNewCaseDesc(caseItem.mo_ta || "");
-                          setIsAddModalOpen(true);
+                          setCaseForm({
+                            ten_truong_hop: caseItem.ten_truong_hop || "",
+                            mo_ta: caseItem.mo_ta || ""
+                          });
+                          setIsAddCaseModalOpen(true);
                         }}
                         className="text-gray-700 hover:bg-gray-50 p-1 rounded transition-colors"
                         title="Chỉnh sửa trường hợp"
@@ -623,15 +533,14 @@ const ProcedureCasesSection = ({
                     <button
                       type="button"
                       onClick={() => {
-                        if (selectedCaseIndex === null) return;
-                        setActiveCaseIndex(selectedCaseIndex);
-                        setNewComponentName("");
-                        setNewComponentDesc("");
-                        setNewComponentSoLuongChinh("");
-                        setNewComponentSoLuongSao("");
-                        setNewComponentGhiChu("");
-                        setComponentLocalError(null);
-                        setComponentFieldErrors({});
+                        const caseIndexToUse = selectedCaseIndex !== null ? selectedCaseIndex : 0;
+                        
+                        if (cases?.length === 0 || !cases) {
+                          return;
+                        }
+                        
+                        setActiveCaseIndex(caseIndexToUse);
+                        resetComponentForm();
                         setIsAddComponentModalOpen(true);
                       }}
                       className="inline-flex items-center gap-2 px-4 py-2 border border-blue-300 text-blue-600 rounded-lg hover:bg-blue-50"
@@ -662,5 +571,4 @@ ProcedureCasesSection.propTypes = {
   removeCaseComponent: PropTypes.func.isRequired,
   errors: PropTypes.object,
 };
-export { convertCasesToCamelCase };
 export default ProcedureCasesSection;
