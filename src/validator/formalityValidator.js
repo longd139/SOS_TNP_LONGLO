@@ -429,3 +429,6 @@ export async function validateFormalityForm(formalityData, isEditMode = false) {
 
     return { isValid: result.valid, errors: result.errors };
 }
+
+
+export { truongHopThuTucSchema, thanhPhanHoSoSchema };

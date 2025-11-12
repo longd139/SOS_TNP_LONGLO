@@ -1,6 +1,6 @@
 import React from 'react';
-import CustomLineChart from '../report/LineChart';
-import CustomBarChart from '../report/BarChart';
+import CustomLineChart from './LineChart';
+import CustomBarChart from './BarChart';
 
 export default function Chart({ type = 'line', data, title, className = '' }) {
     if (type === 'line') {

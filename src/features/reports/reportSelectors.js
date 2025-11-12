@@ -17,3 +17,5 @@ export const selectReportFilters = (state) => state.reports?.filters || {
     trangThai: '',
     mucDo: ''
 };
+
+export const selectReportStatistic = (state) => state.reports?.statisticReport || null;

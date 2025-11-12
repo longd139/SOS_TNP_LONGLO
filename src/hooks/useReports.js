@@ -5,6 +5,7 @@ import {
     fetchHistoryStatus,
     fetchExtent,
     fetchStatusReport,
+    fetchStatisticReport,
     fetchReportById,
     updateReportStatus
 } from '../features/reports/reportThunk';
@@ -18,6 +19,7 @@ import {
     selectReportError,
     selectReportPagination,
     selectReportFilters
+    ,selectReportStatistic
 } from '../features/reports/reportSelectors';
 import {
     clearError,
@@ -39,6 +41,7 @@ export const useReports = ({ autoFetch = false, filters = {} } = {}) => {
     const error = useSelector(selectReportError);
     const pagination = useSelector(selectReportPagination);
     const currentFilters = useSelector(selectReportFilters);
+    const statistic = useSelector(selectReportStatistic);
 
     const loadReports = useCallback((params = {}) => {
         const requestParams = {
@@ -64,6 +67,10 @@ export const useReports = ({ autoFetch = false, filters = {} } = {}) => {
 
     const loadExtent = useCallback(() => {
         return dispatch(fetchExtent()).unwrap();
+    }, [dispatch]);
+
+    const loadStatisticReport = useCallback(() => {
+        return dispatch(fetchStatisticReport()).unwrap();
     }, [dispatch]);
 
     const loadStatusReport = useCallback(() => {
@@ -115,6 +122,8 @@ export const useReports = ({ autoFetch = false, filters = {} } = {}) => {
         setSelectedReport,
         clearSelectedReport,
         clearError: clearReportError,
-        updateStatus
+        updateStatus,
+        statistic,
+        loadStatisticReport
     };
 };

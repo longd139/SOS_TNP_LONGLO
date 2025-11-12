@@ -96,6 +96,22 @@ const updateStatusReport = async (reportId, statusData) => {
     }
 }
 
+const getStatisticReport = async () => {
+    try {
+        const response = await apiClient.get("/api/phan-anh/tong-quan");
+        if (response.data.success) {
+            return response.data.data;
+        } else {
+            throw new Error(response.data.message || "Lấy thống kê phản ánh thất bại");
+        }
+    } catch (error) {
+        if (error.response?.data?.message) {
+            throw new Error(error.response.data.message);
+        }
+        throw error;
+    }
+}
+
 export const REPORT_API = {
     getReportPagination,
     getHistoryStatus,
@@ -103,4 +119,5 @@ export const REPORT_API = {
     getStatusReport,
     getReportById,
     updateStatusReport,
+    getStatisticReport,
 };
