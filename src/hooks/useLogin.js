@@ -18,7 +18,7 @@ export const useLogin = () => {
 
     const login = async (credentials) => {
         const result = await dispatch(loginUser(credentials));
-        if (result.meta.requestStatus === 'fulfilled' && result.payload.user) {
+        if (result.meta.requestStatus === 'fulfilled' && result.payload?.user && !result.payload?.requiresTwoFactorAuth && !result.payload?.otpRequired) {
             handleRedirect(result.payload.user.role);
         }
         return result.payload;

@@ -25,15 +25,15 @@ export default function Login() {
     useAuthRedirect();
 
     useEffect(() => {
-        if (hasInteracted && (tenDangNhap || matKhau)) {
-            if (apiError || Object.keys(errors).length > 0) {
-                clearErrors();
-            }
-            if (Object.keys(validationErrors).length > 0) {
-                setValidationErrors({});
-            }
+        if (!hasInteracted) return;
+        
+        if (apiError || Object.keys(errors).length > 0) {
+            clearErrors();
         }
-    }, [tenDangNhap, matKhau]);
+        if (Object.keys(validationErrors).length > 0) {
+            setValidationErrors({});
+        }
+    }, [tenDangNhap, matKhau, hasInteracted]);
 
     const handleInputChange = (setter) => (e) => {
         setHasInteracted(true);
@@ -56,10 +56,12 @@ export default function Login() {
         setValidationErrors({});
         
         const result = await login(credentials);
+        
         if (result?.requiresTwoFactorAuth) {
             setShow2FAModal(true);
             return;
         }
+        
     };
     
     const handle2FASuccess = (result) => {
