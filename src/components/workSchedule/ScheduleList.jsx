@@ -56,7 +56,6 @@ export default function ScheduleList({
 
     const displayMessage = getDisplayMessage();
 
-    console.log("Rendered ScheduleList with schedules:", schedules);
     return (
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3 md:p-4">
             <div className="flex items-center justify-between mb-2 md:mb-3">

@@ -4,6 +4,7 @@ import BaseModal, { ModalFooter } from "../base/BaseModal";
 import { validateCreateWorkScheduleForm } from "../../validator/workScheduleValidator";
 import dayjs from "dayjs";
 import { hourFormat } from "../../utils/dateUtils";
+import { showToast } from "../../utils/toastNotification";
 
 const WorkScheduleModal = ({
   isOpen,
@@ -79,7 +80,6 @@ const WorkScheduleModal = ({
         return;
       }
 
-      // Keep date format without timezone conversion
       const submitData = {
         ...formData,
         ngayTiepDan: formData.ngayTiepDan,
@@ -92,7 +92,7 @@ const WorkScheduleModal = ({
         onClose();
       }
     } catch (error) {
-      console.error("Error submitting form:", error);
+      showToast.error(error?.message || "Đã có lỗi xảy ra. Vui lòng thử lại.");
     } finally {
       setIsSubmitting(false);
     }
