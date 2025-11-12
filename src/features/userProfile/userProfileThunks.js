@@ -52,6 +52,7 @@ export const fetchMyProfile = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const data = await USER_API.getMyProfile();
+      console.log('Fetched user profile data:', data);
       const normalized = normalizeUserProfile(data);
       return normalized;
     } catch (error) {
