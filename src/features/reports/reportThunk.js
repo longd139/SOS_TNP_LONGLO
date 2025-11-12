@@ -1,6 +1,18 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { REPORT_API } from "../../apis/report";
 
+export const fetchStatisticReport = createAsyncThunk(
+    'report/fetchStatisticReport',
+    async (_, { rejectWithValue }) => {
+        try {
+            const response = await REPORT_API.getStatisticReport();
+            return response;
+        } catch (error) {
+            return rejectWithValue(error.message || 'Failed to fetch report statistic');
+        }
+    }
+)
+
 export const fetchReportPagination = createAsyncThunk(
     'report/fetchReportPagination',
     async ({
@@ -10,6 +22,7 @@ export const fetchReportPagination = createAsyncThunk(
         page = 1,
         size = 10,
         maPhanAnh = '',
+        sortTime = 'desc',
     }, { rejectWithValue }) => {
         try {
             const params = {
@@ -21,6 +34,7 @@ export const fetchReportPagination = createAsyncThunk(
             if (trangThai) params.trangThai = trangThai;
             if (mucDo) params.mucDo = mucDo;
             if (maPhanAnh) params.maPhanAnh = maPhanAnh;
+            if (sortTime) params.sortTime = sortTime;
 
             const response = await REPORT_API.getReportPagination(params);
 

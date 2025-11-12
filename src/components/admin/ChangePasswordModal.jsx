@@ -5,6 +5,7 @@ import BaseModal from '../base/BaseModal';
 import { changePassword } from '../../features/auth/authThunks';
 import { clearChangePasswordSuccess, clearErrors } from '../../features/auth/authSlice';
 import { validateChangePassword } from '../../validator/changePasswordValidator';
+import { showToast } from '../../utils/toastNotification';
 
 const ChangePasswordModal = ({ isOpen, onClose }) => {
     const dispatch = useDispatch();
@@ -23,15 +24,25 @@ const ChangePasswordModal = ({ isOpen, onClose }) => {
     });
 
     const [localErrors, setLocalErrors] = useState({});
-    const [successMessage, setSuccessMessage] = useState('');
+
+    const handleClose = () => {
+        setFormData({
+            matKhauHienTai: '',
+            matKhauMoi: '',
+            confirmMatKhauMoi: '',
+        });
+        setLocalErrors({});
+        dispatch(clearErrors());
+        onClose();
+    };
 
     useEffect(() => {
         if (changePasswordSuccess) {
-            setSuccessMessage('Đổi mật khẩu thành công!');
+            showToast.success('Đổi mật khẩu thành công!');
             dispatch(clearChangePasswordSuccess());
             setTimeout(() => {
                 handleClose();
-            }, 2000);
+            }, 1500);
         }
     }, [changePasswordSuccess, dispatch]);
 
@@ -43,43 +54,28 @@ const ChangePasswordModal = ({ isOpen, onClose }) => {
                 confirmMatKhauMoi: '',
             });
             setLocalErrors({});
-            setSuccessMessage('');
             dispatch(clearErrors());
         }
     }, [isOpen, dispatch]);
-
-    useEffect(() => {
-        if (successMessage) {
-            const timer = setTimeout(() => setSuccessMessage(''), 5000);
-            return () => clearTimeout(timer);
-        }
-    }, [successMessage]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
 
         const validation = await validateChangePassword(formData);
-        if (!validation.isValid) {
+        if (!validation.valid) {
             setLocalErrors(validation.errors);
             return;
         }
 
         try {
-            await dispatch(changePassword(formData)).unwrap();
+            const result = await dispatch(changePassword(formData)).unwrap();
         } catch (error) {
+            if (error?.message) {
+                showToast.error(error.message);
+            } else {
+                showToast.error('Đổi mật khẩu thất bại');
+            }
         }
-    };
-
-    const handleClose = () => {
-        setFormData({
-            matKhauHienTai: '',
-            matKhauMoi: '',
-            confirmMatKhauMoi: '',
-        });
-        setLocalErrors({});
-        setSuccessMessage('');
-        dispatch(clearErrors());
-        onClose();
     };
 
     const handleChange = (e) => {
@@ -97,12 +93,6 @@ const ChangePasswordModal = ({ isOpen, onClose }) => {
     return (
         <BaseModal isOpen={isOpen} onClose={handleClose} title="Đổi mật khẩu">
             <form onSubmit={handleSubmit} className="space-y-4">
-                {successMessage && (
-                    <div className="p-3 bg-green-50 border border-green-200 rounded-lg text-green-800 text-sm">
-                        {successMessage}
-                    </div>
-                )}
-
                 {apiError && (
                     <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-800 text-sm">
                         {apiError}

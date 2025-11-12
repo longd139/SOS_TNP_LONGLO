@@ -36,6 +36,7 @@ export default function ReportList() {
         idLinhVucPhanAnh: "",
         mucDo: "",
         maPhanAnh: "",
+        sortTime: "desc",
     });
 
     const [currentPage, setCurrentPage] = useState(1);
@@ -187,7 +188,7 @@ export default function ReportList() {
 
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-4">
                 <h3 className="font-semibold text-gray-900 mb-3">Bộ lọc</h3>
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+                <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
                             Trạng thái
@@ -264,6 +265,27 @@ export default function ReportList() {
                                         {value}
                                     </option>
                                 ))}
+                        </select>
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Sắp xếp theo thời gian
+                        </label>
+                        <select
+                            value={filters.sortTime || "desc"}
+                            onChange={(e) => handleFilterChange("sortTime", e.target.value)}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none bg-white"
+                            style={{
+                                backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`,
+                                backgroundPosition: "right 0.5rem center",
+                                backgroundRepeat: "no-repeat",
+                                backgroundSize: "1.5em 1.5em",
+                                paddingRight: "2.5rem",
+                            }}
+                        >
+                            <option value="desc">Mới nhất trước</option>
+                            <option value="asc">Cũ nhất trước</option>
                         </select>
                     </div>
 

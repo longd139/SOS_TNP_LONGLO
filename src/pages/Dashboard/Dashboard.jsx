@@ -2,7 +2,7 @@ import React from 'react';
 import StatCard from '../../components/dashboard/StatCard';
 import Chart from '../../components/dashboard/Chart';
 import { dashboardStats, chartData, recentReports } from '../../mockData';
-import { AlertTriangle, CheckCircle, Clock, MessageSquare } from 'lucide-react';
+import { AlertTriangle, CheckCircle, Clock, FileCheck, FileText, MessageSquare, Send } from 'lucide-react';
 
 export default function Dashboard() {
     const getStatusColor = (status) => {
@@ -16,7 +16,7 @@ export default function Dashboard() {
 
     return (
         <div className="space-y-3 md:space-y-4 min-h-full">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
                 <StatCard
                     title="Tổng phản ánh hôm nay"
                     value={dashboardStats.totalReports}
@@ -24,7 +24,19 @@ export default function Dashboard() {
                     color="blue"
                 />
                 <StatCard
-                    title="Chờ xử lý"
+                    title="Đã gửi"
+                    value={dashboardStats.totalReports}
+                    icon={<Send />}
+                    color="gray"
+                />
+                <StatCard
+                    title="Đã tiếp nhận"
+                    value={dashboardStats.pendingReports}
+                    icon={<FileCheck />}
+                    color="violet"
+                />
+                <StatCard
+                    title="Đang xử lý"
                     value={dashboardStats.pendingReports}
                     icon={<Clock />}
                     color="orange"
@@ -36,23 +48,18 @@ export default function Dashboard() {
                     color="green"
                 />
                 <StatCard
-                    title="Khẩn cấp"
+                    title="Đóng"
                     value={dashboardStats.urgentReports}
-                    icon={<AlertTriangle />}
-                    color="red"
+                    icon={<FileText />}
+                    color="gray"
                 />
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 md:gap-4">
+            <div className="grid grid-cols-1 lg:grid-cols-1 gap-3 md:gap-4 pb-4">
                 <Chart
                     type="line"
                     title="Xu hướng phản ánh"
                     data={chartData.trends}
-                />
-                <Chart
-                    type="bar"
-                    title="Lượt truy cập ứng dụng"
-                    data={chartData.visits}
                 />
             </div>
 
