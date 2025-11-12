@@ -28,6 +28,16 @@ const StatCard = ({
             bg: 'bg-red-50',
             icon: 'text-red-600',
             text: 'text-red-600'
+        },
+        gray: {
+            bg: 'bg-gray-50',
+            icon: 'text-gray-600',
+            text: 'text-gray-600'
+        },
+        violet: {
+            bg: 'bg-violet-50',
+            icon: 'text-[#4F39F6]',
+            text: 'text-[#4F39F6]'
         }
     };
 
@@ -38,7 +48,7 @@ const StatCard = ({
             <div className="flex items-center justify-between">
                 <div className="flex-1">
                     <p className="text-sm font-medium text-gray-600 mb-1">{title}</p>
-                    <p className="text-3xl font-bold text-gray-900">{value}</p>
+                    <p className={`text-3xl ${currentColor.text}`}>{value}</p>
                     {trend && (
                         <p className="text-sm text-gray-500 mt-1">{trend}</p>
                     )}

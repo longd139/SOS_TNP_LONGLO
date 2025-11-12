@@ -1,6 +1,18 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { REPORT_API } from "../../apis/report";
 
+export const fetchStatisticReport = createAsyncThunk(
+    'report/fetchStatisticReport',
+    async (_, { rejectWithValue }) => {
+        try {
+            const response = await REPORT_API.getStatisticReport();
+            return response;
+        } catch (error) {
+            return rejectWithValue(error.message || 'Failed to fetch report statistic');
+        }
+    }
+)
+
 export const fetchReportPagination = createAsyncThunk(
     'report/fetchReportPagination',
     async ({

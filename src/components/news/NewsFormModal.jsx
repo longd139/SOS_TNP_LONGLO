@@ -24,7 +24,7 @@ const NewsFormModal = ({ isOpen, onClose, onSubmit, initialData = null, isLoadin
     const [errors, setErrors] = useState({});
     const [isPreviewOpen, setIsPreviewOpen] = useState(false);
     const [contentImages, setContentImages] = useState([]);
-    const { activeCategories, loading: categoriesLoading } = useCategories({ autoFetch: true});
+    const { activeCategories, loading: categoriesLoading } = useCategories({ autoFetch: true });
 
     const modules = {
         toolbar: [
@@ -139,7 +139,7 @@ const NewsFormModal = ({ isOpen, onClose, onSubmit, initialData = null, isLoadin
         };
 
         const { isValid, errors: validationErrors } = await validateNewsForm(dataToValidate);
-        
+
         if (!isValid) {
             setErrors(validationErrors);
             return false;
@@ -184,7 +184,7 @@ const NewsFormModal = ({ isOpen, onClose, onSubmit, initialData = null, isLoadin
         for (let i = 0; i < images.length; i++) {
             const image = images[i];
             const file = base64ToFile(image.base64, image.format, i);
-            
+
             const fileFormData = new FormData();
             fileFormData.append('idTinTuc', newsId);
             fileFormData.append('file', file);
@@ -238,20 +238,20 @@ const NewsFormModal = ({ isOpen, onClose, onSubmit, initialData = null, isLoadin
         await onSubmit(submitData, async (createdNewsId) => {
             if (base64Images.length > 0 && createdNewsId) {
                 const uploadedUrls = await uploadContentImages(createdNewsId, base64Images);
-                
+
                 if (uploadedUrls.length > 0) {
                     const updatedContent = replaceImageUrls(formData.noiDung, uploadedUrls);
-                    
+
                     const updateFormData = new FormData();
                     updateFormData.append('idDanhMuc', formData.idDanhMuc);
                     updateFormData.append('tieuDe', formData.tieuDe);
                     updateFormData.append('noiDung', updatedContent);
                     updateFormData.append('isActive', String(formData.isActive));
-                    
+
                     if (formData.tacGia) {
                         updateFormData.append('tacGia', formData.tacGia);
                     }
-                    
+
                     await onSubmit(updateFormData, null, true);
                 }
             }
@@ -285,7 +285,7 @@ const NewsFormModal = ({ isOpen, onClose, onSubmit, initialData = null, isLoadin
                 isOpen={isOpen}
                 onClose={handleClose}
                 title={initialData ? "Chỉnh sửa bài viết" : "Tạo bài viết mới"}
-                size="lg"
+                size="xl"
                 footer={
                     <ModalFooter
                         onCancel={handlePreview}
@@ -297,135 +297,138 @@ const NewsFormModal = ({ isOpen, onClose, onSubmit, initialData = null, isLoadin
                     />
                 }
             >
-            <div className="space-y-3">
-                <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1 required-label">
-                        Tiêu đề
-                    </label>
-                    <input
-                        type="text"
-                        name="tieuDe"
-                        value={formData.tieuDe}
-                        onChange={handleInputChange}
-                        placeholder="Nhập tiêu đề bài viết..."
-                        className={`w-full px-2.5 py-1.5 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.tieuDe ? 'border-red-500' : 'border-gray-300'
-                            }`}
-                    />
-                    {errors.tieuDe && (
-                        <p className="mt-0.5 text-sm text-red-600">{errors.tieuDe}</p>
-                    )}
-                </div>
-
-                <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1 required-label">
-                        Loại bài viết
-                    </label>
-                    <select
-                        name="idDanhMuc"
-                        value={formData.idDanhMuc}
-                        onChange={handleInputChange}
-                        disabled={categoriesLoading}
-                        className={`w-full px-3 py-2 text-sm border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${errors.idDanhMuc ? 'border-red-500' : ''} ${categoriesLoading ? 'bg-gray-100 cursor-not-allowed' : ''}`}
-                    >
-                        <option value="" className="text-gray-500">-- Chọn danh mục --</option>
-                        {activeCategories.map(cat => (
-                            <option key={cat.id} value={cat.id}>
-                                {cat.ten_danh_muc}
-                            </option>
-                        ))}
-                    </select>
-                    {errors.idDanhMuc && (
-                        <p className="mt-0.5 text-sm text-red-600">{errors.idDanhMuc}</p>
-                    )}
-                </div>
-
-                <div>
-                    <label className="flex items-center space-x-2 cursor-pointer">
+                <div className="space-y-3">
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1 required-label">
+                            Tiêu đề
+                        </label>
                         <input
-                            type="checkbox"
-                            name="isActive"
-                            checked={formData.isActive}
-                            onChange={(e) => setFormData(prev => ({ ...prev, isActive: e.target.checked }))}
-                            className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                            type="text"
+                            name="tieuDe"
+                            value={formData.tieuDe}
+                            onChange={handleInputChange}
+                            placeholder="Nhập tiêu đề bài viết..."
+                            className={`w-full px-2.5 py-1.5 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.tieuDe ? 'border-red-500' : 'border-gray-300'
+                                }`}
                         />
-                        <span className="text-sm font-medium text-gray-700">
-                            Kích hoạt bài viết
-                        </span>
-                    </label>
-                </div>
-
-                <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1 required-label">
-                        Ảnh đại diện
-                    </label>
-                    <div className="border-2 border-dashed border-gray-300 rounded-lg p-4">
-                        {filePreview ? (
-                            <div className="space-y-2">
-                                <div className="relative w-full h-40 bg-gray-100 rounded-lg overflow-hidden">
-                                    <img
-                                        src={filePreview}
-                                        alt="Preview"
-                                        className="w-full h-full object-contain"
-                                    />
-                                </div>
-                                <button
-                                    type="button"
-                                    onClick={() => {
-                                        setFilePreview(null);
-                                        setFormData(prev => ({ ...prev, file: null }));
-                                    }}
-                                    className="text-sm text-red-600 hover:text-red-700"
-                                >
-                                    Xóa ảnh
-                                </button>
-                            </div>
-                        ) : (
-                            <div className="text-center">
-                                <svg
-                                    className="mx-auto h-10 w-10 text-gray-400"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                    stroke="currentColor"
-                                >
-                                    <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth={2}
-                                        d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
-                                    />
-                                </svg>
-                                <div className="mt-1.5">
-                                    <label
-                                        htmlFor="file-upload"
-                                        className="cursor-pointer text-blue-600 hover:text-blue-700"
-                                    >
-                                        Click để tải ảnh lên
-                                    </label>
-                                    <input
-                                        id="file-upload"
-                                        name="file"
-                                        type="file"
-                                        className="sr-only"
-                                        accept="image/png,image/jpeg,image/jpg"
-                                        onChange={handleFileChange}
-                                    />
-                                </div>
-                                <p className="mt-1 text-xs text-gray-500">
-                                    PNG, JPG tối đa 5MB
-                                </p>
-                            </div>
+                        {errors.tieuDe && (
+                            <p className="mt-0.5 text-sm text-red-600">{errors.tieuDe}</p>
                         )}
                     </div>
-                    {errors.file && (
-                        <p className="mt-0.5 text-sm text-red-600">{errors.file}</p>
-                    )}
-                </div>
 
-                <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1 required-label">
-                        Nội dung
-                    </label>
-                    <style>{`
+                    <div className='flex items-center justify-between gap-4'>
+                        <div className='flex-1'>
+                            <label className="block text-sm font-medium text-gray-700 mb-1 required-label">
+                                Loại bài viết
+                            </label>
+                            <select
+                                name="idDanhMuc"
+                                value={formData.idDanhMuc}
+                                onChange={handleInputChange}
+                                disabled={categoriesLoading}
+                                className={`w-full px-3 py-2 text-sm border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${errors.idDanhMuc ? 'border-red-500' : ''} ${categoriesLoading ? 'bg-gray-100 cursor-not-allowed' : ''}`}
+                            >
+                                <option value="" className="text-gray-500">-- Chọn danh mục --</option>
+                                {activeCategories.map(cat => (
+                                    <option key={cat.id} value={cat.id}>
+                                        {cat.ten_danh_muc}
+                                    </option>
+                                ))}
+                            </select>
+                            {errors.idDanhMuc && (
+                                <p className="mt-0.5 text-sm text-red-600">{errors.idDanhMuc}</p>
+                            )}
+                        </div>
+
+                        <div className="flex-shrink-0 mt-6">
+                            <label className="flex items-center space-x-2 cursor-pointer">
+                                <input
+                                    type="checkbox"
+                                    name="isActive"
+                                    checked={formData.isActive}
+                                    onChange={(e) => setFormData(prev => ({ ...prev, isActive: e.target.checked }))}
+                                    className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                                />
+                                <span className="text-sm font-medium text-gray-700">
+                                    Kích hoạt bài viết
+                                </span>
+                            </label>
+                        </div>
+                    </div>
+
+
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1 required-label">
+                            Ảnh đại diện
+                        </label>
+                        <div className="border-2 border-dashed border-gray-300 rounded-lg p-4">
+                            {filePreview ? (
+                                <div className="space-y-2">
+                                    <div className="relative w-full h-40 bg-gray-100 rounded-lg overflow-hidden">
+                                        <img
+                                            src={filePreview}
+                                            alt="Preview"
+                                            className="w-full h-full object-contain"
+                                        />
+                                    </div>
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            setFilePreview(null);
+                                            setFormData(prev => ({ ...prev, file: null }));
+                                        }}
+                                        className="text-sm text-red-600 hover:text-red-700"
+                                    >
+                                        Xóa ảnh
+                                    </button>
+                                </div>
+                            ) : (
+                                <div className="text-center">
+                                    <svg
+                                        className="mx-auto h-10 w-10 text-gray-400"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        stroke="currentColor"
+                                    >
+                                        <path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            strokeWidth={2}
+                                            d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                                        />
+                                    </svg>
+                                    <div className="mt-1.5">
+                                        <label
+                                            htmlFor="file-upload"
+                                            className="cursor-pointer text-blue-600 hover:text-blue-700"
+                                        >
+                                            Click để tải ảnh lên
+                                        </label>
+                                        <input
+                                            id="file-upload"
+                                            name="file"
+                                            type="file"
+                                            className="sr-only"
+                                            accept="image/png,image/jpeg,image/jpg"
+                                            onChange={handleFileChange}
+                                        />
+                                    </div>
+                                    <p className="mt-1 text-xs text-gray-500">
+                                        PNG, JPG tối đa 5MB
+                                    </p>
+                                </div>
+                            )}
+                        </div>
+                        {errors.file && (
+                            <p className="mt-0.5 text-sm text-red-600">{errors.file}</p>
+                        )}
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1 required-label">
+                            Nội dung
+                        </label>
+                        <style>{`
                         .ql-toolbar.ql-snow {
                             display: flex !important;
                             flex-wrap: wrap !important;
@@ -515,58 +518,60 @@ const NewsFormModal = ({ isOpen, onClose, onSubmit, initialData = null, isLoadin
                             display: block !important;
                         }
                     `}</style>
-                    <div className={`border rounded-md ${errors.noiDung ? 'border-red-500' : 'border-gray-300'}`}>
-                        <ReactQuill
-                            theme="snow"
-                            value={formData.noiDung}
-                            onChange={handleContentChange}
-                            modules={modules}
-                            formats={formats}
-                            placeholder="Nhập nội dung bài viết..."
-                            className="bg-white"
-                            style={{ minHeight: '150px' }}
-                        />
+                        <div className={`border rounded-md ${errors.noiDung ? 'border-red-500' : 'border-gray-300'}`}>
+                            <ReactQuill
+                                theme="snow"
+                                value={formData.noiDung}
+                                onChange={handleContentChange}
+                                modules={modules}
+                                formats={formats}
+                                placeholder="Nhập nội dung bài viết..."
+                                className="bg-white"
+                                style={{ minHeight: '150px' }}
+                            />
+                        </div>
+                        {errors.noiDung && (
+                            <p className="mt-0.5 text-sm text-red-600">{errors.noiDung}</p>
+                        )}
                     </div>
-                    {errors.noiDung && (
-                        <p className="mt-0.5 text-sm text-red-600">{errors.noiDung}</p>
-                    )}
-                </div>
 
-                <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Tác giả
-                    </label>
-                    <input
-                        type="text"
-                        name="tacGia"
-                        value={formData.tacGia}
-                        onChange={handleInputChange}
-                        placeholder="Nhập tên tác giả..."
-                        className="w-full px-2.5 py-1.5 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                </div>
+                    <div className="flex items-center justify-between gap-4 ">
+                        <div className="flex-1 w-full">
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                                Tác giả
+                            </label>
+                            <input
+                                type="text"
+                                name="tacGia"
+                                value={formData.tacGia}
+                                onChange={handleInputChange}
+                                placeholder="Nhập tên tác giả..."
+                                className="w-full px-2.5 py-1.5 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            />
+                        </div>
 
-                <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Ngày xuất bản
-                    </label>
-                    <input
-                        type="date"
-                        name="ngayXuatBan"
-                        defaultValue={new Date().toISOString().split('T')[0]}
-                        className="w-full px-2.5 py-1.5 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        disabled
-                    />
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                                Ngày xuất bản
+                            </label>
+                            <input
+                                type="date"
+                                name="ngayXuatBan"
+                                defaultValue={new Date().toISOString().split('T')[0]}
+                                className="w-full px-2.5 py-1.5 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                disabled
+                            />
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </BaseModal>
+            </BaseModal>
 
-        <NewsPreviewModal
-            isOpen={isPreviewOpen}
-            onClose={() => setIsPreviewOpen(false)}
-            newsData={getPreviewData()}
-            isPreview={true}
-        />
+            <NewsPreviewModal
+                isOpen={isPreviewOpen}
+                onClose={() => setIsPreviewOpen(false)}
+                newsData={getPreviewData()}
+                isPreview={true}
+            />
         </>
     );
 };

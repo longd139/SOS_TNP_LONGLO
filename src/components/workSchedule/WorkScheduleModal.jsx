@@ -27,7 +27,6 @@ const WorkScheduleModal = ({
   useEffect(() => {
     if (isOpen) {
       if (mode === "edit" && initialData) {
-        // Convert date format for datetime-local input
         const dateValue = initialData.ngay_tiep_dan || initialData.ngayTiepDan;
         const formattedDate = dateValue
           ? dayjs(dateValue).format("YYYY-MM-DD")

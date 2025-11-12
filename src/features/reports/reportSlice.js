@@ -4,6 +4,7 @@ import {
     fetchReportPagination, 
     fetchExtent, 
     fetchStatusReport, 
+    fetchStatisticReport,
     fetchReportById,
     updateReportStatus
 } from "./reportThunk";
@@ -16,6 +17,7 @@ const initialState = {
     historyStatus: [],
     extent: null,
     statusReport: null,
+    statisticReport: null,
     loading: false,
     error: null,
     pagination: {
@@ -111,6 +113,19 @@ const reportSlice = createSlice({
             .addCase(fetchStatusReport.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload || 'Lấy trạng thái phản ánh thất bại';
+            })
+
+            .addCase(fetchStatisticReport.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(fetchStatisticReport.fulfilled, (state, action) => {
+                state.loading = false;
+                state.statisticReport = action.payload || null;
+            })
+            .addCase(fetchStatisticReport.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload || 'Lấy thống kê phản ánh thất bại';
             })
             
             .addCase(fetchReportById.pending, (state) => {
