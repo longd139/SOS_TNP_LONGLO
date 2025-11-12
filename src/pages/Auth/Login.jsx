@@ -16,6 +16,7 @@ export default function Login() {
     const [matKhau, setMatKhau] = useState("");
     const [show2FAModal, setShow2FAModal] = useState(false);
     const [validationErrors, setValidationErrors] = useState({});
+    const [hasInteracted, setHasInteracted] = useState(false);
 
     const { login, loading, errors, apiError, requiresTwoFactorAuth, clearErrors } = useLogin();
     const dispatch = useDispatch();
@@ -24,16 +25,24 @@ export default function Login() {
     useAuthRedirect();
 
     useEffect(() => {
-        if (Object.keys(errors).length > 0 || apiError) {
-            clearErrors();
-        }
-        if (Object.keys(validationErrors).length > 0) {
-            setValidationErrors({});
+        if (hasInteracted && (tenDangNhap || matKhau)) {
+            if (apiError || Object.keys(errors).length > 0) {
+                clearErrors();
+            }
+            if (Object.keys(validationErrors).length > 0) {
+                setValidationErrors({});
+            }
         }
     }, [tenDangNhap, matKhau]);
 
+    const handleInputChange = (setter) => (e) => {
+        setHasInteracted(true);
+        setter(e.target.value);
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setHasInteracted(true);
 
         const credentials = { tenDangNhap, matKhau };
 
@@ -51,7 +60,9 @@ export default function Login() {
             setShow2FAModal(true);
             return;
         }
-    };    const handle2FASuccess = (result) => {
+    };
+    
+    const handle2FASuccess = (result) => {
         setShow2FAModal(false);
         dispatch(restoreUser());
         dispatch(fetchMyProfile());
@@ -96,7 +107,7 @@ export default function Login() {
                             <input
                                 type="text"
                                 value={tenDangNhap}
-                                onChange={(e) => setTenDangNhap(e.target.value)}
+                                onChange={handleInputChange(setTenDangNhap)}
                                 placeholder="Nhập tên đăng nhập"
                                 className={`pl-10 w-full border rounded-lg py-2 ${validationErrors.tenDangNhap || errors.tenDangNhap ? "border-red-400" : "border-gray-300"
                                     }`}
@@ -120,7 +131,7 @@ export default function Login() {
                             <input
                                 type="password"
                                 value={matKhau}
-                                onChange={(e) => setMatKhau(e.target.value)}
+                                onChange={handleInputChange(setMatKhau)}
                                 placeholder="Nhập mật khẩu"
                                 className={`pl-10 pr-10 w-full border rounded-lg py-2 ${validationErrors.matKhau || errors.matKhau ? "border-red-400" : "border-gray-300"
                                     }`}
