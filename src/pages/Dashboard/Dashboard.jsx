@@ -26,7 +26,6 @@ export default function Dashboard() {
 
     useEffect(() => {
         loadStatisticReport().catch(error => {
-            console.error('Error loading statistics:', error);
         });
 
         loadReports({
@@ -34,7 +33,6 @@ export default function Dashboard() {
             size: 5,
             mucDo: 'Khẩn cấp'
         }).catch(error => {
-            console.error('Error loading reports:', error);
         });
         
     }, [loadStatisticReport, loadReports]);
