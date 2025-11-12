@@ -3,39 +3,156 @@ import PropTypes from "prop-types";
 import { ChevronDown, ChevronUp, X, Edit2 } from "lucide-react";
 import BaseModal, { ModalFooter } from "../base/BaseModal";
 import PortalModal from "../base/PortalModal";
+import { validateSchema } from "../../utils/validationUtils";
+import { truongHopThuTucSchema, thanhPhanHoSoSchema } from "../../validator/formalityValidator";
 
 const ProcedureCasesSection = ({
-  cases,
+  cases = [],
   addCase,
   removeCase,
   updateCase,
-  updateCaseComponent,
   addCaseComponent,
   removeCaseComponent,
-  errors,
+  updateCaseComponent,
+  errors = {},
 }) => {
   const [expandedCases, setExpandedCases] = useState({});
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [editingCaseIndex, setEditingCaseIndex] = useState(null);
-  const [newCaseName, setNewCaseName] = useState("");
-  const [newCaseDesc, setNewCaseDesc] = useState("");
-  const [localError, setLocalError] = useState(null);
+  const [isAddCaseModalOpen, setIsAddCaseModalOpen] = useState(false);
   const [isAddComponentModalOpen, setIsAddComponentModalOpen] = useState(false);
+  const [editingCaseIndex, setEditingCaseIndex] = useState(null);
   const [activeCaseIndex, setActiveCaseIndex] = useState(null);
   const [selectedCaseIndex, setSelectedCaseIndex] = useState(
     cases && cases.length > 0 ? 0 : null
   );
-  const [newComponentName, setNewComponentName] = useState("");
-  const [newComponentDesc, setNewComponentDesc] = useState("");
-  const [newComponentSoLuongChinh, setNewComponentSoLuongChinh] = useState("");
-  const [newComponentSoLuongSao, setNewComponentSoLuongSao] = useState("");
-  const [newComponentGhiChu, setNewComponentGhiChu] = useState("");
-  const [newFieldRequired, setNewFieldRequired] = useState(false);
-  const [newFieldName, setNewFieldName] = useState("");
-  const [newFieldType, setNewFieldType] = useState("string");
-  const [newFieldValue, setNewFieldValue] = useState("");
-  const [addedFields, setAddedFields] = useState([]);
-  const [componentLocalError, setComponentLocalError] = useState(null);
+
+  const [caseForm, setCaseForm] = useState({
+    ten_truong_hop: "",
+    mo_ta: ""
+  });
+  const [caseErrors, setCaseErrors] = useState({});
+
+  const [componentForm, setComponentForm] = useState({
+    ten_thanh_phan: "",
+    mo_ta_chi_tiet: "",
+    so_luong_ban_chinh: "",
+    so_luong_ban_sao: "",
+    ghi_chu: ""
+  });
+  const [componentErrors, setComponentErrors] = useState({});
+  const validateCase = async (data) => {
+    const result = await validateSchema(truongHopThuTucSchema, data);
+    return { isValid: result.valid, errors: result.errors };
+  };
+
+  const validateComponent = async (data) => {
+    const result = await validateSchema(thanhPhanHoSoSchema, data);
+    return { isValid: result.valid, errors: result.errors };
+  };
+  const resetCaseForm = () => {
+    setCaseForm({ ten_truong_hop: "", mo_ta: "" });
+    setCaseErrors({});
+    setEditingCaseIndex(null);
+  };
+
+  const resetComponentForm = () => {
+    setComponentForm({
+      ten_thanh_phan: "",
+      mo_ta_chi_tiet: "",
+      so_luong_ban_chinh: "",
+      so_luong_ban_sao: "",
+      ghi_chu: ""
+    });
+    setComponentErrors({});
+    setActiveCaseIndex(null);
+  };
+  const handleCaseSubmit = async () => {
+    try {
+      const validation = await validateCase(caseForm);
+
+      if (!validation.isValid) {
+        setCaseErrors(validation.errors);
+        return;
+      }
+
+      setCaseErrors({});
+      const isEdit = editingCaseIndex !== null;
+
+      if (isEdit) {
+        updateCase(editingCaseIndex, "ten_truong_hop", caseForm.ten_truong_hop);
+        updateCase(editingCaseIndex, "mo_ta", caseForm.mo_ta);
+        setExpandedCases(prev => ({ ...prev, [editingCaseIndex]: true }));
+      } else {
+        const newIndex = cases.length;
+        const maxThuTu = cases.length > 0 ? Math.max(...cases.map(c => c.thu_tu || 0)) : 0;
+
+        addCase({
+          ten_truong_hop: caseForm.ten_truong_hop,
+          mo_ta: caseForm.mo_ta,
+          thu_tu: maxThuTu + 1,
+          thanh_phan_ho_so: [],
+        });
+
+        setExpandedCases(prev => ({ ...prev, [newIndex]: true }));
+        setTimeout(() => {
+          const el = document.querySelector(`[data-case-index="${newIndex}"]`);
+          el?.scrollIntoView({ behavior: "smooth", block: "center" });
+        }, 50);
+      }
+
+      setIsAddCaseModalOpen(false);
+      resetCaseForm();
+    } catch (error) {
+      console.error("Error in case submission:", error);
+      setCaseErrors({ general: "Có lỗi xảy ra. Vui lòng thử lại." });
+    }
+  };
+
+  const handleComponentSubmit = async () => {
+    try {
+      let caseIndex = activeCaseIndex;
+      if (caseIndex === null || caseIndex === undefined) {
+        caseIndex = selectedCaseIndex !== null ? selectedCaseIndex : 0;
+      }
+
+      if (caseIndex === null || caseIndex === undefined || !cases || caseIndex >= cases.length) {
+        return;
+      }
+
+      const dataForValidation = {
+        ten_thanh_phan: componentForm.ten_thanh_phan?.trim() || "",
+        mo_ta_chi_tiet: componentForm.mo_ta_chi_tiet?.trim() || "",
+        so_luong_ban_chinh: componentForm.so_luong_ban_chinh ? Number(componentForm.so_luong_ban_chinh) : null,
+        so_luong_ban_sao: componentForm.so_luong_ban_sao ? Number(componentForm.so_luong_ban_sao) : null,
+        ghi_chu: componentForm.ghi_chu?.trim() || ""
+      };
+
+      if (!dataForValidation.ten_thanh_phan) {
+        setComponentErrors({ ten_thanh_phan: "Tên thành phần là bắt buộc" });
+        return;
+      }
+
+      const validation = await validateComponent(dataForValidation);
+      if (!validation.isValid) {
+        setComponentErrors(validation.errors);
+        return;
+      }
+
+      setComponentErrors({});
+      addCaseComponent(caseIndex, dataForValidation);
+      setExpandedCases(prev => ({ ...prev, [caseIndex]: true }));
+      setIsAddComponentModalOpen(false);
+      resetComponentForm();
+
+      setTimeout(() => {
+        const el = document.querySelector(`[data-case-index="${caseIndex}"]`);
+        el?.scrollIntoView({ behavior: "smooth", block: "center" });
+      }, 50);
+
+    } catch (error) {
+      console.error("Error in component submission:", error);
+      setComponentErrors({ general: "Có lỗi xảy ra. Vui lòng thử lại." });
+    }
+  };
 
   const toggleCase = (index) => {
     setExpandedCases((prev) => ({
@@ -54,13 +171,10 @@ const ProcedureCasesSection = ({
           <button
             type="button"
             onClick={() => {
-              setLocalError(null);
-              setNewCaseName("");
-              setNewCaseDesc("");
-              setEditingCaseIndex(null);
-              setIsAddModalOpen(true);
+              resetCaseForm();
+              setIsAddCaseModalOpen(true);
             }}
-            className=" py-2 px-4 text-sm text-blue-600 hover:text-blue-700 hover:bg-blue-50 border border-blue-200 rounded-lg font-medium transition-colors"
+            className="py-2 px-4 text-sm text-blue-600 hover:text-blue-700 hover:bg-blue-50 border border-blue-200 rounded-lg font-medium transition-colors"
           >
             + Thêm trường hợp
           </button>
@@ -72,100 +186,63 @@ const ProcedureCasesSection = ({
         </div>
       )}
       <BaseModal
-        isOpen={isAddModalOpen}
-        onClose={() => setIsAddModalOpen(false)}
-        title="Thêm trường hợp mới"
+        isOpen={isAddCaseModalOpen}
+        onClose={() => {
+          setIsAddCaseModalOpen(false);
+          resetCaseForm();
+        }}
+        title={editingCaseIndex !== null ? "Chỉnh sửa trường hợp" : "Thêm trường hợp mới"}
         size="md"
         footer={
           <ModalFooter
-            onCancel={() => setIsAddModalOpen(false)}
-            onSubmit={() => {
-              if (!newCaseName || newCaseName.trim() === "") {
-                setLocalError("Tên trường hợp là bắt buộc");
-                return;
-              }
-
-              if (editingCaseIndex !== null && editingCaseIndex !== undefined) {
-                updateCase(editingCaseIndex, "ten_truong_hop", newCaseName);
-                updateCase(editingCaseIndex, "mo_ta", newCaseDesc);
-                setExpandedCases((prev) => ({
-                  ...prev,
-                  [editingCaseIndex]: true,
-                }));
-                setIsAddModalOpen(false);
-                setEditingCaseIndex(null);
-                setNewCaseName("");
-                setNewCaseDesc("");
-                setLocalError(null);
-                return;
-              }
-
-              const newIndex = cases.length;
-
-              addCase({
-                ten_truong_hop: newCaseName,
-                mo_ta: newCaseDesc,
-                thu_tu: newIndex + 1,
-                thanh_phan_ho_so: [],
-              });
-
-              setExpandedCases((prev) => ({ ...prev, [newIndex]: true }));
-              setTimeout(() => {
-                try {
-                  const el = document.querySelector(
-                    `[data-case-index="${newIndex}"]`
-                  );
-                  if (el && typeof el.scrollIntoView === "function") {
-                    el.scrollIntoView({ behavior: "smooth", block: "center" });
-                  }
-                } catch (e) {}
-              }, 50);
-
-              setIsAddModalOpen(false);
-              setNewCaseName("");
-              setNewCaseDesc("");
-              setLocalError(null);
+            onCancel={() => {
+              setIsAddCaseModalOpen(false);
+              resetCaseForm();
             }}
+            onSubmit={handleCaseSubmit}
             cancelText="Hủy"
-            submitText="Lưu"
+            submitText={editingCaseIndex !== null ? "Cập nhật" : "Lưu"}
             submitType="primary"
           />
         }
       >
-        <div className="space-y-3 max-h-[60vh] overflow-y-auto px-4 py-1">
+        <div className="space-y-4 max-h-[60vh] overflow-y-auto px-4 py-1">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Tên trường hợp
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Tên trường hợp <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
-              value={newCaseName}
+              value={caseForm.ten_truong_hop}
               onChange={(e) => {
-                setNewCaseName(e.target.value);
-                if (localError) setLocalError(null);
+                setCaseForm(prev => ({...prev, ten_truong_hop: e.target.value}));
+                if (caseErrors.ten_truong_hop) {
+                  setCaseErrors(prev => ({...prev, ten_truong_hop: null}));
+                }
               }}
               placeholder="Nhập tên trường hợp..."
-              className={`w-full  bg-gray-200 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 text-sm ${
-                localError
+              maxLength={230}
+              className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 text-sm ${
+                caseErrors.ten_truong_hop
                   ? "border-red-500 focus:border-red-500 focus:ring-red-500"
                   : "border-gray-300 focus:ring-blue-500"
               }`}
             />
-            {localError && (
-              <p className="text-xs text-red-600 mt-1">{localError}</p>
+            {caseErrors.ten_truong_hop && (
+              <p className="text-xs text-red-600 mt-1">{caseErrors.ten_truong_hop}</p>
             )}
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
               Mô tả trường hợp
             </label>
             <textarea
-              value={newCaseDesc}
-              onChange={(e) => setNewCaseDesc(e.target.value)}
+              value={caseForm.mo_ta}
+              onChange={(e) => setCaseForm(prev => ({...prev, mo_ta: e.target.value}))}
               placeholder="Nhập mô tả trường hợp..."
               rows="4"
-              className="w-full  bg-gray-200 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 text-sm border-gray-300 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
             />
           </div>
         </div>
@@ -174,279 +251,122 @@ const ProcedureCasesSection = ({
         isOpen={isAddComponentModalOpen}
         onClose={() => {
           setIsAddComponentModalOpen(false);
-          setActiveCaseIndex(null);
-          setNewComponentName("");
-          setNewComponentDesc("");
-          setNewComponentSoLuongChinh("");
-          setNewComponentSoLuongSao("");
-          setNewComponentGhiChu("");
-          setComponentLocalError(null);
-          setAddedFields([]);
-          setNewFieldRequired(false);
-          setNewFieldName("");
-          setNewFieldType("string");
-          setNewFieldValue("");
+          resetComponentForm();
         }}
-        title="Add a document"
+        title="Thêm thành phần hồ sơ"
         size="lg"
         className="max-w-xl"
         contentClassName="bg-white overflow-hidden"
         footer={
           <ModalFooter
-            onCancel={() => setIsAddComponentModalOpen(false)}
-            onSubmit={() => {
-              if (!newComponentName || newComponentName.trim() === "") {
-                setComponentLocalError("Tên thành phần là bắt buộc");
-                return;
-              }
-
-              if (activeCaseIndex === null || activeCaseIndex === undefined)
-                return;
-
-              addCaseComponent(activeCaseIndex, {
-                ten_thanh_phan: newComponentName,
-                mo_ta_chi_tiet: newComponentDesc,
-                so_luong_ban_chinh: newComponentSoLuongChinh
-                  ? Number(newComponentSoLuongChinh)
-                  : null,
-                so_luong_ban_sao: newComponentSoLuongSao
-                  ? Number(newComponentSoLuongSao)
-                  : null,
-                ghi_chu: newComponentGhiChu,
-                thuoc_tinh_them: addedFields.map((f) => ({
-                  name: f.name,
-                  type: f.type,
-                  value: f.value,
-                  required: !!f.required,
-                })),
-              });
-
-              setExpandedCases((prev) => ({
-                ...prev,
-                [activeCaseIndex]: true,
-              }));
-              setTimeout(() => {
-                try {
-                  const el = document.querySelector(
-                    `[data-case-index="${activeCaseIndex}"]`
-                  );
-                  if (el && typeof el.scrollIntoView === "function") {
-                    el.scrollIntoView({ behavior: "smooth", block: "center" });
-                  }
-                } catch (e) {}
-              }, 50);
-
+            onCancel={() => {
               setIsAddComponentModalOpen(false);
-              setActiveCaseIndex(null);
-              setNewComponentName("");
-              setNewComponentDesc("");
-              setNewComponentSoLuongChinh("");
-              setNewComponentSoLuongSao("");
-              setNewComponentGhiChu("");
-              setComponentLocalError(null);
+              resetComponentForm();
             }}
+            onSubmit={handleComponentSubmit}
             cancelText="Hủy"
             submitText="Lưu"
             submitType="primary"
           />
         }
       >
-        <div className="space-y-3 max-h-[70vh] overflow-y-auto px-1 -mx-1">
+        <div className="space-y-4 max-h-[70vh] overflow-y-auto px-4 pb-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Parent path
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Tên thành phần <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
-              placeholder="/thanhphan 1762658741227"
+              value={componentForm.ten_thanh_phan}
+              onChange={(e) => {
+                setComponentForm(prev => ({...prev, ten_thanh_phan: e.target.value}));
+                if (componentErrors.ten_thanh_phan) {
+                  setComponentErrors(prev => ({...prev, ten_thanh_phan: null}));
+                }
+              }}
+              placeholder="Nhập tên thành phần..."
+              maxLength={230}
               className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 text-sm ${
-                componentLocalError
+                componentErrors.ten_thanh_phan
                   ? "border-red-500 focus:border-red-500 focus:ring-red-500"
                   : "border-gray-300 focus:ring-blue-500"
               }`}
             />
+            {componentErrors.ten_thanh_phan && (
+              <p className="text-xs text-red-600 mt-1">{componentErrors.ten_thanh_phan}</p>
+            )}
           </div>
+
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Document ID
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Mô tả chi tiết
             </label>
-            <div className="w-full">
-              <div className="flex justify-between items-center">
-                <input
-                  type="text"
-                  placeholder="Enter document ID…"
-                  className={`w-full h-10 pl-4 pr-28 text-gray-200 placeholder-gray-500 text-sm rounded-lg border ${
-                    componentLocalError
-                      ? "border-red-500 focus:ring-red-500"
-                      : "focus:ring-blue-500"
-                  } focus:outline-none focus:ring-2 transition-colors`}
-                />
-                <button
-                  type="button"
-                  className="flex items-center justify-center px-8 py-2 ml-2 bg-white text-blue-600 border rounded border-blue-300 text-sm hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-300"
-                >
-                  Auto
-                </button>
-              </div>
-
-              {componentLocalError && (
-                <p className="mt-2 flex items-center gap-2 text-sm text-red-400">
-                  <span className="inline-flex items-center justify-center w-4 h-4 rounded-full bg-red-500 text-white text-xs">
-                    !
-                  </span>
-                  <span>Required</span>
-                </p>
-              )}
-            </div>
+            <textarea
+              value={componentForm.mo_ta_chi_tiet}
+              onChange={(e) => setComponentForm(prev => ({...prev, mo_ta_chi_tiet: e.target.value}))}
+              placeholder="Nhập mô tả chi tiết..."
+              rows="3"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+            />
           </div>
 
-          <div>
-            <div className="flex items-center gap-3 mb-3">
-              <label className="inline-flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  checked={newFieldRequired}
-                  onChange={(e) => setNewFieldRequired(e.target.checked)}
-                  className="w-4 h-4 border rounded text-blue-600 focus:ring-blue-500"
-                />
-                <span className="text-sm text-gray-700">Required</span>
+          <div className="grid grid-cols-3 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Số bản chính
               </label>
-
-              <div className="flex-1">
-                <input
-                  type="text"
-                  value={newFieldName}
-                  onChange={(e) => setNewFieldName(e.target.value)}
-                  placeholder="Optional field name..."
-                  className="w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-
-              <div className="w-36">
-                <select
-                  value={newFieldType}
-                  onChange={(e) => setNewFieldType(e.target.value)}
-                  className="w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  <option value="string">string</option>
-                  <option value="number">number</option>
-                  <option value="boolean">boolean</option>
-                </select>
-              </div>
+              <input
+                type="number"
+                min="0"
+                value={componentForm.so_luong_ban_chinh}
+                onChange={(e) => {
+                  setComponentForm(prev => ({...prev, so_luong_ban_chinh: e.target.value}));
+                  if (componentErrors.so_luong_ban_chinh) {
+                    setComponentErrors(prev => ({...prev, so_luong_ban_chinh: null}));
+                  }
+                }}
+                placeholder="0"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+              />
+              {componentErrors.so_luong_ban_chinh && (
+                <p className="text-xs text-red-600 mt-1">{componentErrors.so_luong_ban_chinh}</p>
+              )}
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                {newFieldType === "string"
-                  ? "String"
-                  : newFieldType.charAt(0).toUpperCase() +
-                    newFieldType.slice(1)}
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Số bản sao
+              </label>
+              <input
+                type="number"
+                min="0"
+                value={componentForm.so_luong_ban_sao}
+                onChange={(e) => {
+                  setComponentForm(prev => ({...prev, so_luong_ban_sao: e.target.value}));
+                  if (componentErrors.so_luong_ban_sao) {
+                    setComponentErrors(prev => ({...prev, so_luong_ban_sao: null}));
+                  }
+                }}
+                placeholder="0"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+              />
+              {componentErrors.so_luong_ban_sao && (
+                <p className="text-xs text-red-600 mt-1">{componentErrors.so_luong_ban_sao}</p>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Ghi chú
               </label>
               <input
                 type="text"
-                value={newFieldValue}
-                onChange={(e) => setNewFieldValue(e.target.value)}
-                placeholder="Enter string value..."
-                className="w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                value={componentForm.ghi_chu}
+                onChange={(e) => setComponentForm(prev => ({...prev, ghi_chu: e.target.value}))}
+                placeholder="Ghi chú..."
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
               />
             </div>
-
-            <div className="mt-2">
-              <button
-                type="button"
-                onClick={() => {
-                  const field = {
-                    id: `${Date.now()}-${Math.round(Math.random() * 10000)}`,
-                    required: !!newFieldRequired,
-                    name: newFieldName,
-                    type: newFieldType,
-                    value: newFieldValue,
-                  };
-                  setAddedFields((prev) => [...prev, field]);
-                  setNewFieldRequired(false);
-                  setNewFieldName("");
-                  setNewFieldType("string");
-                  setNewFieldValue("");
-                }}
-                className="text-sm text-blue-600 hover:text-blue-700 font-medium"
-              >
-                + Add field
-              </button>
-            </div>
-            {addedFields.length > 0 && (
-              <div className="mt-3 space-y-2">
-                {addedFields.map((f, idx) => (
-                  <div
-                    key={f.id}
-                    className="rounded-lg border border-gray-200 bg-gray-50 p-3 relative max-w-[520px] mx-auto"
-                  >
-                    <div className="relative mb-3 flex items-center gap-3">
-                      <input
-                        type="text"
-                        value={f.name}
-                        onChange={(e) => {
-                          const updated = addedFields.map((item) =>
-                            item.id === f.id
-                              ? { ...item, name: e.target.value }
-                              : item
-                          );
-                          setAddedFields(updated);
-                        }}
-                        placeholder="Field name..."
-                        className="flex-1 max-w-[390px] h-10 px-3 py-2 bg-white placeholder-gray-500 text-gray-700 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      />
-                      <button
-                        type="button"
-                        onClick={() =>
-                          setAddedFields((prev) =>
-                            prev.filter((it) => it.id !== f.id)
-                          )
-                        }
-                        className="ml-auto bg-white text-red-500 hover:text-red-600 p-1 rounded border border-gray-200"
-                        title="Xóa field"
-                      >
-                        <span className="text-lg">✕</span>
-                      </button>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <div className="w-32">
-                        <select
-                          value={f.type}
-                          onChange={(e) => {
-                            const updated = addedFields.map((item) =>
-                              item.id === f.id
-                                ? { ...item, type: e.target.value }
-                                : item
-                            );
-                            setAddedFields(updated);
-                          }}
-                          className="w-full px-3 py-2 bg-white text-gray-700 border border-gray-300 rounded-lg text-sm focus:outline-none"
-                        >
-                          <option value="string">string</option>
-                          <option value="number">number</option>
-                          <option value="boolean">boolean</option>
-                        </select>
-                      </div>
-
-                      <input
-                        type="text"
-                        value={f.value}
-                        onChange={(e) => {
-                          const updated = addedFields.map((item) =>
-                            item.id === f.id
-                              ? { ...item, value: e.target.value }
-                              : item
-                          );
-                          setAddedFields(updated);
-                        }}
-                        placeholder="Value..."
-                        className="flex-1 max-w-[267px] h-10 px-3 py-2 bg-white text-gray-700 border border-gray-300 rounded-lg text-sm focus:outline-none"
-                      />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
           </div>
         </div>
       </PortalModal>
@@ -495,9 +415,11 @@ const ProcedureCasesSection = ({
                         onClick={(e) => {
                           e.stopPropagation();
                           setEditingCaseIndex(caseIndex);
-                          setNewCaseName(caseItem.ten_truong_hop || "");
-                          setNewCaseDesc(caseItem.mo_ta || "");
-                          setIsAddModalOpen(true);
+                          setCaseForm({
+                            ten_truong_hop: caseItem.ten_truong_hop || "",
+                            mo_ta: caseItem.mo_ta || ""
+                          });
+                          setIsAddCaseModalOpen(true);
                         }}
                         className="text-gray-700 hover:bg-gray-50 p-1 rounded transition-colors"
                         title="Chỉnh sửa trường hợp"
@@ -568,10 +490,39 @@ const ProcedureCasesSection = ({
                         (component, idx) => (
                           <div
                             key={idx}
-                            className="bg-gray-50 p-3 rounded border border-gray-200"
+                            className="bg-gray-50 p-3 rounded border border-gray-200 hover:bg-gray-100 transition-colors"
                           >
-                            {component.ten_thanh_phan ||
-                              `Thành phần ${idx + 1}`}
+                            <div className="flex justify-between items-start mb-2">
+                              <h6 className="text-sm font-medium text-gray-900">
+                                {component.ten_thanh_phan ||
+                                  `Thành phần ${idx + 1}`}
+                              </h6>
+                              <button
+                                type="button"
+                                onClick={() => removeCaseComponent(selectedCaseIndex, idx)}
+                                className="text-red-600 hover:bg-red-50 p-1 rounded transition-colors"
+                                title="Xóa thành phần này"
+                              >
+                                <X className="w-3 h-3" />
+                              </button>
+                            </div>
+                            
+                            {component.mo_ta_chi_tiet && (
+                              <p className="text-xs text-gray-600 mb-2">
+                                {component.mo_ta_chi_tiet}
+                              </p>
+                            )}
+                            
+                            <div className="flex gap-4 text-xs text-gray-500">
+                              <span>Bản chính: {component.so_luong_ban_chinh || 0}</span>
+                              <span>Bản sao: {component.so_luong_ban_sao || 0}</span>
+                            </div>
+                            
+                            {component.ghi_chu && (
+                              <p className="text-xs text-gray-500 mt-1 italic">
+                                Ghi chú: {component.ghi_chu}
+                              </p>
+                            )}
                           </div>
                         )
                       )}
@@ -582,19 +533,14 @@ const ProcedureCasesSection = ({
                     <button
                       type="button"
                       onClick={() => {
-                        if (selectedCaseIndex === null) return;
-                        setActiveCaseIndex(selectedCaseIndex);
-                        setNewComponentName("");
-                        setNewComponentDesc("");
-                        setNewComponentSoLuongChinh("");
-                        setNewComponentSoLuongSao("");
-                        setNewComponentGhiChu("");
-                        setComponentLocalError(null);
-                        setAddedFields([]);
-                        setNewFieldRequired(false);
-                        setNewFieldName("");
-                        setNewFieldType("string");
-                        setNewFieldValue("");
+                        const caseIndexToUse = selectedCaseIndex !== null ? selectedCaseIndex : 0;
+                        
+                        if (cases?.length === 0 || !cases) {
+                          return;
+                        }
+                        
+                        setActiveCaseIndex(caseIndexToUse);
+                        resetComponentForm();
                         setIsAddComponentModalOpen(true);
                       }}
                       className="inline-flex items-center gap-2 px-4 py-2 border border-blue-300 text-blue-600 rounded-lg hover:bg-blue-50"
@@ -625,5 +571,4 @@ ProcedureCasesSection.propTypes = {
   removeCaseComponent: PropTypes.func.isRequired,
   errors: PropTypes.object,
 };
-
 export default ProcedureCasesSection;
