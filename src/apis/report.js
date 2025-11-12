@@ -98,7 +98,7 @@ const updateStatusReport = async (reportId, statusData) => {
 
 const getStatisticReport = async () => {
     try {
-        const response = await apiClient.get("/api/phan-anh/muc-do-trang-thai-linh-vuc");
+        const response = await apiClient.get("/api/phan-anh/tong-quan");
         if (response.data.success) {
             return response.data.data;
         } else {

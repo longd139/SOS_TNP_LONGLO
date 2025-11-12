@@ -55,7 +55,7 @@ const CustomLineChart = ({ data, title }) => {
                             dy={10}
                         />
                         <YAxis
-                            domain={[0, 80]}
+                            domain={[0, 'auto']}
                             axisLine={false}
                             tickLine={false}
                             tick={{ fontSize: 12, fill: '#6b7280' }}
