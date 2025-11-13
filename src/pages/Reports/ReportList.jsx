@@ -116,8 +116,8 @@ export default function ReportList() {
             dataIndex: "index",
             key: "index",
             render: (value, record, index) => (
-                <span className="text-sm text-gray-600">
-                    #{(pagination.currentPage - 1) * pagination.pageSize + index + 1}
+                <span className="text-sm font-medium text-gray-900">
+                    #{((pagination?.currentPage || 1) - 1) * (pagination?.pageSize || pageSize) + index + 1}
                 </span>
             ),
         },
@@ -344,6 +344,7 @@ export default function ReportList() {
                         current: pagination.currentPage,
                         pageSize: pagination.pageSize,
                         total: pagination.totalItems,
+                        totalPages: pagination.totalPages,
                         onChange: handlePageChange,
                     }}
                 />

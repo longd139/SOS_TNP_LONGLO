@@ -142,7 +142,7 @@ export default function ContactInfo() {
                             </label>
                             <input
                                 type="text"
-                                value={formData.tenDonVi}
+                                value={formData?.tenDonVi}
                                 onChange={(e) => handleChange("tenDonVi", e.target.value)}
                                 disabled={!isEditing}
                                 className={`w-full px-3 py-2 text-sm border rounded-lg bg-gray-50 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50 ${errors['tenDonVi'] ? 'border-red-500' : 'border-gray-300'}`}
@@ -167,7 +167,7 @@ export default function ContactInfo() {
                                 </label>
                                 <input
                                     type="text"
-                                    value={formData.diaChi}
+                                    value={formData?.diaChi}
                                     onChange={(e) => handleChange("diaChi", e.target.value)}
                                     disabled={!isEditing}
                                     className={`w-full px-3 py-2 text-sm border rounded-lg bg-gray-50 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50 ${errors['diaChi'] ? 'border-red-500' : 'border-gray-300'}`}
@@ -183,7 +183,7 @@ export default function ContactInfo() {
                                 </label>
                                 <input
                                     type="text"
-                                    value={formData.linkGoogleMap}
+                                    value={formData?.linkGoogleMap}
                                     onChange={(e) => handleChange("linkGoogleMap", e.target.value)}
                                     disabled={!isEditing}
                                     className={`w-full px-3 py-2 text-sm border rounded-lg bg-gray-50 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50 ${errors['linkGoogleMap'] ? 'border-red-500' : 'border-gray-300'}`}
@@ -211,7 +211,7 @@ export default function ContactInfo() {
                                 </label>
                                 <input
                                     type="text"
-                                    value={formData.soDienThoai}
+                                    value={formData?.soDienThoai}
                                     onChange={(e) => handleChange("soDienThoai", e.target.value)}
                                     disabled={!isEditing}
                                     className={`w-full px-3 py-2 text-sm border rounded-lg bg-gray-50 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50 ${errors['soDienThoai'] ? 'border-red-500' : 'border-gray-300'}`}
@@ -228,7 +228,7 @@ export default function ContactInfo() {
                                 </label>
                                 <input
                                     type="email"
-                                    value={formData.email}
+                                    value={formData?.email}
                                     onChange={(e) => handleChange("email", e.target.value)}
                                     disabled={!isEditing}
                                     className={`w-full px-3 py-2 text-sm border rounded-lg bg-gray-50 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50 ${errors['email'] ? 'border-red-500' : 'border-gray-300'}`}
@@ -258,7 +258,7 @@ export default function ContactInfo() {
                                         <div className="flex-1">
                                             <input
                                                 type="text"
-                                                value={formData.gioLamViec.buoi_sang.tu}
+                                                value={formData?.gioLamViec?.buoi_sang?.tu}
                                                 onChange={(e) =>
                                                     handleChange("gioLamViec.buoi_sang.tu", e.target.value)
                                                 }
@@ -273,7 +273,7 @@ export default function ContactInfo() {
                                         <div className="flex-1">
                                             <input
                                                 type="text"
-                                                value={formData.gioLamViec.buoi_sang.den}
+                                                value={formData?.gioLamViec?.buoi_sang?.den}
                                                 onChange={(e) =>
                                                     handleChange("gioLamViec.buoi_sang.den", e.target.value)
                                                 }
@@ -300,7 +300,7 @@ export default function ContactInfo() {
                                         <div className="flex-1">
                                             <input
                                                 type="text"
-                                                value={formData.gioLamViec.buoi_chieu.tu}
+                                                value={formData?.gioLamViec?.buoi_chieu?.tu}
                                                 onChange={(e) =>
                                                     handleChange("gioLamViec.buoi_chieu.tu", e.target.value)
                                                 }
@@ -315,7 +315,7 @@ export default function ContactInfo() {
                                         <div className="flex-1">
                                             <input
                                                 type="text"
-                                                value={formData.gioLamViec.buoi_chieu.den}
+                                                value={formData?.gioLamViec?.buoi_chieu?.den}
                                                 onChange={(e) =>
                                                     handleChange("gioLamViec.buoi_chieu.den", e.target.value)
                                                 }
@@ -349,7 +349,7 @@ export default function ContactInfo() {
                                 </label>
                                 <input
                                     type="text"
-                                    value={formData.gioLamViec.ghi_chu || ''}
+                                    value={formData?.gioLamViec?.ghi_chu || ''}
                                     onChange={(e) =>
                                         handleChange("gioLamViec.ghi_chu", e.target.value)
                                     }

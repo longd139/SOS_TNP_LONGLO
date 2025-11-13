@@ -10,6 +10,7 @@ import TwoFALoginModal from "../../components/twoFactor/TwoFALoginModal";
 import ROUTE_PATH from "../../constants/routes";
 import { getRedirectPathIfDisabled } from "../../utils/routeRedirectUtils";
 import { validateAuth } from "../../validator/loginValidator";
+import { showToast } from "../../utils/toastNotification";
 
 export default function Login() {
     const [tenDangNhap, setTenDangNhap] = useState("");
@@ -64,10 +65,20 @@ export default function Login() {
         
     };
     
-    const handle2FASuccess = (result) => {
+    const handle2FASuccess = async (result) => {
         setShow2FAModal(false);
         dispatch(restoreUser());
-        dispatch(fetchMyProfile());
+        const profileResult = await dispatch(fetchMyProfile());
+        
+        const userRole = profileResult?.payload?.role || result?.user?.role;
+        if (userRole !== 'ADMIN') {
+            localStorage.removeItem('accessToken');
+            localStorage.removeItem('refreshToken');
+            showToast.error('Bạn không có quyền truy cập vào hệ thống quản trị!');
+            navigate(ROUTE_PATH.LOGIN, { replace: true });
+            return;
+        }
+        
         const redirectPath = getRedirectPathIfDisabled(ROUTE_PATH.DASHBOARD);
         navigate(redirectPath, { replace: true });
     };
