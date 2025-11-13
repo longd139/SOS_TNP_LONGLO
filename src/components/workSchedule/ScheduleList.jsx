@@ -1,4 +1,6 @@
 import { Clock, MapPin, User, FileText, Pencil, Trash2, ToggleLeft, Calendar } from "lucide-react";
+import { isPastSchedule, convertTo24Hour } from "../../validator/workScheduleValidator";
+import dayjs from "dayjs";
 
 export default function ScheduleList({
     schedules,
@@ -30,6 +32,47 @@ export default function ScheduleList({
         return schedule[field] || fallback;
     };
 
+    const getStartTimeFromSchedule = (schedule) => {
+        const timeValue = getFieldValue(schedule, "time");
+        if (timeValue && typeof timeValue === "string") {
+            const timeParts = timeValue.split(" - ");
+            if (timeParts.length >= 1) {
+                return timeParts[0].trim(); 
+            }
+        }
+        return null;
+    };
+
+    const isSchedulePassed = (schedule) => {
+        const scheduleDate = getFieldValue(schedule, "date");
+        const startTime = getStartTimeFromSchedule(schedule);
+        return isPastSchedule(scheduleDate, startTime);
+    };
+
+    const sortedSchedules = [...schedules].sort((a, b) => {
+        const aDate = getFieldValue(a, "date");
+        const aTime = getStartTimeFromSchedule(a);
+        const bDate = getFieldValue(b, "date");
+        const bTime = getStartTimeFromSchedule(b);
+        
+        const aIsPast = isPastSchedule(aDate, aTime);
+        const bIsPast = isPastSchedule(bDate, bTime);
+        
+        if (aIsPast && !bIsPast) return -1;
+        if (!aIsPast && bIsPast) return 1;
+        
+        const aTime24h = convertTo24Hour(aTime);
+        const bTime24h = convertTo24Hour(bTime);
+        const aDateTime = dayjs(`${aDate} ${aTime24h}`, "YYYY-MM-DD HH:mm");
+        const bDateTime = dayjs(`${bDate} ${bTime24h}`, "YYYY-MM-DD HH:mm");
+        
+        if (aIsPast && bIsPast) {
+            return bDateTime.isBefore(aDateTime) ? -1 : 1;
+        } else {
+            return aDateTime.isBefore(bDateTime) ? -1 : 1;
+        }
+    });
+
     const getDisplayMessage = () => {
         if (selectedDate) {
             const selectedSchedules = schedules.filter(
@@ -49,7 +92,7 @@ export default function ScheduleList({
 
         return {
             icon: <Calendar className="w-12 h-12 text-gray-300 mx-auto" />,
-            title: "Chưa có lịch tiếp dân nào",
+            title: "Chưa có lịch tiếp dân",
             message: "Hãy thêm lịch mới hoặc import từ file Excel",
         };
     };
@@ -60,9 +103,9 @@ export default function ScheduleList({
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3 md:p-4">
             <div className="flex items-center justify-between mb-2 md:mb-3">
                 <h2 className="text-base md:text-lg font-semibold text-gray-900">
-                    {selectedDate ? "Lịch tiếp dân trong ngày" : "Lịch tiếp dân sắp tới"}
+                    {selectedDate ? "Lịch tiếp dân trong ngày" : "Tất cả lịch tiếp dân"}
                 </h2>
-                <span className="text-sm text-gray-500">({schedules.length} lịch)</span>
+                <span className="text-sm text-gray-500">({sortedSchedules.length} lịch)</span>
             </div>
 
             <div className="space-y-2 md:space-y-3">
@@ -70,24 +113,33 @@ export default function ScheduleList({
                     <div className="flex justify-center items-center py-8">
                         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
                     </div>
-                ) : schedules.length === 0 ? (
+                ) : sortedSchedules.length === 0 ? (
                     <div className="text-center py-12 text-gray-500">
                         <div className="mb-4 text-4xl">{displayMessage.icon}</div>
                         <p className="text-lg font-medium mb-2">{displayMessage.title}</p>
                         <p className="text-sm">{displayMessage.message}</p>
                     </div>
                 ) : (
-                    schedules.map((schedule) => (
+                    sortedSchedules.map((schedule) => (
                         <div
                             key={schedule.id}
-                            className="bg-gray-50 rounded-lg p-2 md:p-3 border border-gray-200 hover:border-blue-300 transition-colors"
+                            className={`bg-gray-50 rounded-lg p-2 md:p-3 border border-gray-200 hover:border-blue-300 transition-colors ${
+                                isSchedulePassed(schedule) ? "opacity-75" : ""
+                            }`}
                         >
                             <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 md:gap-3 mb-2 md:mb-3">
                                 <div className="flex flex-wrap items-center gap-2 md:gap-3">
-                                    <div className="bg-blue-100 text-blue-700 px-2 md:px-3 py-1 rounded text-xs md:text-sm font-medium">
+                                    <div className={`px-2 md:px-3 py-1 rounded text-xs md:text-sm font-medium ${
+                                        isSchedulePassed(schedule) 
+                                            ? "bg-gray-100 text-gray-600" 
+                                            : "bg-blue-100 text-blue-700"
+                                    }`}>
                                         {formatDate
                                             ? formatDate(getFieldValue(schedule, "date"))
                                             : getFieldValue(schedule, "date")}
+                                        {isSchedulePassed(schedule) && (
+                                            <span className="ml-1 text-xs">(Đã qua)</span>
+                                        )}
                                     </div>
                                     <div className="flex items-center gap-1 text-gray-600">
                                         <Clock className="w-3 h-3 md:w-4 md:h-4" />
@@ -97,7 +149,7 @@ export default function ScheduleList({
                                     </div>
                                 </div>
                                 <div className="flex gap-2 self-end sm:self-auto">
-                                    {onEdit && (
+                                    {onEdit && !isSchedulePassed(schedule) && (
                                         <button
                                             onClick={() => onEdit(schedule)}
                                             className="p-1.5 text-blue-600 hover:bg-blue-50 rounded transition-colors"
