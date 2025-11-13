@@ -78,6 +78,10 @@ export default function Dashboard() {
 
     return (
         <div className="space-y-3 md:space-y-4 min-h-full">
+            <div className="mb-4">
+                <h1 className="text-2xl font-bold text-gray-900">Tổng quan</h1>
+                <p className="text-gray-600 mt-1">Thống kê hoạt động hệ thống</p>
+            </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
                 <StatCard
                     title="Tổng phản ánh hôm nay"
