@@ -285,7 +285,7 @@ const NewsFormModal = ({ isOpen, onClose, onSubmit, initialData = null, isLoadin
                 isOpen={isOpen}
                 onClose={handleClose}
                 title={initialData ? "Chỉnh sửa bài viết" : "Tạo bài viết mới"}
-                size="xl"
+                size="3xl"
                 footer={
                     <ModalFooter
                         onCancel={handlePreview}
