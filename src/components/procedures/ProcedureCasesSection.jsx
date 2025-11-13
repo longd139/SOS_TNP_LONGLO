@@ -102,7 +102,6 @@ const ProcedureCasesSection = ({
       setIsAddCaseModalOpen(false);
       resetCaseForm();
     } catch (error) {
-      console.error("Error in case submission:", error);
       setCaseErrors({ general: "Có lỗi xảy ra. Vui lòng thử lại." });
     }
   };
@@ -149,7 +148,6 @@ const ProcedureCasesSection = ({
       }, 50);
 
     } catch (error) {
-      console.error("Error in component submission:", error);
       setComponentErrors({ general: "Có lỗi xảy ra. Vui lòng thử lại." });
     }
   };

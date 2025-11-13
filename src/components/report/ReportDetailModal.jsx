@@ -18,6 +18,7 @@ import { useReports } from "../../hooks/useReports";
 import { showToast } from "../../utils/toastNotification";
 import { validateReport } from "../../validator/reportValidator";
 import dayjs from "dayjs";
+import MediaGallery from "./MediaGallery";
 
 const ReportDetailModal = ({ isOpen, onClose, report, loading = false, onStatusUpdated, mode = "view" }) => {
     const { statusReport, updateStatus, clearError } = useReports();
@@ -198,38 +199,11 @@ const ReportDetailModal = ({ isOpen, onClose, report, loading = false, onStatusU
                                         </p>
                                     </div>
 
-                                    {report.dinh_kem_phan_anh &&
-                                        report.dinh_kem_phan_anh.length > 0 && (
-                                            <div>
-                                                <h4 className="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                                                    <ImageIcon className="w-4 h-4" />
-                                                    Hình ảnh đính kèm
-                                                </h4>
-                                                <div className="grid grid-cols-2 gap-4">
-                                                    {report.dinh_kem_phan_anh.map((file, index) => (
-                                                        <div key={index} className="relative group">
-                                                            {file.dinh_dang_file?.startsWith("image/") ? (
-                                                                <img
-                                                                    src={`${API_URL}${file.url_file}`}
-                                                                    alt={`Attachment ${index + 1}`}
-                                                                    className="w-full object-cover rounded-lg border border-gray-200 hover:opacity-90 transition-opacity cursor-pointer"
-                                                                    onClick={() =>
-                                                                        window.open(
-                                                                            `${API_URL}${file.url_file}`,
-                                                                            "_blank"
-                                                                        )
-                                                                    }
-                                                                />
-                                                            ) : (
-                                                                <div className="w-full h-48 bg-gray-100 rounded-lg border border-gray-200 flex items-center justify-center">
-                                                                    <FileText className="w-12 h-12 text-gray-400" />
-                                                                </div>
-                                                            )}
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            </div>
-                                        )}
+                                    <MediaGallery
+                                        images={report.dinh_kem_phan_anh || []}
+                                        videos={report.videos || []}
+                                        apiUrl={API_URL}
+                                    />
 
                                     <div className="border-b">
                                         <h4 className="text-sm font-semibold text-gray-900 mb-2 flex items-center gap-2 ">
