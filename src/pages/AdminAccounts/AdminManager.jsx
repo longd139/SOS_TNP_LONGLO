@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import BaseTable from '../../components/base/BaseTable';
 import UserModal from '../../components/users/UserModal';
+import UserFilter from '../../components/admin/UserFilter';
 import { ConfirmModal } from '../../components/base/BaseModal';
 import { ROLE_LABELS, ROLE_COLORS } from '../../constants/role';
 import { useUsers } from '../../hooks/useUsers';
@@ -13,6 +14,7 @@ export default function AdminManager() {
         pagination,
         statistics,
         handlePageChange,
+        loadUsers,
         createUser,
         updateUser,
         updateStatus,
@@ -20,6 +22,11 @@ export default function AdminManager() {
     } = useUsers();
 
     const [modalLoading, setModalLoading] = useState(false);
+    const [filters, setFilters] = useState({
+        searchKeyword: '',
+        isActive: '',
+        vaiTro: ''
+    });
     const [userModal, setUserModal] = useState({
         isOpen: false,
         user: null
@@ -105,6 +112,55 @@ export default function AdminManager() {
         } catch (error) {
             showToast.error(error.message || 'Có lỗi xảy ra khi cập nhật trạng thái tài khoản!' || error);
         }
+    };
+
+    const handleFilterChange = (key, value) => {
+        setFilters(prev => ({ ...prev, [key]: value }));
+    };
+
+    const handleSearch = () => {
+        loadUsers(1, pagination.pageSize, {
+            isActive: filters.isActive !== '' ? filters.isActive : undefined,
+            vaiTro: filters.vaiTro !== '' ? filters.vaiTro : undefined,
+        });
+    };
+
+    const handleSearchWithFilters = (newFilters) => {
+        const { searchKeyword, isActive, vaiTro, pageSize } = newFilters;
+        
+        setFilters({
+            searchKeyword: searchKeyword || '',
+            isActive: isActive !== undefined ? isActive : '',
+            vaiTro: vaiTro || ''
+        });
+
+        loadUsers(1, pageSize || pagination.pageSize, {
+            isActive: isActive !== undefined ? isActive : undefined,
+            vaiTro: vaiTro || undefined,
+        });
+    };
+
+    const handleResetFilters = () => {
+        setFilters({
+            searchKeyword: '',
+            isActive: '',
+            vaiTro: ''
+        });
+        loadUsers(1, pagination.pageSize);
+    };
+
+    const handlePageSizeChange = (newPageSize) => {
+        loadUsers(1, newPageSize, {
+            isActive: filters.isActive !== '' ? filters.isActive : undefined,
+            vaiTro: filters.vaiTro !== '' ? filters.vaiTro : undefined,
+        });
+    };
+
+    const handlePageChangeWithFilters = (page) => {
+        handlePageChange(page, {
+            isActive: filters.isActive !== '' ? filters.isActive : undefined,
+            vaiTro: filters.vaiTro !== '' ? filters.vaiTro : undefined,
+        });
     };
 
     const columns = [
@@ -221,6 +277,16 @@ export default function AdminManager() {
                 </button>
             </div>
 
+            <UserFilter
+                filters={filters}
+                pagination={pagination}
+                onFilterChange={handleFilterChange}
+                onSearch={handleSearch}
+                onReset={handleResetFilters}
+                onPageSizeChange={handlePageSizeChange}
+                onSearchWithFilters={handleSearchWithFilters}
+            />
+
             <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
                 <div className="bg-white overflow-hidden shadow rounded-lg">
                     <div className="p-4">
@@ -324,7 +390,7 @@ export default function AdminManager() {
                 columns={columns}
                 loading={loading}
                 pagination={pagination}
-                onPageChange={handlePageChange}
+                onPageChange={handlePageChangeWithFilters}
                 onEdit={handleEditUser}
                 onDelete={handleDeleteUser}
                 canDelete={canDelete}

@@ -21,7 +21,7 @@ const getMyProfile = async () => {
                         if (r.data && r.data.success) return r.data.data;
                         if (r.data && !r.data.success && typeof r.data === 'object' && Object.keys(r.data).length > 0) return r.data;
                     } catch (e2) {
-                      
+
                     }
                 }
             }
@@ -38,12 +38,22 @@ const getMyProfile = async () => {
 const getAllUsersWithPagination = async ({
     page = 1,
     size = 10,
+    isActive,
+    vaiTro,
 }) => {
     try {
         const params = new URLSearchParams({
             page,
             size,
         });
+
+        if (isActive !== undefined && isActive !== null && isActive !== '') {
+            params.append('isActive', isActive);
+        }
+
+        if (vaiTro && vaiTro !== '') {
+            params.append('vaiTro', vaiTro);
+        }
 
         const response = await apiClient.get("/api/users", { params });
         if (response.data.success) {
@@ -70,7 +80,7 @@ const getAllUsersWithPagination = async ({
                 currentPage: pagination?.currentPage || 1,
                 pageSize: pagination?.pageSize || size
             };
-            
+
         } else {
             throw new Error(response.data.message || "Lấy danh sách người dùng thất bại");
         }

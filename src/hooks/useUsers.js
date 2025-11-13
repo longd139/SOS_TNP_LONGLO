@@ -32,12 +32,12 @@ export const useUsers = () => {
     const statistics = useSelector(selectUserStatistics);
 
     useEffect(() => {
-        dispatch(fetchUsers({ page: 1, pageSize: 10 }));
+        dispatch(fetchUsers({ page: 1, size: 10 }));
     }, [dispatch]);
 
     const loadUsers = useCallback(
-        (page = 1, size = 10) => {
-            return dispatch(fetchUsers({ page, size }));
+        (page = 1, size = 10, filters = {}) => {
+            return dispatch(fetchUsers({ page, size, ...filters }));
         },
         [dispatch]
     );
@@ -46,9 +46,9 @@ export const useUsers = () => {
         async (userData) => {
             const result = await dispatch(createUser(userData));
             if (createUser.fulfilled.match(result)) {
-                await dispatch(fetchUsers({ 
-                    page: pagination.current, 
-                    pageSize: pagination.pageSize 
+                await dispatch(fetchUsers({
+                    page: pagination.current,
+                    pageSize: pagination.pageSize
                 }));
                 return { success: true };
             } else {
@@ -62,9 +62,9 @@ export const useUsers = () => {
         async (userData) => {
             const result = await dispatch(updateUser(userData));
             if (updateUser.fulfilled.match(result)) {
-                await dispatch(fetchUsers({ 
-                    page: pagination.current, 
-                    pageSize: pagination.pageSize 
+                await dispatch(fetchUsers({
+                    page: pagination.current,
+                    pageSize: pagination.pageSize
                 }));
                 return { success: true };
             } else {
@@ -79,14 +79,14 @@ export const useUsers = () => {
             const result = await dispatch(deleteUser(userId));
             if (deleteUser.fulfilled.match(result)) {
                 const remainingUsers = users.length - 1;
-                const shouldGoToPreviousPage = 
-                    remainingUsers === 0 && 
+                const shouldGoToPreviousPage =
+                    remainingUsers === 0 &&
                     pagination.current > 1;
 
                 if (shouldGoToPreviousPage) {
-                    await dispatch(fetchUsers({ 
-                        page: pagination.current - 1, 
-                        pageSize: pagination.pageSize 
+                    await dispatch(fetchUsers({
+                        page: pagination.current - 1,
+                        pageSize: pagination.pageSize
                     }));
                 }
                 return { success: true };
@@ -98,8 +98,8 @@ export const useUsers = () => {
     );
 
     const handlePageChange = useCallback(
-        (page) => {
-            dispatch(fetchUsers({ page, pageSize: pagination.pageSize }));
+        (page, filters = {}) => {
+            dispatch(fetchUsers({ page, size: pagination.pageSize, ...filters }));
         },
         [dispatch, pagination.pageSize]
     );
@@ -108,9 +108,9 @@ export const useUsers = () => {
         async (userId, isActive) => {
             const result = await dispatch(updateUserStatus({ userId, isActive }));
             if (updateUserStatus.fulfilled.match(result)) {
-                await dispatch(fetchUsers({ 
-                    page: pagination.current, 
-                    pageSize: pagination.pageSize 
+                await dispatch(fetchUsers({
+                    page: pagination.current,
+                    pageSize: pagination.pageSize
                 }));
                 return { success: true };
             } else {

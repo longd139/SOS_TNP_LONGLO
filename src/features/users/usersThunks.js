@@ -3,9 +3,9 @@ import UserService from '../../services/userService';
 
 export const fetchUsers = createAsyncThunk(
     'users/fetchUsers',
-    async ({ page = 1, size = 10 } = {}, { rejectWithValue }) => {
+    async ({ page = 1, size = 10, isActive, vaiTro } = {}, { rejectWithValue }) => {
         try {
-            const response = await UserService.getAllUsers({ page, size });
+            const response = await UserService.getAllUsers({ page, size, isActive, vaiTro });
             return {
                 users: response.content || [],
                 pagination: {
