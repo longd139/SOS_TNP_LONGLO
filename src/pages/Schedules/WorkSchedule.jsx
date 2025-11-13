@@ -9,6 +9,7 @@ import WorkScheduleModal from "../../components/workSchedule/WorkScheduleModal";
 import dayjs from "dayjs";
 import { validateFileImport } from "../../validator/fileValidator";
 import { downloadUtils } from "../../utils/downLoadUtils";
+import { isPastDate } from "../../validator/workScheduleValidator";
 
 export default function WorkSchedule() {
     const {
@@ -252,8 +253,18 @@ export default function WorkSchedule() {
         return scheduleList;
     };
 
+    // Filter để chỉ hiển thị lịch từ ngày hôm nay trở đi
+    const filterUpcomingSchedules = (scheduleList) => {
+        return scheduleList.filter(schedule => {
+            const scheduleDate = schedule.ngay_tiep_dan || schedule.ngayTiepDan || schedule.date;
+            return !isPastDate(scheduleDate);
+        });
+    };
+
     const displaySchedules = filterByActive(
-        selectedDate ? getSchedulesForDate(selectedDate) : getSchedulesForDisplay()
+        selectedDate 
+            ? getSchedulesForDate(selectedDate) 
+            : getSchedulesForDisplay() // Hiển thị tất cả lịch, sắp xếp sẽ xử lý trong component
     );
 
     const handleActiveFilterChange = (filter) => {
@@ -268,7 +279,7 @@ export default function WorkSchedule() {
                         Quản lý lịch tiếp dân
                     </h1>
                     <p className="text-sm md:text-base text-gray-600">
-                        Lập lịch và quản lý lịch tiếp dân của lãnh đạo
+                        Lập lịch và quản lý lịch tiếp dân sắp tới của lãnh đạo
                     </p>
                 </div>
 
@@ -313,7 +324,7 @@ export default function WorkSchedule() {
                                     : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                                 }`}
                         >
-                            Tất cả ({schedules.length})
+                            Tất cả ({filterUpcomingSchedules(schedules).length})
                         </button>
                         <button
                             onClick={() => handleActiveFilterChange("active")}
@@ -324,7 +335,7 @@ export default function WorkSchedule() {
                         >
                             Hoạt động (
                             {
-                                schedules.filter(
+                                filterUpcomingSchedules(schedules).filter(
                                     (s) => s.is_active === true || s.isActive === true
                                 ).length
                             }
@@ -339,7 +350,7 @@ export default function WorkSchedule() {
                         >
                             Đã khóa (
                             {
-                                schedules.filter(
+                                filterUpcomingSchedules(schedules).filter(
                                     (s) => s.is_active === false || s.isActive === false
                                 ).length
                             }

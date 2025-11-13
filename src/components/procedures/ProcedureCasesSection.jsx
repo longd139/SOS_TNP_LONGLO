@@ -397,21 +397,6 @@ const ProcedureCasesSection = ({
                         type="button"
                         onClick={(e) => {
                           e.stopPropagation();
-                          toggleCase(caseIndex);
-                        }}
-                        className="text-gray-400 hover:text-gray-600 p-1"
-                        title={expandedCases[caseIndex] ? "Thu gọn" : "Mở rộng"}
-                      >
-                        {expandedCases[caseIndex] ? (
-                          <ChevronUp className="w-4 h-4" />
-                        ) : (
-                          <ChevronDown className="w-4 h-4" />
-                        )}
-                      </button>
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
                           setEditingCaseIndex(caseIndex);
                           setCaseForm({
                             ten_truong_hop: caseItem.ten_truong_hop || "",
