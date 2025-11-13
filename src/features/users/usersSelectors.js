@@ -6,7 +6,11 @@ export const selectUsers = (state) => state.users.users;
 
 export const selectCurrentUser = (state) => state.users.currentUser;
 
+export const selectSelectedUserDetail = (state) => state.users.selectedUserDetail;
+
 export const selectLoading = (state) => state.users.loading;
+
+export const selectDetailLoading = (state) => state.users.detailLoading;
 
 export const selectError = (state) => state.users.error;
 
