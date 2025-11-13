@@ -4,6 +4,7 @@ import BaseModal, { ModalFooter } from '../base/BaseModal';
 import { Upload, Eye, Download } from 'lucide-react';
 import { validateTemplateForm } from '../../validator/templateValidator';
 import { showToast } from '../../utils/toastNotification';
+import { downloadUtils } from '../../utils/downLoadUtils';
 
 const TemplateFormModal = ({
     isOpen,
@@ -248,14 +249,16 @@ const TemplateFormModal = ({
                                     >
                                         <Eye className="w-4 h-4" />
                                     </a>
-                                    <a
-                                        href={`${baseUrl}${initialData?.urlFilePdf ?? initialData?.url_file_pdf}`}
-                                        download
-                                        className="p-1.5 text-blue-600 hover:text-blue-700 hover:bg-blue-100 rounded transition-colors"
-                                        title="Tải xuống file PDF"
-                                    >
-                                        <Download className="w-4 h-4" />
-                                    </a>
+                                    <div>
+                                        <button
+                                            type="button"
+                                            onClick={() => downloadUtils.handleDownloadPdf(initialData)}
+                                            className="p-1.5 text-blue-600 hover:text-blue-700 hover:bg-blue-100 rounded transition-colors"
+                                            title="Tải xuống file PDF"
+                                        >
+                                            <Download className="w-4 h-4" />
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
