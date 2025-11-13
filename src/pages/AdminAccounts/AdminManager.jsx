@@ -2,6 +2,7 @@ import { useState } from 'react';
 import BaseTable from '../../components/base/BaseTable';
 import UserModal from '../../components/users/UserModal';
 import UserFilter from '../../components/admin/UserFilter';
+import UserViewModal from '../../components/admin/UserViewModal';
 import { ConfirmModal } from '../../components/base/BaseModal';
 import { ROLE_LABELS, ROLE_COLORS } from '../../constants/role';
 import { useUsers } from '../../hooks/useUsers';
@@ -13,12 +14,16 @@ export default function AdminManager() {
         loading,
         pagination,
         statistics,
+        selectedUserDetail,
+        detailLoading,
         handlePageChange,
         loadUsers,
         createUser,
         updateUser,
         updateStatus,
-        deleteUser: deleteUserAction
+        deleteUser: deleteUserAction,
+        getUserById,
+        clearUserDetail
     } = useUsers();
 
     const [modalLoading, setModalLoading] = useState(false);
@@ -33,6 +38,11 @@ export default function AdminManager() {
     });
 
     const [deleteModal, setDeleteModal] = useState({
+        isOpen: false,
+        user: null
+    });
+
+    const [viewModal, setViewModal] = useState({
         isOpen: false,
         user: null
     });
@@ -56,6 +66,36 @@ export default function AdminManager() {
             isOpen: true,
             user
         });
+    };
+
+    const handleViewUser = async (user) => {
+        try {
+            setViewModal({
+                isOpen: true,
+                user: null
+            });
+            
+            await getUserById(user.id);
+            
+            setViewModal({
+                isOpen: true,
+                user: user
+            });
+        } catch (error) {
+            showToast.error(error.message || 'Không thể tải thông tin người dùng');
+            setViewModal({
+                isOpen: false,
+                user: null
+            });
+        }
+    };
+
+    const handleViewModalClose = () => {
+        setViewModal({
+            isOpen: false,
+            user: null
+        });
+        clearUserDetail();
     };
 
     const canDelete = (user) => {
@@ -391,6 +431,7 @@ export default function AdminManager() {
                 loading={loading}
                 pagination={pagination}
                 onPageChange={handlePageChangeWithFilters}
+                onView={handleViewUser}
                 onEdit={handleEditUser}
                 onDelete={handleDeleteUser}
                 canDelete={canDelete}
@@ -404,6 +445,13 @@ export default function AdminManager() {
                 onSubmit={handleUserModalSubmit}
                 user={userModal.user}
                 loading={modalLoading}
+            />
+
+            <UserViewModal
+                isOpen={viewModal.isOpen}
+                onClose={handleViewModalClose}
+                userData={selectedUserDetail}
+                loading={detailLoading}
             />
 
             <ConfirmModal

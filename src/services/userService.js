@@ -64,6 +64,19 @@ export class UserService {
         }
     }
 
+    static async getUserById(userId) {
+        try {
+            if (!userId) {
+                throw new Error('User ID is required');
+            }
+
+            const result = await USER_API.getUserById(userId);
+            return result;
+        } catch (error) {
+            throw this.formatError(error);
+        }
+    }
+
     static formatError(error) {
         if (error.response?.data?.message) {
             return new Error(error.response.data.message);

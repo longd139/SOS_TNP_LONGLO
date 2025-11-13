@@ -3,7 +3,9 @@ import { useDispatch, useSelector } from 'react-redux';
 import {
     selectUsers,
     selectCurrentUser,
+    selectSelectedUserDetail,
     selectLoading,
+    selectDetailLoading,
     selectError,
     selectPagination,
     selectUserStatistics
@@ -13,12 +15,14 @@ import {
     createUser,
     updateUser,
     deleteUser,
-    updateUserStatus
+    updateUserStatus,
+    getUserById
 } from '../features/users/usersThunks';
 import {
     clearCurrentUser,
     clearError,
-    setCurrentUser
+    setCurrentUser,
+    clearSelectedUserDetail
 } from '../features/users/usersSlice';
 
 export const useUsers = () => {
@@ -26,7 +30,9 @@ export const useUsers = () => {
 
     const users = useSelector(selectUsers);
     const currentUser = useSelector(selectCurrentUser);
+    const selectedUserDetail = useSelector(selectSelectedUserDetail);
     const loading = useSelector(selectLoading);
+    const detailLoading = useSelector(selectDetailLoading);
     const error = useSelector(selectError);
     const pagination = useSelector(selectPagination);
     const statistics = useSelector(selectUserStatistics);
@@ -135,10 +141,28 @@ export const useUsers = () => {
         dispatch(clearError());
     }, [dispatch]);
 
+    const handleGetUserById = useCallback(
+        async (userId) => {
+            const result = await dispatch(getUserById(userId));
+            if (getUserById.fulfilled.match(result)) {
+                return { success: true, data: result.payload };
+            } else {
+                throw new Error(result.payload || 'Không thể tải thông tin người dùng');
+            }
+        },
+        [dispatch]
+    );
+
+    const clearUserDetail = useCallback(() => {
+        dispatch(clearSelectedUserDetail());
+    }, [dispatch]);
+
     return {
         users,
         currentUser,
+        selectedUserDetail,
         loading,
+        detailLoading,
         error,
         pagination,
         statistics,
@@ -148,9 +172,11 @@ export const useUsers = () => {
         updateUser: handleUpdateUser,
         updateStatus: handleUpdateStatus,
         deleteUser: handleDeleteUser,
+        getUserById: handleGetUserById,
         handlePageChange,
         selectUser,
         clearSelected,
+        clearUserDetail,
         clearError: clearErrorMessage
     };
 };
