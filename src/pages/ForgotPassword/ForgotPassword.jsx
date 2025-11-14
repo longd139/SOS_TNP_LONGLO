@@ -7,7 +7,7 @@ import ROUTE_PATH from "../../constants/routes";
 import { showToast } from "../../utils/toastNotification";
 
 export default function ForgotPassword() {
-    const [step, setStep] = useState(1); // 1: Nhập email, 2: Nhập OTP + password mới
+    const [step, setStep] = useState(1); 
     const [email, setEmail] = useState("");
     const [otp, setOtp] = useState("");
     const [matKhauMoi, setMatKhauMoi] = useState("");

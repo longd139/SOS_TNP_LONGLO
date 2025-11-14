@@ -80,7 +80,6 @@ export const verifyOtpUser = createAsyncThunk(
     async ({ otp, tenDangNhap }, { rejectWithValue }) => {
         try {
             const response = await AUTH_API.verify2FA({ otp, tenDangNhap });
-
             if (!response.success) throw new Error(response.message || 'OTP sai');
             
             const tokenData = response.data;

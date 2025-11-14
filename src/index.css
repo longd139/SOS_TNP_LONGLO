@@ -12,6 +12,7 @@
     body {
         font-size: 12px;
         line-height: 1.5;
+        overflow-x: hidden; /* Prevent horizontal scrolling globally */
     }
 
     h1 {
@@ -46,6 +47,21 @@
 
     button {
         font-size: 12px;
+    }
+}
+
+/* Utility classes for better text handling */
+@layer utilities {
+    .text-wrap {
+        word-wrap: break-word;
+        overflow-wrap: anywhere;
+        white-space: normal;
+    }
+    
+    .prevent-overflow {
+        max-width: 100%;
+        overflow-wrap: anywhere;
+        word-break: break-word;
     }
 }
 

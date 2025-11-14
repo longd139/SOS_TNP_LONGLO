@@ -68,16 +68,7 @@ export default function Login() {
     const handle2FASuccess = async (result) => {
         setShow2FAModal(false);
         dispatch(restoreUser());
-        const profileResult = await dispatch(fetchMyProfile());
-        
-        const userRole = profileResult?.payload?.role || result?.user?.role;
-        if (userRole !== 'ADMIN') {
-            localStorage.removeItem('accessToken');
-            localStorage.removeItem('refreshToken');
-            showToast.error('Bạn không có quyền truy cập vào hệ thống quản trị!');
-            navigate(ROUTE_PATH.LOGIN, { replace: true });
-            return;
-        }
+        await dispatch(fetchMyProfile());
         
         const redirectPath = getRedirectPathIfDisabled(ROUTE_PATH.DASHBOARD);
         navigate(redirectPath, { replace: true });
