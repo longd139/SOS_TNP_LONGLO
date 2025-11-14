@@ -71,7 +71,7 @@ const TemplateFormModal = ({
 
     const handleSubmit = async () => {
         const isValid = await validateForm();
-        
+
         if (!isValid) {
             showToast.error('Vui lòng kiểm tra lại các trường bắt buộc!');
             return;
@@ -81,7 +81,7 @@ const TemplateFormModal = ({
         try {
             const formDataToSubmit = new FormData();
             formDataToSubmit.append('tenMauDon', formData.tenMauDon.trim());
-            
+
             formDataToSubmit.append('maMauDon', formData.maMauDon.trim().toUpperCase());
 
             if (formData.moTa.trim()) {
@@ -172,38 +172,40 @@ const TemplateFormModal = ({
             }
         >
             <div className="space-y-4">
-                <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2 required-label">
-                        Tên biểu mẫu
-                    </label>
-                    <input
-                        type="text"
-                        value={formData.tenMauDon}
-                        onChange={(e) => updateField('tenMauDon', e.target.value)}
-                        placeholder="Nhập tên biểu mẫu..."
-                        className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.tenMauDon ? 'border-red-500' : 'border-gray-300'
-                            }`}
-                    />
-                    {errors.tenMauDon && (
-                        <p className="mt-1 text-sm text-red-600">{errors.tenMauDon}</p>
-                    )}
-                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2 required-label">
+                            Tên biểu mẫu
+                        </label>
+                        <input
+                            type="text"
+                            value={formData.tenMauDon}
+                            onChange={(e) => updateField('tenMauDon', e.target.value)}
+                            placeholder="Nhập tên biểu mẫu..."
+                            className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.tenMauDon ? 'border-red-500' : 'border-gray-300'
+                                }`}
+                        />
+                        {errors.tenMauDon && (
+                            <p className="mt-1 text-sm text-red-600">{errors.tenMauDon}</p>
+                        )}
+                    </div>
 
-                <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2 required-label">
-                        Mã biểu mẫu
-                    </label>
-                    <input
-                        type="text"
-                        value={formData.maMauDon}
-                        onChange={(e) => updateField('maMauDon', e.target.value)}
-                        placeholder="Nhập mã biểu mẫu"
-                        className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.maMauDon ? 'border-red-500' : 'border-gray-300'
-                            }`}
-                    />
-                    {errors.maMauDon && (
-                        <p className="mt-1 text-sm text-red-600">{errors.maMauDon}</p>
-                    )}
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2 required-label">
+                            Mã biểu mẫu
+                        </label>
+                        <input
+                            type="text"
+                            value={formData.maMauDon}
+                            onChange={(e) => updateField('maMauDon', e.target.value)}
+                            placeholder="Nhập mã biểu mẫu"
+                            className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.maMauDon ? 'border-red-500' : 'border-gray-300'
+                                }`}
+                        />
+                        {errors.maMauDon && (
+                            <p className="mt-1 text-sm text-red-600">{errors.maMauDon}</p>
+                        )}
+                    </div>
                 </div>
 
                 <div>

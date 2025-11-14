@@ -233,7 +233,7 @@ const ReportDetailModal = ({ isOpen, onClose, report, loading = false, onStatusU
                                         </label>
                                         <input
                                             type="datetime-local"
-                                            value={expectedResponseDate}
+                                            value={expectedResponseDate || dayjs(report?.thoi_gian_phan_hoi_du_kien).format('YYYY-MM-DDTHH:mm') || ''}
                                             onChange={(e) => setExpectedResponseDate(e.target.value)}
                                             className="w-full px-3 py-2 bg-gray-100 border-0 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
                                         />
@@ -245,7 +245,7 @@ const ReportDetailModal = ({ isOpen, onClose, report, loading = false, onStatusU
                                         </label>
                                         <input
                                             type="datetime-local"
-                                            value={expectedCompletionDate}
+                                            value={expectedCompletionDate || dayjs(report?.ngay_du_kien_hoan_thanh).format('YYYY-MM-DDTHH:mm') || ''}
                                             onChange={(e) => setExpectedCompletionDate(e.target.value)}
                                             className="w-full px-3 py-2 bg-gray-100 border-0 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
                                         />
