@@ -35,7 +35,7 @@ const menuItems = [
     },
     {
         id: 'areas',
-        label: 'Quản lý lĩnh vực',
+        label: 'Quản lý lĩnh vực thủ tục',
         icon: FileText,
         path: ROUTE_PATH.AREAS,
         hasSubmenu: false
