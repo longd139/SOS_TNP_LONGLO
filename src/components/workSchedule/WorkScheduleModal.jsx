@@ -211,7 +211,9 @@ const WorkScheduleModal = ({
         selectedDate.setHours(0, 0, 0, 0);
         
         if (selectedDate.getTime() === today.getTime()) {
-          const time24h = convertTo24Hour(value);
+          const time24h = value.includes('CH') || value.includes('SA') 
+            ? convertTo24Hour(value) 
+            : value;
           const [hours, minutes] = time24h.split(':').map(Number);
           const selectedDateTime = new Date();
           selectedDateTime.setHours(hours, minutes, 0, 0);
@@ -260,7 +262,9 @@ const WorkScheduleModal = ({
         selectedDate.setHours(0, 0, 0, 0);
         
         if (selectedDate.getTime() === today.getTime()) {
-          const time24h = convertTo24Hour(value);
+          const time24h = value.includes('CH') || value.includes('SA') 
+            ? convertTo24Hour(value) 
+            : value;
           const [hours, minutes] = time24h.split(':').map(Number);
           const selectedDateTime = new Date();
           selectedDateTime.setHours(hours, minutes, 0, 0);
@@ -280,8 +284,12 @@ const WorkScheduleModal = ({
       const ketThucValue = field === "ketThuc" ? value : formData.ketThuc;
       
       if (batDauValue && ketThucValue) {
-        const startTime24h = convertTo24Hour(batDauValue);
-        const endTime24h = convertTo24Hour(ketThucValue);
+        const startTime24h = batDauValue.includes('CH') || batDauValue.includes('SA') 
+          ? convertTo24Hour(batDauValue) 
+          : batDauValue;
+        const endTime24h = ketThucValue.includes('CH') || ketThucValue.includes('SA') 
+          ? convertTo24Hour(ketThucValue) 
+          : ketThucValue;
         
         if (startTime24h >= endTime24h) {
           if (field === "batDau") {
@@ -329,7 +337,8 @@ const WorkScheduleModal = ({
       onClose={handleClose}
       title={modalTitle}
       subtitle="Nhập thông tin lịch tiếp dân của lãnh đạo"
-      size="md"
+      size="3xl"
+      className="max-w-5xl"
       footer={
         <ModalFooter
           onCancel={handleClose}

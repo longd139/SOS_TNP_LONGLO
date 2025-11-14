@@ -87,7 +87,8 @@ const GovernmentFormModal = ({ isOpen, onClose, onCreate }) => {
             isOpen={isOpen}
             onClose={onClose}
             title="Tạo mới cơ sở dịch vụ công"
-            size="md"
+            size="3xl"
+            className="max-w-5xl"
             footer={
                 <ModalFooter
                     onCancel={onClose}

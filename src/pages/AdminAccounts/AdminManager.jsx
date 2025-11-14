@@ -2,7 +2,7 @@ import { useState } from 'react';
 import BaseTable from '../../components/base/BaseTable';
 import UserModal from '../../components/users/UserModal';
 import UserFilter from '../../components/admin/UserFilter';
-import UserViewModal from '../../components/admin/UserViewModal';
+import UserViewModal from '../../components/users/UserViewModal';
 import { ConfirmModal } from '../../components/base/BaseModal';
 import { ROLE_LABELS, ROLE_COLORS } from '../../constants/role';
 import { useUsers } from '../../hooks/useUsers';
@@ -162,6 +162,7 @@ export default function AdminManager() {
         loadUsers(1, pagination.pageSize, {
             isActive: filters.isActive !== '' ? filters.isActive : undefined,
             vaiTro: filters.vaiTro !== '' ? filters.vaiTro : undefined,
+            search: filters.searchKeyword !== '' ? filters.searchKeyword : undefined
         });
     };
 
@@ -177,6 +178,7 @@ export default function AdminManager() {
         loadUsers(1, pageSize || pagination.pageSize, {
             isActive: isActive !== undefined ? isActive : undefined,
             vaiTro: vaiTro || undefined,
+            search: searchKeyword || undefined
         });
     };
 
@@ -193,6 +195,7 @@ export default function AdminManager() {
         loadUsers(1, newPageSize, {
             isActive: filters.isActive !== '' ? filters.isActive : undefined,
             vaiTro: filters.vaiTro !== '' ? filters.vaiTro : undefined,
+            search: filters.searchKeyword !== '' ? filters.searchKeyword : undefined
         });
     };
 

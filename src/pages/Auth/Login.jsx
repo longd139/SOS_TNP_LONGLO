@@ -168,7 +168,7 @@ export default function Login() {
                     <div className="text-center mt-2">
                         <button
                             type="button"
-                            onClick={() => navigate("/forgot-password")}
+                            onClick={() => navigate(ROUTE_PATH.FORGOT_PASSWORD)}
                             className="text-sm text-blue-600 hover:underline"
                         >
                             Quên mật khẩu?

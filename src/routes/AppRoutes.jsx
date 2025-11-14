@@ -19,12 +19,19 @@ import AdminManager from "../pages/AdminAccounts/AdminManager";
 import NotFound from "../pages/NotFound";
 import Statistics from "../pages/Statistic/Statistic";
 import ROUTE_PATH from "../constants/routes";
+import ReportAreasManagement from "../pages/ReportAreas/ReportAreasManagement";
+import AreaManagement from "../pages/Areas/AreaManagement";
+import ForgotPassword from "../pages/ForgotPassword/ForgotPassword";
 
 function AppRoutes() {
     return (
         <Routes>
             <Route element={<AuthLayout />}>
                 <Route path={ROUTE_PATH.LOGIN} element={<Login />} />
+            </Route>
+
+            <Route element={<AuthLayout />}>
+                <Route path={ROUTE_PATH.FORGOT_PASSWORD} element={<ForgotPassword />} />
             </Route>
 
             <Route element={
@@ -45,6 +52,8 @@ function AppRoutes() {
                 <Route path={ROUTE_PATH.SCHEDULES} element={<WorkSchedule />} />
                 <Route path={ROUTE_PATH.STATISTICS} element={<Statistics />} />
                 <Route path={ROUTE_PATH.ACCOUNTS} element={<AdminManager />} />
+                <Route path={ROUTE_PATH.REPORT_AREAS} element={<ReportAreasManagement />} />
+                <Route path={ROUTE_PATH.AREAS} element={<AreaManagement />} />
             </Route>
 
             <Route path={ROUTE_PATH.NOT_FOUND} element={<NotFound />} />

@@ -6,7 +6,8 @@ import {
     deleteWorkSchedule, 
     getTemplateWorkSchedule,
     createWorkSchedule,
-    updateWorkSchedule
+    updateWorkSchedule,
+    fetchWorkSchedulesPagination
 } from './workScheduleThunks';
 
 const initialState = {
@@ -22,7 +23,13 @@ const initialState = {
     },
     selectedMonth: new Date().getMonth() + 1,
     selectedYear: new Date().getFullYear(),
-    showActive: true
+    showActive: true,
+    pagination: {
+        currentPage: 1,
+        pageSize: 10,
+        totalPages: 1,
+        totalItems: 0
+    }
 };
 
 const workScheduleSlice = createSlice({
@@ -161,6 +168,25 @@ const workScheduleSlice = createSlice({
             .addCase(updateWorkSchedule.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload?.message || 'Cập nhật lịch tiếp dân thất bại';
+            })
+            
+            .addCase(fetchWorkSchedulesPagination.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(fetchWorkSchedulesPagination.fulfilled, (state, action) => {
+                state.loading = false;
+                state.schedules = action.payload.data || [];
+                state.pagination = action.payload.pagination || {
+                    currentPage: 1,
+                    pageSize: 10,
+                    totalPages: 1,
+                    totalItems: 0
+                };
+            })
+            .addCase(fetchWorkSchedulesPagination.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload?.message || 'Lấy danh sách lịch tiếp dân thất bại';
             });
     }
 });

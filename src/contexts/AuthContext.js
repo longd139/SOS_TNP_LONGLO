@@ -2,6 +2,7 @@ import { createContext, useContext } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { logout } from '../features/auth/authSlice';
 import { selectAuthState } from '../features/auth/authSelectors';
+import { clearProfile } from '../features/userProfile/userProfileSlice';
 import { ROLE } from '../constants/role';
 
 const AuthContext = createContext();
@@ -18,6 +19,7 @@ export const AuthProvider = ({ children }) => {
         localStorage.removeItem('accessToken');
         localStorage.removeItem('refreshToken');
         dispatch(logout());
+        dispatch(clearProfile());
     };
 
     const value = {

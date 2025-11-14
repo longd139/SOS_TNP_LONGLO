@@ -40,6 +40,7 @@ const getAllUsersWithPagination = async ({
     size = 10,
     isActive,
     vaiTro,
+    search
 }) => {
     try {
         const params = new URLSearchParams({
@@ -53,6 +54,9 @@ const getAllUsersWithPagination = async ({
 
         if (vaiTro && vaiTro !== '') {
             params.append('vaiTro', vaiTro);
+        }
+        if (search && search.trim() !== '') {
+            params.append('search', search.trim());
         }
 
         const response = await apiClient.get("/api/users", { params });
@@ -131,7 +135,10 @@ const updateUserProfileByAdmin = async (userData) => {
             userId: userData.id,
             hoVaTen: userData.fullName,
             soDienThoai: userData.phone || "",
-            vaiTro: userData.role
+            vaiTro: userData.role,
+            tenDangNhap: userData.username,
+            email: userData.email,
+            matKhau: userData.password || undefined,
         };
 
         const response = await apiClient.put("/api/users/update-by-admin", requestData);

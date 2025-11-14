@@ -159,7 +159,8 @@ const TemplateFormModal = ({
             isOpen={isOpen}
             onClose={handleClose}
             title={modalTitle}
-            size="lg"
+            size="3xl"
+            className="max-w-5xl"
             footer={
                 <ModalFooter
                     onCancel={handleClose}

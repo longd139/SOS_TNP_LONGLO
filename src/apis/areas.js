@@ -100,13 +100,38 @@ const updateAreaStatus = async (areaId, isActive) => {
     }
 }
 
+const getAreasPagination = async (page, size , isActive, search) => {
+    try {
+        const params = new URLSearchParams();
+        params.append('page', page);
+        params.append('size', size );
+        if (typeof isActive === 'boolean') {
+            params.append('isActive', isActive);
+        }
+        if (typeof search === 'string') {
+            params.append('search', search);
+        }
+        const response = await apiClient.get("/api/linh-vuc/pagination", { params });
+        if (response.data.success) {
+            return response.data;
+        }
+        else throw new Error(response.data.message || "Lấy danh sách lĩnh vực thất bại");
+    } catch (error) {
+        if (error.response?.data?.message) {
+            throw new Error(error.response.data.message);
+        }
+        throw error;
+    }
+}
+
 export const AREAS_API = {
     getAreas,
     createAreas,
     updateArea,
     deleteArea,
     getAreaById,
-    updateAreaStatus
+    updateAreaStatus,
+    getAreasPagination
 };
 
 export default AREAS_API;

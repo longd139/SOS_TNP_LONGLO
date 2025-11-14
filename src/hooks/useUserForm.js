@@ -84,7 +84,9 @@ export const useUserForm = ({ initialUser = null, isOpen = false }) => {
                 fullName: formData.fullName?.trim() || '',
                 phone: formData.phone?.trim() || '',
                 role: formData.role,
-                active: formData.active
+                username: formData.username?.trim() || '',
+                email: formData.email?.trim() || '',
+                password: formData.password.trim() || undefined,
             };
         } else {
             return {

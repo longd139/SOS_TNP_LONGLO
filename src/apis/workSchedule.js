@@ -151,6 +151,39 @@ const createWorkSchedule = async (scheduleData) => {
     }
 }
 
+const getWorkSchedulesPagination = async (
+    weekYear,
+    monthYear,
+    date,
+    isActive,
+    page,
+    size
+) => {
+    try {
+        const params = new URLSearchParams({
+            page: page || 1,
+            size: size || 10
+        });
+        if (weekYear) params.append('weekYear', weekYear);
+        if (monthYear) params.append('monthYear', monthYear);
+        if (date) params.append('date', date);
+        if (typeof isActive === 'boolean') params.append('isActive', isActive);
+
+        const response = await apiFormClient.get('/api/lich-tiep-dan/pagination', { params });
+        
+        if (response.data.success) {
+            return response.data;
+        } else {
+            throw new Error(response.data.message || "Lấy lịch tiếp dân thất bại");
+        }
+    } catch (error) {
+        if (error.response?.data?.message) {
+            throw new Error(error.response.data.message);
+        }   
+        throw error;
+    }
+}
+
 export const WORK_SCHEDULE_API = {
     importWorkSchedule,
     getWorkSchedules,
@@ -159,5 +192,6 @@ export const WORK_SCHEDULE_API = {
     getTemplateWorkSchedule,
     getWorkScheduleById,
     updateWorkSchedule,
-    createWorkSchedule
+    createWorkSchedule,
+    getWorkSchedulesPagination
 };

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { loginUser, verifyOtpUser } from '../features/auth/authThunks';
 import { clearErrors, logout } from '../features/auth/authSlice';
 import { selectAuthState } from '../features/auth/authSelectors';
+import { clearProfile } from '../features/userProfile/userProfileSlice';
 import { ROLE } from '../constants/role';
 import ROUTE_PATH from '../constants/routes';
 import { showToast } from '../utils/toastNotification';
@@ -19,6 +20,7 @@ export const useLogin = () => {
             localStorage.removeItem('accessToken');
             localStorage.removeItem('refreshToken');
             dispatch(logout());
+            dispatch(clearProfile());
             showToast.error('Bạn không có quyền truy cập vào hệ thống quản trị!');
             navigate(ROUTE_PATH.LOGIN, { replace: true });
         }

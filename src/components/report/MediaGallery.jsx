@@ -67,21 +67,21 @@ const MediaGallery = ({ images = [], videos = [], apiUrl }) => {
     const renderImageGrid = () => {
         if (!hasImages) return null;
 
-        const displayImages = images.slice(0, 2);
-        const remainingCount = images.length - 2;
+        const displayImages = images.slice(0, 3);
+        const remainingCount = images.length - 3;
 
         return (
             <div>
-                <h4 className="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                <h4 className="text-sm font-semibold text-gray-900 mb-2 flex items-center gap-2">
                     <ImageIcon className="w-4 h-4" />
-                    Hình ảnh đính kèm ({images.length})
+                    Hình ảnh ({images.length})
                 </h4>
-                <div className={`grid gap-1 ${images.length === 1 ? 'grid-cols-1' : 'grid-cols-2'}`}>
+                <div className="grid grid-cols-3 gap-2">
                     {displayImages.map((file, index) => (
                         <div
                             key={index}
                             className="relative group cursor-pointer overflow-hidden rounded-lg bg-gray-100"
-                            style={{ paddingBottom: images.length === 1 ? '56.25%' : '100%' }}
+                            style={{ paddingBottom: '75%' }}
                             onClick={() => openImagePreview(index)}
                         >
                             {file.dinh_dang_file?.startsWith("image/") ? (
@@ -91,9 +91,9 @@ const MediaGallery = ({ images = [], videos = [], apiUrl }) => {
                                         alt={`Attachment ${index + 1}`}
                                         className="absolute inset-0 w-full h-full object-cover group-hover:opacity-90 transition-opacity"
                                     />
-                                    {index === 1 && remainingCount > 0 && (
+                                    {index === 2 && remainingCount > 0 && (
                                         <div className="absolute inset-0 bg-black bg-opacity-60 flex items-center justify-center">
-                                            <span className="text-white text-3xl font-semibold">
+                                            <span className="text-white text-2xl font-semibold">
                                                 +{remainingCount}
                                             </span>
                                         </div>
@@ -101,7 +101,7 @@ const MediaGallery = ({ images = [], videos = [], apiUrl }) => {
                                 </>
                             ) : (
                                 <div className="absolute inset-0 flex items-center justify-center">
-                                    <ImageIcon className="w-12 h-12 text-gray-400" />
+                                    <ImageIcon className="w-8 h-8 text-gray-400" />
                                 </div>
                             )}
                         </div>
@@ -114,39 +114,39 @@ const MediaGallery = ({ images = [], videos = [], apiUrl }) => {
     const renderVideoGrid = () => {
         if (!hasVideos) return null;
 
-        const displayVideos = videos.slice(0, 2);
-        const remainingCount = videos.length - 2;
+        const displayVideos = videos.slice(0, 3);
+        const remainingCount = videos.length - 3;
 
         return (
             <div>
-                <h4 className="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                <h4 className="text-sm font-semibold text-gray-900 mb-2 flex items-center gap-2">
                     <VideoIcon className="w-4 h-4" />
-                    Video đính kèm ({videos.length})
+                    Video ({videos.length})
                 </h4>
-                <div className={`grid gap-1 ${videos.length === 1 ? 'grid-cols-1' : 'grid-cols-2'}`}>
+                <div className="grid grid-cols-3 gap-2">
                     {displayVideos.map((video, index) => (
                         <div
                             key={index}
                             className="relative group cursor-pointer overflow-hidden rounded-lg bg-gray-900"
-                            style={{ paddingBottom: videos.length === 1 ? '56.25%' : '100%' }}
+                            style={{ paddingBottom: '75%' }}
                             onClick={() => openVideoPreview(index)}
                         >
                             <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-b from-transparent to-black">
                                 <div className="absolute inset-0 flex items-center justify-center">
-                                    <div className="bg-white bg-opacity-90 rounded-full p-4 group-hover:bg-opacity-100 transition-all">
-                                        <Play className="w-8 h-8 text-gray-900" fill="currentColor" />
+                                    <div className="bg-white bg-opacity-90 rounded-full p-3 group-hover:bg-opacity-100 transition-all">
+                                        <Play className="w-6 h-6 text-gray-900" fill="currentColor" />
                                     </div>
                                 </div>
-                                {index === 1 && remainingCount > 0 && (
+                                {index === 2 && remainingCount > 0 && (
                                     <div className="absolute inset-0 bg-black bg-opacity-60 flex items-center justify-center">
-                                        <span className="text-white text-3xl font-semibold">
+                                        <span className="text-white text-2xl font-semibold">
                                             +{remainingCount}
                                         </span>
                                     </div>
                                 )}
                             </div>
                             <div className="absolute bottom-2 left-2 right-2">
-                                <div className="flex items-center gap-2 text-white text-xs">
+                                <div className="flex items-center gap-1 text-white text-xs">
                                     <VideoIcon className="w-3 h-3" />
                                     <span>Video {index + 1}</span>
                                 </div>
@@ -162,7 +162,7 @@ const MediaGallery = ({ images = [], videos = [], apiUrl }) => {
 
     return (
         <>
-            <div className="space-y-4">
+            <div className="space-y-3">
                 {renderImageGrid()}
                 {renderVideoGrid()}
             </div>

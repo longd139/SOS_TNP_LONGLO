@@ -1,4 +1,4 @@
-import { BarChart3, Calendar, FileText, FolderOpen, LayoutDashboard, MessageSquare, Newspaper, Phone, UserCog, Menu, ChevronLeft, X } from 'lucide-react';
+import { BarChart3, Calendar, FileText, FolderOpen, LayoutDashboard, MessageSquare, Newspaper, Phone, UserCog, Menu, ChevronLeft, X, ClipboardList } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import ROUTE_PATH from '../../constants/routes';
@@ -16,56 +16,70 @@ const menuItems = [
         id: 'reports',
         label: 'Quản lý phản ánh',
         icon: MessageSquare,
-        path: '/reports',
+        path: ROUTE_PATH.REPORT,
+        hasSubmenu: false
+    },
+    {
+        id: 'report-areas',
+        label: 'Quản lý lĩnh vực phản ánh',
+        icon: ClipboardList,
+        path: ROUTE_PATH.REPORT_AREAS,
         hasSubmenu: false
     },
     {
         id: 'news',
         label: 'Tin tức & Thông báo',
         icon: Newspaper,
-        path: '/news',
+        path: ROUTE_PATH.NEWS,
+        hasSubmenu: false
+    },
+    {
+        id: 'areas',
+        label: 'Quản lý lĩnh vực thủ tục',
+        icon: FileText,
+        path: ROUTE_PATH.AREAS,
         hasSubmenu: false
     },
     {
         id: 'procedures',
         label: 'Thủ tục hành chính',
         icon: FileText,
-        path: '/procedures',
+        path: ROUTE_PATH.PROCEDURES,
         hasSubmenu: false
     },
     {
         id: 'templates',
         label: 'Biểu mẫu',
         icon: FolderOpen,
-        path: '/templates',
+        path: ROUTE_PATH.TEMPLATES,
         hasSubmenu: false
     },
     {
         id: 'contact',
         label: 'Ủy ban Phường',
         icon: Phone,
-        path: '/contact',
+        path: ROUTE_PATH.CONTACT,
         hasSubmenu: false
     },
     {
         id: 'schedule',
         label: 'Lịch tiếp dân',
         icon: Calendar,
-        path: '/schedules',
+        path: ROUTE_PATH.SCHEDULES,
         hasSubmenu: false
     },
     {
         id: 'statistics',
         label: 'Báo cáo & Thống kê',
         icon: BarChart3,
-        path: '/statistics',
+        path: ROUTE_PATH.STATISTICS,
         hasSubmenu: false
     },
     {
         id: 'accounts',
         label: 'Quản lý tài khoản',
         icon: UserCog,
-        path: '/accounts',
+        path: ROUTE_PATH.ACCOUNTS,
         hasSubmenu: false
     }
 ];

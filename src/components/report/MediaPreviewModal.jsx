@@ -102,7 +102,7 @@ const MediaPreviewModal = ({ isOpen, onClose, mediaItems = [], initialIndex = 0 
     const currentMedia = mediaItems[currentIndex];
 
     return (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center" onClick={onClose}>
+        <div className="fixed inset-0 z-[100] h-full flex items-center justify-center" onClick={onClose}>
             <div
                 className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
                 aria-hidden="true"
@@ -116,7 +116,7 @@ const MediaPreviewModal = ({ isOpen, onClose, mediaItems = [], initialIndex = 0 
             </span>
 
             <div 
-                className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-xl sm:w-full"
+                className="inline-block align-middle bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all w-full max-w-5xl"
                 onClick={(e) => e.stopPropagation()}
             >
                 <div className="bg-white">
@@ -132,7 +132,7 @@ const MediaPreviewModal = ({ isOpen, onClose, mediaItems = [], initialIndex = 0 
                         </button>
                     </div>
 
-                    <div className="relative bg-black" style={{ height: '400px' }}>
+                    <div className="relative bg-black" style={{ height: '90vh', maxHeight: '90vh' }}>
                         {mediaItems.length > 1 && (
                             <>
                                 <button
@@ -156,35 +156,35 @@ const MediaPreviewModal = ({ isOpen, onClose, mediaItems = [], initialIndex = 0 
                                 <img
                                     src={currentMedia.url}
                                     alt={`Media ${currentIndex + 1}`}
-                                    className="max-w-full max-h-full object-contain"
+                                    className="w-full h-full object-contain"
                                 />
                             ) : (
                                 <video
                                     ref={videoRef}
                                     controls
-                                    className="max-w-full max-h-full"
+                                    className="w-full h-full object-contain"
                                 >
                                     Your browser does not support the video tag.
                                 </video>
                             )}
                         </div>
+                        
+                        {mediaItems.length > 1 && (
+                            <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex justify-center gap-2 z-20 bg-black bg-opacity-50 px-3 py-2 rounded-full">
+                                {mediaItems.map((_, index) => (
+                                    <button
+                                        key={index}
+                                        onClick={() => setCurrentIndex(index)}
+                                        className={`w-2 h-2 rounded-full transition-all ${
+                                            index === currentIndex
+                                                ? "bg-blue-500 w-6"
+                                                : "bg-white bg-opacity-70 hover:bg-opacity-100"
+                                        }`}
+                                    />
+                                ))}
+                            </div>
+                        )}
                     </div>
-
-                    {mediaItems.length > 1 && (
-                        <div className="px-4 py-3 bg-gray-50 flex justify-center gap-2">
-                            {mediaItems.map((_, index) => (
-                                <button
-                                    key={index}
-                                    onClick={() => setCurrentIndex(index)}
-                                    className={`w-2 h-2 rounded-full transition-all ${
-                                        index === currentIndex
-                                            ? "bg-blue-600 w-6"
-                                            : "bg-gray-300 hover:bg-gray-400"
-                                    }`}
-                                />
-                            ))}
-                        </div>
-                    )}
                 </div>
             </div>
         </div>
