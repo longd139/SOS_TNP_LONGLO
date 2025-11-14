@@ -40,6 +40,7 @@ const getAllUsersWithPagination = async ({
     size = 10,
     isActive,
     vaiTro,
+    search
 }) => {
     try {
         const params = new URLSearchParams({
@@ -53,6 +54,9 @@ const getAllUsersWithPagination = async ({
 
         if (vaiTro && vaiTro !== '') {
             params.append('vaiTro', vaiTro);
+        }
+        if (search && search.trim() !== '') {
+            params.append('search', search.trim());
         }
 
         const response = await apiClient.get("/api/users", { params });

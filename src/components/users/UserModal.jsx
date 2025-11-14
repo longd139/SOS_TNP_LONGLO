@@ -39,7 +39,8 @@ const UserModal = ({
             isOpen={isOpen}
             onClose={handleClose}
             title={isEditMode ? 'Chỉnh sửa tài khoản' : 'Thêm tài khoản mới'}
-            size="lg"
+            size="3xl"
+            className="max-w-5xl"
             footer={
                 <ModalFooter
                     onCancel={handleClose}

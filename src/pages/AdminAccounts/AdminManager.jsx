@@ -162,6 +162,7 @@ export default function AdminManager() {
         loadUsers(1, pagination.pageSize, {
             isActive: filters.isActive !== '' ? filters.isActive : undefined,
             vaiTro: filters.vaiTro !== '' ? filters.vaiTro : undefined,
+            search: filters.searchKeyword !== '' ? filters.searchKeyword : undefined
         });
     };
 
@@ -177,6 +178,7 @@ export default function AdminManager() {
         loadUsers(1, pageSize || pagination.pageSize, {
             isActive: isActive !== undefined ? isActive : undefined,
             vaiTro: vaiTro || undefined,
+            search: searchKeyword || undefined
         });
     };
 
@@ -193,6 +195,7 @@ export default function AdminManager() {
         loadUsers(1, newPageSize, {
             isActive: filters.isActive !== '' ? filters.isActive : undefined,
             vaiTro: filters.vaiTro !== '' ? filters.vaiTro : undefined,
+            search: filters.searchKeyword !== '' ? filters.searchKeyword : undefined
         });
     };
 

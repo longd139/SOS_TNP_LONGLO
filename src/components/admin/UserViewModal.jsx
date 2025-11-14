@@ -24,7 +24,8 @@ const UserViewModal = ({ isOpen, onClose, userData, loading = false }) => {
             isOpen={isOpen}
             onClose={onClose}
             title="Thông tin chi tiết người dùng"
-            size="xl"
+            size="3xl"
+            className="max-w-5xl"
         >
             {loading ? (
                 <div className="py-12 text-center">

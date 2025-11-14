@@ -18,7 +18,8 @@ const ProcedureDetailModal = ({ isOpen, onClose, procedure }) => {
             isOpen={isOpen}
             onClose={onClose}
             title="Chi tiết thủ tục hành chính"
-            size="2xl"
+            size="3xl"
+            className="max-w-5xl"
             footer={
                 <div className="flex justify-end">
                     <button

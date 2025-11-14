@@ -116,7 +116,7 @@ const MediaPreviewModal = ({ isOpen, onClose, mediaItems = [], initialIndex = 0 
             </span>
 
             <div 
-                className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-xl sm:w-full"
+                className="inline-block align-middle bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all w-full max-w-5xl"
                 onClick={(e) => e.stopPropagation()}
             >
                 <div className="bg-white">
@@ -132,7 +132,7 @@ const MediaPreviewModal = ({ isOpen, onClose, mediaItems = [], initialIndex = 0 
                         </button>
                     </div>
 
-                    <div className="relative bg-black" style={{ height: '400px' }}>
+                    <div className="relative bg-black" style={{ height: '70vh' }}>
                         {mediaItems.length > 1 && (
                             <>
                                 <button

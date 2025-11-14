@@ -210,7 +210,11 @@ export default function BaseFilter({
 
                 {showFilters && advancedFields.length > 0 && (
                     <div className="mt-4 pt-4 border-t border-gray-200">
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div className={`grid gap-4 ${
+                            advancedFields.length === 1 ? 'grid-cols-1' :
+                            advancedFields.length === 2 ? 'grid-cols-1 md:grid-cols-2' :
+                            'grid-cols-1 md:grid-cols-3'
+                        }`}>
                             {advancedFields.map(renderField)}
                         </div>
                     </div>

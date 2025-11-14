@@ -28,6 +28,7 @@ const NewsPreviewModal = ({ isOpen, onClose, newsData, isPreview = false }) => {
             onClose={onClose}
             title="Xem trước bài viết"
             size="3xl"
+            className="max-w-5xl"
         >
             <div className="space-y-4">
                 {imageUrl && (
