@@ -19,6 +19,11 @@ const userProfileSlice = createSlice({
         clearUpdateError: (state) => {
             state.updateError = null;
         },
+        clearProfile: (state) => {
+            state.profile = null;
+            state.error = null;
+            state.updateError = null;
+        },
     },
     extraReducers: (builder) => {
         builder
@@ -50,5 +55,5 @@ const userProfileSlice = createSlice({
     },
 });
 
-export const { clearError, clearUpdateError } = userProfileSlice.actions;
+export const { clearError, clearUpdateError, clearProfile } = userProfileSlice.actions;
 export default userProfileSlice.reducer;
