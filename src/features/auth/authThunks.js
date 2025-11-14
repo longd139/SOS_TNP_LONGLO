@@ -142,3 +142,102 @@ export const changePassword = createAsyncThunk(
         }
     }
 );
+
+export const sendOtpToEmail = createAsyncThunk(
+    'auth/sendOtpToEmail',
+    async ({ email, type = 'RESET_PASSWORD' }, { rejectWithValue }) => {
+        try {
+            if (!email) {
+                throw new Error('Vui lòng nhập email');
+            }
+
+            // Validate email format
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                throw new Error('Định dạng email không hợp lệ');
+            }
+
+            const response = await AUTH_API.sendOtpToEmail({ email });
+
+            showToast.success('Mã OTP đã được gửi đến email của bạn');
+
+            return {
+                message: 'Gửi OTP thành công',
+                email: email,
+                data: response,
+            };
+        } catch (error) {
+            const fieldErrors = {};
+            if (error.errors && Array.isArray(error.errors)) {
+                error.errors.forEach(err => {
+                    if (err.field && err.message) {
+                        fieldErrors[err.field] = err.message;
+                    }
+                });
+            }
+
+            showToast.error(error.message);
+            return rejectWithValue({ 
+                message: error.message || 'Gửi OTP thất bại',
+                errors: fieldErrors
+            });
+        }
+    }
+);
+
+export const resetPassword = createAsyncThunk(
+    'auth/resetPassword',
+    async ({ email, matKhauMoi, confirmMatKhauMoi, otp }, { rejectWithValue }) => {
+        try {
+            if (!email || !matKhauMoi || !confirmMatKhauMoi || !otp) {
+                throw new Error('Vui lòng điền đầy đủ thông tin');
+            }
+
+            // Validate email format
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                throw new Error('Định dạng email không hợp lệ');
+            }
+
+            if (matKhauMoi !== confirmMatKhauMoi) {
+                throw new Error('Mật khẩu mới không khớp');
+            }
+
+            if (matKhauMoi.length < 6) {
+                throw new Error('Mật khẩu mới phải có ít nhất 6 ký tự');
+            }
+
+            if (otp.length !== 6) {
+                throw new Error('Mã OTP phải có 6 số');
+            }
+
+            const response = await AUTH_API.resetPassword({
+                email,
+                matKhauMoi,
+                otp
+            });
+
+            showToast.success('Đặt lại mật khẩu thành công');
+
+            return {
+                message: 'Đặt lại mật khẩu thành công',
+                data: response,
+            };
+        } catch (error) {
+            const fieldErrors = {};
+            if (error.errors && Array.isArray(error.errors)) {
+                error.errors.forEach(err => {
+                    if (err.field && err.message) {
+                        fieldErrors[err.field] = err.message;
+                    }
+                });
+            }
+
+            showToast.error(error.message);
+            return rejectWithValue({ 
+                message: error.message || 'Đặt lại mật khẩu thất bại',
+                errors: fieldErrors
+            });
+        }
+    }
+);

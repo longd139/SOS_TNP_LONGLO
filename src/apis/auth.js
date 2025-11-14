@@ -116,14 +116,31 @@ export const sendOtpApi = async ({ email, type = 'LOGIN' }) => {
     }
 };
 
+const sendOtpToEmailApi = async ({ email }) => {
+    try {
+        const response = await apiClient.post('/api/auths/send-otp?type=RESET_PASSWORD', {
+            email
+        });
 
+        if (response.data.success) {
+            return response.data.data;
+        } else {
+            throw new Error(response.data.message || "Gửi OTP để đặt lại mật khẩu thất bại");
+        }
+    } catch (error) {
+        if (error.response?.data?.message) {
+            throw new Error(error.response.data.message);
+        }
+        throw error;
+    }
+};
 
 
 const resetPasswordApi = async (data) => {
     try {
         const response = await apiClient.put('/api/auths/reset-password', {
             email: data.email,
-            matKhauMoi: data.matKhauMoi,
+            newPassword: data.matKhauMoi,
             otp: data.otp
         });
         if (response.data.success) return response.data.data;
@@ -157,6 +174,7 @@ export const AUTH_API = {
     enableOrDisable2FA: enableOrDisable2FAApi,
     verify2FA: verify2FAApi,
     sendOtp: sendOtpApi,
+    sendOtpToEmail: sendOtpToEmailApi,
     resetPassword: resetPasswordApi,
     verifiedStatus2FA: verifiedStatus2FAApi,
 }

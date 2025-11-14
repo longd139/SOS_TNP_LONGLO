@@ -16,6 +16,7 @@ const ROUTE_PATH = {
     ACCOUNTS: '/accounts',
     NOT_FOUND: '*',
     REPORT_AREAS: '/report-areas',
-    AREAS: '/areas'
+    AREAS: '/areas',
+    FORGOT_PASSWORD: '/forgot-password'
 }
 export default ROUTE_PATH;
