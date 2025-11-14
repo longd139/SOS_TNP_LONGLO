@@ -1,10 +1,11 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { loginUser, verifyOtpUser } from '../features/auth/authThunks';
-import { clearErrors } from '../features/auth/authSlice';
+import { clearErrors, logout } from '../features/auth/authSlice';
 import { selectAuthState } from '../features/auth/authSelectors';
 import { ROLE } from '../constants/role';
 import ROUTE_PATH from '../constants/routes';
+import { showToast } from '../utils/toastNotification';
 
 export const useLogin = () => {
     const dispatch = useDispatch();
@@ -12,8 +13,15 @@ export const useLogin = () => {
     const { loading, errors, apiError, otpRequired, requiresTwoFactorAuth, email, tenDangNhap, user } = useSelector(selectAuthState);
 
     const handleRedirect = (role) => {
-        if (role === ROLE.ADMIN) navigate(ROUTE_PATH.DASHBOARD, { replace: true });
-        else navigate(ROUTE_PATH.LOGIN, { replace: true });
+        if (role === ROLE.ADMIN) {
+            navigate(ROUTE_PATH.DASHBOARD, { replace: true });
+        } else {
+            localStorage.removeItem('accessToken');
+            localStorage.removeItem('refreshToken');
+            dispatch(logout());
+            showToast.error('Bạn không có quyền truy cập vào hệ thống quản trị!');
+            navigate(ROUTE_PATH.LOGIN, { replace: true });
+        }
     };
 
     const login = async (credentials) => {

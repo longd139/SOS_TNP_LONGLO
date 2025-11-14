@@ -7,7 +7,8 @@ import {
     deleteWorkSchedule, 
     getTemplateWorkSchedule,
     createWorkSchedule,
-    updateWorkSchedule
+    updateWorkSchedule,
+    fetchWorkSchedulesPagination
 } from '../features/workSchedule/workScheduleThunks';
 import { 
     clearError,
@@ -33,7 +34,8 @@ import {
     selectSchedulesForDisplay,
     selectSchedulesForMonth,
     selectHasScheduleForDay,
-    selectScheduleStatistics
+    selectScheduleStatistics,
+    selectSchedulePagination
 } from '../features/workSchedule/workScheduleSelectors';
 import { normalizeDate, formatDateVN, createDateString } from '../utils/dateUtils';
 
@@ -50,6 +52,7 @@ export const useSchedule = () => {
     const schedulesForMonth = useSelector(selectSchedulesForMonth);
     const hasScheduleForDay = useSelector(selectHasScheduleForDay);
     const statistics = useSelector(selectScheduleStatistics);
+    const pagination = useSelector(selectSchedulePagination);
 
     const getSchedulesForDate = useCallback((date) => {
         if (!date) return [];
@@ -77,6 +80,18 @@ export const useSchedule = () => {
             ...params
         };
         return dispatch(fetchWorkSchedules(defaultParams));
+    }, [dispatch, filters]);
+
+    const fetchSchedulesPagination = useCallback((params = {}) => {
+        const defaultParams = {
+            weekYear: filters.weekYear,
+            monthYear: filters.monthYear,
+            date: filters.date,
+            page: 1,
+            size: 10,
+            ...params
+        };
+        return dispatch(fetchWorkSchedulesPagination(defaultParams));
     }, [dispatch, filters]);
 
     const importSchedule = useCallback(async (file) => {
@@ -227,8 +242,10 @@ export const useSchedule = () => {
         schedulesForMonth,
         hasScheduleForDay,
         statistics,
+        pagination,
         
         fetchSchedules,
+        fetchSchedulesPagination,
         importSchedule,
         updateStatus,
         deleteSchedule: deleteScheduleItem,

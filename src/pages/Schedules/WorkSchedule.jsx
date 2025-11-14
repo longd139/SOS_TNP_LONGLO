@@ -18,7 +18,9 @@ export default function WorkSchedule() {
         selectedMonth,
         selectedYear,
         schedules,
+        pagination,
         fetchSchedules,
+        fetchSchedulesPagination,
         importSchedule,
         deleteSchedule,
         hasScheduleForDay,
@@ -47,13 +49,23 @@ export default function WorkSchedule() {
 
     const [selectedDate, setSelectedDate] = useState(null);
     const [activeFilter, setActiveFilter] = useState("all");
+    const [currentPage, setCurrentPage] = useState(1);
+    const [pageSize, setPageSize] = useState(10);
 
     useEffect(() => {
         fetchSchedules({
             monthYear: `${selectedMonth}/${selectedYear}`,
             isActive: null
         });
-    }, [fetchSchedules, selectedMonth, selectedYear]);
+        
+        fetchSchedulesPagination({
+            monthYear: `${selectedMonth}/${selectedYear}`,
+            isActive: null,
+            page: currentPage,
+            size: pageSize
+        });
+        
+    }, [selectedMonth, selectedYear, currentPage, pageSize]);
 
     useEffect(() => {
         return () => {
@@ -70,18 +82,32 @@ export default function WorkSchedule() {
     const handleMonthChange = (newMonth) => {
         setSelectedMonth(newMonth);
         setSelectedDate(null);
+        setCurrentPage(1);
         fetchSchedules({
             monthYear: `${newMonth}/${selectedYear}`,
             isActive: null
+        });
+        fetchSchedulesPagination({
+            monthYear: `${newMonth}/${selectedYear}`,
+            isActive: null,
+            page: 1,
+            size: pageSize
         });
     };
 
     const handleYearChange = (newYear) => {
         setSelectedYear(newYear);
         setSelectedDate(null);
+        setCurrentPage(1);
         fetchSchedules({
             monthYear: `${selectedMonth}/${newYear}`,
             isActive: null
+        });
+        fetchSchedulesPagination({
+            monthYear: `${selectedMonth}/${newYear}`,
+            isActive: null,
+            page: 1,
+            size: pageSize
         });
     };
 
@@ -105,6 +131,12 @@ export default function WorkSchedule() {
                 fetchSchedules({
                     monthYear: `${selectedMonth}/${selectedYear}`,
                     isActive: null
+                });
+                fetchSchedulesPagination({
+                    monthYear: `${selectedMonth}/${selectedYear}`,
+                    isActive: null,
+                    page: currentPage,
+                    size: pageSize
                 });
             } else {
                 showToast.error(
@@ -227,6 +259,12 @@ export default function WorkSchedule() {
                     monthYear: `${selectedMonth}/${selectedYear}`,
                     isActive: null
                 });
+                fetchSchedulesPagination({
+                    monthYear: `${selectedMonth}/${selectedYear}`,
+                    isActive: null,
+                    page: currentPage,
+                    size: pageSize
+                });
                 return true;
             } else {
                 showToast.error(result.error || "Có lỗi xảy ra!");
@@ -236,6 +274,16 @@ export default function WorkSchedule() {
             showToast.error("Có lỗi xảy ra khi xử lý lịch tiếp dân!");
             return false;
         }
+    };
+
+    const handlePageChange = (page) => {
+        setCurrentPage(page);
+        fetchSchedulesPagination({
+            monthYear: `${selectedMonth}/${selectedYear}`,
+            isActive: null,
+            page,
+            size: pageSize
+        });
     };
 
     const filterByActive = (scheduleList) => {
@@ -253,7 +301,6 @@ export default function WorkSchedule() {
         return scheduleList;
     };
 
-    // Filter để chỉ hiển thị lịch từ ngày hôm nay trở đi
     const filterUpcomingSchedules = (scheduleList) => {
         return scheduleList.filter(schedule => {
             const scheduleDate = schedule.ngay_tiep_dan || schedule.ngayTiepDan || schedule.date;
@@ -264,7 +311,7 @@ export default function WorkSchedule() {
     const displaySchedules = filterByActive(
         selectedDate 
             ? getSchedulesForDate(selectedDate) 
-            : getSchedulesForDisplay() // Hiển thị tất cả lịch, sắp xếp sẽ xử lý trong component
+            : getSchedulesForDisplay() 
     );
 
     const handleActiveFilterChange = (filter) => {
@@ -371,6 +418,8 @@ export default function WorkSchedule() {
                         onDelete={handleDelete}
                         formatDate={formatDate}
                         selectedDate={selectedDate}
+                        pagination={pagination}
+                        onPageChange={handlePageChange}
                     />
                 </div>
 

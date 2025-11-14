@@ -130,3 +130,13 @@ export const selectScheduleStatistics = createSelector(
         };
     }
 );
+
+export const selectSchedulePagination = createSelector(
+    [selectWorkScheduleState],
+    (workSchedule) => workSchedule.pagination || {
+        currentPage: 1,
+        pageSize: 10,
+        totalPages: 1,
+        totalItems: 0
+    }
+);

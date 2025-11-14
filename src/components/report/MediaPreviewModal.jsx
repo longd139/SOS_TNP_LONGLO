@@ -102,7 +102,7 @@ const MediaPreviewModal = ({ isOpen, onClose, mediaItems = [], initialIndex = 0 
     const currentMedia = mediaItems[currentIndex];
 
     return (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center" onClick={onClose}>
+        <div className="fixed inset-0 z-[100] h-full flex items-center justify-center" onClick={onClose}>
             <div
                 className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
                 aria-hidden="true"
@@ -116,7 +116,7 @@ const MediaPreviewModal = ({ isOpen, onClose, mediaItems = [], initialIndex = 0 
             </span>
 
             <div 
-                className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-xl sm:w-full"
+                className="inline-block align-middle bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all w-full max-w-5xl"
                 onClick={(e) => e.stopPropagation()}
             >
                 <div className="bg-white">
@@ -132,7 +132,7 @@ const MediaPreviewModal = ({ isOpen, onClose, mediaItems = [], initialIndex = 0 
                         </button>
                     </div>
 
-                    <div className="relative bg-black" style={{ height: '400px' }}>
+                    <div className="relative bg-black" style={{ height: 'calc(100vh - 120px)' }}>
                         {mediaItems.length > 1 && (
                             <>
                                 <button
@@ -156,13 +156,13 @@ const MediaPreviewModal = ({ isOpen, onClose, mediaItems = [], initialIndex = 0 
                                 <img
                                     src={currentMedia.url}
                                     alt={`Media ${currentIndex + 1}`}
-                                    className="max-w-full max-h-full object-contain"
+                                    className="w-full h-full object-contain"
                                 />
                             ) : (
                                 <video
                                     ref={videoRef}
                                     controls
-                                    className="max-w-full max-h-full"
+                                    className="w-full h-full object-contain"
                                 >
                                     Your browser does not support the video tag.
                                 </video>

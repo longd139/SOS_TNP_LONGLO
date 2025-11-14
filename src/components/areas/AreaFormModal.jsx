@@ -1,15 +1,29 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import BaseModal, { ModalFooter } from '../base/BaseModal';
 import { validateAreaForm } from '../../validator/areaValidator';
 
-const AreaFormModal = ({ isOpen, onClose, onSubmit }) => {
+const AreaFormModal = ({ isOpen, onClose, onSubmit, initialData = null, mode = 'create', isLoading = false }) => {
     const [formData, setFormData] = useState({
         tenLinhVuc: '',
         moTa: ''
     });
     const [errors, setErrors] = useState({});
     const [isSubmitting, setIsSubmitting] = useState(false);
+
+    useEffect(() => {
+        if (isOpen && initialData && mode === 'edit') {
+            setFormData({
+                tenLinhVuc: initialData.ten_linh_vuc || '',
+                moTa: initialData.mo_ta || ''
+            });
+        } else if (isOpen && mode === 'create') {
+            setFormData({
+                tenLinhVuc: '',
+                moTa: ''
+            });
+        }
+    }, [isOpen, initialData, mode]);
 
     const handleChange = (field, value) => {
         setFormData(prev => ({
@@ -43,7 +57,6 @@ const AreaFormModal = ({ isOpen, onClose, onSubmit }) => {
                 moTa: ''
             });
             setErrors({});
-            onClose();
         } catch (error) {
         } finally {
             setIsSubmitting(false);
@@ -63,16 +76,17 @@ const AreaFormModal = ({ isOpen, onClose, onSubmit }) => {
         <BaseModal
             isOpen={isOpen}
             onClose={handleClose}
-            title="Thêm lĩnh vực mới"
-            size="md"
+            title={mode === 'create' ? 'Thêm lĩnh vực mới' : 'Chỉnh sửa lĩnh vực'}
+            size="xl"
+            className="max-w-5xl "
             footer={
                 <ModalFooter
                     onCancel={handleClose}
                     onSubmit={handleSubmit}
                     cancelText="Hủy"
-                    submitText="Tạo lĩnh vực"
-                    submitDisabled={isSubmitting}
-                    submitLoading={isSubmitting}
+                    submitText={mode === 'create' ? 'Tạo lĩnh vực' : 'Cập nhật'}
+                    submitDisabled={isSubmitting || isLoading}
+                    submitLoading={isSubmitting || isLoading}
                 />
             }
         >
@@ -124,7 +138,10 @@ const AreaFormModal = ({ isOpen, onClose, onSubmit }) => {
 AreaFormModal.propTypes = {
     isOpen: PropTypes.bool.isRequired,
     onClose: PropTypes.func.isRequired,
-    onSubmit: PropTypes.func.isRequired
+    onSubmit: PropTypes.func.isRequired,
+    initialData: PropTypes.object,
+    mode: PropTypes.oneOf(['create', 'edit']),
+    isLoading: PropTypes.bool
 };
 
 export default AreaFormModal;

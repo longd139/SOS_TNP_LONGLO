@@ -98,3 +98,25 @@ export const updateWorkSchedule = createAsyncThunk(
         }
     }
 );
+
+export const fetchWorkSchedulesPagination = createAsyncThunk(
+    'workSchedule/fetchWorkSchedulesPagination',
+    async ({ weekYear = null, monthYear = null, date = null, isActive = null, page = 1, size = 10 } = {}, { rejectWithValue }) => {
+        try {
+            const response = await WORK_SCHEDULE_API.getWorkSchedulesPagination(weekYear, monthYear, date, isActive, page, size);
+            return {
+                data: response.data || [],
+                pagination: response.pagination || {
+                    currentPage: page,
+                    pageSize: size,
+                    totalPages: 1,
+                    totalItems: 0
+                }
+            };
+        } catch (error) {
+            return rejectWithValue({
+                message: error.message || 'Lấy danh sách lịch tiếp dân thất bại'
+            });
+        }
+    }
+);

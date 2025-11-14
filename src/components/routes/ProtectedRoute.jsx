@@ -1,12 +1,20 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { ROLE } from '../../constants/role';
 import { isPathDisabled, getDefaultEnabledRoute } from '../../utils/routeRedirectUtils';
+import { showToast } from '../../utils/toastNotification';
 
 const ProtectedRoute = ({ children, requiredRole = null }) => {
-    const { auth, isLoading } = useAuth();
+    const { auth, isLoading, logout } = useAuth();
     const location = useLocation();
+
+    useEffect(() => {
+        if (!isLoading && auth.isAuthenticated && requiredRole === ROLE.ADMIN && auth.role !== ROLE.ADMIN) {
+            showToast.error('Bạn không có quyền truy cập vào hệ thống quản trị!');
+            logout();
+        }
+    }, [auth.isAuthenticated, auth.role, requiredRole, isLoading]);
 
     if (isLoading) {
         return (

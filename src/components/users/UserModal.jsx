@@ -39,7 +39,8 @@ const UserModal = ({
             isOpen={isOpen}
             onClose={handleClose}
             title={isEditMode ? 'Chỉnh sửa tài khoản' : 'Thêm tài khoản mới'}
-            size="lg"
+            size="xl"
+            className="max-w-5xl"
             footer={
                 <ModalFooter
                     onCancel={handleClose}
@@ -51,53 +52,47 @@ const UserModal = ({
                 />
             }
         >
-            <div className="space-y-4">
-                {!isEditMode && (
-                    <>
-                        <div>
-                            <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-1 required-label">
-                                Tên đăng nhập
-                            </label>
-                            <input
-                                type="text"
-                                id="username"
-                                name="username"
-                                value={formData.username}
-                                onChange={handleInputChange}
-                                className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 ${
-                                    errors.username ? 'border-red-500' : 'border-gray-300'
-                                }`}
-                                placeholder="VD: admin01"
-                            />
-                            {errors.username && (
-                                <p className="mt-1 text-sm text-red-600">{errors.username}</p>
-                            )}
-                        </div>
+            <div className="grid grid-cols-2 gap-4">
+                <div>
+                    <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-1 required-label">
+                        Tên đăng nhập
+                    </label>
+                    <input
+                        type="text"
+                        id="username"
+                        name="username"
+                        value={formData.username}
+                        onChange={handleInputChange}
+                        className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 ${errors.username ? 'border-red-500' : 'border-gray-300'
+                            }`}
+                        placeholder="VD: admin01"
+                    />
+                    {errors.username && (
+                        <p className="mt-1 text-sm text-red-600">{errors.username}</p>
+                    )}
+                </div>
 
-                        <div>
-                            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1 required-label">
-                                Email
-                            </label>
-                            <input
-                                type="email"
-                                id="email"
-                                name="email"
-                                value={formData.email}
-                                onChange={handleInputChange}
-                                className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 ${
-                                    errors.email ? 'border-red-500' : 'border-gray-300'
-                                }`}
-                                placeholder="VD: nguyenvana@tangnhonphu.gov.vn"
-                            />
-                            {errors.email && (
-                                <p className="mt-1 text-sm text-red-600">{errors.email}</p>
-                            )}
-                        </div>
-                    </>
-                )}
+                <div>
+                    <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1 required-label">
+                        Email
+                    </label>
+                    <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        value={formData.email}
+                        onChange={handleInputChange}
+                        className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 ${errors.email ? 'border-red-500' : 'border-gray-300'
+                            }`}
+                        placeholder="VD: nguyenvana@tangnhonphu.gov.vn"
+                    />
+                    {errors.email && (
+                        <p className="mt-1 text-sm text-red-600">{errors.email}</p>
+                    )}
+                </div>
 
                 {isEditMode && (
-                    <>
+                    <div className="grid grid-cols-2 gap-4 w-full col-span-2">
                         <div>
                             <label htmlFor="fullName" className="block text-sm font-medium text-gray-700 mb-1 required-label">
                                 Họ và tên
@@ -108,9 +103,8 @@ const UserModal = ({
                                 name="fullName"
                                 value={formData.fullName}
                                 onChange={handleInputChange}
-                                className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 ${
-                                    errors.fullName ? 'border-red-500' : 'border-gray-300'
-                                }`}
+                                className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 ${errors.fullName ? 'border-red-500' : 'border-gray-300'
+                                    }`}
                                 placeholder="VD: Nguyễn Văn A"
                             />
                             {errors.fullName && (
@@ -128,19 +122,18 @@ const UserModal = ({
                                 name="phone"
                                 value={formData.phone}
                                 onChange={handleInputChange}
-                                className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 ${
-                                    errors.phone ? 'border-red-500' : 'border-gray-300'
-                                }`}
+                                className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 ${errors.phone ? 'border-red-500' : 'border-gray-300'
+                                    }`}
                                 placeholder="VD: 0901234567"
                             />
                             {errors.phone && (
                                 <p className="mt-1 text-sm text-red-600">{errors.phone}</p>
                             )}
                         </div>
-                    </>
+                    </div>
                 )}
 
-                <div>
+                <div className="col-span-2 w-full">
                     <label htmlFor="role" className="block text-sm font-medium text-gray-700 mb-1 required-label">
                         Vai trò
                     </label>
@@ -149,9 +142,8 @@ const UserModal = ({
                         name="role"
                         value={formData.role}
                         onChange={handleInputChange}
-                        className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 ${
-                            errors.role ? 'border-red-500' : 'border-gray-300'
-                        }`}
+                        className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 ${errors.role ? 'border-red-500' : 'border-gray-300'
+                            }`}
                     >
                         {Object.entries(ROLE_LABELS).map(([key, label]) => (
                             <option key={key} value={key}>
@@ -164,49 +156,45 @@ const UserModal = ({
                     )}
                 </div>
 
-                {!isEditMode && (
-                    <>
-                        <div>
-                            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1 required-label">
-                                Mật khẩu
-                            </label>
-                            <input
-                                type="password"
-                                id="password"
-                                name="password"
-                                value={formData.password}
-                                onChange={handleInputChange}
-                                className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 ${
-                                    errors.password ? 'border-red-500' : 'border-gray-300'
+                <div className="col-span-2 grid grid-cols-2 gap-4">
+                    <div>
+                        <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1 required-label">
+                            Mật khẩu
+                        </label>
+                        <input
+                            type="password"
+                            id="password"
+                            name="password"
+                            value={formData.password}
+                            onChange={handleInputChange}
+                            className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 ${errors.password ? 'border-red-500' : 'border-gray-300'
                                 }`}
-                                placeholder="Nhập mật khẩu (tối thiểu 8 ký tự)"
-                            />
-                            {errors.password && (
-                                <p className="mt-1 text-sm text-red-600">{errors.password}</p>
-                            )}
-                        </div>
+                            placeholder="Nhập mật khẩu (tối thiểu 8 ký tự)"
+                        />
+                        {errors.password && (
+                            <p className="mt-1 text-sm text-red-600">{errors.password}</p>
+                        )}
+                    </div>
 
-                        <div>
-                            <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1 required-label">
-                                Xác nhận mật khẩu
-                            </label>
-                            <input
-                                type="password"
-                                id="confirmPassword"
-                                name="confirmPassword"
-                                value={formData.confirmPassword}
-                                onChange={handleInputChange}
-                                className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 ${
-                                    errors.confirmPassword ? 'border-red-500' : 'border-gray-300'
+                    <div>
+                        <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1 required-label">
+                            Xác nhận mật khẩu
+                        </label>
+                        <input
+                            type="password"
+                            id="confirmPassword"
+                            name="confirmPassword"
+                            value={formData.confirmPassword}
+                            onChange={handleInputChange}
+                            className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 ${errors.confirmPassword ? 'border-red-500' : 'border-gray-300'
                                 }`}
-                                placeholder="Nhập lại mật khẩu"
-                            />
-                            {errors.confirmPassword && (
-                                <p className="mt-1 text-sm text-red-600">{errors.confirmPassword}</p>
-                            )}
-                        </div>
-                    </>
-                )}
+                            placeholder="Nhập lại mật khẩu"
+                        />
+                        {errors.confirmPassword && (
+                            <p className="mt-1 text-sm text-red-600">{errors.confirmPassword}</p>
+                        )}
+                    </div>
+                </div>
             </div>
         </BaseModal>
     );
