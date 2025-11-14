@@ -4,6 +4,7 @@ import { LogOut, User, Lock, ChevronDown, Key } from 'lucide-react';
 import { logout } from '../../features/auth/authSlice';
 import { fetchMyProfile } from '../../features/userProfile/userProfileThunks';
 import { selectProfile, selectLoading } from '../../features/userProfile/userProfileSelectors';
+import { clearProfile } from '../../features/userProfile/userProfileSlice';
 import { AUTH_API } from '../../apis/auth';
 import UserProfileModal from './UserProfileModal';
 import TwoFactorToggleModal from '../twoFactor/TwoFactorToggleModal';
@@ -58,6 +59,7 @@ const UserProfileDropdown = () => {
             localStorage.removeItem('accessToken');
             localStorage.removeItem('refreshToken');
             dispatch(logout());
+            dispatch(clearProfile());
             setIsLoggingOut(false);
             setIsOpen(false);
         }
