@@ -132,7 +132,7 @@ const MediaPreviewModal = ({ isOpen, onClose, mediaItems = [], initialIndex = 0 
                         </button>
                     </div>
 
-                    <div className="relative bg-black" style={{ height: 'calc(100vh - 120px)' }}>
+                    <div className="relative bg-black" style={{ height: '90vh', maxHeight: '90vh' }}>
                         {mediaItems.length > 1 && (
                             <>
                                 <button
@@ -168,23 +168,23 @@ const MediaPreviewModal = ({ isOpen, onClose, mediaItems = [], initialIndex = 0 
                                 </video>
                             )}
                         </div>
+                        
+                        {mediaItems.length > 1 && (
+                            <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex justify-center gap-2 z-20 bg-black bg-opacity-50 px-3 py-2 rounded-full">
+                                {mediaItems.map((_, index) => (
+                                    <button
+                                        key={index}
+                                        onClick={() => setCurrentIndex(index)}
+                                        className={`w-2 h-2 rounded-full transition-all ${
+                                            index === currentIndex
+                                                ? "bg-blue-500 w-6"
+                                                : "bg-white bg-opacity-70 hover:bg-opacity-100"
+                                        }`}
+                                    />
+                                ))}
+                            </div>
+                        )}
                     </div>
-
-                    {mediaItems.length > 1 && (
-                        <div className="px-4 py-3 bg-gray-50 flex justify-center gap-2">
-                            {mediaItems.map((_, index) => (
-                                <button
-                                    key={index}
-                                    onClick={() => setCurrentIndex(index)}
-                                    className={`w-2 h-2 rounded-full transition-all ${
-                                        index === currentIndex
-                                            ? "bg-blue-600 w-6"
-                                            : "bg-gray-300 hover:bg-gray-400"
-                                    }`}
-                                />
-                            ))}
-                        </div>
-                    )}
                 </div>
             </div>
         </div>
