@@ -8,7 +8,7 @@ const UserViewModal = ({ isOpen, onClose, userData, loading = false }) => {
     if (!userData) return null;
 
     const InfoRow = ({ icon: Icon, label, value, valueClassName = "text-gray-900" }) => (
-        <div className="flex items-start gap-3 py-3 border-b border-gray-100 last:border-0">
+        <div className="flex items-start gap-3 py-3">
             <div className="flex-shrink-0 mt-1">
                 <Icon className="w-5 h-5 text-gray-400" />
             </div>

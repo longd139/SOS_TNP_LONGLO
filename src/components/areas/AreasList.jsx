@@ -229,8 +229,8 @@ export default function AreasList() {
         <div className="min-h-screen">
             <div className="mb-4 flex items-center justify-between">
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-900">Quản lý lĩnh vực</h1>
-                    <p className="text-gray-600 mt-1">Quản lý các lĩnh vực của hệ thống</p>
+                    <h1 className="text-2xl font-bold text-gray-900">Quản lý lĩnh vực thủ tục</h1>
+                    <p className="text-gray-600 mt-1">Quản lý các lĩnh vực của thủ tục hành chính</p>
                 </div>
                 <button
                     onClick={handleCreate}
@@ -269,7 +269,7 @@ export default function AreasList() {
                 onDelete={!showActive ? handleDelete : null}
                 onUpdateStatus={handleUpdateStatus}
                 showActions={true}
-                emptyMessage={loading ? "Đang tải dữ liệu..." : "Không có lĩnh vực nào"}
+                emptyMessage={loading ? "Đang tải dữ liệu..." : "Không có lĩnh vực thủ tục nào"}
                 pagination={pagination}
                 onPageChange={handlePageChange}
             />
