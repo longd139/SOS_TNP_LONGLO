@@ -80,7 +80,6 @@ export const verifyOtpUser = createAsyncThunk(
     async ({ otp, tenDangNhap }, { rejectWithValue }) => {
         try {
             const response = await AUTH_API.verify2FA({ otp, tenDangNhap });
-
             if (!response.success) throw new Error(response.message || 'OTP sai');
             
             const tokenData = response.data;
@@ -151,7 +150,6 @@ export const sendOtpToEmail = createAsyncThunk(
                 throw new Error('Vui lòng nhập email');
             }
 
-            // Validate email format
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             if (!emailRegex.test(email)) {
                 throw new Error('Định dạng email không hợp lệ');
@@ -193,7 +191,6 @@ export const resetPassword = createAsyncThunk(
                 throw new Error('Vui lòng điền đầy đủ thông tin');
             }
 
-            // Validate email format
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             if (!emailRegex.test(email)) {
                 throw new Error('Định dạng email không hợp lệ');

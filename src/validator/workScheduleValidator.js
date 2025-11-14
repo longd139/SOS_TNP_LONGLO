@@ -131,7 +131,6 @@ export const createWorkScheduleSchema = yup.object().shape({
                 selectedDate.setHours(0, 0, 0, 0);
 
                 if (selectedDate.getTime() === today.getTime()) {
-                    // Handle both 24-hour format and 12-hour format with AM/PM
                     const time24h = (value.includes('CH') || value.includes('SA')) 
                         ? convertTo24Hour(value) 
                         : value;

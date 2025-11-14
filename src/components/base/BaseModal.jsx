@@ -11,6 +11,7 @@ const BaseModal = ({
   closeOnOverlay = true,
   className = "",
   subtitle = "",
+  contentPadding = true,
 }) => {
   const [isDragging, setIsDragging] = React.useState(false);
 
@@ -43,6 +44,7 @@ const BaseModal = ({
     xl: "max-w-xl",
     "2xl": "max-w-2xl",
     "3xl": "max-w-3xl",
+    "5xl": "max-w-5xl",
   };
 
   const handleOverlayClick = (e) => {
@@ -66,7 +68,7 @@ const BaseModal = ({
           inline-block align-bottom bg-white text-left shadow-xl transform transition-all overflow-hidden
           sm:my-8 sm:align-middle sm:w-full ${sizeClasses[size]} ${className}
         `}
-          style={{ borderRadius: "12px" }}
+          style={{ borderRadius: "12px", wordWrap: "break-word" }}
         >
           {(title || showCloseButton) && (
             <div
@@ -111,7 +113,7 @@ const BaseModal = ({
             </div>
           )}
 
-          <div className="bg-white px-3 pt-4 pb-3 sm:p-4">{children}</div>
+          <div className={`bg-white overflow-hidden ${contentPadding ? 'px-3 pt-4 pb-3 sm:p-4' : ''}`}>{children}</div>
 
           {footer && (
             <div
