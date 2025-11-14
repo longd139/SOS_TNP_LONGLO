@@ -151,7 +151,6 @@ export const sendOtpToEmail = createAsyncThunk(
                 throw new Error('Vui lòng nhập email');
             }
 
-            // Validate email format
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             if (!emailRegex.test(email)) {
                 throw new Error('Định dạng email không hợp lệ');
@@ -193,7 +192,6 @@ export const resetPassword = createAsyncThunk(
                 throw new Error('Vui lòng điền đầy đủ thông tin');
             }
 
-            // Validate email format
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             if (!emailRegex.test(email)) {
                 throw new Error('Định dạng email không hợp lệ');
