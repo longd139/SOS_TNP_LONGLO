@@ -2,7 +2,7 @@ import { useState } from 'react';
 import BaseTable from '../../components/base/BaseTable';
 import UserModal from '../../components/users/UserModal';
 import UserFilter from '../../components/admin/UserFilter';
-import UserViewModal from '../../components/admin/UserViewModal';
+import UserViewModal from '../../components/users/UserViewModal';
 import { ConfirmModal } from '../../components/base/BaseModal';
 import { ROLE_LABELS, ROLE_COLORS } from '../../constants/role';
 import { useUsers } from '../../hooks/useUsers';

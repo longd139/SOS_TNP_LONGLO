@@ -24,7 +24,7 @@ const UserViewModal = ({ isOpen, onClose, userData, loading = false }) => {
             isOpen={isOpen}
             onClose={onClose}
             title="Thông tin chi tiết người dùng"
-            size="3xl"
+            size="xl"
             className="max-w-5xl"
         >
             {loading ? (
@@ -49,11 +49,10 @@ const UserViewModal = ({ isOpen, onClose, userData, loading = false }) => {
                             </div>
                             <div>
                                 <span
-                                    className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
-                                        userData.is_active !== false
+                                    className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${userData.is_active !== false
                                             ? 'bg-green-100 text-green-800'
                                             : 'bg-red-100 text-red-800'
-                                    }`}
+                                        }`}
                                 >
                                     {userData.is_active !== false ? 'Hoạt động' : 'Đã khóa'}
                                 </span>
@@ -67,11 +66,11 @@ const UserViewModal = ({ isOpen, onClose, userData, loading = false }) => {
                                 Thông tin cơ bản
                             </h4>
                         </div>
-                        <div className="px-6 py-1">
+                        <div className="px-6 py-1 grid grid-cols-2 gap-y-4 gap-x-6">
                             <InfoRow
                                 icon={Mail}
                                 label="Email"
-                                value={userData.email}
+                                value={userData?.email ? userData.email : 'Chưa cập nhật'}
                             />
                             <InfoRow
                                 icon={Phone}
@@ -82,9 +81,10 @@ const UserViewModal = ({ isOpen, onClose, userData, loading = false }) => {
                                 icon={Shield}
                                 label="Vai trò"
                                 value={
-                                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                                        ROLE_COLORS[userData.vai_tro] || 'bg-gray-100 text-gray-800'
-                                    }`}>
+                                    <span
+                                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${ROLE_COLORS[userData.vai_tro] || 'bg-gray-100 text-gray-800'
+                                            }`}
+                                    >
                                         {ROLE_LABELS[userData.vai_tro] || userData.vai_tro}
                                     </span>
                                 }
@@ -93,16 +93,18 @@ const UserViewModal = ({ isOpen, onClose, userData, loading = false }) => {
                                 icon={ToggleLeft}
                                 label="Xác thực hai yếu tố"
                                 value={
-                                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                                        userData.xac_thuc_hai_yeu_to
-                                            ? 'bg-green-100 text-green-800'
-                                            : 'bg-gray-100 text-gray-800'
-                                    }`}>
+                                    <span
+                                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${userData.xac_thuc_hai_yeu_to
+                                                ? 'bg-green-100 text-green-800'
+                                                : 'bg-gray-100 text-gray-800'
+                                            }`}
+                                    >
                                         {userData.xac_thuc_hai_yeu_to ? 'Đã bật' : 'Chưa bật'}
                                     </span>
                                 }
                             />
                         </div>
+
                     </div>
 
                     <div className="bg-white rounded-lg border border-gray-200">
@@ -111,7 +113,7 @@ const UserViewModal = ({ isOpen, onClose, userData, loading = false }) => {
                                 Thông tin hệ thống
                             </h4>
                         </div>
-                        <div className="px-6 py-1">
+                        <div className="px-6 py-1 grid grid-cols-2 gap-y-4 gap-x-6">
                             <InfoRow
                                 icon={Calendar}
                                 label="Ngày tạo"
@@ -121,12 +123,6 @@ const UserViewModal = ({ isOpen, onClose, userData, loading = false }) => {
                                 icon={Calendar}
                                 label="Ngày cập nhật"
                                 value={formatDate(userData.thoi_gian_cap_nhat)}
-                            />
-                            <InfoRow
-                                icon={User}
-                                label="ID"
-                                value={`#${userData.id}`}
-                                valueClassName="text-gray-600 font-mono"
                             />
                         </div>
                     </div>

@@ -135,7 +135,10 @@ const updateUserProfileByAdmin = async (userData) => {
             userId: userData.id,
             hoVaTen: userData.fullName,
             soDienThoai: userData.phone || "",
-            vaiTro: userData.role
+            vaiTro: userData.role,
+            tenDangNhap: userData.username,
+            email: userData.email,
+            matKhau: userData.password || undefined,
         };
 
         const response = await apiClient.put("/api/users/update-by-admin", requestData);

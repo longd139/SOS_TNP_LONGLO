@@ -1,4 +1,5 @@
 import axios from "axios";
+import { jwtDecode } from "jwt-decode";
 import ROUTE_PATH from "../constants/routes";
 const API_URL = process.env.REACT_APP_API_URL;
 
@@ -14,9 +15,50 @@ const refreshClient = axios.create({
     headers: { "Content-Type": "application/json" },
 });
 
+const isTokenExpiringSoon = (token) => {
+    try {
+        const decoded = jwtDecode(token);
+        const currentTime = Math.floor(Date.now() / 1000);
+        const timeUntilExpiry = decoded.exp - currentTime;
+        return timeUntilExpiry < 300;
+    } catch (error) {
+        return true; 
+    }
+};
+
+const refreshAccessToken = async () => {
+    const refreshToken = localStorage.getItem("refreshToken");
+    
+    if (!refreshToken) {
+        throw new Error("No refresh token available");
+    }
+
+    try {
+        const response = await refreshClient.put('/api/auths/refresh-token', refreshToken);
+        const { access_token: newToken, refresh_token: newRefreshToken } = response.data.data;
+        
+        localStorage.setItem("accessToken", newToken);
+        localStorage.setItem("refreshToken", newRefreshToken);
+        
+        return newToken;
+    } catch (error) {
+        localStorage.clear();
+        window.location.href = ROUTE_PATH.LOGIN;
+        throw error;
+    }
+};
+
 apiClient.interceptors.request.use(
-    (config) => {
-        const accessToken = localStorage.getItem("accessToken");
+    async (config) => {
+        let accessToken = localStorage.getItem("accessToken");
+
+        if (accessToken && isTokenExpiringSoon(accessToken)) {
+            try {
+                accessToken = await refreshAccessToken();
+            } catch (error) {
+                
+            }
+        }
 
         if (accessToken) config.headers.Authorization = `Bearer ${accessToken}`;
 
@@ -73,8 +115,19 @@ const apiFormClient = axios.create({
 })
 
 apiFormClient.interceptors.request.use(
-    (config) => {
-        const accessToken = localStorage.getItem("accessToken");
+    async (config) => {
+        let accessToken = localStorage.getItem("accessToken");
+        
+        // Check if token is expiring soon and refresh it proactively
+        if (accessToken && isTokenExpiringSoon(accessToken)) {
+            try {
+                accessToken = await refreshAccessToken();
+            } catch (error) {
+                // If refresh fails, let the response interceptor handle it
+                console.error("Proactive token refresh failed:", error);
+            }
+        }
+        
         if (accessToken) {
             config.headers.Authorization = `Bearer ${accessToken}`;
         }
