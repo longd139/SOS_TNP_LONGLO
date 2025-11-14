@@ -21,12 +21,17 @@ import Statistics from "../pages/Statistic/Statistic";
 import ROUTE_PATH from "../constants/routes";
 import ReportAreasManagement from "../pages/ReportAreas/ReportAreasManagement";
 import AreaManagement from "../pages/Areas/AreaManagement";
+import ForgotPassword from "../pages/ForgotPassword/ForgotPassword";
 
 function AppRoutes() {
     return (
         <Routes>
             <Route element={<AuthLayout />}>
                 <Route path={ROUTE_PATH.LOGIN} element={<Login />} />
+            </Route>
+
+            <Route element={<AuthLayout />}>
+                <Route path={ROUTE_PATH.FORGOT_PASSWORD} element={<ForgotPassword />} />
             </Route>
 
             <Route element={
