@@ -175,7 +175,7 @@ const MediaPreviewModal = ({ isOpen, onClose, mediaItems = [], initialIndex = 0 
                         )}
 
                         <div 
-                            className="w-full h-full flex items-center justify-center"
+                            className="w-full h-full flex  justify-center"
                             style={{ 
                                 overflow: 'hidden'
                             }}
