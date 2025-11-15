@@ -214,9 +214,8 @@ const MediaPreviewModal = ({ isOpen, onClose, mediaItems = [], initialIndex = 0 
 
                     <div
                         className="px-4 py-1 bg-white border-t border-gray-200 flex items-center justify-between"
-                        style={{ flexShrink: 0 }}
+                        style={{ flexShrink: 0, height: '25px' }}
                     >
-                        {/* Dot indicator */}
                         <div className="flex-1 flex justify-center">
                             {mediaItems.length > 1 && (
                                 <div className="flex justify-center gap-2 bg-black bg-opacity-50 px-3 py-2 rounded-full max-w-[90%] overflow-x-auto">
