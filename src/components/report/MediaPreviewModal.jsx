@@ -103,27 +103,27 @@ const MediaPreviewModal = ({ isOpen, onClose, mediaItems = [], initialIndex = 0 
     const currentMedia = mediaItems[currentIndex];
 
     const modalContent = (
-        <div 
+        <div
             className="fixed inset-0 z-[9999] overflow-hidden"
             style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }}
-            aria-labelledby="modal-title" 
-            role="dialog" 
+            aria-labelledby="modal-title"
+            role="dialog"
             aria-modal="true"
         >
-            <div 
-                className="fixed inset-0 bg-gray-900 bg-opacity-75 transition-opacity" 
+            <div
+                className="fixed inset-0 bg-gray-900 bg-opacity-75 transition-opacity"
                 onClick={onClose}
                 style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }}
             ></div>
 
-            <div 
+            <div
                 className="fixed inset-0 flex justify-center p-4"
                 style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, overflow: 'hidden' }}
             >
-                <div 
+                <div
                     className="relative bg-white rounded-lg shadow-xl w-full max-w-5xl"
-                    style={{ 
-                        height: '70vh', 
+                    style={{
+                        height: '70vh',
                         maxHeight: '70vh',
                         minHeight: '530px',
                         display: 'flex',
@@ -131,9 +131,9 @@ const MediaPreviewModal = ({ isOpen, onClose, mediaItems = [], initialIndex = 0 
                         overflow: 'hidden'
                     }}
                 >
-                    <div 
+                    <div
                         className="flex items-center justify-between px-4 bg-white border-b border-gray-200"
-                        style={{ flexShrink: 0}}
+                        style={{ flexShrink: 0, height: '25px' }}
                     >
                         <h3 className="text-lg font-semibold text-gray-900 pr-8">
                             Xem phương tiện ({currentIndex + 1}/{mediaItems.length})
@@ -146,9 +146,9 @@ const MediaPreviewModal = ({ isOpen, onClose, mediaItems = [], initialIndex = 0 
                         </button>
                     </div>
 
-                    <div 
+                    <div
                         className="relative bg-black flex items-center justify-center"
-                        style={{ 
+                        style={{
                             flex: 1,
                             overflow: 'hidden',
                             minHeight: 0
@@ -174,9 +174,9 @@ const MediaPreviewModal = ({ isOpen, onClose, mediaItems = [], initialIndex = 0 
                             </>
                         )}
 
-                        <div 
-                            className="w-full h-full flex  justify-center"
-                            style={{ 
+                        <div
+                            className="w-full h-full flex justify-center"
+                            style={{
                                 overflow: 'hidden'
                             }}
                         >
@@ -184,7 +184,7 @@ const MediaPreviewModal = ({ isOpen, onClose, mediaItems = [], initialIndex = 0 
                                 <img
                                     src={currentMedia.url}
                                     alt={`Media ${currentIndex + 1}`}
-                                    style={{ 
+                                    style={{
                                         maxWidth: '100%',
                                         maxHeight: '100%',
                                         width: 'auto',
@@ -196,7 +196,7 @@ const MediaPreviewModal = ({ isOpen, onClose, mediaItems = [], initialIndex = 0 
                                 <video
                                     ref={videoRef}
                                     controls
-                                    style={{ 
+                                    style={{
                                         maxWidth: '100%',
                                         maxHeight: '100%',
                                         width: 'auto',
@@ -209,35 +209,32 @@ const MediaPreviewModal = ({ isOpen, onClose, mediaItems = [], initialIndex = 0 
                             )}
                         </div>
 
-                        {mediaItems.length > 1 && (
-                            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex justify-center gap-2 z-20 bg-black bg-opacity-50 px-3 py-2 rounded-full max-w-[90%] overflow-x-auto">
-                                {mediaItems.map((_, index) => (
-                                    <button
-                                        key={index}
-                                        onClick={() => setCurrentIndex(index)}
-                                        className={`w-2 h-2 rounded-full transition-all flex-shrink-0 ${
-                                            index === currentIndex
-                                                ? "bg-blue-500 w-6"
-                                                : "bg-white bg-opacity-70 hover:bg-opacity-100"
-                                        }`}
-                                    />
-                                ))}
-                            </div>
-                        )}
+
                     </div>
 
-                    <div 
-                        className="px-4 py-1 bg-white border-t border-gray-200 flex justify-end"
-                        style={{ flexShrink: 0}}
+                    <div
+                        className="px-4 py-1 bg-white border-t border-gray-200 flex items-center justify-between"
+                        style={{ flexShrink: 0, height: '25px' }}
                     >
-                        <button
-                            type="button"
-                            className="inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-2 py-1 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
-                            onClick={onClose}
-                        >
-                            Đóng
-                        </button>
+                        <div className="flex-1 flex justify-center">
+                            {mediaItems.length > 1 && (
+                                <div className="flex justify-center gap-2 bg-black bg-opacity-50 px-3 py-2 rounded-full max-w-[90%] overflow-x-auto">
+                                    {mediaItems.map((_, index) => (
+                                        <button
+                                            key={index}
+                                            onClick={() => setCurrentIndex(index)}
+                                            className={`w-2 h-2 rounded-full transition-all flex-shrink-0 ${index === currentIndex
+                                                    ? "bg-blue-500 w-6"
+                                                    : "bg-white bg-opacity-70 hover:bg-opacity-100"
+                                                }`}
+                                        />
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+
                     </div>
+
                 </div>
             </div>
         </div>
