@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import BaseTable from "../../components/base/BaseTable";
 import ReportDetailModal from "../../components/report/ReportDetailModal";
+import ReportFilter from "../../components/report/ReportFilter";
 import { useReports } from "../../hooks/useReports";
 import { useReportAreas } from "../../hooks/useReportAreas";
 import { showToast } from "../../utils/toastNotification";
@@ -37,48 +38,62 @@ export default function ReportList() {
         mucDo: "",
         maPhanAnh: "",
         sortTime: "desc",
+        pageSize: 10,
     });
 
     const [currentPage, setCurrentPage] = useState(1);
-    const [pageSize] = useState(10);
+    const [hasLoadedInitial, setHasLoadedInitial] = useState(false);
 
-    const loadInitialData = async () => {
+    const loadInitialData = useCallback(async () => {
         try {
             await Promise.all([
                 loadExtent(),
                 loadStatusReport(),
-                loadReportAreas({ page: 1, size: 100, isActive: true }),
+                loadReportAreas({ page: 1, size: 10, isActive: true }),
             ]);
+            setHasLoadedInitial(true);
         } catch (error) {
             showToast.error("Lỗi khi tải dữ liệu khởi tạo");
+            setHasLoadedInitial(true);
         }
+    }, [loadExtent, loadStatusReport, loadReportAreas]);
+
+    useEffect(() => {
+        if (!hasLoadedInitial) {
+            loadInitialData();
+        }
+    }, [hasLoadedInitial, loadInitialData]);
+
+    useEffect(() => {
+        if (hasLoadedInitial) {
+            loadReports({
+                page: currentPage,
+                size: filters.pageSize,
+                trangThai: filters.trangThai,
+                idLinhVucPhanAnh: filters.idLinhVucPhanAnh,
+                mucDo: filters.mucDo,
+                maPhanAnh: filters.maPhanAnh,
+                sortTime: filters.sortTime,
+            }).catch(() => {
+                showToast.error("Lỗi khi tải danh sách phản ánh");
+            });
+        }
+    }, [hasLoadedInitial, currentPage, filters.pageSize, filters.trangThai, filters.idLinhVucPhanAnh, filters.mucDo, filters.maPhanAnh, filters.sortTime, loadReports]);
+
+    const handleFilterChange = (newFilters) => {
+        setFilters(newFilters);
+        setCurrentPage(1);
     };
 
-    const fetchReports = useCallback(async () => {
-        try {
-            await loadReports({
-                page: currentPage,
-                size: pageSize,
-                ...filters,
-            });
-        } catch (error) {
-            showToast.error("Lỗi khi tải danh sách phản ánh");
-        }
-    }, [currentPage, pageSize, filters, loadReports]);
-
-    useEffect(() => {
-        loadInitialData();
-    }, []);
-
-    useEffect(() => {
-        fetchReports();
-    }, [fetchReports]);
-
-    const handleFilterChange = (name, value) => {
-        setFilters((prev) => ({
-            ...prev,
-            [name]: value === "all" ? "" : value,
-        }));
+    const handleResetFilters = () => {
+        setFilters({
+            trangThai: "",
+            idLinhVucPhanAnh: "",
+            mucDo: "",
+            maPhanAnh: "",
+            sortTime: "desc",
+            pageSize: 10,
+        });
         setCurrentPage(1);
     };
 
@@ -117,7 +132,7 @@ export default function ReportList() {
             key: "index",
             render: (value, record, index) => (
                 <span className="text-sm font-medium text-gray-900">
-                    #{((pagination?.currentPage || 1) - 1) * (pagination?.pageSize || pageSize) + index + 1}
+                    #{((pagination?.currentPage || 1) - 1) * (pagination?.pageSize || filters.pageSize) + index + 1}
                 </span>
             ),
         },
@@ -186,140 +201,15 @@ export default function ReportList() {
                 <p className="text-gray-600 mt-1">Xem và xử lý phản ánh từ người dân</p>
             </div>
 
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-4">
-                <h3 className="font-semibold text-gray-900 mb-3">Bộ lọc</h3>
-                <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Trạng thái
-                        </label>
-                        <select
-                            value={filters.trangThai || "all"}
-                            onChange={(e) => handleFilterChange("trangThai", e.target.value)}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none bg-white"
-                            style={{
-                                backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`,
-                                backgroundPosition: "right 0.5rem center",
-                                backgroundRepeat: "no-repeat",
-                                backgroundSize: "1.5em 1.5em",
-                                paddingRight: "2.5rem",
-                            }}
-                        >
-                            <option value="all">Tất cả</option>
-                            {statusReport &&
-                                Object.entries(statusReport).map(([key, value]) => (
-                                    <option key={key} value={value}>
-                                        {value}
-                                    </option>
-                                ))}
-                        </select>
-                    </div>
-
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Lĩnh vực
-                        </label>
-                        <select
-                            value={filters.idLinhVucPhanAnh || "all"}
-                            onChange={(e) =>
-                                handleFilterChange("idLinhVucPhanAnh", e.target.value)
-                            }
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none bg-white"
-                            style={{
-                                backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`,
-                                backgroundPosition: "right 0.5rem center",
-                                backgroundRepeat: "no-repeat",
-                                backgroundSize: "1.5em 1.5em",
-                                paddingRight: "2.5rem",
-                            }}
-                        >
-                            <option value="all">Tất cả</option>
-                            {reportAreas.map((area) => (
-                                <option key={area.id} value={area.id}>
-                                    {area.ten}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
-
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Mức độ
-                        </label>
-                        <select
-                            value={filters.mucDo || "all"}
-                            onChange={(e) => handleFilterChange("mucDo", e.target.value)}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none bg-white"
-                            style={{
-                                backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`,
-                                backgroundPosition: "right 0.5rem center",
-                                backgroundRepeat: "no-repeat",
-                                backgroundSize: "1.5em 1.5em",
-                                paddingRight: "2.5rem",
-                            }}
-                        >
-                            <option value="all">Tất cả</option>
-                            {extent &&
-                                Object.entries(extent).map(([key, value]) => (
-                                    <option key={key} value={value}>
-                                        {value}
-                                    </option>
-                                ))}
-                        </select>
-                    </div>
-
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Sắp xếp theo thời gian
-                        </label>
-                        <select
-                            value={filters.sortTime || "desc"}
-                            onChange={(e) => handleFilterChange("sortTime", e.target.value)}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none bg-white"
-                            style={{
-                                backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`,
-                                backgroundPosition: "right 0.5rem center",
-                                backgroundRepeat: "no-repeat",
-                                backgroundSize: "1.5em 1.5em",
-                                paddingRight: "2.5rem",
-                            }}
-                        >
-                            <option value="desc">Mới nhất trước</option>
-                            <option value="asc">Cũ nhất trước</option>
-                        </select>
-                    </div>
-
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Mã phản ánh
-                        </label>
-                        <div className="relative">
-                            <input
-                                type="text"
-                                placeholder="Tìm theo mã phản ánh..."
-                                value={filters.maPhanAnh}
-                                onChange={(e) =>
-                                    handleFilterChange("maPhanAnh", e.target.value)
-                                }
-                                className="w-full px-3 py-2 pl-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                            />
-                            <svg
-                                className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                            >
-                                <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                                />
-                            </svg>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <ReportFilter
+                onFilter={handleFilterChange}
+                onReset={handleResetFilters}
+                filters={filters}
+                pagination={pagination}
+                statusReport={statusReport}
+                reportAreas={reportAreas}
+                extent={extent}
+            />
 
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-4 px-4 py-3">
                 <h3 className="font-semibold text-gray-900">
@@ -362,7 +252,15 @@ export default function ReportList() {
                 loading={!selectedReport && isPreviewModalOpen}
                 onStatusUpdated={() => {
                     clearError();
-                    fetchReports();
+                    loadReports({
+                        page: currentPage,
+                        size: filters.pageSize,
+                        trangThai: filters.trangThai,
+                        idLinhVucPhanAnh: filters.idLinhVucPhanAnh,
+                        mucDo: filters.mucDo,
+                        maPhanAnh: filters.maPhanAnh,
+                        sortTime: filters.sortTime,
+                    });
                 }}
                 mode={modalMode}
             />

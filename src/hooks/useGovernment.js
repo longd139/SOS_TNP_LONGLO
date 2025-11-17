@@ -53,7 +53,6 @@ export const useGovernment = ({ autoFetch = false, filters = {}, isActive } = {}
                 ...filters
             });
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [autoFetch]);
 
     const createNewGovernment = useCallback((formData) => {
