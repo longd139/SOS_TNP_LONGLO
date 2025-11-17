@@ -11,6 +11,7 @@ import areasReducer from '../features/areas/areasSlice';
 import workScheduleReducer from '../features/workSchedule/workScheduleSlice';
 import reportAreaReducer from '../features/reportAreas/reportAreasSlice';
 import reportsReducer from '../features/reports/reportSlice';
+import governmentReducer from '../features/government/governmentSlice';
 
 export const store = configureStore({
     reducer: {
@@ -26,5 +27,6 @@ export const store = configureStore({
         workSchedule: workScheduleReducer,
         reportArea: reportAreaReducer,
         reports: reportsReducer,
+        government: governmentReducer,
     },
 });
