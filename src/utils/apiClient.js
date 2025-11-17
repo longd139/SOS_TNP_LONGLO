@@ -118,13 +118,10 @@ apiFormClient.interceptors.request.use(
     async (config) => {
         let accessToken = localStorage.getItem("accessToken");
         
-        // Check if token is expiring soon and refresh it proactively
         if (accessToken && isTokenExpiringSoon(accessToken)) {
             try {
                 accessToken = await refreshAccessToken();
             } catch (error) {
-                // If refresh fails, let the response interceptor handle it
-                console.error("Proactive token refresh failed:", error);
             }
         }
         

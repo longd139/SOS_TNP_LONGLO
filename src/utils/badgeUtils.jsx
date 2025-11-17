@@ -126,22 +126,22 @@ export const renderContactInfo = (contactInfo, maxWidth = 180) => {
     const isAnonymous = name === "Ẩn danh";
 
     return (
-        <div className="text-sm" style={{ maxWidth: `${maxWidth}px` }} title={fullText}>
+        <div className="text-sm break-words overflow-wrap-anywhere max-w-full" style={{ maxWidth: `${maxWidth}px` }} title={fullText}>
             {isAnonymous ? (
-                <span className="inline-flex items-center text-gray-600 bg-gray-100 px-2.5 py-1 rounded-md text-xs">
+                <span className="inline-flex items-center text-gray-600 bg-gray-100 px-2.5 py-1 rounded-md text-xs break-words">
                     {name}
                 </span>
             ) : (
-                <>
-                    <div className="text-gray-900 truncate text-ellipsis overflow-hidden whitespace-nowrap">
+                <div className="space-y-1">
+                    <div className="text-gray-900 break-words overflow-wrap-anywhere word-break-break-word">
                         {name}
                     </div>
                     {phone && (
-                        <div className="text-gray-600 truncate text-ellipsis overflow-hidden whitespace-nowrap">
+                        <div className="text-gray-600 break-words overflow-wrap-anywhere word-break-break-word">
                             {phone}
                         </div>
                     )}
-                </>
+                </div>
             )}
         </div>
     );

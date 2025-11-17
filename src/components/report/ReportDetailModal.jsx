@@ -145,9 +145,9 @@ const ReportDetailModal = ({ isOpen, onClose, report, loading = false, onStatusU
                     <span className="ml-3 text-gray-600">Đang tải dữ liệu...</span>
                 </div>
             ) : report ? (
-                <div className="space-y-4 max-h-[70vh] overflow-y-auto px-1 -mx-1">
+                <div className="space-y-4 max-h-[70vh] overflow-y-auto overflow-x-hidden px-1 -mx-1 break-words">
                     <div className="flex-1">
-                        <p className="text-lg mb-2 font-medium">
+                        <p className="text-lg mb-2 font-medium break-words overflow-wrap-anywhere">
                             {report.tieu_de}
                         </p>
                         <div className="flex items-center gap-2 mb-4">
@@ -157,8 +157,8 @@ const ReportDetailModal = ({ isOpen, onClose, report, loading = false, onStatusU
                         </div>
                     </div>
 
-                    <div className="flex justify-between items-center">
-                        <div className="flex items-center gap-2 mb-3">
+                    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
+                        <div className="flex items-center gap-2">
                             <Calendar className="w-4 h-4 text-gray-600" />
                             <span className="text-sm text-gray-600">
                                 Ngày gửi:
@@ -167,25 +167,29 @@ const ReportDetailModal = ({ isOpen, onClose, report, loading = false, onStatusU
                                 {formatDate(report.thoi_gian_tao)}
                             </span>
                         </div>
-                        <div className="flex items-center gap-2 mb-3">
-                            <User className="w-4 h-4 text-gray-600" />
-                            <span className="text-sm text-gray-600">
+                        <div className="flex items-start gap-2 min-w-0 flex-shrink">
+                            <User className="w-4 h-4 text-gray-600 flex-shrink-0 mt-0.5" />
+                            <span className="text-sm text-gray-600 flex-shrink-0">
                                 Người gửi:
                             </span>
-                            {renderContactInfo({
-                                name: report.ten_nguoi_phan_anh,
-                                phone: report.so_dien_thoai_nguoi_phan_anh,
-                            })}
+                            <div className="min-w-0 flex-1">
+                                {renderContactInfo({
+                                    name: report.ten_nguoi_phan_anh,
+                                    phone: report.so_dien_thoai_nguoi_phan_anh,
+                                })}
+                            </div>
                         </div>
                     </div>
 
-                    <div>
+                    <div className="mb-6">
                         <h4 className="text-sm font-semibold text-gray-900 mb-2 flex items-center gap-2">
                             Mô tả chi tiết
                         </h4>
-                        <p className="text-sm text-gray-700 rounded-md whitespace-pre-wrap mb-6">
-                            {report.mo_ta || "Không có mô tả"}
-                        </p>
+                        <div className="bg-gray-50 p-3 rounded-md">
+                            <p className="text-sm text-gray-700 whitespace-pre-wrap break-words overflow-wrap-anywhere word-break-break-word">
+                                {report.mo_ta || "Không có mô tả"}
+                            </p>
+                        </div>
                     </div>
 
                     <MediaGallery
@@ -199,7 +203,7 @@ const ReportDetailModal = ({ isOpen, onClose, report, loading = false, onStatusU
                             <MapPin className="w-4 h-4" />
                             Vị trí
                         </h4>
-                        <p className="text-sm text-gray-700 bg-gray-100 p-3.5 rounded-md">
+                        <p className="text-sm text-gray-700 bg-gray-100 p-3.5 rounded-md break-words overflow-wrap-anywhere">
                             {report.vi_tri || "Không có thông tin vị trí"}
                         </p>
                     </div>
@@ -215,7 +219,7 @@ const ReportDetailModal = ({ isOpen, onClose, report, loading = false, onStatusU
                                     onChange={(e) => setSelectedStatus(e.target.value)}
                                     disabled={!isEditMode}
                                     style={{ border: 'none' }}
-                                    className={`w-full px-3 py-2.5 text-gray-700 bg-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm resize-none ${!isEditMode ? 'cursor-not-allowed opacity-75' : ''}`}
+                                    className={`w-full px-3 py-2.5 text-gray-700 bg-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm resize-none break-words ${!isEditMode ? 'cursor-not-allowed opacity-75' : ''}`}
                                 >
                                     {statusReport &&
                                         Object.entries(statusReport).map(([key, value]) => (
@@ -233,7 +237,7 @@ const ReportDetailModal = ({ isOpen, onClose, report, loading = false, onStatusU
                                         </label>
                                         <input
                                             type="datetime-local"
-                                            value={expectedResponseDate}
+                                            value={expectedResponseDate || dayjs(report?.thoi_gian_phan_hoi_du_kien).format('YYYY-MM-DDTHH:mm') || ''}
                                             onChange={(e) => setExpectedResponseDate(e.target.value)}
                                             className="w-full px-3 py-2 bg-gray-100 border-0 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
                                         />
@@ -245,7 +249,7 @@ const ReportDetailModal = ({ isOpen, onClose, report, loading = false, onStatusU
                                         </label>
                                         <input
                                             type="datetime-local"
-                                            value={expectedCompletionDate}
+                                            value={expectedCompletionDate || dayjs(report?.ngay_du_kien_hoan_thanh).format('YYYY-MM-DDTHH:mm') || ''}
                                             onChange={(e) => setExpectedCompletionDate(e.target.value)}
                                             className="w-full px-3 py-2 bg-gray-100 border-0 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
                                         />
@@ -262,7 +266,8 @@ const ReportDetailModal = ({ isOpen, onClose, report, loading = false, onStatusU
                                     disabled={!isEditMode}
                                     value={responseContent}
                                     onChange={(e) => setResponseContent(e.target.value)}
-                                    className={`w-full px-3 py-2 text-gray-700 bg-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm resize-none ${!isEditMode ? 'cursor-not-allowed opacity-75' : ''}`}
+                                    className={`w-full px-3 py-2 text-gray-700 bg-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm resize-none break-words overflow-wrap-anywhere word-break-break-word ${!isEditMode ? 'cursor-not-allowed opacity-75' : ''}`}
+                                    style={{ minHeight: '72px', wordWrap: 'break-word' }}
                                 />
                             </div>
                         </div>

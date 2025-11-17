@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
-import { X, ChevronLeft, ChevronRight } from "lucide-react";
+import { createPortal } from "react-dom";
+import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import Hls from "hls.js";
 
 const MediaPreviewModal = ({ isOpen, onClose, mediaItems = [], initialIndex = 0 }) => {
@@ -17,22 +18,22 @@ const MediaPreviewModal = ({ isOpen, onClose, mediaItems = [], initialIndex = 0 
         const currentMedia = mediaItems[currentIndex];
         if (currentMedia?.type === 'video' && videoRef.current) {
             const videoUrl = currentMedia.url;
-            
+
             if (Hls.isSupported()) {
                 if (hlsRef.current) {
                     hlsRef.current.destroy();
                 }
-                
+
                 const hls = new Hls({
                     debug: false,
                     enableWorker: true,
                     lowLatencyMode: true,
                     backBufferLength: 90
                 });
-                
+
                 hls.loadSource(videoUrl);
                 hls.attachMedia(videoRef.current);
-                
+
                 hls.on(Hls.Events.MANIFEST_PARSED, () => {
                     videoRef.current.play().catch(err => {
                     });
@@ -101,94 +102,145 @@ const MediaPreviewModal = ({ isOpen, onClose, mediaItems = [], initialIndex = 0 
 
     const currentMedia = mediaItems[currentIndex];
 
-    return (
-        <div className="fixed inset-0 z-[100] h-full flex items-center justify-center" onClick={onClose}>
+    const modalContent = (
+        <div
+            className="fixed inset-0 z-[9999] overflow-hidden"
+            style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }}
+            aria-labelledby="modal-title"
+            role="dialog"
+            aria-modal="true"
+        >
             <div
-                className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
-                aria-hidden="true"
+                className="fixed inset-0 bg-gray-900 bg-opacity-75 transition-opacity"
+                onClick={onClose}
+                style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }}
             ></div>
 
-            <span
-                className="hidden sm:inline-block sm:align-middle sm:h-screen"
-                aria-hidden="true"
+            <div
+                className="fixed inset-0 flex justify-center p-4"
+                style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, overflow: 'hidden' }}
             >
-                &#8203;
-            </span>
-
-            <div 
-                className="inline-block align-middle bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all w-full max-w-5xl"
-                onClick={(e) => e.stopPropagation()}
-            >
-                <div className="bg-white">
-                    <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200">
-                        <h3 className="text-sm font-semibold text-gray-900">
+                <div
+                    className="relative bg-white rounded-lg shadow-xl w-full max-w-5xl"
+                    style={{
+                        height: '70vh',
+                        maxHeight: '70vh',
+                        minHeight: '530px',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        overflow: 'hidden'
+                    }}
+                >
+                    <div
+                        className="flex items-center justify-between px-4 bg-white border-b border-gray-200"
+                        style={{ flexShrink: 0, height: '25px' }}
+                    >
+                        <h3 className="text-lg font-semibold text-gray-900 pr-8">
                             Xem phương tiện ({currentIndex + 1}/{mediaItems.length})
                         </h3>
                         <button
                             onClick={onClose}
                             className="text-gray-400 hover:text-gray-500 focus:outline-none"
                         >
-                            <X className="w-5 h-5" />
+                            <X className="w-6 h-6" />
                         </button>
                     </div>
 
-                    <div className="relative bg-black" style={{ height: 'calc(100vh - 120px)' }}>
+                    <div
+                        className="relative bg-black flex items-center justify-center"
+                        style={{
+                            flex: 1,
+                            overflow: 'hidden',
+                            minHeight: 0
+                        }}
+                    >
                         {mediaItems.length > 1 && (
                             <>
                                 <button
                                     onClick={handlePrevious}
-                                    className="absolute left-2 top-1/2 -translate-y-1/2 text-white hover:text-gray-300 bg-black bg-opacity-50 rounded-full p-2 z-10"
+                                    className="absolute left-2 top-1/2 -translate-y-1/2 text-white hover:text-gray-300 bg-black bg-opacity-50 rounded-full p-2 z-20 transition-colors"
+                                    title="Ảnh trước"
                                 >
                                     <ChevronLeft className="w-6 h-6" />
                                 </button>
 
                                 <button
                                     onClick={handleNext}
-                                    className="absolute right-2 top-1/2 -translate-y-1/2 text-white hover:text-gray-300 bg-black bg-opacity-50 rounded-full p-2 z-10"
+                                    className="absolute right-2 top-1/2 -translate-y-1/2 text-white hover:text-gray-300 bg-black bg-opacity-50 rounded-full p-2 z-20 transition-colors"
+                                    title="Ảnh tiếp theo"
                                 >
                                     <ChevronRight className="w-6 h-6" />
                                 </button>
                             </>
                         )}
 
-                        <div className="w-full h-full flex items-center justify-center">
+                        <div
+                            className="w-full h-full flex justify-center"
+                            style={{
+                                overflow: 'hidden'
+                            }}
+                        >
                             {currentMedia.type === 'image' ? (
                                 <img
                                     src={currentMedia.url}
                                     alt={`Media ${currentIndex + 1}`}
-                                    className="w-full h-full object-contain"
+                                    style={{
+                                        maxWidth: '100%',
+                                        maxHeight: '100%',
+                                        width: 'auto',
+                                        height: 'auto',
+                                        objectFit: 'contain'
+                                    }}
                                 />
                             ) : (
                                 <video
                                     ref={videoRef}
                                     controls
-                                    className="w-full h-full object-contain"
+                                    style={{
+                                        maxWidth: '100%',
+                                        maxHeight: '100%',
+                                        width: 'auto',
+                                        height: 'auto',
+                                        objectFit: 'contain'
+                                    }}
                                 >
                                     Your browser does not support the video tag.
                                 </video>
                             )}
                         </div>
+
+
                     </div>
 
-                    {mediaItems.length > 1 && (
-                        <div className="px-4 py-3 bg-gray-50 flex justify-center gap-2">
-                            {mediaItems.map((_, index) => (
-                                <button
-                                    key={index}
-                                    onClick={() => setCurrentIndex(index)}
-                                    className={`w-2 h-2 rounded-full transition-all ${
-                                        index === currentIndex
-                                            ? "bg-blue-600 w-6"
-                                            : "bg-gray-300 hover:bg-gray-400"
-                                    }`}
-                                />
-                            ))}
+                    <div
+                        className="px-4 py-1 bg-white border-t border-gray-200 flex items-center justify-between"
+                        style={{ flexShrink: 0, height: '25px' }}
+                    >
+                        <div className="flex-1 flex justify-center">
+                            {mediaItems.length > 1 && (
+                                <div className="flex justify-center gap-2 bg-black bg-opacity-50 px-3 py-2 rounded-full max-w-[90%] overflow-x-auto">
+                                    {mediaItems.map((_, index) => (
+                                        <button
+                                            key={index}
+                                            onClick={() => setCurrentIndex(index)}
+                                            className={`w-2 h-2 rounded-full transition-all flex-shrink-0 ${index === currentIndex
+                                                    ? "bg-blue-500 w-6"
+                                                    : "bg-white bg-opacity-70 hover:bg-opacity-100"
+                                                }`}
+                                        />
+                                    ))}
+                                </div>
+                            )}
                         </div>
-                    )}
+
+                    </div>
+
                 </div>
             </div>
         </div>
     );
+
+    return createPortal(modalContent, document.body);
 };
 
 export default MediaPreviewModal;

@@ -3,9 +3,9 @@ import BaseFilter from '../base/BaseFilter';
 
 const ReportAreasFilter = ({ onFilter, onReset, filters = {}, pagination = {} }) => {
     const initialFilters = {
-        search: filters.search || '',
-        isActive: filters.isActive ?? true,
-        pageSize: pagination.pageSize || 10
+        search: '',
+        isActive: true,
+        pageSize: 10
     };
 
     const filterFields = [
