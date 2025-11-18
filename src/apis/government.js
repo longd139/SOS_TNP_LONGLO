@@ -9,7 +9,7 @@ const getGovernment = async ({ search = '', isActive = true, page, size } = {}) 
         if (page !== undefined) params.append('page', page);
         if (size !== undefined) params.append('size', size);
 
-        const response = await apiClient.get('/api/co-so-dich-vu-cong', {
+        const response = await apiClient.get('/api/co-so-dich-vu-cong/pagination', {
             params
         });
 
