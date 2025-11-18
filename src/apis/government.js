@@ -1,15 +1,15 @@
 import apiClient from "../utils/apiClient";
 
-const getGovernment = async ({ search = '', isRemoved = false, page, size } = {}) => {
+const getGovernment = async ({ search = '', isActive = true, page, size } = {}) => {
     try {
         const params = new URLSearchParams();
         if (search) params.append('search', search);
-        params.append('isActive', !isRemoved);
-        params.append('is_active', !isRemoved);
+        params.append('isActive', isActive);
+        params.append('is_active', isActive);
         if (page !== undefined) params.append('page', page);
         if (size !== undefined) params.append('size', size);
 
-        const response = await apiClient.get('/api/co-so-dich-vu-cong', {
+        const response = await apiClient.get('/api/co-so-dich-vu-cong/pagination', {
             params
         });
 
@@ -19,11 +19,11 @@ const getGovernment = async ({ search = '', isRemoved = false, page, size } = {}
         if (!raw) return { content: [], pagination: null };
 
         if (Array.isArray(raw)) {
-            return { content: raw, pagination: response.data.pagintation || response.data.pagination || null };
+            return { content: raw, pagination: response.data.pagination || null };
         }
 
         const content = raw.data || raw.content || [];
-        const pagination = raw.pagination || raw.pagintation || response.data.pagintation || response.data.pagination || null;
+        const pagination = raw.pagination || response.data.pagination || null;
         return { content, pagination };
     } catch (error) {
         if (error.response?.data?.message) {

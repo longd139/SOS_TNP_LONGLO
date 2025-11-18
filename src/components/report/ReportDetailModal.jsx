@@ -32,21 +32,33 @@ const ReportDetailModal = ({ isOpen, onClose, report, loading = false, onStatusU
     const isEditMode = mode === "edit";
 
     useEffect(() => {
-        if (isOpen && report && report.lich_su_trang_thai && report.lich_su_trang_thai.length > 0) {
-            const latest = report.lich_su_trang_thai.reduce((prev, curr) => {
-                try {
-                    return dayjs(prev.thoi_gian_tao).isSameOrAfter(dayjs(curr.thoi_gian_tao)) ? curr : prev;
-                } catch (e) {
-                    return prev;
-                }
-            }, report.lich_su_trang_thai[0]);
+        if (isOpen && report) {
+            if (report.lich_su_trang_thai && report.lich_su_trang_thai.length > 0) {
+                const latest = report.lich_su_trang_thai.reduce((prev, curr) => {
+                    try {
+                        return dayjs(prev.thoi_gian_tao).isSameOrAfter(dayjs(curr.thoi_gian_tao)) ? curr : prev;
+                    } catch (e) {
+                        return prev;
+                    }
+                }, report.lich_su_trang_thai[0]);
 
-            const latestName = (latest && latest.ten) ? latest.ten : "";
+                const latestName = (latest && latest.ten) ? latest.ten : "";
+                setSelectedStatus(latestName);
+                
+                setResponseContent(latest?.ghi_chu || "");
+            }
             
-            setSelectedStatus(latestName);
-            setResponseContent("");
-            setExpectedResponseDate("");
-            setExpectedCompletionDate("");
+            if (report.thoi_gian_phan_hoi_du_kien) {
+                setExpectedResponseDate(dayjs(report.thoi_gian_phan_hoi_du_kien).format('YYYY-MM-DDTHH:mm'));
+            } else {
+                setExpectedResponseDate("");
+            }
+            
+            if (report.ngay_du_kien_hoan_thanh) {
+                setExpectedCompletionDate(dayjs(report.ngay_du_kien_hoan_thanh).format('YYYY-MM-DDTHH:mm'));
+            } else {
+                setExpectedCompletionDate("");
+            }
         }
     }, [report?.id, statusReport, isOpen]);
 
@@ -237,7 +249,7 @@ const ReportDetailModal = ({ isOpen, onClose, report, loading = false, onStatusU
                                         </label>
                                         <input
                                             type="datetime-local"
-                                            value={expectedResponseDate || dayjs(report?.thoi_gian_phan_hoi_du_kien).format('YYYY-MM-DDTHH:mm') || ''}
+                                            value={expectedResponseDate}
                                             onChange={(e) => setExpectedResponseDate(e.target.value)}
                                             className="w-full px-3 py-2 bg-gray-100 border-0 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
                                         />
@@ -249,7 +261,7 @@ const ReportDetailModal = ({ isOpen, onClose, report, loading = false, onStatusU
                                         </label>
                                         <input
                                             type="datetime-local"
-                                            value={expectedCompletionDate || dayjs(report?.ngay_du_kien_hoan_thanh).format('YYYY-MM-DDTHH:mm') || ''}
+                                            value={expectedCompletionDate}
                                             onChange={(e) => setExpectedCompletionDate(e.target.value)}
                                             className="w-full px-3 py-2 bg-gray-100 border-0 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
                                         />

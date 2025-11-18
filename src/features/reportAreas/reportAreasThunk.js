@@ -63,7 +63,7 @@ export const updateStatusReportArea = createAsyncThunk(
             const result = await REPORT_AREAS_API.updateReportAreaStatus(reportAreaId, isActive);
             return result;
         } catch (error) {
-            return rejectWithValue(error.message || 'Cập nhật trạng thái lĩnh vực phản ánh thất bại');
+            return rejectWithValue(error || 'Cập nhật trạng thái lĩnh vực phản ánh thất bại');
         }
     }
 )

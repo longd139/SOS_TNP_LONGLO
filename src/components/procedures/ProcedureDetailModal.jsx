@@ -286,13 +286,13 @@ const ProcedureDetailModal = ({ isOpen, onClose, procedure }) => {
                         <div>
                             <label className="block text-sm font-medium text-gray-600 mb-1">Thời gian tạo</label>
                             <p className="text-sm text-gray-900">
-                                {dayjs(procedure.thoi_gian_tao).format('HH:mm:ss DD/MM/YYYY')}
+                                {dayjs(procedure.thoi_gian_tao).format('DD/MM/YYYY HH:mm')}
                             </p>
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-gray-600 mb-1">Thời gian cập nhật</label>
                             <p className="text-sm text-gray-900">
-                                {dayjs(procedure.thoi_gian_cap_nhap).format('HH:mm:ss DD/MM/YYYY')}
+                                {dayjs(procedure.thoi_gian_cap_nhap).format('DD/MM/YYYY HH:mm')}
                             </p>
                         </div>
                     </div>
