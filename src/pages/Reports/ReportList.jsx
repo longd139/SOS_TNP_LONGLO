@@ -180,7 +180,7 @@ export default function ReportList() {
             title: "Ngày gửi",
             dataIndex: "thoi_gian_tao",
             key: "thoi_gian_tao",
-            render: (value) => <span className="text-sm text-gray-600">{dayjs(value).format("HH:mm DD/MM/YYYY")}</span>,
+            render: (value) => <span className="text-sm text-gray-600">{dayjs(value).format("DD/MM/YYYY HH:mm")}</span>,
         },
         {
             title: "Thông tin liên hệ",

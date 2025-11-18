@@ -84,9 +84,9 @@ export const getProcedureColumns = (pagination) => [
         render: (value) => (
             <span 
                 className="block max-w-[150px] truncate text-ellipsis overflow-hidden whitespace-nowrap text-sm text-gray-900"
-                title={value ? dayjs(value).format('HH:mm:ss DD/MM/YYYY') : 'N/A'}
+                title={value ? dayjs(value).format('DD/MM/YYYY HH:mm') : 'N/A'}
             >
-                {value ? dayjs(value).format('HH:mm:ss DD/MM/YYYY') : 'N/A'}
+                {value ? dayjs(value).format('DD/MM/YYYY HH:mm') : 'N/A'}
             </span>
         )
     },
