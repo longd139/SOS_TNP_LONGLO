@@ -54,7 +54,7 @@ export default function ProceduresFilter({
             type: 'select',
             options: [
                 { value: true, label: 'Hoạt động' },
-                { value: false, label: 'Đã xóa' }
+                { value: false, label: 'Vô hiệu hóa' }
             ]
         },
         {

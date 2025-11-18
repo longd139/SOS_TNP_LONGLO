@@ -91,13 +91,6 @@ export default function Login() {
                     Ứng dụng công dân Phường Tăng Nhơn Phú
                 </p>
 
-                {apiError && (
-                    <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg flex items-center gap-2">
-                        <AlertCircle className="w-4 h-4" />
-                        <span className="text-sm">{apiError}</span>
-                    </div>
-                )}
-
                 <form onSubmit={handleSubmit} className="space-y-4 text-left">
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1 required-label">
