@@ -212,7 +212,7 @@ export default function ReportList() {
             />
 
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-4 px-4 py-3">
-                <h3 className="font-semibold text-gray-900">
+                <h3 className="font-semibold text-gray-900 mb-0">
                     Danh sách phản ánh ({pagination.totalItems || 0})
                 </h3>
             </div>
