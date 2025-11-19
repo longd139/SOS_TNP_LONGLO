@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import BaseModal, { ModalFooter } from "../base/BaseModal";
 import { validateGovernmentForm } from "../../validator/governmentValidator";
+import { GOVERNMENT_API } from "../../apis/government";
+import { showToast } from "../../utils/toastNotification";
 
 const initialState = {
   tenCoSo: "",
@@ -22,6 +24,7 @@ const GovernmentFormModal = ({
 }) => {
   const [form, setForm] = useState(initialState);
   const [errors, setErrors] = useState({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
@@ -69,12 +72,40 @@ const GovernmentFormModal = ({
       linkGoogleMap: form.linkGoogleMap,
     };
 
-    if (mode === "edit") {
-      onSubmit && onSubmit(payload);
-    } else {
-      onSubmit && onSubmit(payload);
-      setForm(initialState);
-      setErrors({});
+    setIsSubmitting(true);
+    try {
+      if (mode === "edit") {
+        if (onSubmit) await onSubmit(payload);
+      } else {
+        let created = null;
+        if (onCreate) {
+          try {
+            created = await Promise.resolve(onCreate(payload));
+          } catch (e) {
+          }
+        }
+
+        if (!created) {
+          const apiCreated = await GOVERNMENT_API.createGovernment(payload);
+          created = apiCreated;
+          if (onCreate) {
+            try {
+              onCreate(created);
+            } catch (e) {
+            }
+          }
+        }
+
+        if (created) {
+          setForm(initialState);
+          setErrors({});
+          onClose();
+        }
+      }
+    } catch (err) {
+      if (err?.message) showToast?.error(err.message);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 

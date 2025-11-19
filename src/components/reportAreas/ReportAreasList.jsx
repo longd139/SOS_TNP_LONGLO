@@ -139,7 +139,7 @@ export default function ReportAreasList() {
                 search: filters.search
             });
         } catch (error) {
-            showToast.error(error.message || 'Xóa lĩnh vực thất bại!');
+            showToast.error(error || 'Xóa lĩnh vực thất bại!');
         }
     };
 

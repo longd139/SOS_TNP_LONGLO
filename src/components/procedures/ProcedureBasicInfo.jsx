@@ -88,7 +88,7 @@ const ProcedureBasicInfo = ({ formData, errors, updateField }) => {
                     <label className="block text-sm font-medium text-gray-700 mb-2 required-label">
                         Mã CSDVC
                     </label>
-                    <div className="flex gap-2">
+                    <div className="flex items-start gap-2">
                         <div className="flex-1">
                             <input
                                 type="text"
@@ -144,7 +144,7 @@ const ProcedureBasicInfo = ({ formData, errors, updateField }) => {
                         <button
                             type="button"
                             onClick={() => setOpenCreate(true)}
-                            className="flex-shrink-0 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors flex items-center justify-center"
+                            className="self-start flex-shrink-0 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors flex items-center justify-center"
                             title="Tạo mới cơ sở dịch vụ công"
                         >
                             <PlusCircle className="w-5 h-5" />
