@@ -179,11 +179,11 @@ export default function BaseFilter({
                         >
                             <Filter className="w-4 h-4" />
                             Bộ lọc
-                            {hasActiveFilters() && (
+                            {/* {hasActiveFilters() && (
                                 <span className="ml-1 px-2 py-0.5 bg-blue-600 text-white text-xs rounded-full">
                                     {activeFilterCount()}
                                 </span>
-                            )}
+                            )} */}
                         </button>
                     )}
 

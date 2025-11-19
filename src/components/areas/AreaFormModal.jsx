@@ -1,7 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import BaseModal, { ModalFooter } from '../base/BaseModal';
 import { validateAreaForm } from '../../validator/areaValidator';
+
+// Persist form input across unmounts to avoid losing user-entered data on errors
+let _persistedAreaForm = null;
 
 const AreaFormModal = ({ isOpen, onClose, onSubmit, initialData = null, mode = 'create', isLoading = false }) => {
     const [formData, setFormData] = useState({
@@ -11,18 +14,26 @@ const AreaFormModal = ({ isOpen, onClose, onSubmit, initialData = null, mode = '
     const [errors, setErrors] = useState({});
     const [isSubmitting, setIsSubmitting] = useState(false);
 
+    const prevIsOpen = useRef(false);
+
     useEffect(() => {
-        if (isOpen && initialData && mode === 'edit') {
-            setFormData({
-                tenLinhVuc: initialData.ten_linh_vuc || '',
-                moTa: initialData.mo_ta || ''
-            });
-        } else if (isOpen && mode === 'create') {
-            setFormData({
-                tenLinhVuc: '',
-                moTa: ''
-            });
+        // Initialize/reset only when modal opens (false -> true)
+        if (!prevIsOpen.current && isOpen) {
+            if (_persistedAreaForm) {
+                setFormData(_persistedAreaForm);
+            } else if (initialData && mode === 'edit') {
+                setFormData({
+                    tenLinhVuc: initialData.ten_linh_vuc || '',
+                    moTa: initialData.mo_ta || ''
+                });
+            } else if (mode === 'create') {
+                setFormData({
+                    tenLinhVuc: '',
+                    moTa: ''
+                });
+            }
         }
+        prevIsOpen.current = isOpen;
     }, [isOpen, initialData, mode]);
 
     const handleChange = (field, value) => {
@@ -30,6 +41,7 @@ const AreaFormModal = ({ isOpen, onClose, onSubmit, initialData = null, mode = '
             ...prev,
             [field]: value
         }));
+        _persistedAreaForm = { ...formData, [field]: value };
         if (errors[field]) {
             setErrors(prev => ({
                 ...prev,
@@ -57,6 +69,7 @@ const AreaFormModal = ({ isOpen, onClose, onSubmit, initialData = null, mode = '
                 moTa: ''
             });
             setErrors({});
+            _persistedAreaForm = null;
         } catch (error) {
         } finally {
             setIsSubmitting(false);

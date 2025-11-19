@@ -18,12 +18,11 @@ const ProcedureBasicInfo = ({ formData, errors, updateField }) => {
         const t = setTimeout(async () => {
             setLoading(true);
             try {
-                const resp = await GOVERNMENT_API.getGovernment({ 
-                    search: search || '', 
-                    isRemoved: false, 
-                    size: search ? 10 : 20 
+                const resp = await GOVERNMENT_API.getGovermentNoPagination({
+                    search: search,
+                    isActive: true
                 });
-                setResults(resp.content || []);
+                setResults(resp || []);
             } catch (err) {
                 setResults([]);
             } finally {

@@ -33,6 +33,27 @@ const getGovernment = async ({ search = '', isActive = true, page, size } = {}) 
     }
 }
 
+const getGovermentNoPagination = async ({ isActive = true, search = '' } = {}) => {
+    try {
+        const params = new URLSearchParams();
+        if (typeof isActive !== 'undefined') {
+            params.append('isActive', String(isActive));
+            params.append('is_active', String(isActive));
+        }
+        if (search) params.append('search', search);
+        const response = await apiClient.get('/api/co-so-dich-vu-cong', {
+            params
+        });
+        if (!response.data.success) throw new Error(response.data.message || 'Failed to fetch government data');
+        return response.data.data;
+    } catch (error) {
+        if (error.response?.data?.message) {
+            throw new Error(error.response.data.message);
+        }
+        throw error;
+    }
+}
+
 const createGovernment = async (governmentData) => {
     try {
         const response = await apiClient.post('/api/co-so-dich-vu-cong', governmentData);
@@ -104,5 +125,6 @@ export const GOVERNMENT_API = {
     getGovernmentById,
     updateGovernment,
     deleteGovernment,
-    updateStatusGovernment
+    updateStatusGovernment,
+    getGovermentNoPagination
 }
