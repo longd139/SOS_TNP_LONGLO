@@ -4,8 +4,8 @@ import BaseModal, { ModalFooter } from '../base/BaseModal';
 import { validateReportArea } from '../../validator/reportAreaValidator';
 import { showToast } from '../../utils/toastNotification';
 
-// Persist form input across unmounts/re-mounts to avoid losing user-entered data on errors
 let _persistedReportAreaForm = null;
+let _persistedReportAreaId = null;
 
 const ReportAreaFormModal = ({
     isOpen,
@@ -25,7 +25,16 @@ const ReportAreaFormModal = ({
 
     useEffect(() => {
         if (!prevIsOpen.current && isOpen) {
-            // Restore persisted input if available (user typed before and error occurred)
+            if (mode === 'edit' && initialData && _persistedReportAreaId !== initialData.id) {
+                _persistedReportAreaForm = null;
+                _persistedReportAreaId = initialData.id;
+            }
+
+            if (mode === 'create' && _persistedReportAreaId !== null) {
+                _persistedReportAreaForm = null;
+                _persistedReportAreaId = null;
+            }
+
             if (_persistedReportAreaForm) {
                 setFormData(_persistedReportAreaForm);
             } else if (initialData && mode === 'edit') {
@@ -51,6 +60,7 @@ const ReportAreaFormModal = ({
         });
         setErrors({});
         _persistedReportAreaForm = null;
+        _persistedReportAreaId = null;
     };
 
     const validateForm = async () => {
@@ -61,7 +71,7 @@ const ReportAreaFormModal = ({
 
     const handleSubmit = async () => {
         const isValid = await validateForm();
-        
+
         if (!isValid) {
             showToast.error('Vui lòng kiểm tra lại các trường bắt buộc!');
             return;
@@ -74,7 +84,7 @@ const ReportAreaFormModal = ({
             });
             resetForm();
         } catch (error) {
-            showToast.error(error.message || 'Đã có lỗi xảy ra khi gửi dữ liệu!');
+            // showToast.error(error.message || 'Đã có lỗi xảy ra khi gửi dữ liệu!');
         }
     };
 
@@ -126,9 +136,8 @@ const ReportAreaFormModal = ({
                         value={formData.ten}
                         onChange={(e) => updateField('ten', e.target.value)}
                         placeholder="Nhập tên lĩnh vực..."
-                        className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                            errors.ten ? 'border-red-500' : 'border-gray-300'
-                        }`}
+                        className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.ten ? 'border-red-500' : 'border-gray-300'
+                            }`}
                     />
                     {errors.ten && (
                         <p className="mt-1 text-sm text-red-600">{errors.ten}</p>
@@ -144,9 +153,8 @@ const ReportAreaFormModal = ({
                         onChange={(e) => updateField('moTa', e.target.value)}
                         placeholder="Nhập mô tả lĩnh vực..."
                         rows="4"
-                        className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                            errors.moTa ? 'border-red-500' : 'border-gray-300'
-                        }`}
+                        className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.moTa ? 'border-red-500' : 'border-gray-300'
+                            }`}
                     />
                     {errors.moTa && (
                         <p className="mt-1 text-sm text-red-600">{errors.moTa}</p>
