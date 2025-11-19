@@ -100,6 +100,7 @@ export default function AreasList() {
             });
         } catch (error) {
             showToast.error(error.message || 'Tạo lĩnh vực thất bại!');
+            throw error;
         } finally {
             setIsSubmitting(false);
         }
@@ -120,6 +121,7 @@ export default function AreasList() {
             });
         } catch (error) {
             showToast.error(error.message || 'Cập nhật lĩnh vực thất bại!');
+            throw error;
         } finally {
             setIsSubmitting(false);
         }
