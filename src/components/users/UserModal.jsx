@@ -1,6 +1,6 @@
 import React from 'react';
 import BaseModal, { ModalFooter } from '../base/BaseModal';
-import { ROLE_LABELS } from '../../constants/role';
+import { ROLE_LABELS, ROLE_LABELS_ADMIN } from '../../constants/role';
 import { useUserForm } from '../../hooks/useUserForm';
 
 const UserModal = ({
@@ -145,7 +145,7 @@ const UserModal = ({
                         className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 ${errors.role ? 'border-red-500' : 'border-gray-300'
                             }`}
                     >
-                        {Object.entries(ROLE_LABELS).map(([key, label]) => (
+                        {Object.entries(ROLE_LABELS_ADMIN).map(([key, label]) => (
                             <option key={key} value={key}>
                                 {label}
                             </option>
