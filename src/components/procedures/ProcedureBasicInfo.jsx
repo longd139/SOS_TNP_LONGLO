@@ -67,7 +67,22 @@ const ProcedureBasicInfo = ({ formData, errors, updateField }) => {
 
     const handleCreateSuccess = (created) => {
         if (!created) return;
-        handleSelect(created);
+        const payload = created.data || created;
+
+        const idCandidate = payload?.id ?? payload?._id ?? payload?.Id ?? payload?.ID;
+        const id = (typeof idCandidate === 'string' || typeof idCandidate === 'number') ? idCandidate : null;
+
+        const nameCandidate = payload?.ten_co_so || payload?.tenCoSo || payload?.name || '';
+        const name = typeof nameCandidate === 'string' ? nameCandidate : '';
+
+        if (!id && !name) return;
+
+        if (id) updateField('idCoSoDichVuCong', id);
+        if (name) {
+            updateField('tenCoSoDichVuCong', name);
+            setSearch(name);
+        }
+        setShowDropdown(false);
     };
 
     const handleKeyDown = (e) => {
