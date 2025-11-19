@@ -54,7 +54,7 @@ export default function ProceduresFilter({
             type: 'select',
             options: [
                 { value: true, label: 'Hoạt động' },
-                { value: false, label: 'Vô hiệu hóa' }
+                { value: false, label: 'Không hoạt động' }
             ]
         },
         {

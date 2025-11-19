@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { FileText, Download, Plus } from "lucide-react";
+import { FileText, Download, Plus, Loader2 } from "lucide-react";
 import { ConfirmModal } from "../../components/base/BaseModal";
 import TemplateFormModal from "../../components/templates/TemplateFormModal";
 import TemplateFilter from "../../components/templates/TemplateFilter";
@@ -334,6 +334,7 @@ export default function TemplateManager() {
             dataIndex: "isActive",
             key: "isActive",
             width: "120px",
+            //here
             render: (value, record) => {
                 const v =
                     typeof value !== "undefined"
@@ -341,10 +342,12 @@ export default function TemplateManager() {
                         : record?.is_active ?? record?.isActive;
                 return (
                     <span
-                        className="block max-w-[120px] truncate text-ellipsis overflow-hidden whitespace-nowrap text-sm text-gray-900"
-                        title={v ? "Hoạt động" : "Không hoạt động"}
+                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${value
+                            ? 'bg-green-100 text-green-800'
+                            : 'bg-gray-100 text-gray-800'
+                            }`}
                     >
-                        {v ? "Hoạt động" : "Không hoạt động"}
+                        {value ? 'Hoạt động' : 'Không hoạt động'}
                     </span>
                 );
             },
@@ -353,13 +356,23 @@ export default function TemplateManager() {
 
     return (
         <div className="min-h-screen">
-            <div className="mb-3 md:mb-4 sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3">
-                <h1 className="text-xl md:text-2xl font-bold text-gray-900">
-                    Quản lý biểu mẫu
-                </h1>
-                <p className="text-sm md:text-base text-gray-600 mt-1">
-                    Quản lý các biểu mẫu tải xuống cho người dân
-                </p>
+            <div className="mb-4 flex items-center justify-between">
+                <div>
+                    <h1 className="text-xl md:text-2xl font-bold text-gray-900">
+                        Quản lý biểu mẫu
+                    </h1>
+                    <p className="text-sm md:text-base text-gray-600 mt-1">
+                        Quản lý các biểu mẫu tải xuống cho người dân
+                    </p>
+                </div>
+                <button
+                    onClick={handleCreateTemplate}
+                    className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm md:text-base"
+                >
+                    <Plus className="w-4 h-4" />
+                    <span className="hidden sm:inline">Thêm biểu mẫu mới</span>
+                    <span className="sm:hidden">Thêm mới</span>
+                </button>
             </div>
 
             <TemplateFilter
@@ -373,14 +386,14 @@ export default function TemplateManager() {
                 onSearchWithFilters={handleSearchWithFilters}
             />
 
-            <div className="mb-3 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 bg-white p-3 rounded-lg shadow-sm border border-gray-200">
+            <div className="mb-4 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 bg-white p-3 rounded-lg shadow-sm border border-gray-200">
                 <div className="flex items-center gap-3">
-                    <div className="text-xs md:text-sm text-gray-600">
+                    <h3 className="font-semibold text-gray-900 mb-0">
                         Danh sách thủ tục ({pagination.total})
-                    </div>
+                    </h3>
                     {showRemoved && (
                         <span className="px-2 md:px-3 py-1 bg-red-100 text-red-800 text-xs font-medium rounded-full">
-                            Đã xóa
+                            Không hoạt động
                         </span>
                     )}
                     {!showRemoved && (
@@ -389,14 +402,12 @@ export default function TemplateManager() {
                         </span>
                     )}
                 </div>
-                <button
-                    onClick={handleCreateTemplate}
-                    className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm md:text-base"
-                >
-                    <Plus className="w-4 h-4" />
-                    <span className="hidden sm:inline">Thêm biểu mẫu mới</span>
-                    <span className="sm:hidden">Thêm mới</span>
-                </button>
+                {loading && (
+                    <div className="flex items-center gap-2 text-sm text-gray-600">
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        <span>Đang tải...</span>
+                    </div>
+                )}
             </div>
 
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
