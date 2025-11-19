@@ -33,13 +33,17 @@ export const useGovernment = ({ autoFetch = false, filters = {}, isActive } = {}
     const pagination = useSelector(selectGovernmentPagination);
     const currentFilters = useSelector(selectGovernmentFilters);
 
-    const loadGovernments = useCallback((params = {}) => {
+    const loadGovernments = useCallback((params = {}, forceRefresh = false) => {
         const requestParams = {
             page: params.page || pagination.currentPage,
             size: params.size || pagination.pageSize,
             search: params.search || currentFilters.search || '',
             isActive: params.isActive !== undefined ? params.isActive : currentFilters.isActive
         };
+
+        if (forceRefresh) {
+            requestParams._refresh = Date.now();
+        }
 
         return dispatch(fetchGovernmentPagination(requestParams)).unwrap();
     }, [dispatch, pagination, currentFilters]);

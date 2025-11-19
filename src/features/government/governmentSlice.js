@@ -69,6 +69,10 @@ const governmentSlice = createSlice({
                 state.loading = false;
                 if (action.payload) {
                     state.governments.unshift(action.payload);
+                    state.pagination.totalItems = (state.pagination.totalItems || 0) + 1;
+                    if (state.governments.length > state.pagination.pageSize) {
+                        state.governments.pop();
+                    }
                 }
             })
             .addCase(createGovernment.rejected, (state, action) => {
@@ -83,9 +87,16 @@ const governmentSlice = createSlice({
             .addCase(updateGovernment.fulfilled, (state, action) => {
                 state.loading = false;
                 if (action.payload) {
-                    const index = state.governments.findIndex(gov => gov.id === action.payload.id);
-                    if (index !== -1) {
-                        state.governments[index] = action.payload;
+                    const updatedId = action.payload.id || action.meta?.arg?.id;
+                    if (updatedId) {
+                        const index = state.governments.findIndex(gov => gov.id === updatedId);
+                        if (index !== -1) {
+                            state.governments[index] = {
+                                ...state.governments[index],
+                                ...action.payload,
+                                id: updatedId
+                            };
+                        }
                     }
                 }
             })

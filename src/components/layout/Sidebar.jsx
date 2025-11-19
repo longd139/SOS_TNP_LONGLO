@@ -55,6 +55,13 @@ const menuItems = [
         hasSubmenu: false
     },
     {
+        id: 'government',
+        label: 'Quản lý cơ sở dịch vụ công',
+        icon: FolderOpen,
+        path: ROUTE_PATH.GOVERNMENT,
+        hasSubmenu: false
+    },
+    {
         id: 'contact',
         label: 'Ủy ban Phường',
         icon: Phone,

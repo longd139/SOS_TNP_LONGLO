@@ -47,7 +47,7 @@ const BaseTable = ({
                             ))}
                             {showActions && (
                                 <th
-                                    className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap"
+                                    className="px-6 text-left py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap"
                                     style={{ width: actionColumnWidth, maxWidth: actionColumnWidth }}
                                 >
                                     Thao tác
@@ -89,8 +89,8 @@ const BaseTable = ({
                                         );
                                     })}
                                     {showActions && (
-                                        <td className="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
-                                            <div className="flex justify-center space-x-2">
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                            <div className="flex space-x-2">
                                                 {onView && (
                                                     <button
                                                         onClick={() => onView(item)}
@@ -109,15 +109,6 @@ const BaseTable = ({
                                                         <Pencil className="w-4 h-4" />
                                                     </button>
                                                 )}
-                                                {onDelete && (!canDelete || canDelete(item)) && (
-                                                    <button
-                                                        onClick={() => onDelete(item)}
-                                                        className="text-red-600 hover:text-red-900 p-1 rounded hover:bg-red-100"
-                                                        title="Xóa"
-                                                    >
-                                                        <Trash2 className="w-4 h-4" />
-                                                    </button>
-                                                )}
                                                 {
                                                     onUpdateStatus && (
                                                         <button
@@ -127,7 +118,18 @@ const BaseTable = ({
                                                         >
                                                             <ToggleLeft className="w-4 h-4" />
                                                         </button>
-                                                    )}
+                                                    )
+                                                }
+                                                {onDelete && (!canDelete || canDelete(item)) && (
+                                                    <button
+                                                        onClick={() => onDelete(item)}
+                                                        className="text-red-600 hover:text-red-900 p-1 rounded hover:bg-red-100"
+                                                        title="Xóa"
+                                                    >
+                                                        <Trash2 className="w-4 h-4" />
+                                                    </button>
+                                                )}
+                                                
                                             </div>
                                         </td>
                                     )}
@@ -169,14 +171,14 @@ const BaseTable = ({
                                     const currentPage = pagination.current || pagination.currentPage || 1;
                                     const pageSize = pagination.pageSize || 10;
                                     const totalItems = pagination.total || pagination.totalItems || 0;
-                                    
+
                                     if (totalItems === 0) {
                                         return <>Không có kết quả nào</>;
                                     }
-                                    
+
                                     const startItem = ((currentPage - 1) * pageSize) + 1;
                                     const endItem = Math.min(currentPage * pageSize, totalItems);
-                                    
+
                                     return (
                                         <>
                                             Hiển thị{' '}
@@ -225,8 +227,8 @@ const BaseTable = ({
                                             key={pageNum}
                                             onClick={() => handleChange && handleChange(pageNum)}
                                             className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${pageNum === currentPage
-                                                    ? 'z-10 bg-blue-50 border-blue-500 text-blue-600'
-                                                    : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
+                                                ? 'z-10 bg-blue-50 border-blue-500 text-blue-600'
+                                                : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
                                                 }`}
                                         >
                                             {pageNum}

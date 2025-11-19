@@ -162,6 +162,7 @@ export default function AreasList() {
         {
             title: 'STT',
             key: 'stt',
+            width: '80px',
             render: (value, record, index) => (
                 <span className="text-sm font-medium text-gray-900">
                     #{((pagination?.currentPage || 1) - 1) * (pagination?.pageSize || 10) + index + 1}
@@ -186,9 +187,10 @@ export default function AreasList() {
             title: 'Mô tả',
             dataIndex: 'mo_ta',
             key: 'mo_ta',
+            width: '400px',
             render: (value) => (
                 <div
-                    className="text-sm text-gray-600 max-w-[400px] truncate"
+                    className="text-sm text-gray-600 min-w-0 truncate"
                     title={value || 'Không có mô tả'}
                 >
                     {value || 'Không có mô tả'}
