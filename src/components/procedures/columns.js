@@ -14,7 +14,7 @@ export const getProcedureColumns = (pagination) => [
         key: 'ten_thu_tuc',
         width: '250px',
         render: (value) => (
-            <span 
+            <span
                 className="block max-w-[250px] truncate text-ellipsis overflow-hidden whitespace-nowrap text-sm text-gray-900"
                 title={value}
             >
@@ -28,7 +28,7 @@ export const getProcedureColumns = (pagination) => [
         key: 'so_dien_thoai_co_so',
         width: '120px',
         render: (value) => (
-            <span 
+            <span
                 className="block max-w-[120px] truncate text-ellipsis overflow-hidden whitespace-nowrap text-sm text-gray-900"
                 title={value || 'N/A'}
             >
@@ -50,7 +50,7 @@ export const getProcedureColumns = (pagination) => [
                 displayValue = value.ten_linh_vuc || value;
             }
             return (
-                <span 
+                <span
                     className="block max-w-[180px] truncate text-ellipsis overflow-hidden whitespace-nowrap text-sm text-gray-900"
                     title={displayValue}
                 >
@@ -67,7 +67,7 @@ export const getProcedureColumns = (pagination) => [
         render: (value) => {
             const displayValue = value || 'N/A';
             return (
-                <span 
+                <span
                     className="block max-w-[200px] truncate text-ellipsis overflow-hidden whitespace-nowrap text-sm text-gray-900"
                     title={displayValue}
                 >
@@ -82,7 +82,7 @@ export const getProcedureColumns = (pagination) => [
         key: 'thoi_gian_tao',
         width: '150px',
         render: (value) => (
-            <span 
+            <span
                 className="block max-w-[150px] truncate text-ellipsis overflow-hidden whitespace-nowrap text-sm text-gray-900"
                 title={value ? dayjs(value).format('DD/MM/YYYY HH:mm') : 'N/A'}
             >
@@ -96,9 +96,11 @@ export const getProcedureColumns = (pagination) => [
         key: 'is_active',
         width: '120px',
         render: (value) => (
-            <span 
-                className="block max-w-[120px] truncate text-ellipsis overflow-hidden whitespace-nowrap text-sm text-gray-900"
-                title={value ? 'Hoạt động' : 'Không hoạt động'}
+            <span
+                className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${value
+                        ? 'bg-green-100 text-green-800'
+                        : 'bg-gray-100 text-gray-800'
+                    }`}
             >
                 {value ? 'Hoạt động' : 'Không hoạt động'}
             </span>

@@ -42,7 +42,7 @@ export default function AreasList() {
     const handleFilter = (newFilters) => {
         updateFilters({ search: newFilters.search || '' });
         setShowActive(newFilters.isActive);
-        
+
         loadAreas({
             page: 1,
             size: newFilters.pageSize || pagination.pageSize,
@@ -215,11 +215,10 @@ export default function AreasList() {
             width: '120px',
             render: (value) => (
                 <span
-                    className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                        value
+                    className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${value
                             ? 'bg-green-100 text-green-800'
                             : 'bg-gray-100 text-gray-800'
-                    }`}
+                        }`}
                 >
                     {value ? 'Hoạt động' : 'Không hoạt động'}
                 </span>
@@ -243,25 +242,35 @@ export default function AreasList() {
                 </button>
             </div>
 
-            <AreaFilter 
-                onFilter={handleFilter} 
+            <AreaFilter
+                onFilter={handleFilter}
                 onReset={handleReset}
                 filters={{ search: filters.search, isActive: showActive }}
                 pagination={pagination}
             />
 
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-4 px-4 py-3">
-                <div className="flex items-center justify-between">
-                    <h3 className="font-semibold text-gray-900">
+            <div className="flex flex-col mb-4 sm:flex-row sm:justify-between sm:items-center gap-2 bg-white p-3 rounded-lg shadow-sm border border-gray-200">
+                <div className="flex items-center gap-3">
+                    <h3 className="font-semibold text-gray-900 mb-0">
                         Danh sách lĩnh vực ({pagination.totalItems || 0})
                     </h3>
-                    {loading && (
-                        <div className="flex items-center gap-2 text-sm text-gray-600">
-                            <Loader2 className="w-4 h-4 animate-spin" />
-                            <span>Đang tải...</span>
-                        </div>
+                    {!showActive && (
+                        <span className="px-2 md:px-3 py-1 bg-red-100 text-red-800 text-xs font-medium rounded-full">
+                            Không hoạt động
+                        </span>
+                    )}
+                    {showActive && (
+                        <span className="px-3 py-1 bg-green-100 text-green-800 text-xs font-medium rounded-full">
+                            Đang hoạt động
+                        </span>
                     )}
                 </div>
+                {loading && (
+                    <div className="flex items-center gap-2 text-sm text-gray-600">
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        <span>Đang tải...</span>
+                    </div>
+                )}
             </div>
 
             <BaseTable
