@@ -587,6 +587,29 @@ const NewsFormModal = ({ isOpen, onClose, onSubmit, initialData = null, isLoadin
                         .ql-tooltip a.ql-action {
                             margin-right: 5px !important;
                         }
+                        .ql-editor p.ql-align-center img,
+                        .ql-editor div.ql-align-center img {
+                            display: block !important;
+                            margin-left: auto !important;
+                            margin-right: auto !important;
+                        }
+                        .ql-editor p.ql-align-right img,
+                        .ql-editor div.ql-align-right img {
+                            display: block !important;
+                            margin-left: auto !important;
+                            margin-right: 0 !important;
+                        }
+                        .ql-editor p.ql-align-left img,
+                        .ql-editor div.ql-align-left img {
+                            display: block !important;
+                            margin-left: 0 !important;
+                            margin-right: auto !important;
+                        }
+                        /* Also handle images that may be direct children */
+                        .ql-editor img {
+                            max-width: 100% !important;
+                            height: auto !important;
+                        }
                     `}</style>
                         <div className={`border rounded-md overflow-visible ${errors.noiDung ? 'border-red-500' : 'border-gray-300'}`}>
                             <ReactQuill
