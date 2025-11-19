@@ -20,13 +20,17 @@ import { validateReport } from "../../validator/reportValidator";
 import dayjs from "dayjs";
 import MediaGallery from "./MediaGallery";
 import BaseModal, { ModalFooter } from "../base/BaseModal";
+import { DateTimePicker, utcToVietnamTime, vietnamTimeToUTC } from "../../utils/datePicker";
+import { ConfigProvider } from "antd";
+import viVN from "antd/locale/vi_VN";
+import "antd/dist/reset.css";
 
 const ReportDetailModal = ({ isOpen, onClose, report, loading = false, onStatusUpdated, mode = "view" }) => {
     const { statusReport, updateStatus, clearError } = useReports();
     const [selectedStatus, setSelectedStatus] = useState("");
     const [responseContent, setResponseContent] = useState("");
-    const [expectedResponseDate, setExpectedResponseDate] = useState("");
-    const [expectedCompletionDate, setExpectedCompletionDate] = useState("");
+    const [expectedResponseDate, setExpectedResponseDate] = useState(null);
+    const [expectedCompletionDate, setExpectedCompletionDate] = useState(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const isEditMode = mode === "edit";
@@ -48,18 +52,10 @@ const ReportDetailModal = ({ isOpen, onClose, report, loading = false, onStatusU
                 setResponseContent(latest?.ghi_chu || "");
             }
             
-            if (report.thoi_gian_phan_hoi_du_kien) {
-                setExpectedResponseDate(dayjs(report.thoi_gian_phan_hoi_du_kien).format('YYYY-MM-DDTHH:mm'));
-            } else {
-                setExpectedResponseDate("");
-            }
-            
-            if (report.ngay_du_kien_hoan_thanh) {
-                setExpectedCompletionDate(dayjs(report.ngay_du_kien_hoan_thanh).format('YYYY-MM-DDTHH:mm'));
-            } else {
-                setExpectedCompletionDate("");
-            }
+            setExpectedResponseDate(utcToVietnamTime(report.thoi_gian_phan_hoi_du_kien));
+            setExpectedCompletionDate(utcToVietnamTime(report.ngay_du_kien_hoan_thanh));
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [report?.id, statusReport, isOpen]);
 
     const handleUpdateStatus = async () => {
@@ -70,8 +66,8 @@ const ReportDetailModal = ({ isOpen, onClose, report, loading = false, onStatusU
             const formData = {
                 selectedStatus,
                 responseContent,
-                expectedResponseDate: expectedResponseDate ? new Date(expectedResponseDate) : null,
-                expectedCompletionDate: expectedCompletionDate ? new Date(expectedCompletionDate) : null,
+                expectedResponseDate: expectedResponseDate ? expectedResponseDate.toDate() : null,
+                expectedCompletionDate: expectedCompletionDate ? expectedCompletionDate.toDate() : null,
             };
 
             const { isValid, errors } = await validateReport(formData);
@@ -89,19 +85,19 @@ const ReportDetailModal = ({ isOpen, onClose, report, loading = false, onStatusU
             };
 
             if (expectedResponseDate) {
-                statusData.thoiGianPhanHoiDuKien = new Date(expectedResponseDate).toISOString();
+                statusData.thoiGianPhanHoiDuKien = vietnamTimeToUTC(expectedResponseDate);
             }
 
             if (expectedCompletionDate) {
-                statusData.ngayDuKienHoanThanh = new Date(expectedCompletionDate).toISOString();
+                statusData.ngayDuKienHoanThanh = vietnamTimeToUTC(expectedCompletionDate);
             }
 
             await updateStatus(report.id, statusData);
             showToast.success("Cập nhật trạng thái thành công");
             setSelectedStatus("");
             setResponseContent("");
-            setExpectedResponseDate("");
-            setExpectedCompletionDate("");
+            setExpectedResponseDate(null);
+            setExpectedCompletionDate(null);
 
             if (onStatusUpdated) {
                 onStatusUpdated();
@@ -242,16 +238,15 @@ const ReportDetailModal = ({ isOpen, onClose, report, loading = false, onStatusU
                                 </select>
                             </div>
                             {isEditMode && (
-                                <>
+                                <ConfigProvider locale={viVN}>
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-2 required-label">
                                             Thời gian phản hồi dự kiến
                                         </label>
-                                        <input
-                                            type="datetime-local"
+                                        <DateTimePicker
                                             value={expectedResponseDate}
-                                            onChange={(e) => setExpectedResponseDate(e.target.value)}
-                                            className="w-full px-3 py-2 bg-gray-100 border-0 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                                            onChange={(date) => setExpectedResponseDate(date)}
+                                            placeholder="Chọn thời gian phản hồi"
                                         />
                                     </div>
 
@@ -259,14 +254,13 @@ const ReportDetailModal = ({ isOpen, onClose, report, loading = false, onStatusU
                                         <label className="block text-sm font-medium text-gray-700 mb-2 required-label">
                                             Ngày dự kiến hoàn thành
                                         </label>
-                                        <input
-                                            type="datetime-local"
+                                        <DateTimePicker
                                             value={expectedCompletionDate}
-                                            onChange={(e) => setExpectedCompletionDate(e.target.value)}
-                                            className="w-full px-3 py-2 bg-gray-100 border-0 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                                            onChange={(date) => setExpectedCompletionDate(date)}
+                                            placeholder="Chọn ngày hoàn thành"
                                         />
                                     </div>
-                                </>
+                                </ConfigProvider>
                             )}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2 required-label">
