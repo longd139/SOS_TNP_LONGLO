@@ -100,7 +100,7 @@ export default function ReportAreasList() {
                 search: filters.search
             });
         } catch (error) {
-            showToast.error(error.message || 'Tạo lĩnh vực thất bại!');
+            showToast.error(error || 'Tạo lĩnh vực thất bại!');
         } finally {
             setIsSubmitting(false);
         }
@@ -120,7 +120,7 @@ export default function ReportAreasList() {
                 search: filters.search
             });
         } catch (error) {
-            showToast.error(error.message || 'Cập nhật lĩnh vực thất bại!');
+            showToast.error(error || 'Cập nhật lĩnh vực thất bại!');
         } finally {
             setIsSubmitting(false);
         }

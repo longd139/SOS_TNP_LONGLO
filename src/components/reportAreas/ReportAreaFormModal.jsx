@@ -1,8 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import BaseModal, { ModalFooter } from '../base/BaseModal';
 import { validateReportArea } from '../../validator/reportAreaValidator';
 import { showToast } from '../../utils/toastNotification';
+
+// Persist form input across unmounts/re-mounts to avoid losing user-entered data on errors
+let _persistedReportAreaForm = null;
 
 const ReportAreaFormModal = ({
     isOpen,
@@ -18,19 +21,27 @@ const ReportAreaFormModal = ({
     });
     const [errors, setErrors] = useState({});
 
+    const prevIsOpen = useRef(false);
+
     useEffect(() => {
-        if (initialData && mode === 'edit') {
-            setFormData({
-                ten: initialData.ten || '',
-                moTa: initialData.mo_ta || initialData.moTa || ''
-            });
-        } else {
-            setFormData({
-                ten: '',
-                moTa: ''
-            });
+        if (!prevIsOpen.current && isOpen) {
+            // Restore persisted input if available (user typed before and error occurred)
+            if (_persistedReportAreaForm) {
+                setFormData(_persistedReportAreaForm);
+            } else if (initialData && mode === 'edit') {
+                setFormData({
+                    ten: initialData.ten || '',
+                    moTa: initialData.mo_ta || initialData.moTa || ''
+                });
+            } else {
+                setFormData({
+                    ten: '',
+                    moTa: ''
+                });
+            }
+            setErrors({});
         }
-        setErrors({});
+        prevIsOpen.current = isOpen;
     }, [initialData, mode, isOpen]);
 
     const resetForm = () => {
@@ -39,6 +50,7 @@ const ReportAreaFormModal = ({
             moTa: ''
         });
         setErrors({});
+        _persistedReportAreaForm = null;
     };
 
     const validateForm = async () => {
@@ -73,6 +85,7 @@ const ReportAreaFormModal = ({
 
     const updateField = (field, value) => {
         setFormData(prev => ({ ...prev, [field]: value }));
+        _persistedReportAreaForm = { ...formData, [field]: value };
         if (errors[field]) {
             setErrors(prev => {
                 const newErrors = { ...prev };
