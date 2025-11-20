@@ -6,7 +6,7 @@ export const getStatusStyle = (statusName) => {
         "mới": { bg: "#FEF3C7", color: "#92400E" },
         "đã gửi": { bg: "#FEF3C7", color: "#92400E" },
         "đã tiếp nhận": { bg: "#DBEAFE", color: "#1E40AF" },
-        "đang xử lý": { bg: "#DBEAFE", color: "#1E40AF" },
+        "đang xử lý": { bg: "#beeaeaff", color: "#3e88c4ff" },
         "đã giải quyết": { bg: "#D1FAE5", color: "#065F46" },
         "đóng": { bg: "#E5E7EB", color: "#374151" },
     };
