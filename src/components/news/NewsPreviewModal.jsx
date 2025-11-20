@@ -33,7 +33,8 @@ const NewsPreviewModal = ({ isOpen, onClose, newsData, isPreview = false }) => {
         attachments.forEach((attachment, index) => {
             const placeholder = `<!--IMAGE_PLACEHOLDER_${index}-->`;
             if (processedHtml.includes(placeholder)) {
-                const imgTag = `<img src="${baseUrl}${attachment.url_file}" alt="content-image" style="max-width: 100%; height: auto;" />`;
+                const alignmentMatch = html.match(new RegExp(`<[^>]*class="[^"]*ql-align-[^"]*"[^>]*>\\s*${placeholder.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`));
+                let imgTag = `<img src="${baseUrl}${attachment.url_file}" alt="content-image" style="max-width: 100%; height: auto;" />`;
                 processedHtml = processedHtml.replace(placeholder, imgTag);
             }
         });

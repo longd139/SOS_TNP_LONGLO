@@ -102,11 +102,24 @@ export default function NewsManager() {
         setSelectedNews(null);
     };
 
-    const handleCreateSubmit = async (formData, callback = null, isUpdate = false) => {
+    const handleCreateSubmit = async (formData, callback = null, isUpdate = false, newsId = null) => {
         if (isUpdate) {
             try {
-                await updateNews(selectedNews.id, formData);
+                const targetId = newsId || selectedNews?.id;
+                if (targetId) {
+                    const result = await updateNews(targetId, formData);
+                    if (result.success) {
+                        loadNews({
+                            page: pagination.currentPage,
+                            size: pageSize,
+                            isActive: showActive,
+                            idDanhMuc: filters.idDanhMuc,
+                            search: filters.search
+                        });
+                    }
+                }
             } catch (error) {
+                console.error('Error updating news with images:', error);
             }
             return;
         }
@@ -115,11 +128,11 @@ export default function NewsManager() {
         try {
             const result = await createNews(formData);
             if (result.success) {
-                const newsId = result.data?.id;
+                const createdNewsId = result.data?.id;
                 showToast.success('Tạo tin tức thành công!');
 
-                if (callback && newsId) {
-                    await callback(newsId);
+                if (callback && createdNewsId) {
+                    await callback(createdNewsId);
                 }
 
                 setIsCreateModalOpen(false);
@@ -133,11 +146,25 @@ export default function NewsManager() {
         }
     };
 
-    const handleEditSubmit = async (formData, callback = null, isUpdate = false) => {
+    const handleEditSubmit = async (formData, callback = null, isUpdate = false, newsId = null) => {
         if (isUpdate) {
             try {
-                await updateNews(selectedNews.id, formData);
+                const targetId = newsId || selectedNews?.id;
+                if (targetId) {
+                    const result = await updateNews(targetId, formData);
+                    if (result.success) {
+                        // Reload the news list to show updated content
+                        loadNews({
+                            page: pagination.currentPage,
+                            size: pageSize,
+                            isActive: showActive,
+                            idDanhMuc: filters.idDanhMuc,
+                            search: filters.search
+                        });
+                    }
+                }
             } catch (error) {
+                console.error('Error updating news with images:', error);
             }
             return;
         }
