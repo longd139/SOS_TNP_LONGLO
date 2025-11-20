@@ -6,27 +6,39 @@ export const reportSchema = yup.object().shape({
     responseContent: yup.string().required('Nội dung phản hồi là bắt buộc'),
     expectedResponseDate: yup
         .date()
-        .required('Thời gian phản hồi dự kiến là bắt buộc')
-        .test(
-            'is-future-date',
-            'Thời gian phản hồi dự kiến phải sau ngày hiện tại',
-            (value) => {
-                if (!value) return true;
-                return value > new Date();
-            }
-        ),
+        .nullable()
+        .when('selectedStatus', {
+            is: (status) => status !== 'Đã giải quyết' && status !== 'Đóng',
+            then: (schema) => schema
+                .required('Thời gian phản hồi dự kiến là bắt buộc')
+                .test(
+                    'is-future-date',
+                    'Thời gian phản hồi dự kiến phải sau ngày hiện tại',
+                    (value) => {
+                        if (!value) return true;
+                        return value > new Date();
+                    }
+                ),
+            otherwise: (schema) => schema.notRequired()
+        }),
     expectedCompletionDate: yup
         .date()
-        .required('Thời gian hoàn thành dự kiến là bắt buộc')
-        .test(
-            'is-after-expected-response-date',
-            'Thời gian hoàn thành dự kiến phải sau thời gian phản hồi dự kiến',
-            function (value) {
-                const { expectedResponseDate } = this.parent;
-                if (!value || !expectedResponseDate) return true;
-                return value > expectedResponseDate;
-            }
-        ),
+        .nullable()
+        .when('selectedStatus', {
+            is: (status) => status !== 'Đã giải quyết' && status !== 'Đóng',
+            then: (schema) => schema
+                .required('Thời gian hoàn thành dự kiến là bắt buộc')
+                .test(
+                    'is-after-expected-response-date',
+                    'Thời gian hoàn thành dự kiến phải sau thời gian phản hồi dự kiến',
+                    function (value) {
+                        const { expectedResponseDate } = this.parent;
+                        if (!value || !expectedResponseDate) return true;
+                        return value > expectedResponseDate;
+                    }
+                ),
+            otherwise: (schema) => schema.notRequired()
+        }),
 });
 
 export async function validateReport(data) {
