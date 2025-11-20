@@ -6,6 +6,10 @@ import {
     MapPin,
     FileText,
     Image as ImageIcon,
+    MessageCircle,
+    MessageSquare,
+    Clock4,
+    SquarePen,
 } from "lucide-react";
 import { formatDate } from "../../utils/formatDate";
 import {
@@ -13,6 +17,7 @@ import {
     renderCategoryBadgeStyled,
     renderUrgencyBadge,
     renderContactInfo,
+    getStatusStyle,
 } from "../../utils/badgeUtils";
 import { useReports } from "../../hooks/useReports";
 import { showToast } from "../../utils/toastNotification";
@@ -24,8 +29,10 @@ import { DateTimePicker, utcToVietnamTime, vietnamTimeToUTC } from "../../utils/
 import { ConfigProvider } from "antd";
 import viVN from "antd/locale/vi_VN";
 import "antd/dist/reset.css";
+import UserService from "../../services/userService";
+import { ROLE_LABELS } from "../../constants/role";
 
-const ReportDetailModal = ({ isOpen, onClose, report, loading = false, onStatusUpdated, mode = "view" }) => {
+const ReportDetailModal = ({ isOpen, onClose, report, loading = false, onStatusUpdated, mode = "edit", onModeChange }) => {
     const { statusReport, updateStatus, clearError } = useReports();
     const [selectedStatus, setSelectedStatus] = useState("");
     const [responseContent, setResponseContent] = useState("");
@@ -34,6 +41,41 @@ const ReportDetailModal = ({ isOpen, onClose, report, loading = false, onStatusU
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const isEditMode = mode === "edit";
+
+    const [userCache, setUserCache] = useState({});
+
+    const handleEditMode = () => {
+        if (onModeChange) {
+            onModeChange("edit");
+        }
+    };
+
+    useEffect(() => {
+    async function fetchUsers() {
+        const map = {};
+
+        const entries = report?.lich_su_trang_thai || [];
+        for (const item of entries) {
+            if (item.nguoi_tao && !map[item.nguoi_tao]) {
+                try {
+                    const user = await UserService.getUserById(item.nguoi_tao);
+
+                    const role = user?.vai_tro;
+                    const roleLabel = ROLE_LABELS[role] || "Không xác định";
+
+                    map[item.nguoi_tao] = `${user?.ho_va_ten || "Không xác định"} - ${roleLabel}`;
+                } catch (e) {
+                    map[item.nguoi_tao] = "Không xác định";
+                }
+            }
+        }
+
+        setUserCache(map);
+    }
+
+    fetchUsers();
+}, [report?.lich_su_trang_thai]);
+
 
     useEffect(() => {
         if (isOpen && report) {
@@ -48,14 +90,13 @@ const ReportDetailModal = ({ isOpen, onClose, report, loading = false, onStatusU
 
                 const latestName = (latest && latest.ten) ? latest.ten : "";
                 setSelectedStatus(latestName);
-                
+
                 setResponseContent(latest?.ghi_chu || "");
             }
-            
+
             setExpectedResponseDate(utcToVietnamTime(report.thoi_gian_phan_hoi_du_kien));
             setExpectedCompletionDate(utcToVietnamTime(report.ngay_du_kien_hoan_thanh));
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [report?.id, statusReport, isOpen]);
 
     const handleUpdateStatus = async () => {
@@ -216,68 +257,197 @@ const ReportDetailModal = ({ isOpen, onClose, report, loading = false, onStatusU
                         </p>
                     </div>
 
-                    <div className="mt-0">
-                        <h4 className="text-sm font-semibold text-gray-900 mb-3 required-label">
-                            {isEditMode ? "Cập nhật trạng thái" : "Trạng thái"}
-                        </h4>
-                        <div className="space-y-3">
-                            <div>
-                                <select
-                                    value={selectedStatus}
-                                    onChange={(e) => setSelectedStatus(e.target.value)}
-                                    disabled={!isEditMode}
-                                    style={{ border: 'none' }}
-                                    className={`w-full px-3 py-2.5 text-gray-700 bg-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm resize-none break-words ${!isEditMode ? 'cursor-not-allowed opacity-75' : ''}`}
-                                >
-                                    {statusReport &&
-                                        Object.entries(statusReport).map(([key, value]) => (
-                                            <option key={key} value={value}>
-                                                {value}
-                                            </option>
-                                        ))}
-                                </select>
-                            </div>
-                            {isEditMode && (
-                                <ConfigProvider locale={viVN}>
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2 required-label">
-                                            Thời gian phản hồi dự kiến
-                                        </label>
-                                        <DateTimePicker
-                                            value={expectedResponseDate}
-                                            onChange={(date) => setExpectedResponseDate(date)}
-                                            placeholder="Chọn thời gian phản hồi"
-                                        />
+                    {!isEditMode && (
+                        <>
+                            <div className="">
+                                <div className="flex items-center justify-between">
+                                    <h4 className="text-sm font-semibold text-gray-900 mb-2 flex items-center gap-2">
+                                        Trạng thái hiện tại
+                                    </h4>
+                                    <div className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 focus:ring-blue-500 text-white px-4 py-2 rounded-md text-sm font-medium">
+                                        <SquarePen className="w-4 h-4 flex-shrink-0" />
+                                        <button onClick={handleEditMode}>
+                                            Cập nhật trạng thái
+                                        </button>
                                     </div>
+                                </div>
+                                <p>
+                                    {renderStatusBadge(report.lich_su_trang_thai)}
+                                </p>
+                            </div>
 
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2 required-label">
-                                            Ngày dự kiến hoàn thành
-                                        </label>
-                                        <DateTimePicker
-                                            value={expectedCompletionDate}
-                                            onChange={(date) => setExpectedCompletionDate(date)}
-                                            placeholder="Chọn ngày hoàn thành"
-                                        />
+                            <div className="space-y-2">
+                                <div className="flex items-center gap-2">
+                                    <Clock4 className="w-4 h-4 flex-shrink-0" />
+                                    <span className="text-sm font-semibold text-gray-900 leading-none">
+                                        Lịch sử cập nhật ({report.lich_su_trang_thai?.length || 0})
+                                    </span>
+                                </div>
+
+                                {report.lich_su_trang_thai && report.lich_su_trang_thai.length > 0 ? (
+                                    <div className="relative pl-8">
+                                        <div className="absolute left-4 top-0 bottom-0 w-0.5 bg-gray-300"></div>
+                                        {report.lich_su_trang_thai.map((item, index) => {
+                                            const statusStyle = getStatusStyle(item.ten);
+                                            const isLatest = index === 0;
+                                            return (
+                                                <div key={item.id} className="mb-2 relative">
+                                                    <span
+                                                        className={`absolute -left-6 top-1.5 w-4 h-4 rounded-full border-2 ${isLatest
+                                                            ? "bg-blue-600 border-blue-600"
+                                                            : "bg-white border-gray-400"
+                                                            }`}
+                                                    ></span>
+
+                                                    <div className="p-2 bg-gray-50 ml-2 rounded-md">
+                                                        <div className="flex items-center gap-2 mb-2 flex-wrap">
+                                                            <span
+                                                                className="px-3 py-1 text-xs font-medium rounded-full"
+                                                                style={{
+                                                                    backgroundColor: statusStyle.bg,
+                                                                    color: statusStyle.color,
+                                                                }}
+                                                            >
+                                                                {item.ten}
+                                                            </span>
+                                                            <span className="text-xs text-gray-500">
+                                                                {formatDate(item.thoi_gian_tao)}
+                                                            </span>
+                                                        </div>
+                                                        {item.nguoi_tao && (
+                                                            <p className="text-sm text-gray-700">
+                                                                <User className="inline-block mr-2 text-gray-400 w-4 h-4" />
+                                                                {userCache[item.nguoi_tao] || "Đang tải..."}
+                                                            </p>
+                                                        )}
+
+                                                        {item.ghi_chu && (
+                                                            <p className="text-sm text-gray-700 break-words overflow-wrap-anywhere">
+                                                                <MessageSquare className="inline-block mr-2 text-gray-400 w-4 h-4" />
+                                                                {item.ghi_chu}
+                                                            </p>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            );
+                                        })}
                                     </div>
-                                </ConfigProvider>
-                            )}
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2 required-label">
-                                    Nội dung phản hồi
-                                </label>
-                                <textarea
-                                    placeholder="Nhập nội dung phản hồi cho người dân..."
-                                    rows="3"
-                                    disabled={!isEditMode}
-                                    value={responseContent}
-                                    onChange={(e) => setResponseContent(e.target.value)}
-                                    className={`w-full px-3 py-2 text-gray-700 bg-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm resize-none break-words overflow-wrap-anywhere word-break-break-word ${!isEditMode ? 'cursor-not-allowed opacity-75' : ''}`}
-                                    style={{ minHeight: '72px', wordWrap: 'break-word' }}
-                                />
+                                ) : (
+                                    <div className="text-sm text-gray-500">
+                                        Không có lịch sử cập nhật
+                                    </div>
+                                )}
                             </div>
-                        </div>
-                    </div>
+                        </>
+
+                    )}
+                    {
+                        isEditMode && (
+                            <>
+                                <div className="mt-0">
+                                    <h4 className="text-sm font-semibold text-gray-900 mb-3 required-label">
+                                        Cập nhật trạng thái
+                                    </h4>
+                                    <div className="space-y-3">
+                                        <div>
+                                            <select
+                                                value={selectedStatus}
+                                                onChange={(e) => setSelectedStatus(e.target.value)}
+                                                disabled={!isEditMode}
+                                                style={{ border: 'none' }}
+                                                className={`w-full px-3 py-2.5 text-gray-700 bg-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm resize-none break-words ${!isEditMode ? 'cursor-not-allowed opacity-75' : ''}`}
+                                            >
+                                                {statusReport &&
+                                                    Object.entries(statusReport).map(([key, value]) => (
+                                                        <option key={key} value={value}>
+                                                            {value}
+                                                        </option>
+                                                    ))}
+                                            </select>
+                                        </div>
+                                        {isEditMode && (
+                                            <ConfigProvider locale={viVN}>
+                                                <div>
+                                                    <label className="block text-sm font-medium text-gray-700 mb-2 required-label">
+                                                        Thời gian phản hồi dự kiến
+                                                    </label>
+                                                    <DateTimePicker
+                                                        value={expectedResponseDate}
+                                                        onChange={(date) => setExpectedResponseDate(date)}
+                                                        placeholder="Chọn thời gian phản hồi"
+                                                    />
+                                                </div>
+
+                                                <div>
+                                                    <label className="block text-sm font-medium text-gray-700 mb-2 required-label">
+                                                        Ngày dự kiến hoàn thành
+                                                    </label>
+                                                    <DateTimePicker
+                                                        value={expectedCompletionDate}
+                                                        onChange={(date) => setExpectedCompletionDate(date)}
+                                                        placeholder="Chọn ngày hoàn thành"
+                                                    />
+                                                </div>
+                                            </ConfigProvider>
+                                        )}
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-2 required-label">
+                                                Nội dung phản hồi
+                                            </label>
+                                            <textarea
+                                                placeholder="Nhập nội dung phản hồi cho người dân..."
+                                                rows="3"
+                                                disabled={!isEditMode}
+                                                value={responseContent}
+                                                onChange={(e) => setResponseContent(e.target.value)}
+                                                className={`w-full px-3 py-2 text-gray-700 bg-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm resize-none break-words overflow-wrap-anywhere word-break-break-word ${!isEditMode ? 'cursor-not-allowed opacity-75' : ''}`}
+                                                style={{ minHeight: '72px', wordWrap: 'break-word' }}
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <h4 className="text-sm font-semibold text-gray-900 mb-3">
+                                        Lịch sử trạng thái
+                                    </h4>
+
+                                    {report.lich_su_trang_thai && report.lich_su_trang_thai.length > 0 ? (
+                                        <div className="space-y-4">
+                                            {report.lich_su_trang_thai.map((item, index) => (
+                                                <div key={item.id} className="p-3 bg-gray-50 rounded-md space-y-2">
+                                                    <div className="flex items-center gap-2 text-sm text-gray-600">
+                                                        <Clock4 className="w-4 h-4" />
+                                                        <span>{formatDate(item.thoi_gian_tao)}</span>
+                                                    </div>
+                                                    
+                                                    {item.nguoi_tao && (
+                                                        <div className="flex items-center gap-2 text-sm text-gray-600">
+                                                            <User className="w-4 h-4" />
+                                                            <span>{userCache[item.nguoi_tao] || "Đang tải..."}</span>
+                                                        </div>
+                                                    )}
+
+                                                    {item.ghi_chu && (
+                                                        <div className="flex items-start gap-2 text-sm text-gray-700">
+                                                            <MessageSquare className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                                                            <span className="break-words overflow-wrap-anywhere">
+                                                                {item.ghi_chu}
+                                                            </span>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    ) : (
+                                        <div className="text-sm text-gray-500">
+                                            Không có lịch sử cập nhật
+                                        </div>
+                                    )}
+                                </div>
+                            </>
+                        )
+                    }
                 </div>
             ) : (
                 <div className="text-center py-12">

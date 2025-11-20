@@ -66,7 +66,7 @@ export default function ReportList() {
 
     useEffect(() => {
         if (hasLoadedInitial) {
-            loadReports({
+            const params = {
                 page: currentPage,
                 size: filters.pageSize,
                 trangThai: filters.trangThai,
@@ -74,11 +74,13 @@ export default function ReportList() {
                 mucDo: filters.mucDo,
                 maPhanAnh: filters.maPhanAnh,
                 sortTime: filters.sortTime,
-            }).catch(() => {
+            };
+            
+            loadReports(params).catch(() => {
                 showToast.error("Lỗi khi tải danh sách phản ánh");
             });
         }
-    }, [hasLoadedInitial, currentPage, filters.pageSize, filters.trangThai, filters.idLinhVucPhanAnh, filters.mucDo, filters.maPhanAnh, filters.sortTime, loadReports]);
+    }, [hasLoadedInitial, currentPage, filters, loadReports]);
 
     const handleFilterChange = (newFilters) => {
         setFilters(newFilters);
@@ -263,6 +265,7 @@ export default function ReportList() {
                     });
                 }}
                 mode={modalMode}
+                onModeChange={setModalMode}
             />
         </div>
     );

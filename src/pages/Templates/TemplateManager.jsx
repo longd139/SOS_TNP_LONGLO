@@ -389,7 +389,7 @@ export default function TemplateManager() {
             <div className="mb-4 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 bg-white p-3 rounded-lg shadow-sm border border-gray-200">
                 <div className="flex items-center gap-3">
                     <h3 className="font-semibold text-gray-900 mb-0">
-                        Danh sách thủ tục ({pagination.total})
+                        Danh sách biểu mẫu ({pagination.total})
                     </h3>
                     {showRemoved && (
                         <span className="px-2 md:px-3 py-1 bg-red-100 text-red-800 text-xs font-medium rounded-full">
