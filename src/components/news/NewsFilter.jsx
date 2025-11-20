@@ -2,14 +2,14 @@ import React from 'react';
 import BaseFilter from '../base/BaseFilter';
 import { useCategories } from '../../hooks/useCategories';
 
-export default function NewsFilter({ onFilter, onReset }) {
+export default function NewsFilter({ onFilter, onReset, currentFilters = {} }) {
     const { activeCategories } = useCategories({ autoFetch: true, isRemoved: false });
 
     const initialFilters = {
-        search: '',
-        idDanhMuc: '',
-        isActive: true,
-        pageSize: 10
+        search: currentFilters.search || '',
+        idDanhMuc: currentFilters.idDanhMuc || '',
+        isActive: currentFilters.isActive !== undefined ? currentFilters.isActive : true,
+        pageSize: currentFilters.pageSize || 10
     };
 
     const filterFields = [
