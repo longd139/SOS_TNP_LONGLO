@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
 import dayjs from "dayjs";
 import "dayjs/locale/vi";
@@ -47,6 +47,22 @@ export default function ProceduresManager() {
     } = useProcedure();
 
     const columns = getProcedureColumns(pagination);
+
+    useEffect(() => {
+        resetFilters();
+        toggleShowActive(true);
+
+        dispatch(
+            fetchProcedures({
+                page: 1,
+                size: 10,
+                search: '',
+                id_linh_vuc: undefined,
+                isActive: true,
+            })
+        );
+    }, []);
+
     const openCreateModal = () => {
         setIsCreateModalOpen(true);
     };
@@ -219,6 +235,12 @@ export default function ProceduresManager() {
                 filters={filters}
                 pagination={pagination}
                 showActive={showActive}
+                currentFilters={{
+                    searchKeyword: filters.searchKeyword || '',
+                    selectedDomain: filters.selectedDomain || '',
+                    showActive: showActive,
+                    pageSize: pagination.pageSize || 10
+                }}
                 onFilterChange={handleFilterChange}
                 onSearch={searchProcedures}
                 onReset={resetFilters}
@@ -227,7 +249,7 @@ export default function ProceduresManager() {
                 onSearchWithFilters={handleSearchWithFilters}
             />
 
-            <div className="mb-3 flex flex-col mb-4 sm:flex-row sm:justify-between sm:items-center gap-2 bg-white p-3 rounded-lg shadow-sm border border-gray-200">
+            <div className="flex flex-col mb-4 sm:flex-row sm:justify-between sm:items-center gap-2 bg-white p-3 rounded-lg shadow-sm border border-gray-200">
                 <div className="flex items-center gap-3">
                     <h3 className="font-semibold text-gray-900 mb-0">
                         Danh sách thủ tục ({pagination.total})

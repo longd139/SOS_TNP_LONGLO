@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Search, X, Filter, RotateCcw } from 'lucide-react';
 
 export default function BaseFilter({
@@ -13,6 +13,10 @@ export default function BaseFilter({
 }) {
     const [filters, setFilters] = useState(initialFilters);
     const [showFilters, setShowFilters] = useState(showAdvancedFilters);
+
+    useEffect(() => {
+        setFilters(initialFilters);
+    }, [JSON.stringify(initialFilters)]);
 
     const searchField = fields.find(f => f.isSearch || f.type === 'search');
     const advancedFields = fields.filter(f => !f.isSearch && f.type !== 'search');
@@ -172,11 +176,10 @@ export default function BaseFilter({
                     {advancedFields.length > 0 && (
                         <button
                             onClick={() => setShowFilters(!showFilters)}
-                            className={`inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg border transition-colors ${
-                                showFilters || hasActiveFilters()
+                            className={`inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg border transition-colors ${showFilters || hasActiveFilters()
                                     ? 'bg-blue-50 border-blue-500 text-blue-700'
                                     : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
-                            }`}
+                                }`}
                         >
                             <Filter className="w-4 h-4" />
                             Bộ lọc
@@ -211,11 +214,10 @@ export default function BaseFilter({
 
                 {showFilters && advancedFields.length > 0 && (
                     <div className="mt-4 pt-4 border-t border-gray-200">
-                        <div className={`grid gap-4 ${
-                            advancedFields.length === 1 ? 'grid-cols-1' :
-                            advancedFields.length === 2 ? 'grid-cols-1 md:grid-cols-2' :
-                            'grid-cols-1 md:grid-cols-3'
-                        }`}>
+                        <div className={`grid gap-4 ${advancedFields.length === 1 ? 'grid-cols-1' :
+                                advancedFields.length === 2 ? 'grid-cols-1 md:grid-cols-2' :
+                                    'grid-cols-1 md:grid-cols-3'
+                            }`}>
                             {advancedFields.map(renderField)}
                         </div>
                     </div>
