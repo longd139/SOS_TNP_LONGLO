@@ -44,18 +44,8 @@ export const useReports = ({ autoFetch = false, filters = {} } = {}) => {
     const statistic = useSelector(selectReportStatistic);
 
     const loadReports = useCallback((params = {}) => {
-        const requestParams = {
-            page: params.page || pagination.currentPage,
-            size: params.size || pagination.pageSize,
-            idLinhVucPhanAnh: params.idLinhVucPhanAnh || currentFilters.idLinhVucPhanAnh || '',
-            trangThai: params.trangThai || currentFilters.trangThai || '',
-            mucDo: params.mucDo || currentFilters.mucDo || '',
-            maPhanAnh: params.maPhanAnh || currentFilters.maPhanAnh || '',
-            sortTime: params.sortTime || currentFilters.sortTime || 'desc'
-        };
-
-        return dispatch(fetchReportPagination(requestParams)).unwrap();
-    }, [dispatch, pagination.currentPage, pagination.pageSize, currentFilters.idLinhVucPhanAnh, currentFilters.trangThai, currentFilters.mucDo, currentFilters.maPhanAnh, currentFilters.sortTime]);
+        return dispatch(fetchReportPagination(params)).unwrap();
+    }, [dispatch]);
 
     const loadReportById = useCallback((reportId) => {
         return dispatch(fetchReportById(reportId)).unwrap();
