@@ -32,7 +32,7 @@ import "antd/dist/reset.css";
 import UserService from "../../services/userService";
 import { ROLE_LABELS } from "../../constants/role";
 
-const ReportDetailModal = ({ isOpen, onClose, report, loading = false, onStatusUpdated, mode = "view" }) => {
+const ReportDetailModal = ({ isOpen, onClose, report, loading = false, onStatusUpdated, mode = "edit", onModeChange }) => {
     const { statusReport, updateStatus, clearError } = useReports();
     const [selectedStatus, setSelectedStatus] = useState("");
     const [responseContent, setResponseContent] = useState("");
@@ -43,6 +43,12 @@ const ReportDetailModal = ({ isOpen, onClose, report, loading = false, onStatusU
     const isEditMode = mode === "edit";
 
     const [userCache, setUserCache] = useState({});
+
+    const handleEditMode = () => {
+        if (onModeChange) {
+            onModeChange("edit");
+        }
+    };
 
     useEffect(() => {
     async function fetchUsers() {
@@ -260,8 +266,7 @@ const ReportDetailModal = ({ isOpen, onClose, report, loading = false, onStatusU
                                     </h4>
                                     <div className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 focus:ring-blue-500 text-white px-4 py-2 rounded-md text-sm font-medium">
                                         <SquarePen className="w-4 h-4 flex-shrink-0" />
-                                        <button
-                                        >
+                                        <button onClick={handleEditMode}>
                                             Cập nhật trạng thái
                                         </button>
                                     </div>
@@ -281,14 +286,14 @@ const ReportDetailModal = ({ isOpen, onClose, report, loading = false, onStatusU
 
                                 {report.lich_su_trang_thai && report.lich_su_trang_thai.length > 0 ? (
                                     <div className="relative pl-8">
-                                        <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-gray-300"></div>
+                                        <div className="absolute left-4 top-0 bottom-0 w-0.5 bg-gray-300"></div>
                                         {report.lich_su_trang_thai.map((item, index) => {
                                             const statusStyle = getStatusStyle(item.ten);
                                             const isLatest = index === 0;
                                             return (
                                                 <div key={item.id} className="mb-2 relative">
                                                     <span
-                                                        className={`absolute -left-4 top-1.5 w-4 h-4 rounded-full border-2 ${isLatest
+                                                        className={`absolute -left-6 top-1.5 w-4 h-4 rounded-full border-2 ${isLatest
                                                             ? "bg-blue-600 border-blue-600"
                                                             : "bg-white border-gray-400"
                                                             }`}
@@ -403,51 +408,36 @@ const ReportDetailModal = ({ isOpen, onClose, report, loading = false, onStatusU
                                 </div>
 
                                 <div>
-                                    <div className="flex items-center gap-2">
-                                        <span className="text-sm font-semibold text-gray-900 leading-none">
-                                            Lịch sử cập nhật
-                                        </span>
-                                    </div>
+                                    <h4 className="text-sm font-semibold text-gray-900 mb-3">
+                                        Lịch sử trạng thái
+                                    </h4>
 
                                     {report.lich_su_trang_thai && report.lich_su_trang_thai.length > 0 ? (
-                                        <div className="relative">
-                                            {report.lich_su_trang_thai.map((item, index) => {
-                                                const statusStyle = getStatusStyle(item.ten);
-                                                return (
-                                                    <div key={item.id} className="mb-2 relative">
-
-                                                        <div className="p-2 bg-gray-50 rounded-md">
-                                                            <div className="flex items-center gap-2 mb-2 flex-wrap">
-                                                                <span
-                                                                    className="px-3 py-1 text-xs font-medium rounded-full"
-                                                                    style={{
-                                                                        backgroundColor: statusStyle.bg,
-                                                                        color: statusStyle.color,
-                                                                    }}
-                                                                >
-                                                                    {item.ten}
-                                                                </span>
-                                                                <span className="text-xs text-gray-500">
-                                                                    {formatDate(item.thoi_gian_tao)}
-                                                                </span>
-                                                            </div>
-                                                            {item.nguoi_tao && (
-                                                                <p className="text-sm text-gray-700">
-                                                                    <User className="inline-block mr-2 text-gray-400 w-4 h-4" />
-                                                                    {userCache[item.nguoi_tao] || "Đang tải..."}
-                                                                </p>
-                                                            )}
-
-                                                            {item.ghi_chu && (
-                                                                <p className="text-sm text-gray-700 break-words overflow-wrap-anywhere">
-                                                                    <MessageSquare className="inline-block mr-2 text-gray-400 w-4 h-4" />
-                                                                    {item.ghi_chu}
-                                                                </p>
-                                                            )}
-                                                        </div>
+                                        <div className="space-y-4">
+                                            {report.lich_su_trang_thai.map((item, index) => (
+                                                <div key={item.id} className="p-3 bg-gray-50 rounded-md space-y-2">
+                                                    <div className="flex items-center gap-2 text-sm text-gray-600">
+                                                        <Clock4 className="w-4 h-4" />
+                                                        <span>{formatDate(item.thoi_gian_tao)}</span>
                                                     </div>
-                                                );
-                                            })}
+                                                    
+                                                    {item.nguoi_tao && (
+                                                        <div className="flex items-center gap-2 text-sm text-gray-600">
+                                                            <User className="w-4 h-4" />
+                                                            <span>{userCache[item.nguoi_tao] || "Đang tải..."}</span>
+                                                        </div>
+                                                    )}
+
+                                                    {item.ghi_chu && (
+                                                        <div className="flex items-start gap-2 text-sm text-gray-700">
+                                                            <MessageSquare className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                                                            <span className="break-words overflow-wrap-anywhere">
+                                                                {item.ghi_chu}
+                                                            </span>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            ))}
                                         </div>
                                     ) : (
                                         <div className="text-sm text-gray-500">
