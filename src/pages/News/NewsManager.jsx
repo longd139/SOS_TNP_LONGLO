@@ -8,6 +8,7 @@ import NewsPreviewModal from '../../components/news/NewsPreviewModal';
 import { useNews } from '../../hooks/useNews';
 import { formatDate } from '../../utils/formatDate';
 import { showToast } from '../../utils/toastNotification';
+import { getNewsById } from '../../services/newsService';
 
 export default function NewsManager() {
     const {
@@ -34,14 +35,33 @@ export default function NewsManager() {
     const [selectedNews, setSelectedNews] = useState(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [pageSize, setPageSize] = useState(10);
+    const [isLoadingPreview, setIsLoadingPreview] = useState(false);
 
     useEffect(() => {
-        fetchNewsList(1, pageSize);
+        setShowActive(true);
+        setFilters({ idDanhMuc: null, search: '' });
+        setPageSize(10);
+
+        loadNews({
+            page: 1,
+            size: 10,
+            isActive: true,
+            idDanhMuc: null,
+            search: ''
+        });
     }, []);
 
-    const handleView = (item) => {
-        setSelectedNews(item);
-        setIsPreviewModalOpen(true);
+    const handleView = async (item) => {
+        setIsLoadingPreview(true);
+        try {
+            const fullNewsData = await getNewsById(item.id);
+            setSelectedNews(fullNewsData);
+            setIsPreviewModalOpen(true);
+        } catch (error) {
+            showToast.error('Không thể tải chi tiết bài viết!');
+        } finally {
+            setIsLoadingPreview(false);
+        }
     };
 
     const handleEdit = (item) => {
@@ -253,8 +273,8 @@ export default function NewsManager() {
             render: (value) => (
                 <span
                     className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${value
-                            ? 'bg-green-100 text-green-800'
-                            : 'bg-gray-100 text-gray-800'
+                        ? 'bg-green-100 text-green-800'
+                        : 'bg-gray-100 text-gray-800'
                         }`}
                 >
                     {value ? 'Hoạt động' : 'Không hoạt động'}
@@ -286,9 +306,16 @@ export default function NewsManager() {
                 </div>
             )}
 
-            <NewsFilter onFilter={handleFilter} onReset={handleResetFilter} />
-
-            <div className="mb-3 flex flex-col mb-4 sm:flex-row sm:justify-between sm:items-center gap-2 bg-white p-3 rounded-lg shadow-sm border border-gray-200">
+            <NewsFilter
+                currentFilters={{
+                    search: filters.search || '',
+                    idDanhMuc: filters.idDanhMuc || '',
+                    isActive: showActive,
+                    pageSize: pageSize
+                }}
+                onFilter={handleFilter}
+                onReset={handleResetFilter}
+            />            <div className="mb-3 flex flex-col mb-4 sm:flex-row sm:justify-between sm:items-center gap-2 bg-white p-3 rounded-lg shadow-sm border border-gray-200">
                 <div className="flex items-center gap-3">
                     <h3 className="font-semibold text-gray-900 mb-0">
                         Danh sách bài viết ({pagination.totalItems || 0})

@@ -95,6 +95,9 @@ const deleteNews = async (newsId) => {
 
 const uploadFile = async (idTinTuc, fileData) => {
     try {
+        if (idTinTuc && fileData instanceof FormData) {
+            fileData.set('idTinTuc', idTinTuc);
+        }
         const response = await apiFormClient.post(`/api/tin-tuc/upload`, fileData);
         if (response.data.success) return response.data.data;
         else throw new Error(response.data.message || "Tải lên tệp tin thất bại");

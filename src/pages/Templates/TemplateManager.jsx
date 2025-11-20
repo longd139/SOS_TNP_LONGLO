@@ -62,8 +62,10 @@ export default function TemplateManager() {
     );
 
     useEffect(() => {
-        loadTemplates(1, pagination.pageSize, filters.searchKeyword, showRemoved);
-    }, [showRemoved]);
+        dispatch(resetFilters());
+        dispatch(setShowRemoved(false));
+        loadTemplates(1, 10, "", false);
+    }, []);
 
     const handleView = (template) => {
         downloadUtils.handleDownload(template);
