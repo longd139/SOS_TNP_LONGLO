@@ -1,11 +1,18 @@
 import React from 'react';
 import BaseFilter from '../base/BaseFilter';
+import { useDispatch } from 'react-redux';
 
-const GovernmentFilter = ({ onFilter, onReset, filters = {}, pagination = {} }) => {
+const GovernmentFilter = ({ 
+    onFilter, 
+    onReset, 
+    filters = {}, 
+    pagination = {}
+}) => {
+
     const initialFilters = {
-        search: filters.search || '',
-        isActive: filters.isActive ?? true,
-        pageSize: pagination.pageSize || 10
+        search: '',
+        isActive: true,
+        pageSize: 10
     };
 
     const filterFields = [
@@ -37,25 +44,17 @@ const GovernmentFilter = ({ onFilter, onReset, filters = {}, pagination = {} }) 
         }
     ];
 
-    const handleFilter = (newFilters) => {
-        onFilter({
-            search: newFilters.search || '',
-            isActive: newFilters.isActive,
-            pageSize: Number(newFilters.pageSize)
-        });
-    };
-
-    const handleReset = () => {
-        onReset();
+    const handleFilter = (filters) => {
+        onFilter(filters);
     };
 
     return (
         <BaseFilter
             fields={filterFields}
             onFilter={handleFilter}
-            onReset={handleReset}
+            onReset={onReset}
             initialFilters={initialFilters}
-            searchPlaceholder="Tìm kiếm theo tên lĩnh vực..."
+            searchPlaceholder="Tìm kiếm theo tiêu đề..."
             showSearchButton={true}
         />
     );

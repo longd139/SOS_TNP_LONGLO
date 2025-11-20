@@ -39,7 +39,7 @@ const ReportAreasFilter = ({ onFilter, onReset, filters = {}, pagination = {} })
 
     const handleFilter = (newFilters) => {
         onFilter({
-            search: newFilters.search || '',
+            search: newFilters.search.trim() || '',
             isActive: newFilters.isActive,
             pageSize: Number(newFilters.pageSize)
         });
