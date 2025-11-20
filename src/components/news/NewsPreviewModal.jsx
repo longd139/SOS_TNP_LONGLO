@@ -3,6 +3,7 @@ import { Calendar, FolderOpen, User } from 'lucide-react';
 import BaseModal from '../base/BaseModal';
 import { downloadUtils } from '../../utils/downLoadUtils';
 import { formatDate } from '../../utils/formatDate';
+import DOMPurify from 'dompurify';
 
 const NewsPreviewModal = ({ isOpen, onClose, newsData, isPreview = false }) => {
     if (!newsData) return null;
@@ -21,6 +22,26 @@ const NewsPreviewModal = ({ isOpen, onClose, newsData, isPreview = false }) => {
     const imageUrl = isPreview 
         ? data.url_anh_dai_dien 
         : (data.url_anh_dai_dien ? downloadUtils.handleViewImage(data) : null);
+
+    const sanitizeHtml = (rawHtml) => {
+        if (!rawHtml) return '';
+        return DOMPurify.sanitize(rawHtml, {
+            ADD_ATTR: ['target', 'class'],
+            FORBID_TAGS: ['script', 'style'],
+            transformTags: {
+                'a': (tagName, attribs) => ({
+                    tagName: 'a',
+                    attribs: {
+                        ...attribs,
+                        target: '_blank',
+                        rel: 'noopener noreferrer'
+                    }
+                })
+            }
+        });
+    };
+
+    const sanitizedContent = sanitizeHtml(data.noi_dung);
 
     return (
         <BaseModal
@@ -68,10 +89,35 @@ const NewsPreviewModal = ({ isOpen, onClose, newsData, isPreview = false }) => {
                     )}
                 </div>
 
-                <div className="prose max-w-none">
+                <div className="prose max-w-none news-content">
+                    <style>{`
+                        /* Ensure Quill alignment classes apply to images in preview */
+                        .quill-content p.ql-align-center img,
+                        .quill-content div.ql-align-center img {
+                            display: block !important;
+                            margin-left: auto !important;
+                            margin-right: auto !important;
+                        }
+                        .quill-content p.ql-align-right img,
+                        .quill-content div.ql-align-right img {
+                            display: block !important;
+                            margin-left: auto !important;
+                            margin-right: 0 !important;
+                        }
+                        .quill-content p.ql-align-left img,
+                        .quill-content div.ql-align-left img {
+                            display: block !important;
+                            margin-left: 0 !important;
+                            margin-right: auto !important;
+                        }
+                        .quill-content img {
+                            max-width: 100% !important;
+                            height: auto !important;
+                        }
+                    `}</style>
                     <div 
-                        className="text-gray-700 leading-relaxed"
-                        dangerouslySetInnerHTML={{ __html: data.noi_dung }}
+                        className="text-gray-700 leading-relaxed quill-content"
+                        dangerouslySetInnerHTML={{ __html: sanitizedContent }}
                     />
                 </div>
 

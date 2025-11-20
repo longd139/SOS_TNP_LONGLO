@@ -17,7 +17,7 @@ export default function NewsFilter({ onFilter, onReset }) {
             name: 'search',
             type: 'search',
             isSearch: true,
-            placeholder: 'Tìm kiếm theo tiêu đề, tác giả...'
+            placeholder: 'Tìm kiếm theo tiêu đề'
         },
         {
             name: 'idDanhMuc',

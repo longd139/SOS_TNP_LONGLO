@@ -1,8 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import BaseModal, { ModalFooter } from '../base/BaseModal';
 import { validateReportArea } from '../../validator/reportAreaValidator';
 import { showToast } from '../../utils/toastNotification';
+
+let _persistedReportAreaForm = null;
+let _persistedReportAreaId = null;
 
 const ReportAreaFormModal = ({
     isOpen,
@@ -18,19 +21,36 @@ const ReportAreaFormModal = ({
     });
     const [errors, setErrors] = useState({});
 
+    const prevIsOpen = useRef(false);
+
     useEffect(() => {
-        if (initialData && mode === 'edit') {
-            setFormData({
-                ten: initialData.ten || '',
-                moTa: initialData.mo_ta || initialData.moTa || ''
-            });
-        } else {
-            setFormData({
-                ten: '',
-                moTa: ''
-            });
+        if (!prevIsOpen.current && isOpen) {
+            if (mode === 'edit' && initialData && _persistedReportAreaId !== initialData.id) {
+                _persistedReportAreaForm = null;
+                _persistedReportAreaId = initialData.id;
+            }
+
+            if (mode === 'create' && _persistedReportAreaId !== null) {
+                _persistedReportAreaForm = null;
+                _persistedReportAreaId = null;
+            }
+
+            if (_persistedReportAreaForm) {
+                setFormData(_persistedReportAreaForm);
+            } else if (initialData && mode === 'edit') {
+                setFormData({
+                    ten: initialData.ten || '',
+                    moTa: initialData.mo_ta || initialData.moTa || ''
+                });
+            } else {
+                setFormData({
+                    ten: '',
+                    moTa: ''
+                });
+            }
+            setErrors({});
         }
-        setErrors({});
+        prevIsOpen.current = isOpen;
     }, [initialData, mode, isOpen]);
 
     const resetForm = () => {
@@ -39,6 +59,8 @@ const ReportAreaFormModal = ({
             moTa: ''
         });
         setErrors({});
+        _persistedReportAreaForm = null;
+        _persistedReportAreaId = null;
     };
 
     const validateForm = async () => {
@@ -49,7 +71,7 @@ const ReportAreaFormModal = ({
 
     const handleSubmit = async () => {
         const isValid = await validateForm();
-        
+
         if (!isValid) {
             showToast.error('Vui lòng kiểm tra lại các trường bắt buộc!');
             return;
@@ -62,7 +84,7 @@ const ReportAreaFormModal = ({
             });
             resetForm();
         } catch (error) {
-            showToast.error(error.message || 'Đã có lỗi xảy ra khi gửi dữ liệu!');
+            // showToast.error(error.message || 'Đã có lỗi xảy ra khi gửi dữ liệu!');
         }
     };
 
@@ -73,6 +95,7 @@ const ReportAreaFormModal = ({
 
     const updateField = (field, value) => {
         setFormData(prev => ({ ...prev, [field]: value }));
+        _persistedReportAreaForm = { ...formData, [field]: value };
         if (errors[field]) {
             setErrors(prev => {
                 const newErrors = { ...prev };
@@ -113,9 +136,8 @@ const ReportAreaFormModal = ({
                         value={formData.ten}
                         onChange={(e) => updateField('ten', e.target.value)}
                         placeholder="Nhập tên lĩnh vực..."
-                        className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                            errors.ten ? 'border-red-500' : 'border-gray-300'
-                        }`}
+                        className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.ten ? 'border-red-500' : 'border-gray-300'
+                            }`}
                     />
                     {errors.ten && (
                         <p className="mt-1 text-sm text-red-600">{errors.ten}</p>
@@ -131,9 +153,8 @@ const ReportAreaFormModal = ({
                         onChange={(e) => updateField('moTa', e.target.value)}
                         placeholder="Nhập mô tả lĩnh vực..."
                         rows="4"
-                        className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                            errors.moTa ? 'border-red-500' : 'border-gray-300'
-                        }`}
+                        className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.moTa ? 'border-red-500' : 'border-gray-300'
+                            }`}
                     />
                     {errors.moTa && (
                         <p className="mt-1 text-sm text-red-600">{errors.moTa}</p>

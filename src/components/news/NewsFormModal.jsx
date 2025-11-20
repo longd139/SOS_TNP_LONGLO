@@ -9,6 +9,7 @@ import { validateNewsForm } from '../../validator/newsValidator';
 import NewsPreviewModal from './NewsPreviewModal';
 import { uploadNewsFile } from '../../features/news/newsThunks';
 import { showToast } from '../../utils/toastNotification';
+import DOMPurify from 'dompurify';
 
 const NewsFormModal = ({ isOpen, onClose, onSubmit, initialData = null, isLoading = false }) => {
     const dispatch = useDispatch();
@@ -165,6 +166,23 @@ const NewsFormModal = ({ isOpen, onClose, onSubmit, initialData = null, isLoadin
         return images;
     };
 
+    const ensureLinksOpenInNewTab = (html) => {
+        if (!html) return html;
+        try {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            const anchors = doc.querySelectorAll('a[href]');
+            anchors.forEach(a => {
+                a.setAttribute('target', '_blank');
+                a.setAttribute('rel', 'noopener noreferrer');
+            });
+            const updated = doc.body.innerHTML;
+            return DOMPurify.sanitize(updated, { ADD_ATTR: ['target'] });
+        } catch (e) {
+            return DOMPurify.sanitize(html, { ADD_ATTR: ['target'] });
+        }
+    };
+
     const base64ToFile = (base64String, format, index) => {
         const byteString = atob(base64String);
         const arrayBuffer = new ArrayBuffer(byteString.length);
@@ -222,7 +240,8 @@ const NewsFormModal = ({ isOpen, onClose, onSubmit, initialData = null, isLoadin
         const submitData = new FormData();
         submitData.append('idDanhMuc', formData.idDanhMuc);
         submitData.append('tieuDe', formData.tieuDe);
-        submitData.append('noiDung', formData.noiDung);
+        const contentForSubmit = ensureLinksOpenInNewTab(formData.noiDung);
+        submitData.append('noiDung', contentForSubmit);
         submitData.append('isActive', String(formData.isActive));
 
         if (formData.tacGia) {
@@ -518,8 +537,81 @@ const NewsFormModal = ({ isOpen, onClose, onSubmit, initialData = null, isLoadin
                             font-size: 14px !important;
                             display: block !important;
                         }
+                        /* Style links inside Quill editor */
+                        .ql-editor a {
+                            color: #1d4ed8 !important;
+                            text-decoration: underline !important;
+                            cursor: pointer !important;
+                        }
+                        .ql-editor a:hover {
+                            color: #1e40af !important;
+                        }
+                        .ql-tooltip {
+                            position: absolute !important;
+                            z-index: 10000 !important;
+                            background-color: #f3f3f3 !important;
+                            border: 1px solid #ccc !important;
+                            border-radius: 4px !important;
+                            box-shadow: 0 2px 8px rgba(0,0,0,0.15) !important;
+                            padding: 5px 10px !important;
+                            left: auto !important;
+                            right: auto !important;
+                        }
+                        .ql-tooltip.ql-flip {
+                            top: auto !important;
+                            bottom: auto !important;
+                        }
+                        .ql-tooltip input[type="text"] {
+                            display: inline-block !important;
+                            width: 200px !important;
+                            padding: 5px 8px !important;
+                            border: 1px solid #999 !important;
+                            border-radius: 3px !important;
+                            font-size: 12px !important;
+                            margin: 0 5px !important;
+                        }
+                        .ql-tooltip a {
+                            display: inline-block !important;
+                            padding: 3px 8px !important;
+                            margin-left: 5px !important;
+                            border-radius: 3px !important;
+                            background-color: #1d4ed8 !important;
+                            color: white !important;
+                            text-decoration: none !important;
+                            font-size: 12px !important;
+                            cursor: pointer !important;
+                        }
+                        .ql-tooltip a:hover {
+                            background-color: #1e40af !important;
+                        }
+                        .ql-tooltip a.ql-action {
+                            margin-right: 5px !important;
+                        }
+                        .ql-editor p.ql-align-center img,
+                        .ql-editor div.ql-align-center img {
+                            display: block !important;
+                            margin-left: auto !important;
+                            margin-right: auto !important;
+                        }
+                        .ql-editor p.ql-align-right img,
+                        .ql-editor div.ql-align-right img {
+                            display: block !important;
+                            margin-left: auto !important;
+                            margin-right: 0 !important;
+                        }
+                        .ql-editor p.ql-align-left img,
+                        .ql-editor div.ql-align-left img {
+                            display: block !important;
+                            margin-left: 0 !important;
+                            margin-right: auto !important;
+                        }
+                        /* Also handle images that may be direct children */
+                        .ql-editor img {
+                            max-width: 100% !important;
+                            height: auto !important;
+                        }
                     `}</style>
-                        <div className={`border rounded-md ${errors.noiDung ? 'border-red-500' : 'border-gray-300'}`}>
+                        <div className={`border rounded-md overflow-visible ${errors.noiDung ? 'border-red-500' : 'border-gray-300'}`}>
                             <ReactQuill
                                 theme="snow"
                                 value={formData.noiDung}

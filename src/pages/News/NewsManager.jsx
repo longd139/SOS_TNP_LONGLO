@@ -10,22 +10,22 @@ import { formatDate } from '../../utils/formatDate';
 import { showToast } from '../../utils/toastNotification';
 
 export default function NewsManager() {
-    const { 
-        news, 
-        loading, 
-        error, 
-        pagination, 
+    const {
+        news,
+        loading,
+        error,
+        pagination,
         filters,
         showActive,
         fetchNewsList,
-        loadNews, 
-        createNews, 
-        updateNews, 
+        loadNews,
+        createNews,
+        updateNews,
         updateStatus,
-        deleteNews, 
+        deleteNews,
         setFilters,
         setShowActive,
-        clearError 
+        clearError
     } = useNews();
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -97,11 +97,11 @@ export default function NewsManager() {
             if (result.success) {
                 const newsId = result.data?.id;
                 showToast.success('Tạo tin tức thành công!');
-                
+
                 if (callback && newsId) {
                     await callback(newsId);
                 }
-                
+
                 setIsCreateModalOpen(false);
             } else {
                 showToast.error(result.error || 'Tạo tin tức thất bại!');
@@ -127,11 +127,11 @@ export default function NewsManager() {
             const result = await updateNews(selectedNews.id, formData);
             if (result.success) {
                 showToast.success('Cập nhật tin tức thành công!');
-                
+
                 if (callback && selectedNews.id) {
                     await callback(selectedNews.id);
                 }
-                
+
                 setIsEditModalOpen(false);
                 setSelectedNews(null);
             } else {
@@ -149,7 +149,7 @@ export default function NewsManager() {
     };
 
     const handleFilter = (newFilters) => {
-        
+
         const updatedFilters = {};
         if (newFilters.idDanhMuc !== undefined) {
             updatedFilters.idDanhMuc = newFilters.idDanhMuc || null;
@@ -160,7 +160,7 @@ export default function NewsManager() {
         if (Object.keys(updatedFilters).length > 0) {
             setFilters(updatedFilters);
         }
-        
+
         if (newFilters.isActive !== undefined) {
             setShowActive(newFilters.isActive);
         }
@@ -169,7 +169,7 @@ export default function NewsManager() {
         if (newFilters.pageSize !== undefined) {
             setPageSize(selectedPageSize);
         }
-        
+
         loadNews({
             page: 1,
             size: selectedPageSize,
@@ -183,7 +183,7 @@ export default function NewsManager() {
         setFilters({ idDanhMuc: null, search: '' });
         setShowActive(true);
         setPageSize(10);
-        
+
         loadNews({
             page: 1,
             size: 10,
@@ -252,11 +252,10 @@ export default function NewsManager() {
             width: '120px',
             render: (value) => (
                 <span
-                    className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                        value
+                    className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${value
                             ? 'bg-green-100 text-green-800'
                             : 'bg-gray-100 text-gray-800'
-                    }`}
+                        }`}
                 >
                     {value ? 'Hoạt động' : 'Không hoạt động'}
                 </span>
@@ -289,18 +288,28 @@ export default function NewsManager() {
 
             <NewsFilter onFilter={handleFilter} onReset={handleResetFilter} />
 
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-4 px-4 py-3">
-                <div className="flex items-center justify-between">
-                    <h3 className="font-semibold text-gray-900">
+            <div className="mb-3 flex flex-col mb-4 sm:flex-row sm:justify-between sm:items-center gap-2 bg-white p-3 rounded-lg shadow-sm border border-gray-200">
+                <div className="flex items-center gap-3">
+                    <h3 className="font-semibold text-gray-900 mb-0">
                         Danh sách bài viết ({pagination.totalItems || 0})
                     </h3>
-                    {loading && (
-                        <div className="flex items-center gap-2 text-sm text-gray-600">
-                            <Loader2 className="w-4 h-4 animate-spin" />
-                            <span>Đang tải...</span>
-                        </div>
+                    {!showActive && (
+                        <span className="px-2 md:px-3 py-1 bg-red-100 text-red-800 text-xs font-medium rounded-full">
+                            Không hoạt động
+                        </span>
+                    )}
+                    {showActive && (
+                        <span className="px-3 py-1 bg-green-100 text-green-800 text-xs font-medium rounded-full">
+                            Đang hoạt động
+                        </span>
                     )}
                 </div>
+                {loading && (
+                    <div className="flex items-center gap-2 text-sm text-gray-600">
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        <span>Đang tải...</span>
+                    </div>
+                )}
             </div>
 
             <BaseTable

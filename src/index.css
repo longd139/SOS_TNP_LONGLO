@@ -256,6 +256,18 @@
     fill: #2563eb;
 }
 
+.news-content.prose a,
+.news-content .quill-content a,
+.quill-content a {
+    color: #1d4ed8 !important;
+    text-decoration: underline !important;
+}
+.news-content.prose a:hover,
+.news-content .quill-content a:hover,
+.quill-content a:hover {
+    color: #1e40af !important; 
+}
+
 /* .tree-connector::before {
     content: "";
     position: absolute;

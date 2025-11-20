@@ -11,6 +11,7 @@ import { getProcedureColumns } from "../../components/procedures/columns";
 import { showToast } from "../../utils/toastNotification";
 import { ConfirmModal } from "../../components/base/BaseModal";
 import { fetchProcedures } from "../../features/procedures/proceduresThunks";
+import { Loader2 } from "lucide-react";
 dayjs.locale("vi");
 
 export default function ProceduresManager() {
@@ -155,7 +156,7 @@ export default function ProceduresManager() {
         }
     };
 
-    const handleSearchWithFilters = (newFilters) => {        
+    const handleSearchWithFilters = (newFilters) => {
         updateFilters({
             searchKeyword: newFilters.searchKeyword,
             selectedDomain: newFilters.selectedDomain,
@@ -170,7 +171,7 @@ export default function ProceduresManager() {
         }
 
         const id_linh_vuc = newFilters.selectedDomain === '' ? undefined : newFilters.selectedDomain;
-        
+
         dispatch(
             fetchProcedures({
                 page: 1,
@@ -184,42 +185,14 @@ export default function ProceduresManager() {
 
     return (
         <div className="min-h-screen">
-            <div className="mb-3 md:mb-4">
-                <h1 className="text-xl md:text-2xl font-bold text-gray-900 mb-2">
-                    Quản lý thủ tục hành chính
-                </h1>
-                <p className="text-sm md:text-base text-gray-600">
-                    Quản lý các thủ tục được hiển thị trong ứng dụng
-                </p>
-            </div>
-
-            <ProceduresFilter
-                filters={filters}
-                pagination={pagination}
-                showActive={showActive}
-                onFilterChange={handleFilterChange}
-                onSearch={searchProcedures}
-                onReset={resetFilters}
-                onToggleActive={toggleShowActive}
-                onPageSizeChange={changePageSize}
-                onSearchWithFilters={handleSearchWithFilters}
-            />
-
-            <div className="mb-3 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 bg-white p-3 rounded-lg shadow-sm border border-gray-200">
-                <div className="flex items-center gap-3">
-                    <div className="text-xs md:text-sm text-gray-600">
-                        Danh sách thủ tục ({pagination.total})
-                    </div>
-                    {!showActive && (
-                        <span className="px-2 md:px-3 py-1 bg-red-100 text-red-800 text-xs font-medium rounded-full">
-                            Đã vô hiệu hóa
-                        </span>
-                    )}
-                    {showActive && (
-                        <span className="px-3 py-1 bg-green-100 text-green-800 text-xs font-medium rounded-full">
-                            Đang hoạt động
-                        </span>
-                    )}
+            <div className="mb-4 flex items-center justify-between">
+                <div>
+                    <h1 className="text-xl md:text-2xl font-bold text-gray-900 mb-2">
+                        Quản lý thủ tục hành chính
+                    </h1>
+                    <p className="text-sm md:text-base text-gray-600">
+                        Quản lý các thủ tục được hiển thị trong ứng dụng
+                    </p>
                 </div>
                 <button
                     onClick={openCreateModal}
@@ -240,6 +213,42 @@ export default function ProceduresManager() {
                     </svg>
                     Thêm thủ tục mới
                 </button>
+            </div>
+
+            <ProceduresFilter
+                filters={filters}
+                pagination={pagination}
+                showActive={showActive}
+                onFilterChange={handleFilterChange}
+                onSearch={searchProcedures}
+                onReset={resetFilters}
+                onToggleActive={toggleShowActive}
+                onPageSizeChange={changePageSize}
+                onSearchWithFilters={handleSearchWithFilters}
+            />
+
+            <div className="mb-3 flex flex-col mb-4 sm:flex-row sm:justify-between sm:items-center gap-2 bg-white p-3 rounded-lg shadow-sm border border-gray-200">
+                <div className="flex items-center gap-3">
+                    <h3 className="font-semibold text-gray-900 mb-0">
+                        Danh sách thủ tục ({pagination.total})
+                    </h3>
+                    {!showActive && (
+                        <span className="px-2 md:px-3 py-1 bg-red-100 text-red-800 text-xs font-medium rounded-full">
+                            Không hoạt động
+                        </span>
+                    )}
+                    {showActive && (
+                        <span className="px-3 py-1 bg-green-100 text-green-800 text-xs font-medium rounded-full">
+                            Đang hoạt động
+                        </span>
+                    )}
+                </div>
+                {loading && (
+                    <div className="flex items-center gap-2 text-sm text-gray-600">
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        <span>Đang tải...</span>
+                    </div>
+                )}
             </div>
 
             <BaseTable

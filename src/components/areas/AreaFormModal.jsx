@@ -1,7 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import BaseModal, { ModalFooter } from '../base/BaseModal';
 import { validateAreaForm } from '../../validator/areaValidator';
+
+let _persistedAreaForm = null;
+let _persistedAreaId = null;
 
 const AreaFormModal = ({ isOpen, onClose, onSubmit, initialData = null, mode = 'create', isLoading = false }) => {
     const [formData, setFormData] = useState({
@@ -11,18 +14,35 @@ const AreaFormModal = ({ isOpen, onClose, onSubmit, initialData = null, mode = '
     const [errors, setErrors] = useState({});
     const [isSubmitting, setIsSubmitting] = useState(false);
 
+    const prevIsOpen = useRef(false);
+
     useEffect(() => {
-        if (isOpen && initialData && mode === 'edit') {
-            setFormData({
-                tenLinhVuc: initialData.ten_linh_vuc || '',
-                moTa: initialData.mo_ta || ''
-            });
-        } else if (isOpen && mode === 'create') {
-            setFormData({
-                tenLinhVuc: '',
-                moTa: ''
-            });
+        if (!prevIsOpen.current && isOpen) {
+            if (mode === 'edit' && initialData && _persistedAreaId !== initialData.id) {
+                _persistedAreaForm = null;
+                _persistedAreaId = initialData.id;
+            }
+
+            if (mode === 'create' && _persistedAreaId !== null) {
+                _persistedAreaForm = null;
+                _persistedAreaId = null;
+            }
+
+            if (_persistedAreaForm) {
+                setFormData(_persistedAreaForm);
+            } else if (initialData && mode === 'edit') {
+                setFormData({
+                    tenLinhVuc: initialData.ten_linh_vuc || '',
+                    moTa: initialData.mo_ta || ''
+                });
+            } else if (mode === 'create') {
+                setFormData({
+                    tenLinhVuc: '',
+                    moTa: ''
+                });
+            }
         }
+        prevIsOpen.current = isOpen;
     }, [isOpen, initialData, mode]);
 
     const handleChange = (field, value) => {
@@ -30,6 +50,7 @@ const AreaFormModal = ({ isOpen, onClose, onSubmit, initialData = null, mode = '
             ...prev,
             [field]: value
         }));
+        _persistedAreaForm = { ...formData, [field]: value };
         if (errors[field]) {
             setErrors(prev => ({
                 ...prev,
@@ -40,10 +61,10 @@ const AreaFormModal = ({ isOpen, onClose, onSubmit, initialData = null, mode = '
 
     const handleSubmit = async () => {
         setIsSubmitting(true);
-        
+
         try {
             const validation = await validateAreaForm(formData);
-            
+
             if (!validation.isValid) {
                 setErrors(validation.errors);
                 setIsSubmitting(false);
@@ -51,12 +72,13 @@ const AreaFormModal = ({ isOpen, onClose, onSubmit, initialData = null, mode = '
             }
 
             await onSubmit(formData);
-            
+
             setFormData({
                 tenLinhVuc: '',
                 moTa: ''
             });
             setErrors({});
+            _persistedAreaForm = null;
         } catch (error) {
         } finally {
             setIsSubmitting(false);
@@ -69,6 +91,8 @@ const AreaFormModal = ({ isOpen, onClose, onSubmit, initialData = null, mode = '
             moTa: ''
         });
         setErrors({});
+        _persistedAreaForm = null;
+        _persistedAreaId = null;
         onClose();
     };
 
@@ -100,11 +124,10 @@ const AreaFormModal = ({ isOpen, onClose, onSubmit, initialData = null, mode = '
                         value={formData.tenLinhVuc}
                         onChange={(e) => handleChange('tenLinhVuc', e.target.value)}
                         placeholder="Nhập tên lĩnh vực..."
-                        className={`w-full px-3 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 ${
-                            errors.tenLinhVuc
+                        className={`w-full px-3 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 ${errors.tenLinhVuc
                                 ? 'border-red-500 focus:ring-red-500'
                                 : 'border-gray-300 focus:ring-blue-500'
-                        }`}
+                            }`}
                     />
                     {errors.tenLinhVuc && (
                         <p className="mt-1 text-xs text-red-600">{errors.tenLinhVuc}</p>
@@ -120,11 +143,10 @@ const AreaFormModal = ({ isOpen, onClose, onSubmit, initialData = null, mode = '
                         onChange={(e) => handleChange('moTa', e.target.value)}
                         placeholder="Nhập mô tả về lĩnh vực..."
                         rows="3"
-                        className={`w-full px-3 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 ${
-                            errors.moTa
+                        className={`w-full px-3 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 ${errors.moTa
                                 ? 'border-red-500 focus:ring-red-500'
                                 : 'border-gray-300 focus:ring-blue-500'
-                        }`}
+                            }`}
                     />
                     {errors.moTa && (
                         <p className="mt-1 text-xs text-red-600">{errors.moTa}</p>

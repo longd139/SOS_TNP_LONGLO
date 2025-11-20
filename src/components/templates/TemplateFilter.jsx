@@ -34,7 +34,7 @@ export default function TemplateFilter({
       type: "select",
       options: [
         { value: false, label: "Đang hoạt động" },
-        { value: true, label: "Đã xóa" },
+        { value: true, label: "Không hoạt động" },
       ],
     },
     {
