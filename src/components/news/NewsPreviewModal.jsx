@@ -16,17 +16,37 @@ const NewsPreviewModal = ({ isOpen, onClose, newsData, isPreview = false }) => {
         danh_muc_tin_tuc: {
             ten_danh_muc: newsData.categoryName
         },
-        thoi_gian_tao: new Date().toISOString()
+        thoi_gian_tao: new Date().toISOString(),
+        dinh_kem_tin_tuc: []
     } : newsData;
 
     const imageUrl = isPreview 
         ? data.url_anh_dai_dien 
         : (data.url_anh_dai_dien ? downloadUtils.handleViewImage(data) : null);
 
+    const processContentImages = (html, attachments) => {
+        if (!html || !attachments || attachments.length === 0) return html;
+        
+        let processedHtml = html;
+        const baseUrl = process.env.REACT_APP_API_URL;
+        
+        attachments.forEach((attachment, index) => {
+            const placeholder = `<!--IMAGE_PLACEHOLDER_${index}-->`;
+            if (processedHtml.includes(placeholder)) {
+                const imgTag = `<img src="${baseUrl}${attachment.url_file}" alt="content-image" style="max-width: 100%; height: auto;" />`;
+                processedHtml = processedHtml.replace(placeholder, imgTag);
+            }
+        });
+        
+        return processedHtml;
+    };
+
     const sanitizeHtml = (rawHtml) => {
         if (!rawHtml) return '';
         return DOMPurify.sanitize(rawHtml, {
-            ADD_ATTR: ['target', 'class'],
+            ADD_ATTR: ['target', 'class', 'style', 'alt', 'width', 'height'],
+            ADD_TAGS: ['img'],
+            ALLOW_DATA_ATTR: true,
             FORBID_TAGS: ['script', 'style'],
             transformTags: {
                 'a': (tagName, attribs) => ({
@@ -41,7 +61,13 @@ const NewsPreviewModal = ({ isOpen, onClose, newsData, isPreview = false }) => {
         });
     };
 
-    const sanitizedContent = sanitizeHtml(data.noi_dung);
+    let contentWithImages = data.noi_dung;
+    
+    if (!isPreview && data.dinh_kem_tin_tuc && data.dinh_kem_tin_tuc.length > 0) {
+        contentWithImages = processContentImages(data.noi_dung, data.dinh_kem_tin_tuc);
+    }
+    
+    const sanitizedContent = sanitizeHtml(contentWithImages);
 
     return (
         <BaseModal

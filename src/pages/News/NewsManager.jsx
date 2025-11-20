@@ -8,6 +8,7 @@ import NewsPreviewModal from '../../components/news/NewsPreviewModal';
 import { useNews } from '../../hooks/useNews';
 import { formatDate } from '../../utils/formatDate';
 import { showToast } from '../../utils/toastNotification';
+import { getNewsById } from '../../services/newsService';
 
 export default function NewsManager() {
     const {
@@ -34,6 +35,7 @@ export default function NewsManager() {
     const [selectedNews, setSelectedNews] = useState(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [pageSize, setPageSize] = useState(10);
+    const [isLoadingPreview, setIsLoadingPreview] = useState(false);
 
     useEffect(() => {
         setShowActive(true);
@@ -49,9 +51,17 @@ export default function NewsManager() {
         });
     }, []);
 
-    const handleView = (item) => {
-        setSelectedNews(item);
-        setIsPreviewModalOpen(true);
+    const handleView = async (item) => {
+        setIsLoadingPreview(true);
+        try {
+            const fullNewsData = await getNewsById(item.id);
+            setSelectedNews(fullNewsData);
+            setIsPreviewModalOpen(true);
+        } catch (error) {
+            showToast.error('Không thể tải chi tiết bài viết!');
+        } finally {
+            setIsLoadingPreview(false);
+        }
     };
 
     const handleEdit = (item) => {

@@ -151,19 +151,34 @@ const NewsFormModal = ({ isOpen, onClose, onSubmit, initialData = null, isLoadin
     };
 
     const extractBase64Images = (html) => {
-        const imgRegex = /<img[^>]+src="data:image\/([^;]+);base64,([^"]+)"/g;
+        const imgRegex = /<img([^>]*)src="data:image\/([^;]+);base64,([^"]+)"([^>]*)>/g;
         const images = [];
         let match;
+        let index = 0;
 
         while ((match = imgRegex.exec(html)) !== null) {
+            const beforeSrc = match[1] || '';
+            const afterSrc = match[4] || '';
             images.push({
-                format: match[1],
-                base64: match[2],
-                fullSrc: match[0]
+                format: match[2],
+                base64: match[3],
+                fullTag: match[0],
+                placeholder: `<!--IMAGE_PLACEHOLDER_${index}-->`,
+                attributes: beforeSrc + afterSrc,
+                index: index
             });
+            index++;
         }
 
         return images;
+    };
+
+    const replaceBase64WithPlaceholders = (html, images) => {
+        let result = html;
+        images.forEach((image) => {
+            result = result.replace(image.fullTag, image.placeholder);
+        });
+        return result;
     };
 
     const ensureLinksOpenInNewTab = (html) => {
@@ -197,22 +212,34 @@ const NewsFormModal = ({ isOpen, onClose, onSubmit, initialData = null, isLoadin
     };
 
     const uploadContentImages = async (newsId, images) => {
-        const uploadedUrls = [];
+        const uploadedImages = [];
+        let currentNewsId = newsId;
 
         for (let i = 0; i < images.length; i++) {
             const image = images[i];
             const file = base64ToFile(image.base64, image.format, i);
 
             const fileFormData = new FormData();
-            fileFormData.append('idTinTuc', newsId);
+            if (currentNewsId) {
+                fileFormData.append('idTinTuc', currentNewsId);
+            } else {
+                fileFormData.append('idTinTuc', '');
+            }
             fileFormData.append('file', file);
 
             try {
-                const result = await dispatch(uploadNewsFile({ idTinTuc: newsId, fileData: fileFormData })).unwrap();
+                const result = await dispatch(uploadNewsFile({ idTinTuc: currentNewsId, fileData: fileFormData })).unwrap();
+                
+                if (!currentNewsId && result.idTinTuc) {
+                    currentNewsId = result.idTinTuc;
+                }
+                
                 if (result.url_file) {
-                    uploadedUrls.push({
-                        oldSrc: `data:image/${image.format};base64,${image.base64}`,
-                        newSrc: process.env.REACT_APP_API_URL + result.url_file
+                    uploadedImages.push({
+                        placeholder: image.placeholder,
+                        url: process.env.REACT_APP_API_URL + result.url_file,
+                        attributes: image.attributes,
+                        index: image.index
                     });
                 }
             } catch (error) {
@@ -220,15 +247,16 @@ const NewsFormModal = ({ isOpen, onClose, onSubmit, initialData = null, isLoadin
             }
         }
 
-        return uploadedUrls;
+        return { uploadedImages, newsId: currentNewsId };
     };
 
-    const replaceImageUrls = (html, urlMap) => {
-        let updatedHtml = html;
-        urlMap.forEach(({ oldSrc, newSrc }) => {
-            updatedHtml = updatedHtml.replace(new RegExp(oldSrc.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'), newSrc);
+    const replacePlaceholdersWithUrls = (html, uploadedImages) => {
+        let result = html;
+        uploadedImages.forEach((image) => {
+            const imgTag = `<img${image.attributes} src="${image.url}" />`;
+            result = result.replace(image.placeholder, imgTag);
         });
-        return updatedHtml;
+        return result;
     };
 
     const handleSubmit = async () => {
@@ -237,11 +265,21 @@ const NewsFormModal = ({ isOpen, onClose, onSubmit, initialData = null, isLoadin
             return;
         }
 
+        const base64Images = extractBase64Images(formData.noiDung);
+        setContentImages(base64Images);
+
         const submitData = new FormData();
         submitData.append('idDanhMuc', formData.idDanhMuc);
         submitData.append('tieuDe', formData.tieuDe);
-        const contentForSubmit = ensureLinksOpenInNewTab(formData.noiDung);
+        
+        // Replace base64 images with placeholders to maintain position
+        let contentToSave = formData.noiDung;
+        if (base64Images.length > 0) {
+            contentToSave = replaceBase64WithPlaceholders(formData.noiDung, base64Images);
+        }
+        const contentForSubmit = ensureLinksOpenInNewTab(contentToSave);
         submitData.append('noiDung', contentForSubmit);
+        
         submitData.append('isActive', String(formData.isActive));
 
         if (formData.tacGia) {
@@ -251,20 +289,18 @@ const NewsFormModal = ({ isOpen, onClose, onSubmit, initialData = null, isLoadin
             submitData.append('file', formData.file);
         }
 
-        const base64Images = extractBase64Images(formData.noiDung);
-        setContentImages(base64Images);
-
         await onSubmit(submitData, async (createdNewsId) => {
             if (base64Images.length > 0 && createdNewsId) {
-                const uploadedUrls = await uploadContentImages(createdNewsId, base64Images);
+                const { uploadedImages, newsId } = await uploadContentImages(createdNewsId, base64Images);
 
-                if (uploadedUrls.length > 0) {
-                    const updatedContent = replaceImageUrls(formData.noiDung, uploadedUrls);
+                if (uploadedImages.length > 0) {
+                    const finalContent = replacePlaceholdersWithUrls(contentToSave, uploadedImages);
+                    const finalContentWithLinks = ensureLinksOpenInNewTab(finalContent);
 
                     const updateFormData = new FormData();
                     updateFormData.append('idDanhMuc', formData.idDanhMuc);
                     updateFormData.append('tieuDe', formData.tieuDe);
-                    updateFormData.append('noiDung', updatedContent);
+                    updateFormData.append('noiDung', finalContentWithLinks);
                     updateFormData.append('isActive', String(formData.isActive));
 
                     if (formData.tacGia) {
@@ -289,9 +325,13 @@ const NewsFormModal = ({ isOpen, onClose, onSubmit, initialData = null, isLoadin
 
     const getPreviewData = () => {
         const selectedCategory = activeCategories.find(cat => cat.id === formData.idDanhMuc);
+        
+        // For preview, keep base64 images in content so they can be displayed
+        let previewContent = formData.noiDung;
+        
         return {
             tieuDe: formData.tieuDe,
-            noiDung: formData.noiDung,
+            noiDung: previewContent,
             tacGia: formData.tacGia,
             filePreview: filePreview,
             categoryName: selectedCategory?.ten_danh_muc || 'Chưa chọn danh mục'
