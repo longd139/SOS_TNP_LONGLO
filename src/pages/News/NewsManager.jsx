@@ -36,7 +36,17 @@ export default function NewsManager() {
     const [pageSize, setPageSize] = useState(10);
 
     useEffect(() => {
-        fetchNewsList(1, pageSize);
+        setShowActive(true);
+        setFilters({ idDanhMuc: null, search: '' });
+        setPageSize(10);
+
+        loadNews({
+            page: 1,
+            size: 10,
+            isActive: true,
+            idDanhMuc: null,
+            search: ''
+        });
     }, []);
 
     const handleView = (item) => {
@@ -253,8 +263,8 @@ export default function NewsManager() {
             render: (value) => (
                 <span
                     className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${value
-                            ? 'bg-green-100 text-green-800'
-                            : 'bg-gray-100 text-gray-800'
+                        ? 'bg-green-100 text-green-800'
+                        : 'bg-gray-100 text-gray-800'
                         }`}
                 >
                     {value ? 'Hoạt động' : 'Không hoạt động'}
@@ -286,9 +296,16 @@ export default function NewsManager() {
                 </div>
             )}
 
-            <NewsFilter onFilter={handleFilter} onReset={handleResetFilter} />
-
-            <div className="mb-3 flex flex-col mb-4 sm:flex-row sm:justify-between sm:items-center gap-2 bg-white p-3 rounded-lg shadow-sm border border-gray-200">
+            <NewsFilter
+                currentFilters={{
+                    search: filters.search || '',
+                    idDanhMuc: filters.idDanhMuc || '',
+                    isActive: showActive,
+                    pageSize: pageSize
+                }}
+                onFilter={handleFilter}
+                onReset={handleResetFilter}
+            />            <div className="mb-3 flex flex-col mb-4 sm:flex-row sm:justify-between sm:items-center gap-2 bg-white p-3 rounded-lg shadow-sm border border-gray-200">
                 <div className="flex items-center gap-3">
                     <h3 className="font-semibold text-gray-900 mb-0">
                         Danh sách bài viết ({pagination.totalItems || 0})

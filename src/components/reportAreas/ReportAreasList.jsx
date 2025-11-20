@@ -32,6 +32,9 @@ export default function ReportAreasList() {
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     useEffect(() => {
+        updateShowActive(true);
+        clearFilters();
+
         loadReportAreas({
             page: 1,
             size: 10,

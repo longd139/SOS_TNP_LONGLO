@@ -4,7 +4,7 @@ import BaseFilter from '../base/BaseFilter';
 import { fetchAreas } from '../../features/areas/areasThunks';
 import { selectAreas } from '../../features/areas/areasSelectors';
 
-export default function ProceduresFilter({ 
+export default function ProceduresFilter({
     filters = {},
     pagination = {},
     showActive = true,
@@ -13,7 +13,8 @@ export default function ProceduresFilter({
     onReset,
     onToggleActive,
     onPageSizeChange,
-    onSearchWithFilters
+    onSearchWithFilters,
+    currentFilters = {}
 }) {
     const dispatch = useDispatch();
     const areas = useSelector(selectAreas);
@@ -23,10 +24,10 @@ export default function ProceduresFilter({
     }, [dispatch]);
 
     const initialFilters = {
-        searchKeyword: filters.searchKeyword || '',
-        selectedDomain: filters.selectedDomain || '',
-        showActive: showActive,
-        pageSize: pagination.pageSize || 10
+        searchKeyword: currentFilters.searchKeyword !== undefined ? currentFilters.searchKeyword : (filters.searchKeyword || ''),
+        selectedDomain: currentFilters.selectedDomain !== undefined ? currentFilters.selectedDomain : (filters.selectedDomain || ''),
+        showActive: currentFilters.showActive !== undefined ? currentFilters.showActive : showActive,
+        pageSize: currentFilters.pageSize || pagination.pageSize || 10
     };
 
     const filterFields = [
@@ -70,7 +71,7 @@ export default function ProceduresFilter({
         }
     ];
 
-    const handleFilter = (newFilters) => {        
+    const handleFilter = (newFilters) => {
         if (newFilters.searchKeyword !== filters.searchKeyword) {
             onFilterChange?.('searchKeyword', newFilters.searchKeyword);
         }
