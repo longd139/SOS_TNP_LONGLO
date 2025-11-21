@@ -247,16 +247,11 @@ export default function TemplateManager() {
             dataIndex: "id",
             key: "id",
             width: "20px",
-            render: (value, record, index) => {
-                const currentPage = pagination.current || 1;
-                const pageSize = pagination.pageSize || 10;
-                const sttNumber = (currentPage - 1) * pageSize + index + 1;
-                return (
-                    <span className="text-sm font-medium text-gray-900">
-                        #{sttNumber.toString().padStart(2, "0")}
-                    </span>
-                );
-            },
+            render: (value, record, index) => (
+                <span className="text-sm font-medium text-gray-900">
+                    #{((pagination?.currentPage || 1) - 1) * (pagination?.pageSize || filters.pageSize) + index + 1}
+                </span>
+            ),
         },
         {
             title: "Tên biểu mẫu",
