@@ -42,45 +42,39 @@ export default function ReportList() {
     });
 
     const [currentPage, setCurrentPage] = useState(1);
-    const [hasLoadedInitial, setHasLoadedInitial] = useState(false);
-
-    const loadInitialData = useCallback(async () => {
-        try {
-            await Promise.all([
-                loadExtent(),
-                loadStatusReport(),
-                loadReportAreas({ page: 1, size: 10, isActive: true }),
-            ]);
-            setHasLoadedInitial(true);
-        } catch (error) {
-            showToast.error("Lỗi khi tải dữ liệu khởi tạo");
-            setHasLoadedInitial(true);
-        }
-    }, [loadExtent, loadStatusReport, loadReportAreas]);
 
     useEffect(() => {
-        if (!hasLoadedInitial) {
-            loadInitialData();
-        }
-    }, [hasLoadedInitial, loadInitialData]);
+        const loadInitialData = async () => {
+            try {
+                await Promise.all([
+                    loadExtent(),
+                    loadStatusReport(),
+                    loadReportAreas({ page: 1, size: 10, isActive: true }),
+                ]);
+            } catch (error) {
+                showToast.error("Lỗi khi tải dữ liệu khởi tạo");
+            }
+        };
+
+        loadInitialData();
+    }, []);
 
     useEffect(() => {
-        if (hasLoadedInitial) {
-            const params = {
-                page: currentPage,
-                size: filters.pageSize,
-                trangThai: filters.trangThai,
-                idLinhVucPhanAnh: filters.idLinhVucPhanAnh,
-                mucDo: filters.mucDo,
-                maPhanAnh: filters.maPhanAnh,
-                sortTime: filters.sortTime,
-            };
-            
-            loadReports(params).catch(() => {
-                showToast.error("Lỗi khi tải danh sách phản ánh");
-            });
-        }
-    }, [hasLoadedInitial, currentPage, filters, loadReports]);
+        const params = {
+            page: currentPage,
+            size: filters.pageSize,
+            trangThai: filters.trangThai,
+            idLinhVucPhanAnh: filters.idLinhVucPhanAnh,
+            mucDo: filters.mucDo,
+            maPhanAnh: filters.maPhanAnh,
+            sortTime: filters.sortTime,
+        };
+        
+        loadReports(params).catch(() => {
+            showToast.error("Lỗi khi tải danh sách phản ánh");
+        });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [currentPage, filters.pageSize, filters.trangThai, filters.idLinhVucPhanAnh, filters.mucDo, filters.maPhanAnh, filters.sortTime]);
 
     const handleFilterChange = (newFilters) => {
         setFilters(newFilters);

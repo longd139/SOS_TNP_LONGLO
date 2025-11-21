@@ -40,14 +40,16 @@ export default function AreasList() {
     }, []);
 
     const handleFilter = (newFilters) => {
-        updateFilters({ search: newFilters.search || '' });
+        const searchValue = typeof newFilters.search === 'string' ? newFilters.search.trim() : '';
+        
+        updateFilters({ search: searchValue });
         setShowActive(newFilters.isActive);
 
         loadAreas({
             page: 1,
             size: newFilters.pageSize || pagination.pageSize,
             isActive: newFilters.isActive,
-            search: newFilters.search || ''
+            search: searchValue
         });
     };
 

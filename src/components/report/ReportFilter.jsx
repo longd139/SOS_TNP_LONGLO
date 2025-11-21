@@ -11,12 +11,12 @@ const ReportFilter = ({
     extent = {}
 }) => {
     const initialFilters = {
-        trangThai: '',
-        idLinhVucPhanAnh: '',
-        mucDo: '',
-        maPhanAnh: '',
-        sortTime: 'desc',
-        pageSize: 10
+        trangThai: filters.trangThai || '',
+        idLinhVucPhanAnh: filters.idLinhVucPhanAnh || '',
+        mucDo: filters.mucDo || '',
+        maPhanAnh: filters.maPhanAnh || '',
+        sortTime: filters.sortTime || 'desc',
+        pageSize: pagination.pageSize || 10
     };
 
     const filterFields = [
@@ -89,7 +89,7 @@ const ReportFilter = ({
             trangThai: newFilters.trangThai || '',
             idLinhVucPhanAnh: newFilters.idLinhVucPhanAnh || '',
             mucDo: newFilters.mucDo || '',
-            maPhanAnh: newFilters.maPhanAnh || '',
+            maPhanAnh: (newFilters.maPhanAnh || '').trim(),
             sortTime: newFilters.sortTime || 'desc',
             pageSize: Number(newFilters.pageSize) || 10
         });

@@ -54,22 +54,20 @@ export const useNews = () => {
     const createNews = useCallback(async (newsData) => {
         const result = await dispatch(createNewsItem(newsData));
         if (createNewsItem.fulfilled.match(result)) {
-            fetchNewsList(pagination.currentPage, pagination.pageSize);
             return { success: true, data: result.payload };
         } else {
             return { success: false, error: result.payload?.message || result.payload || 'Tạo tin tức thất bại!' };
         }
-    }, [dispatch, fetchNewsList, pagination]);
+    }, [dispatch]);
 
     const updateNews = useCallback(async (newsId, newsData) => {
         const result = await dispatch(updateNewsItem({ newsId, newsData }));
         if (updateNewsItem.fulfilled.match(result)) {
-            fetchNewsList(pagination.currentPage, pagination.pageSize);
             return { success: true, data: result.payload };
         } else {
             return { success: false, error: result.payload?.message || result.payload || 'Cập nhật tin tức thất bại!' };
         }
-    }, [dispatch, fetchNewsList, pagination]);
+    }, [dispatch]);
 
     const handleUpdateStatus = useCallback(async (newsItem) => {
         const newStatus = !(newsItem.is_active || newsItem.isActive);
@@ -88,12 +86,11 @@ export const useNews = () => {
     const deleteNews = useCallback(async (newsId) => {
         const result = await dispatch(deleteNewsItem(newsId));
         if (deleteNewsItem.fulfilled.match(result)) {
-            fetchNewsList(pagination.currentPage, pagination.pageSize);
             return { success: true };
         } else {
             return { success: false, error: result.payload?.message || result.payload || 'Xóa tin tức thất bại!' };
         }
-    }, [dispatch, fetchNewsList, pagination]);
+    }, [dispatch]);
 
     const handleSetCurrentNews = useCallback((newsItem) => {
         dispatch(setCurrentNews(newsItem));
