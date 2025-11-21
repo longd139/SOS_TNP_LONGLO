@@ -46,13 +46,14 @@ export const useReportAreas = ({ autoFetch = false, filters = {}, isActive } = {
                 ...filters
             });
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [autoFetch]);
 
     const loadReportAreas = useCallback((params = {}) => {
         const requestParams = {
             page: params.page || pagination.currentPage,
             size: params.size || pagination.pageSize,
-            search: params.search || currentFilters.search || '',
+            search: params.search !== undefined ? params.search : (currentFilters.search || ''),
             isActive: params.isActive !== undefined ? params.isActive : showActive
         };
 

@@ -3,9 +3,9 @@ import BaseFilter from '../base/BaseFilter';
 
 const ReportAreasFilter = ({ onFilter, onReset, filters = {}, pagination = {} }) => {
     const initialFilters = {
-        search: '',
-        isActive: true,
-        pageSize: 10
+        search: filters.search || '',
+        isActive: filters.isActive !== undefined ? filters.isActive : true,
+        pageSize: pagination.pageSize || 10
     };
 
     const filterFields = [
@@ -38,8 +38,15 @@ const ReportAreasFilter = ({ onFilter, onReset, filters = {}, pagination = {} })
     ];
 
     const handleFilter = (newFilters) => {
+        const searchValue = typeof newFilters.search === 'string' ? newFilters.search.trim() : '';
         onFilter({
-            search: newFilters.search.trim() || '',
+            search: searchValue,
+            isActive: newFilters.isActive,
+            pageSize: Number(newFilters.pageSize)
+        });
+
+        console.log('Applied Filters:', {
+            search: searchValue,
             isActive: newFilters.isActive,
             pageSize: Number(newFilters.pageSize)
         });

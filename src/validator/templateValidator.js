@@ -23,10 +23,15 @@ export const createTemplateSchema = yup.object().shape({
     
     file: yup
         .mixed()
-        .required("Vui lòng chọn file PDF")
-        .test('fileType', 'Chỉ chấp nhận file PDF', (value) => {
+        .required("Vui lòng chọn file")
+        .test('fileType', 'Chỉ chấp nhận file PDF, DOC, DOCX', (value) => {
             if (!value) return false;
-            return value.type === 'application/pdf';
+            const allowedTypes = [
+                'application/pdf',
+                'application/msword',
+                'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+            ];
+            return allowedTypes.includes(value.type);
         })
         .test('fileSize', 'Kích thước file không được vượt quá 10MB', (value) => {
             if (!value) return false;
@@ -57,9 +62,14 @@ export const updateTemplateSchema = yup.object().shape({
     file: yup
         .mixed()
         .nullable()
-        .test('fileType', 'Chỉ chấp nhận file PDF', (value) => {
+        .test('fileType', 'Chỉ chấp nhận file PDF, DOC, DOCX', (value) => {
             if (!value) return true;
-            return value.type === 'application/pdf';
+            const allowedTypes = [
+                'application/pdf',
+                'application/msword',
+                'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+            ];
+            return allowedTypes.includes(value.type);
         })
         .test('fileSize', 'Kích thước file không được vượt quá 10MB', (value) => {
             if (!value) return true;

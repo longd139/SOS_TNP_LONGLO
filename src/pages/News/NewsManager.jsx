@@ -95,6 +95,13 @@ export default function NewsManager() {
         const result = await deleteNews(selectedNews.id);
         if (result.success) {
             showToast.success('Xóa tin tức thành công!');
+            loadNews({
+                page: pagination.currentPage,
+                size: pageSize,
+                isActive: showActive,
+                idDanhMuc: filters.idDanhMuc,
+                search: filters.search
+            });
         } else {
             showToast.error(result.error || 'Xóa tin tức thất bại!');
         }
@@ -119,7 +126,7 @@ export default function NewsManager() {
                     }
                 }
             } catch (error) {
-                console.error('Error updating news with images:', error);
+                showToast.error(error || error.message || 'Cập nhật tin tức thất bại!');
             }
             return;
         }
@@ -136,6 +143,13 @@ export default function NewsManager() {
                 }
 
                 setIsCreateModalOpen(false);
+                loadNews({
+                    page: pagination.currentPage,
+                    size: pageSize,
+                    isActive: showActive,
+                    idDanhMuc: filters.idDanhMuc,
+                    search: filters.search
+                });
             } else {
                 showToast.error(result.error || 'Tạo tin tức thất bại!');
             }
@@ -153,7 +167,6 @@ export default function NewsManager() {
                 if (targetId) {
                     const result = await updateNews(targetId, formData);
                     if (result.success) {
-                        // Reload the news list to show updated content
                         loadNews({
                             page: pagination.currentPage,
                             size: pageSize,
@@ -164,7 +177,7 @@ export default function NewsManager() {
                     }
                 }
             } catch (error) {
-                console.error('Error updating news with images:', error);
+                showToast.error(error || error.message || 'Cập nhật tin tức thất bại!');
             }
             return;
         }
@@ -181,6 +194,13 @@ export default function NewsManager() {
 
                 setIsEditModalOpen(false);
                 setSelectedNews(null);
+                loadNews({
+                    page: pagination.currentPage,
+                    size: pageSize,
+                    isActive: showActive,
+                    idDanhMuc: filters.idDanhMuc,
+                    search: filters.search
+                });
             } else {
                 showToast.error(result.error || 'Cập nhật tin tức thất bại!');
             }
@@ -202,7 +222,8 @@ export default function NewsManager() {
             updatedFilters.idDanhMuc = newFilters.idDanhMuc || null;
         }
         if (newFilters.search !== undefined) {
-            updatedFilters.search = newFilters.search || '';
+            const trimmedSearch = typeof newFilters.search === 'string' ? newFilters.search.trim() : '';
+            updatedFilters.search = trimmedSearch;
         }
         if (Object.keys(updatedFilters).length > 0) {
             setFilters(updatedFilters);
@@ -217,12 +238,16 @@ export default function NewsManager() {
             setPageSize(selectedPageSize);
         }
 
+        const trimmedSearch = newFilters.search !== undefined 
+            ? (typeof newFilters.search === 'string' ? newFilters.search.trim() : '')
+            : filters.search;
+
         loadNews({
             page: 1,
             size: selectedPageSize,
             isActive: newFilters.isActive !== undefined ? newFilters.isActive : showActive,
             idDanhMuc: newFilters.idDanhMuc !== undefined ? (newFilters.idDanhMuc || null) : filters.idDanhMuc,
-            search: newFilters.search !== undefined ? newFilters.search : filters.search
+            search: trimmedSearch
         });
     };
 

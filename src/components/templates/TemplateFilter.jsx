@@ -147,7 +147,17 @@ export default function TemplateFilter({
                 onClick={() => {
                   const newFilters = { ...localFilters, searchKeyword: '' };
                   setLocalFilters(newFilters);
-                  handleApplyFilters();
+                  
+                  if (onSearchWithFilters) {
+                    onSearchWithFilters({
+                      searchKeyword: '',
+                      showRemoved: localFilters.showRemoved,
+                      pageSize: Number(localFilters.pageSize),
+                    });
+                  } else {
+                    onFilterChange?.('searchKeyword', '');
+                    onSearch?.();
+                  }
                 }}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
               >

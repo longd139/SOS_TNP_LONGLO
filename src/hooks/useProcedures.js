@@ -66,51 +66,24 @@ export const useProcedure = () => {
     const createProcedure = useCallback(async (formData) => {
         try {
             const result = await dispatch(createProcedureThunk(formData)).unwrap();
-
-            dispatch(fetchProcedures({
-                page: pagination.current,
-                size: pagination.pageSize,
-                search: filters.searchKeyword,
-                id_linh_vuc: filters.selectedDomain,
-                isActive: showActive
-            }));
-
             return { success: true };
         } catch (error) {
             return { success: false, error: { message: error } };
         }
-    }, [dispatch, pagination, filters, showActive]);
+    }, [dispatch]);
 
     const updateProcedure = useCallback(async (procedureId, formData) => {
         try {
             const result = await dispatch(updateProcedureThunk({ procedureId, formData })).unwrap();
-
-            dispatch(fetchProcedures({
-                page: pagination.current,
-                size: pagination.pageSize,
-                search: filters.searchKeyword,
-                id_linh_vuc: filters.selectedDomain,
-                isActive: showActive
-            }));
-
             return { success: true };
         } catch (error) {
             return { success: false, error: { message: error } };
         }
-    }, [dispatch, pagination, filters, showActive]);
+    }, [dispatch]);
 
     const deleteProcedure = useCallback(async (procedureId, procedureName) => {
         try {
             const result = await dispatch(deleteProcedureThunk({ procedureId, procedureName })).unwrap();
-
-            dispatch(fetchProcedures({
-                page: pagination.current,
-                size: pagination.pageSize,
-                search: filters.searchKeyword,
-                id_linh_vuc: filters.selectedDomain,
-                isActive: showActive
-            }));
-
             return { success: true };
         } catch (error) {
             if (error === 'User cancelled') {
@@ -118,7 +91,7 @@ export const useProcedure = () => {
             }
             return { success: false, error: { message: error } };
         }
-    }, [dispatch, pagination, filters, showActive]);
+    }, [dispatch]);
 
     const getProcedureById = useCallback(async (procedureId) => {
         try {
@@ -190,25 +163,13 @@ export const useProcedure = () => {
         async (procedureId, isActive) => {
             const result = await dispatch(updateProcedureStatus({ procedureId, isActive }));
             if (updateProcedureStatus.fulfilled.match(result)) {
-                await dispatch(fetchProcedures({ 
-                    page: pagination.current,
-                    size: pagination.pageSize,
-                    search: filters.searchKeyword,
-                    id_linh_vuc: filters.selectedDomain,
-                    isActive: showActive
-                }));
                 return { success: true };
             } else {
                 throw new Error(result.payload || 'Không thể cập nhật trạng thái thủ tục');
             }
         },
-        [dispatch, pagination]
+        [dispatch]
     );
-
-    useEffect(() => {
-        loadProcedures(1, pagination.pageSize, filters.searchKeyword, filters.selectedDomain, showActive);
-        loadAreas();
-    }, [showActive]); 
 
     return {
         procedures,
