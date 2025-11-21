@@ -74,14 +74,28 @@ export default function WorkSchedule() {
         }
     };
 
-    // Initial load only - fetch when month/year changes, not on filter or page changes
+    const fetchAllSchedulesForCalendar = async (monthYear) => {
+        try {
+            const countResult = await WORK_SCHEDULE_API.getWorkSchedulesPagination(null, monthYear, null, null, 1, 1);
+            const totalItems = countResult.pagination?.totalItems || 0;
+            
+            if (totalItems > 0) {
+                await fetchSchedulesPagination({
+                    monthYear,
+                    isActive: null,
+                    page: 1,
+                    size: totalItems 
+                });
+            }
+        } catch (error) {
+            showToast.error(error || "Lỗi khi tải lịch tiếp dân cho lịch tháng.");
+        }
+    };
+
     useEffect(() => {
         const monthYear = `${selectedMonth}/${selectedYear}`;
         
-        fetchSchedules({
-            monthYear,
-            isActive: null
-        });
+        fetchAllSchedulesForCalendar(monthYear);
         
         fetchSchedulesPagination({
             monthYear,
@@ -92,7 +106,6 @@ export default function WorkSchedule() {
 
         fetchCounts(monthYear);
         
-        // Reset to page 1 when month/year changes
         setCurrentPage(1);
         setActiveFilter("all");
         setSelectedDate(null);
@@ -112,7 +125,6 @@ export default function WorkSchedule() {
         setCurrentPage(1);
         
         if (date) {
-            // Fetch schedules for specific date
             fetchSchedulesPagination({
                 date: date,
                 isActive: activeFilter === "all" ? null : activeFilter === "active" ? true : false,
@@ -120,7 +132,6 @@ export default function WorkSchedule() {
                 size: pageSize
             });
             
-            // Fetch counts for specific date
             try {
                 const [allResult, activeResult, inactiveResult] = await Promise.all([
                     WORK_SCHEDULE_API.getWorkSchedulesPagination(null, null, date, null, 1, 1),
@@ -153,10 +164,10 @@ export default function WorkSchedule() {
         setSelectedMonth(newMonth);
         setSelectedDate(null);
         setCurrentPage(1);
-        fetchSchedules({
-            monthYear,
-            isActive: null
-        });
+        setActiveFilter("all");
+        
+        fetchAllSchedulesForCalendar(monthYear);
+        
         fetchSchedulesPagination({
             monthYear,
             isActive: null,
@@ -171,10 +182,10 @@ export default function WorkSchedule() {
         setSelectedYear(newYear);
         setSelectedDate(null);
         setCurrentPage(1);
-        fetchSchedules({
-            monthYear,
-            isActive: null
-        });
+        setActiveFilter("all");
+        
+        fetchAllSchedulesForCalendar(monthYear);
+        
         fetchSchedulesPagination({
             monthYear,
             isActive: null,
@@ -201,18 +212,37 @@ export default function WorkSchedule() {
             const res = await updateStatus(schedule);
             if (res.success) {
                 const monthYear = `${selectedMonth}/${selectedYear}`;
+                const isActiveValue = activeFilter === "all" ? null : activeFilter === "active" ? true : false;
+                
                 showToast.success("Cập nhật trạng thái lịch tiếp dân thành công.");
-                fetchSchedules({
-                    monthYear,
-                    isActive: null
-                });
-                fetchSchedulesPagination({
-                    monthYear,
-                    isActive: null,
-                    page: currentPage,
-                    size: pageSize
-                });
-                fetchCounts(monthYear);
+                
+                if (selectedDate) {
+                    fetchSchedulesPagination({
+                        date: selectedDate,
+                        isActive: isActiveValue,
+                        page: currentPage,
+                        size: pageSize
+                    });
+                    
+                    const [allResult, activeResult, inactiveResult] = await Promise.all([
+                        WORK_SCHEDULE_API.getWorkSchedulesPagination(null, null, selectedDate, null, 1, 1),
+                        WORK_SCHEDULE_API.getWorkSchedulesPagination(null, null, selectedDate, true, 1, 1),
+                        WORK_SCHEDULE_API.getWorkSchedulesPagination(null, null, selectedDate, false, 1, 1)
+                    ]);
+                    setCounts({
+                        all: allResult.pagination?.totalItems || 0,
+                        active: activeResult.pagination?.totalItems || 0,
+                        inactive: inactiveResult.pagination?.totalItems || 0
+                    });
+                } else {
+                    fetchSchedulesPagination({
+                        monthYear,
+                        isActive: isActiveValue,
+                        page: currentPage,
+                        size: pageSize
+                    });
+                    fetchCounts(monthYear);
+                }
             } else {
                 showToast.error(
                     res.error || "Cập nhật trạng thái lịch tiếp dân thất bại."
@@ -280,11 +310,15 @@ export default function WorkSchedule() {
                         `Import thành công! Đã import ${result.data?.importedCount || 0
                         } lịch tiếp dân.`
                     );
-                    fetchSchedules({
+                    fetchSchedulesPagination({
                         monthYear,
-                        isActive: null
+                        isActive: null,
+                        page: 1,
+                        size: pageSize
                     });
                     fetchCounts(monthYear);
+                    setCurrentPage(1);
+                    setActiveFilter("all");
                 } else {
                     showToast.error(
                         result.error ||
@@ -328,21 +362,29 @@ export default function WorkSchedule() {
 
             if (result.success) {
                 const monthYear = `${selectedMonth}/${selectedYear}`;
+                const isActiveValue = activeFilter === "all" ? null : activeFilter === "active" ? true : false;
+                
                 showToast.success(
                     mode === "create"
                         ? "Tạo lịch tiếp dân thành công!"
                         : "Cập nhật lịch tiếp dân thành công!"
                 );
-                fetchSchedules({
-                    monthYear,
-                    isActive: null
-                });
-                fetchSchedulesPagination({
-                    monthYear,
-                    isActive: null,
-                    page: currentPage,
-                    size: pageSize
-                });
+                
+                if (selectedDate) {
+                    fetchSchedulesPagination({
+                        date: selectedDate,
+                        isActive: isActiveValue,
+                        page: currentPage,
+                        size: pageSize
+                    });
+                } else {
+                    fetchSchedulesPagination({
+                        monthYear,
+                        isActive: isActiveValue,
+                        page: currentPage,
+                        size: pageSize
+                    });
+                }
                 fetchCounts(monthYear);
                 return true;
             } else {
@@ -377,11 +419,9 @@ export default function WorkSchedule() {
         }
     };
 
-    // Since API now filters by date and isActive, we can display schedules directly
     const displaySchedules = schedules;
 
     const handleActiveFilterChange = (filter) => {
-        // Don't do anything if clicking the same filter
         if (filter === activeFilter) return;
         
         setActiveFilter(filter);
@@ -390,7 +430,6 @@ export default function WorkSchedule() {
         const isActiveValue = filter === "all" ? null : filter === "active" ? true : false;
         
         if (selectedDate) {
-            // Filter by date and status
             fetchSchedulesPagination({
                 date: selectedDate,
                 isActive: isActiveValue,
@@ -398,7 +437,6 @@ export default function WorkSchedule() {
                 size: pageSize
             });
         } else {
-            // Filter by month/year and status
             const monthYear = `${selectedMonth}/${selectedYear}`;
             fetchSchedulesPagination({
                 monthYear,
@@ -415,10 +453,6 @@ export default function WorkSchedule() {
         setSelectedDate(null);
         setCurrentPage(1);
         
-        fetchSchedules({
-            monthYear,
-            isActive: null
-        });
         fetchSchedulesPagination({
             monthYear,
             isActive: null,

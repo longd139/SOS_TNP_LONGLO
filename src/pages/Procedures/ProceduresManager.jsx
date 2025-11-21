@@ -63,7 +63,6 @@ export default function ProceduresManager() {
         );
         
         dispatch(fetchAreas());
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const openCreateModal = () => {
@@ -97,7 +96,6 @@ export default function ProceduresManager() {
         if (result.success) {
             closeCreateModal();
             showToast.success("Tạo thủ tục thành công!");
-            // Refresh list after successful create
             dispatch(
                 fetchProcedures({
                     page: pagination.current,
@@ -121,7 +119,6 @@ export default function ProceduresManager() {
         if (result.success) {
             closeEditModal();
             showToast.success("Cập nhật thủ tục thành công!");
-            // Refresh list after successful update
             dispatch(
                 fetchProcedures({
                     page: pagination.current,
@@ -160,7 +157,6 @@ export default function ProceduresManager() {
 
         if (result.success) {
             showToast.success("Đã xóa thủ tục thành công.");
-            // Refresh list after successful delete
             dispatch(
                 fetchProcedures({
                     page: pagination.current,
@@ -198,7 +194,6 @@ export default function ProceduresManager() {
                 `Thủ tục đã được ${!procedure.is_active ? "kích hoạt" : "vô hiệu hóa"
                 } thành công!`
             );
-            // Refresh list after successful status update
             dispatch(
                 fetchProcedures({
                     page: pagination.current,

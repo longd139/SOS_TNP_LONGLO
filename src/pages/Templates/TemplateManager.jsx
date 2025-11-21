@@ -331,7 +331,6 @@ export default function TemplateManager() {
             dataIndex: "isActive",
             key: "isActive",
             width: "120px",
-            //here
             render: (value, record) => {
                 const v =
                     typeof value !== "undefined"

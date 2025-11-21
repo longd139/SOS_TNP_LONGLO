@@ -59,9 +59,11 @@ const workScheduleSlice = createSlice({
         },
         setSelectedMonth: (state, action) => {
             state.selectedMonth = action.payload;
+            state.allSchedules = [];
         },
         setSelectedYear: (state, action) => {
             state.selectedYear = action.payload;
+            state.allSchedules = [];
         },
         setShowActive: (state, action) => {
             state.showActive = action.payload;
@@ -187,6 +189,11 @@ const workScheduleSlice = createSlice({
             .addCase(fetchWorkSchedulesPagination.fulfilled, (state, action) => {
                 state.loading = false;
                 state.schedules = action.payload.data || [];
+                if (action.payload.data && action.payload.data.length > 0) {
+                    const existingIds = new Set(state.allSchedules.map(s => s.id));
+                    const newSchedules = action.payload.data.filter(s => !existingIds.has(s.id));
+                    state.allSchedules = [...state.allSchedules, ...newSchedules];
+                }
                 state.pagination = action.payload.pagination || {
                     currentPage: 1,
                     pageSize: 10,

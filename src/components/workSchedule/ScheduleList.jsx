@@ -51,8 +51,6 @@ export default function ScheduleList({
         return isPastSchedule(scheduleDate, startTime);
     };
 
-    // Use schedules as-is from API for pagination to work correctly
-    // API should handle sorting on server-side
     const sortedSchedules = schedules;
 
     const getDisplayMessage = () => {
