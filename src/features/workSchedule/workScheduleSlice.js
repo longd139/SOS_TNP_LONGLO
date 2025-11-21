@@ -188,18 +188,31 @@ const workScheduleSlice = createSlice({
             })
             .addCase(fetchWorkSchedulesPagination.fulfilled, (state, action) => {
                 state.loading = false;
-                state.schedules = action.payload.data || [];
-                if (action.payload.data && action.payload.data.length > 0) {
+                const pageSize = action.payload.pagination?.pageSize || 10;
+                
+                // If page size is 10 or less, this is for the list display
+                // If page size is larger, this is for calendar highlighting
+                if (pageSize <= 10) {
+                    // Update schedules for list display
+                    state.schedules = action.payload.data || [];
+                    state.pagination = action.payload.pagination || {
+                        currentPage: 1,
+                        pageSize: 10,
+                        totalPages: 1,
+                        totalItems: 0
+                    };
+                }
+                
+                // Always update allSchedules for calendar highlighting
+                if (pageSize > 10) {
+                    // Large fetch for calendar - replace allSchedules
+                    state.allSchedules = action.payload.data || [];
+                } else if (action.payload.data && action.payload.data.length > 0) {
+                    // Small fetch - merge into allSchedules
                     const existingIds = new Set(state.allSchedules.map(s => s.id));
                     const newSchedules = action.payload.data.filter(s => !existingIds.has(s.id));
                     state.allSchedules = [...state.allSchedules, ...newSchedules];
                 }
-                state.pagination = action.payload.pagination || {
-                    currentPage: 1,
-                    pageSize: 10,
-                    totalPages: 1,
-                    totalItems: 0
-                };
             })
             .addCase(fetchWorkSchedulesPagination.rejected, (state, action) => {
                 state.loading = false;

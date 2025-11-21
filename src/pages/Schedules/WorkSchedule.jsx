@@ -74,42 +74,58 @@ export default function WorkSchedule() {
         }
     };
 
-    const fetchAllSchedulesForCalendar = async (monthYear) => {
+    const fetchAllSchedulesData = async (monthYear) => {
         try {
-            const countResult = await WORK_SCHEDULE_API.getWorkSchedulesPagination(null, monthYear, null, null, 1, 1);
-            const totalItems = countResult.pagination?.totalItems || 0;
+            const [allResult, activeResult, inactiveResult] = await Promise.all([
+                WORK_SCHEDULE_API.getWorkSchedulesPagination(null, monthYear, null, null, 1, 1),
+                WORK_SCHEDULE_API.getWorkSchedulesPagination(null, monthYear, null, true, 1, 1),
+                WORK_SCHEDULE_API.getWorkSchedulesPagination(null, monthYear, null, false, 1, 1)
+            ]);
+
+            const totalItems = allResult.pagination?.totalItems || 0;
             
+            setCounts({
+                all: totalItems,
+                active: activeResult.pagination?.totalItems || 0,
+                inactive: inactiveResult.pagination?.totalItems || 0
+            });
+
             if (totalItems > 0) {
+                await Promise.all([
+                    fetchSchedulesPagination({
+                        monthYear,
+                        isActive: null,
+                        page: 1,
+                        size: totalItems 
+                    }),
+                    fetchSchedulesPagination({
+                        monthYear,
+                        isActive: null,
+                        page: 1,
+                        size: pageSize
+                    })
+                ]);
+            } else {
                 await fetchSchedulesPagination({
                     monthYear,
                     isActive: null,
                     page: 1,
-                    size: totalItems 
+                    size: pageSize
                 });
             }
         } catch (error) {
-            showToast.error(error || "Lỗi khi tải lịch tiếp dân cho lịch tháng.");
+            showToast.error(error || "Lỗi khi tải dữ liệu lịch tiếp dân.");
         }
     };
 
     useEffect(() => {
         const monthYear = `${selectedMonth}/${selectedYear}`;
         
-        fetchAllSchedulesForCalendar(monthYear);
-        
-        fetchSchedulesPagination({
-            monthYear,
-            isActive: null,
-            page: 1,
-            size: pageSize
-        });
-
-        fetchCounts(monthYear);
+        fetchAllSchedulesData(monthYear);
         
         setCurrentPage(1);
         setActiveFilter("all");
         setSelectedDate(null);
-        
     }, [selectedMonth, selectedYear]);
 
     useEffect(() => {
@@ -160,39 +176,11 @@ export default function WorkSchedule() {
     };
 
     const handleMonthChange = (newMonth) => {
-        const monthYear = `${newMonth}/${selectedYear}`;
         setSelectedMonth(newMonth);
-        setSelectedDate(null);
-        setCurrentPage(1);
-        setActiveFilter("all");
-        
-        fetchAllSchedulesForCalendar(monthYear);
-        
-        fetchSchedulesPagination({
-            monthYear,
-            isActive: null,
-            page: 1,
-            size: pageSize
-        });
-        fetchCounts(monthYear);
     };
 
     const handleYearChange = (newYear) => {
-        const monthYear = `${selectedMonth}/${newYear}`;
         setSelectedYear(newYear);
-        setSelectedDate(null);
-        setCurrentPage(1);
-        setActiveFilter("all");
-        
-        fetchAllSchedulesForCalendar(monthYear);
-        
-        fetchSchedulesPagination({
-            monthYear,
-            isActive: null,
-            page: 1,
-            size: pageSize
-        });
-        fetchCounts(monthYear);
     };
 
     const handleEdit = (schedule) => {
