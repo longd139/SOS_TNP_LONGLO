@@ -358,7 +358,7 @@ export default function ContactInfo() {
                             )}
 
                             <div>
-                                <label className="block text-sm font-medium text-gray-600 mb-1">
+                                <label className="block text-sm font-medium text-gray-600 mb-1 required-label">
                                     Ghi chú
                                 </label>
                                 <input
