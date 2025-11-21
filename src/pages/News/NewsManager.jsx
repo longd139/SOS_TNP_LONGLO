@@ -64,9 +64,17 @@ export default function NewsManager() {
         }
     };
 
-    const handleEdit = (item) => {
-        setSelectedNews(item);
-        setIsEditModalOpen(true);
+    const handleEdit = async (item) => {
+        setIsLoadingPreview(true);
+        try {
+            const fullNewsData = await getNewsById(item.id);
+            setSelectedNews(fullNewsData);
+            setIsEditModalOpen(true);
+        } catch (error) {
+            showToast.error('Không thể tải chi tiết bài viết!');
+        } finally {
+            setIsLoadingPreview(false);
+        }
     };
 
     const handleDelete = (item) => {

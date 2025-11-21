@@ -1,7 +1,7 @@
 import * as yup from 'yup';
 import { validateSchema } from "../utils/validationUtils";
 
-const newsSchema = yup.object().shape({
+const baseNewsFields = {
     idDanhMuc: yup
         .string()
         .required("Danh mục tin tức là bắt buộc"),
@@ -17,25 +17,49 @@ const newsSchema = yup.object().shape({
             if (!value) return false;
             const strippedValue = value.replace(/<[^>]*>/g, '').trim();
             return strippedValue.length > 0 && strippedValue !== '';
-        }),
+        })
+};
+
+const createNewsSchema = yup.object().shape({
+    ...baseNewsFields,
     file: yup
         .mixed()
-        .test('fileRequired', 'Vui lòng chọn ảnh đại diện', (value) => {
-            if (value === 'existing') return true;
-            return !!value;
-        })
+        .required('Vui lòng chọn ảnh đại diện')
         .test('fileSize', 'Kích thước file không được vượt quá 5MB', (value) => {
-            if (!value || value === 'existing') return true;
+            if (!value) return true;
             return value.size <= 5 * 1024 * 1024; 
         })
         .test('fileType', 'Chỉ chấp nhận file PNG, JPG', (value) => {
-            if (!value || value === 'existing') return true;
+            if (!value) return true;
             const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg'];
             return allowedTypes.includes(value.type);
         })
 });
 
-export async function validateNewsForm(data) {
-    const result = await validateSchema(newsSchema, data);
+const editNewsSchema = yup.object().shape({
+    ...baseNewsFields,
+    file: yup
+        .mixed()
+        .nullable()
+        .test('fileRequired', 'Vui lòng chọn ảnh đại diện', function(value) {
+            const existingImg = this.options.context?.hasExistingImage;
+            if (existingImg) return true;
+            return !!value;
+        })
+        .test('fileSize', 'Kích thước file không được vượt quá 5MB', (value) => {
+            if (!value) return true;
+            return value.size <= 5 * 1024 * 1024; 
+        })
+        .test('fileType', 'Chỉ chấp nhận file PNG, JPG', (value) => {
+            if (!value) return true;
+            const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg'];
+            return allowedTypes.includes(value.type);
+        })
+});
+
+export async function validateNewsForm(data, isEditMode = false, hasExistingImage = false) {
+    const schema = isEditMode ? editNewsSchema : createNewsSchema;
+    const context = isEditMode ? { hasExistingImage } : undefined;
+    const result = await validateSchema(schema, data, { context });
     return { isValid: result.valid, errors: result.errors };
 }

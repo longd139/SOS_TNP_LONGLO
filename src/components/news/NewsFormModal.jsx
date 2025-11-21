@@ -43,7 +43,8 @@ const NewsFormModal = ({ isOpen, onClose, onSubmit, initialData = null, isLoadin
         'bold', 'italic', 'underline',
         'list', 'bullet',
         'align',
-        'link', 'image'
+        'link', 'image',
+        'direction'
     ];
 
     useEffect(() => {
@@ -72,6 +73,7 @@ const NewsFormModal = ({ isOpen, onClose, onSubmit, initialData = null, isLoadin
                 const fullImageUrl = downloadUtils.handleViewImage(initialData);
                 setFilePreview(fullImageUrl);
             }
+            setErrors({});
         } else {
             resetForm();
         }
@@ -144,15 +146,17 @@ const NewsFormModal = ({ isOpen, onClose, onSubmit, initialData = null, isLoadin
     };
 
     const validateForm = async () => {
+        const isEditMode = !!initialData;
+        // Only consider image exists if filePreview is still present
+        // If user removed the image (filePreview is null), file becomes required
+        const hasExistingImage = isEditMode && !!filePreview;
+
         const dataToValidate = {
             idDanhMuc: formData.idDanhMuc,
             tieuDe: formData.tieuDe,
             noiDung: formData.noiDung,
             file: formData.file
         };
-
-        const isEditMode = !!initialData;
-        const hasExistingImage = isEditMode && !!filePreview && !formData.file;
 
         const { isValid, errors: validationErrors } = await validateNewsForm(
             dataToValidate, 
