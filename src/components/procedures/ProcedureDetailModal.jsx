@@ -13,6 +13,7 @@ const ProcedureDetailModal = ({ isOpen, onClose, procedure }) => {
     //     }).format(value);
     // };
 
+    console.log('Procedure Detail:', procedure);
     return (
         <BaseModal
             isOpen={isOpen}
@@ -266,7 +267,7 @@ const ProcedureDetailModal = ({ isOpen, onClose, procedure }) => {
 
                                         <div className="flex-shrink-0">
                                             <button
-                                                onClick={() => downloadUtils.handleDownload(mauDon?.mau_don)}
+                                                onClick={() => downloadUtils.handleDownloadPdf(mauDon?.mau_don)}
                                                 className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
                                                 title="Tải xuống"
                                             >
