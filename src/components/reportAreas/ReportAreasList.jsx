@@ -44,14 +44,16 @@ export default function ReportAreasList() {
     }, []);
 
     const handleFilter = (newFilters) => {
-        updateFilters({ search: newFilters.search || '' });
+        const searchValue = (newFilters.search || '').trim();
+        
+        updateFilters({ search: searchValue });
         updateShowActive(newFilters.isActive);
 
         loadReportAreas({
             page: 1,
             size: newFilters.pageSize || pagination.pageSize,
             isActive: newFilters.isActive,
-            search: newFilters.search || ''
+            search: searchValue
         });
     };
 

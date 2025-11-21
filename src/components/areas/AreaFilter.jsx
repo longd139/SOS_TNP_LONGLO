@@ -38,8 +38,9 @@ const AreaFilter = ({ onFilter, onReset, filters = {}, pagination = {} }) => {
     ];
 
     const handleFilter = (newFilters) => {
+        const searchValue = typeof newFilters.search === 'string' ? newFilters.search.trim() : '';
         onFilter({
-            search: newFilters.search || '',
+            search: searchValue,
             isActive: newFilters.isActive,
             pageSize: Number(newFilters.pageSize)
         });

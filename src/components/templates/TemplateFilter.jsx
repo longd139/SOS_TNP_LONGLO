@@ -147,7 +147,17 @@ export default function TemplateFilter({
                 onClick={() => {
                   const newFilters = { ...localFilters, searchKeyword: '' };
                   setLocalFilters(newFilters);
-                  handleApplyFilters();
+                  
+                  if (onSearchWithFilters) {
+                    onSearchWithFilters({
+                      searchKeyword: '',
+                      showRemoved: localFilters.showRemoved,
+                      pageSize: Number(localFilters.pageSize),
+                    });
+                  } else {
+                    onFilterChange?.('searchKeyword', '');
+                    onSearch?.();
+                  }
                 }}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
               >
@@ -174,16 +184,6 @@ export default function TemplateFilter({
             <Search className="w-4 h-4" />
             Tìm kiếm
           </button>
-
-          {hasActiveFilters() && (
-            <button
-              onClick={handleResetFilters}
-              className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
-            >
-              <RotateCcw className="w-4 h-4" />
-              Xóa bộ lọc
-            </button>
-          )}
         </div>
 
         {showFilters && (

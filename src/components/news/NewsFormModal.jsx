@@ -48,10 +48,22 @@ const NewsFormModal = ({ isOpen, onClose, onSubmit, initialData = null, isLoadin
 
     useEffect(() => {
         if (initialData) {
+            let processedContent = initialData.noi_dung || '';
+            if (initialData.dinh_kem_tin_tuc && initialData.dinh_kem_tin_tuc.length > 0) {
+                const baseUrl = process.env.REACT_APP_API_URL;
+                initialData.dinh_kem_tin_tuc.forEach((attachment, index) => {
+                    const placeholder = `<!--IMAGE_PLACEHOLDER_${index}-->`;
+                    if (processedContent.includes(placeholder)) {
+                        const imgTag = `<img src="${baseUrl}${attachment.url_file}" alt="content-image" />`;
+                        processedContent = processedContent.replace(placeholder, imgTag);
+                    }
+                });
+            }
+
             setFormData({
                 idDanhMuc: initialData.id_danh_muc || '',
                 tieuDe: initialData.tieu_de || '',
-                noiDung: initialData.noi_dung || '',
+                noiDung: processedContent,
                 tacGia: initialData.tac_gia || '',
                 isActive: initialData.is_active !== undefined ? initialData.is_active : true,
                 file: null
@@ -307,7 +319,7 @@ const NewsFormModal = ({ isOpen, onClose, onSubmit, initialData = null, isLoadin
                         updateFormData.append('tacGia', formData.tacGia);
                     }
 
-                    await onSubmit(updateFormData, null, true);
+                    await onSubmit(updateFormData, null, true, createdNewsId);
                 }
             }
         });

@@ -136,8 +136,13 @@ const TemplateFormModal = ({
     const handleFileChange = (e) => {
         const file = e.target.files[0];
         if (file) {
-            if (file.type !== 'application/pdf') {
-                showToast.error('Chỉ chấp nhận file PDF!');
+            const allowedTypes = [
+                'application/pdf',
+                'application/msword',
+                'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+            ];
+            if (!allowedTypes.includes(file.type)) {
+                showToast.error('Chỉ chấp nhận file PDF, DOC, DOCX!');
                 e.target.value = '';
                 return;
             }
@@ -223,7 +228,7 @@ const TemplateFormModal = ({
 
                 <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2 required-label">
-                        File PDF
+                        File
                     </label>
 
                     {mode === 'edit' && (initialData?.urlFilePdf ?? initialData?.url_file_pdf) && !fileName && (
@@ -243,21 +248,12 @@ const TemplateFormModal = ({
                                     </p>
                                 </div>
                                 <div className="flex items-center gap-1 flex-shrink-0 ml-auto">
-                                    <a
-                                        href={`${baseUrl}${initialData?.urlFilePdf ?? initialData?.url_file_pdf}`}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="p-1.5 text-blue-600 hover:text-blue-700 hover:bg-blue-100 rounded transition-colors"
-                                        title="Xem file PDF"
-                                    >
-                                        <Eye className="w-4 h-4" />
-                                    </a>
                                     <div>
                                         <button
                                             type="button"
                                             onClick={() => downloadUtils.handleDownloadPdf(initialData)}
                                             className="p-1.5 text-blue-600 hover:text-blue-700 hover:bg-blue-100 rounded transition-colors"
-                                            title="Tải xuống file PDF"
+                                            title="Tải xuống file"
                                         >
                                             <Download className="w-4 h-4" />
                                         </button>
@@ -299,10 +295,10 @@ const TemplateFormModal = ({
                         <Upload className="w-12 h-12 mx-auto text-gray-400 mb-3" />
                         <div className="mb-2">
                             <label className="cursor-pointer text-blue-600 hover:text-blue-700 font-medium">
-                                {fileName ? 'Chọn file khác' : (mode === 'edit' ? 'Thay đổi file PDF' : 'Chọn file PDF')}
+                                {fileName ? 'Chọn file khác' : (mode === 'edit' ? 'Thay đổi file' : 'Chọn file')}
                                 <input
                                     type="file"
-                                    accept=".pdf"
+                                    accept=".pdf,.doc,.docx"
                                     onChange={handleFileChange}
                                     className="hidden"
                                 />
@@ -310,7 +306,7 @@ const TemplateFormModal = ({
                         </div>
                         {!fileName && mode === 'create' && (
                             <p className="text-xs text-gray-500 mt-2">
-                                Chỉ chấp nhận file PDF, tối đa 1 file
+                                Chỉ chấp nhận file PDF, DOC, DOCX, tối đa 1 file
                             </p>
                         )}
                         {!fileName && mode === 'edit' && (

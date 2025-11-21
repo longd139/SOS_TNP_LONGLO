@@ -68,7 +68,7 @@ export default function TemplateManager() {
     }, []);
 
     const handleView = (template) => {
-        downloadUtils.handleDownload(template);
+        downloadUtils.handleDownloadPdf(template);
     };
 
     const handleEdit = (template) => {

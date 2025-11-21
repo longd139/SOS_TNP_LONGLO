@@ -10,7 +10,7 @@ import { useProcedure } from "../../hooks/useProcedures";
 import { getProcedureColumns } from "../../components/procedures/columns";
 import { showToast } from "../../utils/toastNotification";
 import { ConfirmModal } from "../../components/base/BaseModal";
-import { fetchProcedures } from "../../features/procedures/proceduresThunks";
+import { fetchProcedures, fetchAreas } from "../../features/procedures/proceduresThunks";
 import { Loader2 } from "lucide-react";
 dayjs.locale("vi");
 
@@ -61,6 +61,9 @@ export default function ProceduresManager() {
                 isActive: true,
             })
         );
+        
+        dispatch(fetchAreas());
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const openCreateModal = () => {
@@ -94,6 +97,16 @@ export default function ProceduresManager() {
         if (result.success) {
             closeCreateModal();
             showToast.success("Tạo thủ tục thành công!");
+            // Refresh list after successful create
+            dispatch(
+                fetchProcedures({
+                    page: pagination.current,
+                    size: pagination.pageSize,
+                    search: filters.searchKeyword,
+                    id_linh_vuc: filters.selectedDomain,
+                    isActive: showActive,
+                })
+            );
         } else {
             const errorMessage = result.error?.message || result.error || "Có lỗi xảy ra khi tạo thủ tục!";
             showToast.error(errorMessage);
@@ -108,6 +121,16 @@ export default function ProceduresManager() {
         if (result.success) {
             closeEditModal();
             showToast.success("Cập nhật thủ tục thành công!");
+            // Refresh list after successful update
+            dispatch(
+                fetchProcedures({
+                    page: pagination.current,
+                    size: pagination.pageSize,
+                    search: filters.searchKeyword,
+                    id_linh_vuc: filters.selectedDomain,
+                    isActive: showActive,
+                })
+            );
         } else {
             const errorMessage = result.error?.message || result.error || "Có lỗi xảy ra khi cập nhật thủ tục!";
             showToast.error(errorMessage);
@@ -137,6 +160,16 @@ export default function ProceduresManager() {
 
         if (result.success) {
             showToast.success("Đã xóa thủ tục thành công.");
+            // Refresh list after successful delete
+            dispatch(
+                fetchProcedures({
+                    page: pagination.current,
+                    size: pagination.pageSize,
+                    search: filters.searchKeyword,
+                    id_linh_vuc: filters.selectedDomain,
+                    isActive: showActive,
+                })
+            );
         } else if (result.cancelled) {
         } else {
             const errorMessage = result.error?.message || result.error || "Có lỗi xảy ra khi xóa thủ tục!";
@@ -164,6 +197,16 @@ export default function ProceduresManager() {
             showToast.success(
                 `Thủ tục đã được ${!procedure.is_active ? "kích hoạt" : "vô hiệu hóa"
                 } thành công!`
+            );
+            // Refresh list after successful status update
+            dispatch(
+                fetchProcedures({
+                    page: pagination.current,
+                    size: pagination.pageSize,
+                    search: filters.searchKeyword,
+                    id_linh_vuc: filters.selectedDomain,
+                    isActive: showActive,
+                })
             );
         } catch (error) {
             showToast.error(

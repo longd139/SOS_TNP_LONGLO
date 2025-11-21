@@ -368,7 +368,7 @@ const ReportDetailModal = ({ isOpen, onClose, report, loading = false, onStatusU
                                         {isEditMode && (
                                             <ConfigProvider locale={viVN}>
                                                 <div>
-                                                    <label className="block text-sm font-medium text-gray-700 mb-2 required-label">
+                                                    <label className={`block text-sm font-medium text-gray-700 mb-2 ${selectedStatus !== 'Đã giải quyết' && selectedStatus !== 'Đóng' ? 'required-label' : ''}`}>
                                                         Thời gian phản hồi dự kiến
                                                     </label>
                                                     <DateTimePicker
@@ -379,7 +379,7 @@ const ReportDetailModal = ({ isOpen, onClose, report, loading = false, onStatusU
                                                 </div>
 
                                                 <div>
-                                                    <label className="block text-sm font-medium text-gray-700 mb-2 required-label">
+                                                    <label className={`block text-sm font-medium text-gray-700 mb-2 ${selectedStatus !== 'Đã giải quyết' && selectedStatus !== 'Đóng' ? 'required-label' : ''}`}>
                                                         Ngày dự kiến hoàn thành
                                                     </label>
                                                     <DateTimePicker

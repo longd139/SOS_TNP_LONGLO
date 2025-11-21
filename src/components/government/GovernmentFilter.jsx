@@ -10,9 +10,9 @@ const GovernmentFilter = ({
 }) => {
 
     const initialFilters = {
-        search: '',
-        isActive: true,
-        pageSize: 10
+        search: filters.search || '',
+        isActive: filters.isActive !== undefined ? filters.isActive : true,
+        pageSize: pagination.pageSize || 10
     };
 
     const filterFields = [
@@ -44,8 +44,13 @@ const GovernmentFilter = ({
         }
     ];
 
-    const handleFilter = (filters) => {
-        onFilter(filters);
+    const handleFilter = (newFilters) => {
+        const searchValue = typeof newFilters.search === 'string' ? newFilters.search.trim() : '';
+        onFilter({
+            search: searchValue,
+            isActive: newFilters.isActive,
+            pageSize: Number(newFilters.pageSize)
+        });
     };
 
     return (

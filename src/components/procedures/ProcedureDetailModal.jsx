@@ -6,13 +6,14 @@ import dayjs from 'dayjs';
 import { downloadUtils } from '../../utils/downLoadUtils';
 const ProcedureDetailModal = ({ isOpen, onClose, procedure }) => {
     if (!procedure) return null;
-    const formatCurrency = (value) => {
-        return new Intl.NumberFormat('vi-VN', {
-            style: 'currency',
-            currency: 'VND'
-        }).format(value);
-    };
+    // const formatCurrency = (value) => {
+    //     return new Intl.NumberFormat('vi-VN', {
+    //         style: 'currency',
+    //         currency: 'VND'
+    //     }).format(value);
+    // };
 
+    console.log('Procedure Detail:', procedure);
     return (
         <BaseModal
             isOpen={isOpen}
@@ -175,7 +176,7 @@ const ProcedureDetailModal = ({ isOpen, onClose, procedure }) => {
                                         <div>
                                             <label className="block text-sm font-medium text-gray-600 mb-1">Lệ phí</label>
                                             <p className="text-sm text-gray-900 font-semibold text-green-600">
-                                                {formatCurrency(parseFloat(cach.le_phi) || 0)}
+                                                {cach.le_phi || '-'}
                                             </p>
                                         </div>
                                     </div>
@@ -266,7 +267,7 @@ const ProcedureDetailModal = ({ isOpen, onClose, procedure }) => {
 
                                         <div className="flex-shrink-0">
                                             <button
-                                                onClick={() => downloadUtils.handleDownload(mauDon?.mau_don)}
+                                                onClick={() => downloadUtils.handleDownloadPdf(mauDon?.mau_don)}
                                                 className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
                                                 title="Tải xuống"
                                             >

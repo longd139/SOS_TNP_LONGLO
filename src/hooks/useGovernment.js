@@ -37,7 +37,7 @@ export const useGovernment = ({ autoFetch = false, filters = {}, isActive } = {}
         const requestParams = {
             page: params.page || pagination.currentPage,
             size: params.size || pagination.pageSize,
-            search: params.search || currentFilters.search || '',
+            search: params.search !== undefined ? params.search : (currentFilters.search || ''),
             isActive: params.isActive !== undefined ? params.isActive : currentFilters.isActive
         };
 
