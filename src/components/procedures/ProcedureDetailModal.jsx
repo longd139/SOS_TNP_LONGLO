@@ -6,12 +6,12 @@ import dayjs from 'dayjs';
 import { downloadUtils } from '../../utils/downLoadUtils';
 const ProcedureDetailModal = ({ isOpen, onClose, procedure }) => {
     if (!procedure) return null;
-    const formatCurrency = (value) => {
-        return new Intl.NumberFormat('vi-VN', {
-            style: 'currency',
-            currency: 'VND'
-        }).format(value);
-    };
+    // const formatCurrency = (value) => {
+    //     return new Intl.NumberFormat('vi-VN', {
+    //         style: 'currency',
+    //         currency: 'VND'
+    //     }).format(value);
+    // };
 
     return (
         <BaseModal
@@ -175,7 +175,7 @@ const ProcedureDetailModal = ({ isOpen, onClose, procedure }) => {
                                         <div>
                                             <label className="block text-sm font-medium text-gray-600 mb-1">Lệ phí</label>
                                             <p className="text-sm text-gray-900 font-semibold text-green-600">
-                                                {formatCurrency(parseFloat(cach.le_phi) || 0)}
+                                                {cach.le_phi || '-'}
                                             </p>
                                         </div>
                                     </div>
