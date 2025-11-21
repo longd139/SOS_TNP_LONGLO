@@ -61,7 +61,6 @@ export default function TemplateFilter({
     onReset?.();
   };
 
-  // Kiểm tra active filters - loại trừ showRemoved và pageSize
   const hasActiveFilters = () => {
     return Object.entries(localFilters).some(([key, value]) => {
       if (key === 'showRemoved' || key === 'pageSize') return false;

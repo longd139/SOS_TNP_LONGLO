@@ -73,7 +73,6 @@ export default function ReportList() {
         loadReports(params).catch(() => {
             showToast.error("Lỗi khi tải danh sách phản ánh");
         });
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [currentPage, filters.pageSize, filters.trangThai, filters.idLinhVucPhanAnh, filters.mucDo, filters.maPhanAnh, filters.sortTime]);
 
     const handleFilterChange = (newFilters) => {

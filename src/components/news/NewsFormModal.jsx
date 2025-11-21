@@ -147,8 +147,6 @@ const NewsFormModal = ({ isOpen, onClose, onSubmit, initialData = null, isLoadin
 
     const validateForm = async () => {
         const isEditMode = !!initialData;
-        // Only consider image exists if filePreview is still present
-        // If user removed the image (filePreview is null), file becomes required
         const hasExistingImage = isEditMode && !!filePreview;
 
         const dataToValidate = {
@@ -295,7 +293,6 @@ const NewsFormModal = ({ isOpen, onClose, onSubmit, initialData = null, isLoadin
         submitData.append('idDanhMuc', formData.idDanhMuc);
         submitData.append('tieuDe', formData.tieuDe);
         
-        // Replace base64 images with placeholders to maintain position
         let contentToSave = formData.noiDung;
         if (base64Images.length > 0) {
             contentToSave = replaceBase64WithPlaceholders(formData.noiDung, base64Images);
@@ -349,7 +346,6 @@ const NewsFormModal = ({ isOpen, onClose, onSubmit, initialData = null, isLoadin
     const getPreviewData = () => {
         const selectedCategory = activeCategories.find(cat => cat.id === formData.idDanhMuc);
         
-        // For preview, keep base64 images in content so they can be displayed
         let previewContent = formData.noiDung;
         
         return {
