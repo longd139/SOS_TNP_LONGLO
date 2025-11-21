@@ -21,10 +21,12 @@ import {
     setShowActive,
     addSchedule,
     updateSchedule,
-    removeSchedule
+    removeSchedule,
+    setCounts
 } from '../features/workSchedule/workScheduleSlice';
 import { 
-    selectSchedulesList, 
+    selectSchedulesList,
+    selectAllSchedulesList,
     selectSchedulesLoading, 
     selectSchedulesError, 
     selectCurrentSchedule,
@@ -35,13 +37,15 @@ import {
     selectSchedulesForMonth,
     selectHasScheduleForDay,
     selectScheduleStatistics,
-    selectSchedulePagination
+    selectSchedulePagination,
+    selectScheduleCounts
 } from '../features/workSchedule/workScheduleSelectors';
 import { normalizeDate, formatDateVN, createDateString } from '../utils/dateUtils';
 
 export const useSchedule = () => {
     const dispatch = useDispatch();
     const schedules = useSelector(selectSchedulesList);
+    const allSchedules = useSelector(selectAllSchedulesList);
     const loading = useSelector(selectSchedulesLoading);
     const error = useSelector(selectSchedulesError);
     const currentSchedule = useSelector(selectCurrentSchedule);
@@ -53,6 +57,7 @@ export const useSchedule = () => {
     const hasScheduleForDay = useSelector(selectHasScheduleForDay);
     const statistics = useSelector(selectScheduleStatistics);
     const pagination = useSelector(selectSchedulePagination);
+    const counts = useSelector(selectScheduleCounts);
 
     const getSchedulesForDate = useCallback((date) => {
         if (!date) return [];
@@ -210,6 +215,10 @@ export const useSchedule = () => {
         dispatch(setShowActive(value));
     }, [dispatch]);
 
+    const handleSetCounts = useCallback((newCounts) => {
+        dispatch(setCounts(newCounts));
+    }, [dispatch]);
+
     const clearScheduleError = useCallback(() => {
         dispatch(clearError());
     }, [dispatch]);
@@ -232,6 +241,7 @@ export const useSchedule = () => {
 
     return {
         schedules,
+        allSchedules,
         loading,
         error,
         currentSchedule,
@@ -243,6 +253,7 @@ export const useSchedule = () => {
         hasScheduleForDay,
         statistics,
         pagination,
+        counts,
         
         fetchSchedules,
         fetchSchedulesPagination,
@@ -262,6 +273,7 @@ export const useSchedule = () => {
         setSelectedMonth: handleSetSelectedMonth,
         setSelectedYear: handleSetSelectedYear,
         setShowActive: handleSetShowActive,
+        setCounts: handleSetCounts,
         
         clearError: clearScheduleError,
         hasSchedule,

@@ -68,7 +68,7 @@ const NewsFormModal = ({ isOpen, onClose, onSubmit, initialData = null, isLoadin
                 isActive: initialData.is_active !== undefined ? initialData.is_active : true,
                 file: null
             });
-            if (initialData.url_anh_dai_dien) {
+            if (initialData.url_anh_dai_dien || initialData.urlAnhDaiDien) {
                 const fullImageUrl = downloadUtils.handleViewImage(initialData);
                 setFilePreview(fullImageUrl);
             }
@@ -148,10 +148,17 @@ const NewsFormModal = ({ isOpen, onClose, onSubmit, initialData = null, isLoadin
             idDanhMuc: formData.idDanhMuc,
             tieuDe: formData.tieuDe,
             noiDung: formData.noiDung,
-            file: !initialData ? formData.file : (formData.file || 'existing')
+            file: formData.file
         };
 
-        const { isValid, errors: validationErrors } = await validateNewsForm(dataToValidate);
+        const isEditMode = !!initialData;
+        const hasExistingImage = isEditMode && !!filePreview && !formData.file;
+
+        const { isValid, errors: validationErrors } = await validateNewsForm(
+            dataToValidate, 
+            isEditMode, 
+            hasExistingImage
+        );
 
         if (!isValid) {
             setErrors(validationErrors);

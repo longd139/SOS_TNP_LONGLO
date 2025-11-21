@@ -192,7 +192,7 @@ export default function ScheduleList({
                     {selectedDate ? "Lịch tiếp dân trong ngày" : "Lịch tiếp dân sắp tới"}
                 </h2>
                 <span className="text-sm text-gray-500">
-                    ({selectedDate ? sortedSchedules.length : (pagination?.totalItems || sortedSchedules.length)} lịch)
+                    ({selectedDate ? sortedSchedules.length : (pagination?.totalItems || 0)} lịch)
                 </span>
             </div>
 

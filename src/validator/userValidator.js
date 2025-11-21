@@ -53,6 +53,27 @@ export const updateUserSchema = yup.object().shape({
         .required("Vai trò là bắt buộc")
         .oneOf(['ADMIN', 'NHAN_VIEN', 'LANH_DAO', 'PHO_CHU_TICH', 'CHU_TICH', 'KHU_PHO'], "Vai trò không hợp lệ"),
 
+    password: yup
+        .string()
+        .notRequired()
+        .test('password-length', 'Mật khẩu phải có ít nhất 8 ký tự', function(value) {
+            if (!value || value.trim() === '') return true;
+            return value.length >= 8;
+        })
+        .test('password-max', 'Mật khẩu không được vượt quá 100 ký tự', function(value) {
+            if (!value || value.trim() === '') return true;
+            return value.length <= 100;
+        }),
+
+    confirmPassword: yup
+        .string()
+        .notRequired()
+        .test('passwords-match', 'Mật khẩu xác nhận không khớp', function(value) {
+            const { password } = this.parent;
+            if (!password || password.trim() === '') return true;
+            return value === password;
+        }),
+
     active: yup
         .boolean()
         .default(true)
@@ -70,7 +91,40 @@ export const createUserWithPhoneSchema = createUserSchema.shape({
         })
 });
 
-export const updateUserWithPhoneSchema = updateUserSchema.shape({
+export const updateUserWithPhoneSchema = yup.object().shape({
+    fullName: yup
+        .string()
+        .required("Họ và tên là bắt buộc")
+        .min(2, "Họ và tên phải có ít nhất 2 ký tự")
+        .max(100, "Họ và tên không được vượt quá 100 ký tự")
+        .test('trim', 'Họ và tên là bắt buộc', value => value && value.trim().length > 0),
+
+    role: yup
+        .string()
+        .required("Vai trò là bắt buộc")
+        .oneOf(['ADMIN', 'NHAN_VIEN', 'LANH_DAO', 'PHO_CHU_TICH', 'CHU_TICH', 'KHU_PHO'], "Vai trò không hợp lệ"),
+
+    password: yup
+        .string()
+        .notRequired()
+        .test('password-length', 'Mật khẩu phải có ít nhất 8 ký tự', function(value) {
+            if (!value || value.trim() === '') return true;
+            return value.length >= 8;
+        })
+        .test('password-max', 'Mật khẩu không được vượt quá 100 ký tự', function(value) {
+            if (!value || value.trim() === '') return true;
+            return value.length <= 100;
+        }),
+
+    confirmPassword: yup
+        .string()
+        .notRequired()
+        .test('passwords-match', 'Mật khẩu xác nhận không khớp', function(value) {
+            const { password } = this.parent;
+            if (!password || password.trim() === '') return true;
+            return value === password;
+        }),
+
     phone: yup
         .string()
         .nullable()
@@ -79,7 +133,11 @@ export const updateUserWithPhoneSchema = updateUserSchema.shape({
             if (!value || value.trim() === '') return true;
             const cleanPhone = value.replace(/[\s\-()]/g, '');
             return vietnamesePhoneRegex.test(cleanPhone);
-        })
+        }),
+
+    active: yup
+        .boolean()
+        .default(true)
 });
 
 export const changePasswordSchema = yup.object().shape({

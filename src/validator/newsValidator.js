@@ -1,6 +1,5 @@
 import * as yup from 'yup';
 import { validateSchema } from "../utils/validationUtils";
-import { STATUS_NEWS } from "../constants/status";
 
 const newsSchema = yup.object().shape({
     idDanhMuc: yup

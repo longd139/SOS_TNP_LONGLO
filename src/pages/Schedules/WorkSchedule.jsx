@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Download, Upload, Plus } from "lucide-react";
+import { Download, Upload, Plus, RotateCcw } from "lucide-react";
 import { showToast } from "../../utils/toastNotification";
 import { ConfirmModal } from "../../components/base/BaseModal";
 import { useSchedule } from "../../hooks/useSchedule";
@@ -10,6 +10,7 @@ import dayjs from "dayjs";
 import { validateFileImport } from "../../validator/fileValidator";
 import { downloadUtils } from "../../utils/downLoadUtils";
 import { isPastDate } from "../../validator/workScheduleValidator";
+import { WORK_SCHEDULE_API } from "../../apis/workSchedule";
 
 export default function WorkSchedule() {
     const {
@@ -18,7 +19,9 @@ export default function WorkSchedule() {
         selectedMonth,
         selectedYear,
         schedules,
+        allSchedules,
         pagination,
+        counts,
         fetchSchedules,
         fetchSchedulesPagination,
         importSchedule,
@@ -34,6 +37,7 @@ export default function WorkSchedule() {
         getTemplate,
         createScheduleItem,
         updateScheduleItem,
+        setCounts,
     } = useSchedule();
 
     const [deleteConfirm, setDeleteConfirm] = useState({
@@ -52,18 +56,39 @@ export default function WorkSchedule() {
     const [currentPage, setCurrentPage] = useState(1);
     const [pageSize, setPageSize] = useState(10);
 
+    const fetchCounts = async (monthYear) => {
+        try {
+            const [allResult, activeResult, inactiveResult] = await Promise.all([
+                WORK_SCHEDULE_API.getWorkSchedulesPagination(null, monthYear, null, null, 1, 1),
+                WORK_SCHEDULE_API.getWorkSchedulesPagination(null, monthYear, null, true, 1, 1),
+                WORK_SCHEDULE_API.getWorkSchedulesPagination(null, monthYear, null, false, 1, 1)
+            ]);
+
+            setCounts({
+                all: allResult.pagination?.totalItems || 0,
+                active: activeResult.pagination?.totalItems || 0,
+                inactive: inactiveResult.pagination?.totalItems || 0
+            });
+        } catch (error) {
+        }
+    };
+
     useEffect(() => {
+        const monthYear = `${selectedMonth}/${selectedYear}`;
+        
         fetchSchedules({
-            monthYear: `${selectedMonth}/${selectedYear}`,
+            monthYear,
             isActive: null
         });
         
         fetchSchedulesPagination({
-            monthYear: `${selectedMonth}/${selectedYear}`,
+            monthYear,
             isActive: null,
             page: currentPage,
             size: pageSize
         });
+
+        fetchCounts(monthYear);
         
     }, [selectedMonth, selectedYear, currentPage, pageSize]);
 
@@ -75,40 +100,81 @@ export default function WorkSchedule() {
         };
     }, [error, clearError]);
 
-    const handleDateSelect = (date) => {
+    const handleDateSelect = async (date) => {
         setSelectedDate(date);
+        setCurrentPage(1);
+        
+        if (date) {
+            // Fetch schedules for specific date
+            fetchSchedulesPagination({
+                date: date,
+                isActive: activeFilter === "all" ? null : activeFilter === "active" ? true : false,
+                page: 1,
+                size: pageSize
+            });
+            
+            // Fetch counts for specific date
+            try {
+                const [allResult, activeResult, inactiveResult] = await Promise.all([
+                    WORK_SCHEDULE_API.getWorkSchedulesPagination(null, null, date, null, 1, 1),
+                    WORK_SCHEDULE_API.getWorkSchedulesPagination(null, null, date, true, 1, 1),
+                    WORK_SCHEDULE_API.getWorkSchedulesPagination(null, null, date, false, 1, 1)
+                ]);
+
+                setCounts({
+                    all: allResult.pagination?.totalItems || 0,
+                    active: activeResult.pagination?.totalItems || 0,
+                    inactive: inactiveResult.pagination?.totalItems || 0
+                });
+            } catch (error) {
+            }
+        } else {
+            const monthYear = `${selectedMonth}/${selectedYear}`;
+            fetchSchedulesPagination({
+                monthYear,
+                isActive: activeFilter === "all" ? null : activeFilter === "active" ? true : false,
+                page: 1,
+                size: pageSize
+            });
+            
+            fetchCounts(monthYear);
+        }
     };
 
     const handleMonthChange = (newMonth) => {
+        const monthYear = `${newMonth}/${selectedYear}`;
         setSelectedMonth(newMonth);
         setSelectedDate(null);
         setCurrentPage(1);
         fetchSchedules({
-            monthYear: `${newMonth}/${selectedYear}`,
+            monthYear,
             isActive: null
         });
         fetchSchedulesPagination({
-            monthYear: `${newMonth}/${selectedYear}`,
+            monthYear,
             isActive: null,
             page: 1,
             size: pageSize
         });
+        fetchCounts(monthYear);
     };
 
     const handleYearChange = (newYear) => {
+        const monthYear = `${selectedMonth}/${newYear}`;
         setSelectedYear(newYear);
         setSelectedDate(null);
         setCurrentPage(1);
         fetchSchedules({
-            monthYear: `${selectedMonth}/${newYear}`,
+            monthYear,
             isActive: null
         });
         fetchSchedulesPagination({
-            monthYear: `${selectedMonth}/${newYear}`,
+            monthYear,
             isActive: null,
             page: 1,
             size: pageSize
         });
+        fetchCounts(monthYear);
     };
 
     const handleEdit = (schedule) => {
@@ -127,17 +193,19 @@ export default function WorkSchedule() {
         try {
             const res = await updateStatus(schedule);
             if (res.success) {
+                const monthYear = `${selectedMonth}/${selectedYear}`;
                 showToast.success("Cập nhật trạng thái lịch tiếp dân thành công.");
                 fetchSchedules({
-                    monthYear: `${selectedMonth}/${selectedYear}`,
+                    monthYear,
                     isActive: null
                 });
                 fetchSchedulesPagination({
-                    monthYear: `${selectedMonth}/${selectedYear}`,
+                    monthYear,
                     isActive: null,
                     page: currentPage,
                     size: pageSize
                 });
+                fetchCounts(monthYear);
             } else {
                 showToast.error(
                     res.error || "Cập nhật trạng thái lịch tiếp dân thất bại."
@@ -200,14 +268,16 @@ export default function WorkSchedule() {
                 const result = await importSchedule(file);
 
                 if (result.success) {
+                    const monthYear = `${selectedMonth}/${selectedYear}`;
                     showToast.success(
                         `Import thành công! Đã import ${result.data?.importedCount || 0
                         } lịch tiếp dân.`
                     );
                     fetchSchedules({
-                        monthYear: `${selectedMonth}/${selectedYear}`,
+                        monthYear,
                         isActive: null
                     });
+                    fetchCounts(monthYear);
                 } else {
                     showToast.error(
                         result.error ||
@@ -250,21 +320,23 @@ export default function WorkSchedule() {
             }
 
             if (result.success) {
+                const monthYear = `${selectedMonth}/${selectedYear}`;
                 showToast.success(
                     mode === "create"
                         ? "Tạo lịch tiếp dân thành công!"
                         : "Cập nhật lịch tiếp dân thành công!"
                 );
                 fetchSchedules({
-                    monthYear: `${selectedMonth}/${selectedYear}`,
+                    monthYear,
                     isActive: null
                 });
                 fetchSchedulesPagination({
-                    monthYear: `${selectedMonth}/${selectedYear}`,
+                    monthYear,
                     isActive: null,
                     page: currentPage,
                     size: pageSize
                 });
+                fetchCounts(monthYear);
                 return true;
             } else {
                 showToast.error(result.error || "Có lỗi xảy ra!");
@@ -278,44 +350,74 @@ export default function WorkSchedule() {
 
     const handlePageChange = (page) => {
         setCurrentPage(page);
-        fetchSchedulesPagination({
-            monthYear: `${selectedMonth}/${selectedYear}`,
-            isActive: null,
-            page,
-            size: pageSize
-        });
-    };
-
-    const filterByActive = (scheduleList) => {
-        if (activeFilter === "all") return scheduleList;
-        if (activeFilter === "active") {
-            return scheduleList.filter(
-                (s) => s.is_active === true || s.isActive === true
-            );
+        
+        const isActiveValue = activeFilter === "all" ? null : activeFilter === "active" ? true : false;
+        
+        if (selectedDate) {
+            fetchSchedulesPagination({
+                date: selectedDate,
+                isActive: isActiveValue,
+                page,
+                size: pageSize
+            });
+        } else {
+            fetchSchedulesPagination({
+                monthYear: `${selectedMonth}/${selectedYear}`,
+                isActive: isActiveValue,
+                page,
+                size: pageSize
+            });
         }
-        if (activeFilter === "inactive") {
-            return scheduleList.filter(
-                (s) => s.is_active === false || s.isActive === false
-            );
-        }
-        return scheduleList;
     };
 
-    const filterUpcomingSchedules = (scheduleList) => {
-        return scheduleList.filter(schedule => {
-            const scheduleDate = schedule.ngay_tiep_dan || schedule.ngayTiepDan || schedule.date;
-            return !isPastDate(scheduleDate);
-        });
-    };
-
-    const displaySchedules = filterByActive(
-        selectedDate 
-            ? getSchedulesForDate(selectedDate) 
-            : getSchedulesForDisplay() 
-    );
+    // Since API now filters by date and isActive, we can display schedules directly
+    const displaySchedules = schedules;
 
     const handleActiveFilterChange = (filter) => {
         setActiveFilter(filter);
+        setCurrentPage(1);
+        
+        const isActiveValue = filter === "all" ? null : filter === "active" ? true : false;
+        
+        if (selectedDate) {
+            // Filter by date and status
+            fetchSchedulesPagination({
+                date: selectedDate,
+                isActive: isActiveValue,
+                page: 1,
+                size: pageSize
+            });
+        } else {
+            // Filter by month/year and status
+            const monthYear = `${selectedMonth}/${selectedYear}`;
+            fetchSchedulesPagination({
+                monthYear,
+                isActive: isActiveValue,
+                page: 1,
+                size: pageSize
+            });
+        }
+    };
+
+    const handleResetFilter = () => {
+        const monthYear = `${selectedMonth}/${selectedYear}`;
+        setActiveFilter("all");
+        setSelectedDate(null);
+        setCurrentPage(1);
+        
+        fetchSchedules({
+            monthYear,
+            isActive: null
+        });
+        fetchSchedulesPagination({
+            monthYear,
+            isActive: null,
+            page: 1,
+            size: pageSize
+        });
+        fetchCounts(monthYear);
+        
+        showToast.success("Đã làm mới bộ lọc");
     };
 
     return (
@@ -359,51 +461,49 @@ export default function WorkSchedule() {
             </div>
 
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3 md:p-4 mb-4">
-                <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-                    <span className="text-sm font-medium text-gray-700">
-                        Lọc theo trạng thái:
-                    </span>
-                    <div className="flex flex-wrap gap-2">
-                        <button
-                            onClick={() => handleActiveFilterChange("all")}
-                            className={`px-3 md:px-4 py-1.5 md:py-2 text-xs md:text-sm rounded-lg transition-colors ${activeFilter === "all"
-                                    ? "bg-blue-600 text-white"
-                                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                                }`}
-                        >
-                            Tất cả ({filterUpcomingSchedules(schedules).length})
-                        </button>
-                        <button
-                            onClick={() => handleActiveFilterChange("active")}
-                            className={`px-3 md:px-4 py-1.5 md:py-2 text-xs md:text-sm rounded-lg transition-colors ${activeFilter === "active"
-                                    ? "bg-green-600 text-white"
-                                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                                }`}
-                        >
-                            Hoạt động (
-                            {
-                                filterUpcomingSchedules(schedules).filter(
-                                    (s) => s.is_active === true || s.isActive === true
-                                ).length
-                            }
-                            )
-                        </button>
-                        <button
-                            onClick={() => handleActiveFilterChange("inactive")}
-                            className={`px-3 md:px-4 py-1.5 md:py-2 text-xs md:text-sm rounded-lg transition-colors ${activeFilter === "inactive"
-                                    ? "bg-red-600 text-white"
-                                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                                }`}
-                        >
-                            Đã khóa (
-                            {
-                                filterUpcomingSchedules(schedules).filter(
-                                    (s) => s.is_active === false || s.isActive === false
-                                ).length
-                            }
-                            )
-                        </button>
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+                        <span className="text-sm font-medium text-gray-700">
+                            Lọc theo trạng thái:
+                        </span>
+                        <div className="flex flex-wrap gap-2">
+                            <button
+                                onClick={() => handleActiveFilterChange("all")}
+                                className={`px-3 md:px-4 py-1.5 md:py-2 text-xs md:text-sm rounded-lg transition-colors ${activeFilter === "all"
+                                        ? "bg-blue-600 text-white"
+                                        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                                    }`}
+                            >
+                                Tất cả ({counts.all})
+                            </button>
+                            <button
+                                onClick={() => handleActiveFilterChange("active")}
+                                className={`px-3 md:px-4 py-1.5 md:py-2 text-xs md:text-sm rounded-lg transition-colors ${activeFilter === "active"
+                                        ? "bg-green-600 text-white"
+                                        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                                    }`}
+                            >
+                                Hoạt động ({counts.active})
+                            </button>
+                            <button
+                                onClick={() => handleActiveFilterChange("inactive")}
+                                className={`px-3 md:px-4 py-1.5 md:py-2 text-xs md:text-sm rounded-lg transition-colors ${activeFilter === "inactive"
+                                        ? "bg-red-600 text-white"
+                                        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                                    }`}
+                            >
+                                Đã khóa ({counts.inactive})
+                            </button>
+                        </div>
                     </div>
+                    <button
+                        onClick={handleResetFilter}
+                        className="px-3 md:px-4 py-1.5 md:py-2 text-xs md:text-sm rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors flex items-center justify-center gap-2"
+                        title="Làm mới bộ lọc"
+                    >
+                        <RotateCcw className="w-3.5 h-3.5 md:w-4 md:h-4" />
+                        <span className="hidden sm:inline">Làm mới</span>
+                    </button>
                 </div>
             </div>
 
