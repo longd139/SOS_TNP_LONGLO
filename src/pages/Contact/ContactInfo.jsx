@@ -370,7 +370,7 @@ export default function ContactInfo() {
                                     disabled={!isEditing}
                                     className={`w-full px-3 py-2 text-sm border rounded-lg bg-gray-50 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 disabled:text-gray-500 ${errors['gioLamViec.ghi_chu'] ? 'border-red-500' : 'border-gray-300'
                                         }`}
-                                    placeholder="Ghi chú thêm về giờ làm việc (không bắt buộc)"
+                                    placeholder="Ghi chú thêm về giờ làm việc (bắt buộc)"
                                 />
                                 {errors['gioLamViec.ghi_chu'] && (
                                     <p className="mt-1 text-xs text-red-600">{errors['gioLamViec.ghi_chu']}</p>

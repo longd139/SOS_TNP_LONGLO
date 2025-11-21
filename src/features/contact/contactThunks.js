@@ -4,7 +4,7 @@ import { validateContact, validateUpdateContact } from '../../validator/contactV
 
 const transformContactData = (data) => {
     if (!data) return null;
-    
+
     return {
         id: data.id,
         tenDonVi: data.ten_don_vi || '',
@@ -41,7 +41,7 @@ const transformContactDataForRequest = (data) => {
                 tu: data.gioLamViec.buoi_chieu.tu,
                 den: data.gioLamViec.buoi_chieu.den,
             },
-            ghiChu: data.gioLamViec.ghi_chu?.trim() || null,
+            ghiChu: data.gioLamViec.ghi_chu?.trim() || "",
         },
         linkGoogleMap: data.linkGoogleMap,
     };
@@ -52,15 +52,15 @@ export const fetchContact = createAsyncThunk(
     async (_, { rejectWithValue }) => {
         try {
             const response = await COMMITTEE_API.getCommittees();
-            
+
             let data = response;
-            
+
             if (Array.isArray(response)) {
                 data = response[0] || null;
             }
-            
+
             const transformedData = transformContactData(data);
-            
+
             return transformedData;
         } catch (error) {
             return rejectWithValue(error.response?.data?.message || error.message || 'Không thể tải thông tin ủy ban');
@@ -81,7 +81,7 @@ export const createContact = createAsyncThunk(
             const requestData = transformContactDataForRequest(contactData);
             const result = await COMMITTEE_API.createCommittee(requestData);
             const transformedResult = transformContactData(result);
-            
+
             return transformedResult;
         } catch (error) {
             return rejectWithValue(error.message || 'Không thể tạo thông tin ủy ban');
@@ -94,7 +94,7 @@ export const updateContact = createAsyncThunk(
     async ({ committeeId, contactData }, { rejectWithValue }) => {
         try {
             const validation = await validateUpdateContact(contactData);
-            
+
             if (!validation.isValid) {
                 const firstError = Object.values(validation.errors)[0];
                 return rejectWithValue(firstError || 'Dữ liệu không hợp lệ');
@@ -102,10 +102,10 @@ export const updateContact = createAsyncThunk(
 
             const { id, ...dataWithoutId } = contactData;
             const requestData = transformContactDataForRequest(dataWithoutId);
-            
+
             const result = await COMMITTEE_API.updateCommittee(committeeId, requestData);
             const transformedResult = transformContactData(result);
-            
+
             return transformedResult;
         } catch (error) {
             return rejectWithValue(error.response?.data?.message || error.message || 'Không thể cập nhật thông tin ủy ban');
