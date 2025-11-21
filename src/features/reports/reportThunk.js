@@ -106,7 +106,7 @@ export const updateReportStatus = createAsyncThunk(
             const response = await REPORT_API.updateStatusReport(reportId, statusData);
             return { reportId, updatedData: response };
         } catch (error) {
-            return rejectWithValue(error.message || 'Failed to update report status');
+            return rejectWithValue(error);
         }
     }
 )

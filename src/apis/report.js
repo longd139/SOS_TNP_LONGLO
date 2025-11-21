@@ -86,11 +86,19 @@ const updateStatusReport = async (reportId, statusData) => {
         if (response.data.success) {
             return response.data.data;
         } else {
-            throw new Error(response.data.message || "Cập nhật trạng thái phản ánh thất bại");
+            const errorData = {
+                message: response.data.message || "Cập nhật trạng thái phản ánh thất bại",
+                errors: response.data.errors || []
+            };
+            throw errorData;
         }
     } catch (error) {
-        if (error.response?.data?.message) {
-            throw new Error(error.response.data.message);
+        if (error.response?.data) {
+            const errorData = {
+                message: error.response.data.message || "Cập nhật trạng thái phản ánh thất bại",
+                errors: error.response.data.errors || []
+            };
+            throw errorData;
         }
         throw error;
     }
