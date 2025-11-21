@@ -248,15 +248,6 @@ const TemplateFormModal = ({
                                     </p>
                                 </div>
                                 <div className="flex items-center gap-1 flex-shrink-0 ml-auto">
-                                    <a
-                                        href={`${baseUrl}${initialData?.urlFilePdf ?? initialData?.url_file_pdf}`}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="p-1.5 text-blue-600 hover:text-blue-700 hover:bg-blue-100 rounded transition-colors"
-                                        title="Xem file"
-                                    >
-                                        <Eye className="w-4 h-4" />
-                                    </a>
                                     <div>
                                         <button
                                             type="button"
