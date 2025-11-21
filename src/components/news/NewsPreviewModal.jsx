@@ -118,6 +118,20 @@ const NewsPreviewModal = ({ isOpen, onClose, newsData, isPreview = false }) => {
 
                 <div className="prose max-w-none news-content">
                     <style>{`
+                        /* Quill text alignment classes */
+                        .quill-content .ql-align-center {
+                            text-align: center !important;
+                        }
+                        .quill-content .ql-align-right {
+                            text-align: right !important;
+                        }
+                        .quill-content .ql-align-left {
+                            text-align: left !important;
+                        }
+                        .quill-content .ql-align-justify {
+                            text-align: justify !important;
+                        }
+                        
                         /* Ensure Quill alignment classes apply to images in preview */
                         .quill-content p.ql-align-center img,
                         .quill-content div.ql-align-center img {

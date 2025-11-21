@@ -73,6 +73,7 @@ export default function WorkSchedule() {
         }
     };
 
+    // Initial load only - fetch when month/year changes, not on filter or page changes
     useEffect(() => {
         const monthYear = `${selectedMonth}/${selectedYear}`;
         
@@ -84,13 +85,18 @@ export default function WorkSchedule() {
         fetchSchedulesPagination({
             monthYear,
             isActive: null,
-            page: currentPage,
+            page: 1,
             size: pageSize
         });
 
         fetchCounts(monthYear);
         
-    }, [selectedMonth, selectedYear, currentPage, pageSize]);
+        // Reset to page 1 when month/year changes
+        setCurrentPage(1);
+        setActiveFilter("all");
+        setSelectedDate(null);
+        
+    }, [selectedMonth, selectedYear]);
 
     useEffect(() => {
         return () => {
@@ -374,6 +380,9 @@ export default function WorkSchedule() {
     const displaySchedules = schedules;
 
     const handleActiveFilterChange = (filter) => {
+        // Don't do anything if clicking the same filter
+        if (filter === activeFilter) return;
+        
         setActiveFilter(filter);
         setCurrentPage(1);
         

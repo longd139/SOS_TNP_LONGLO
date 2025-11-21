@@ -1,6 +1,6 @@
-export async function validateSchema(schema, data) {
+export async function validateSchema(schema, data, options = {}) {
     try {
-        await schema.validate(data, { abortEarly: false });
+        await schema.validate(data, { abortEarly: false, ...options });
         return { valid: true, errors: {} };
     } catch (err) {
         const errors = {};
