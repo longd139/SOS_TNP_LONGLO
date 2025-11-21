@@ -12,6 +12,7 @@ import {
 
 const initialState = {
     schedules: [],
+    allSchedules: [],
     currentSchedule: null,
     loading: false,
     error: null,
@@ -29,6 +30,11 @@ const initialState = {
         pageSize: 10,
         totalPages: 1,
         totalItems: 0
+    },
+    counts: {
+        all: 0,
+        active: 0,
+        inactive: 0
     }
 };
 
@@ -71,6 +77,9 @@ const workScheduleSlice = createSlice({
         },
         removeSchedule: (state, action) => {
             state.schedules = state.schedules.filter(schedule => schedule.id !== action.payload);
+        },
+        setCounts: (state, action) => {
+            state.counts = { ...state.counts, ...action.payload };
         }
     },
     extraReducers: (builder) => {
@@ -81,6 +90,7 @@ const workScheduleSlice = createSlice({
             })
             .addCase(fetchWorkSchedules.fulfilled, (state, action) => {
                 state.loading = false;
+                state.allSchedules = action.payload || [];
                 state.schedules = action.payload || [];
             })
             .addCase(fetchWorkSchedules.rejected, (state, action) => {
@@ -202,7 +212,8 @@ export const {
     setShowActive,
     addSchedule,
     updateSchedule,
-    removeSchedule
+    removeSchedule,
+    setCounts
 } = workScheduleSlice.actions;
 
 export default workScheduleSlice.reducer;

@@ -11,6 +11,11 @@ export const selectSchedulesList = createSelector(
     (workSchedule) => workSchedule.schedules
 );
 
+export const selectAllSchedulesList = createSelector(
+    [selectWorkScheduleState],
+    (workSchedule) => workSchedule.allSchedules || workSchedule.schedules
+);
+
 export const selectSchedulesLoading = createSelector(
     [selectWorkScheduleState],
     (workSchedule) => workSchedule.loading
@@ -63,7 +68,7 @@ export const selectSchedulesForDisplay = createSelector(
 );
 
 export const selectSchedulesForMonth = createSelector(
-    [selectSchedulesList, selectSelectedMonth, selectSelectedYear],
+    [selectAllSchedulesList, selectSelectedMonth, selectSelectedYear],
     (schedules, month, year) => {
         return schedules.filter(schedule => {
             const scheduleDate = new Date(getScheduleDateField(schedule));
@@ -138,5 +143,14 @@ export const selectSchedulePagination = createSelector(
         pageSize: 10,
         totalPages: 1,
         totalItems: 0
+    }
+);
+
+export const selectScheduleCounts = createSelector(
+    [selectWorkScheduleState],
+    (workSchedule) => workSchedule.counts || {
+        all: 0,
+        active: 0,
+        inactive: 0
     }
 );

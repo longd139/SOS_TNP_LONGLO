@@ -44,12 +44,6 @@ const ReportAreasFilter = ({ onFilter, onReset, filters = {}, pagination = {} })
             isActive: newFilters.isActive,
             pageSize: Number(newFilters.pageSize)
         });
-
-        console.log('Applied Filters:', {
-            search: searchValue,
-            isActive: newFilters.isActive,
-            pageSize: Number(newFilters.pageSize)
-        });
     };
 
     const handleReset = () => {
