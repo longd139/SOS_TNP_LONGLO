@@ -54,7 +54,8 @@ export default function WorkSchedule() {
     const [selectedDate, setSelectedDate] = useState(null);
     const [activeFilter, setActiveFilter] = useState("all");
     const [currentPage, setCurrentPage] = useState(1);
-    const [pageSize, setPageSize] = useState(10);
+    
+    const pageSize = 10;
 
     const fetchCounts = async (monthYear) => {
         try {
