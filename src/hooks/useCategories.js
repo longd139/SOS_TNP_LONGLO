@@ -9,18 +9,19 @@ import {
     selectActiveCategories 
 } from '../features/categories/categoriesSelectors';
 
-export const useCategories = ({ autoFetch = true, isRemoved = false } = {}) => {
+export const useCategories = ({ autoFetch = true, isRemoved = false, forceFetch = false } = {}) => {
     const dispatch = useDispatch();
     const categories = useSelector(selectCategoriesList);
     const activeCategories = useSelector(selectActiveCategories);
     const loading = useSelector(selectCategoriesLoading);
     const error = useSelector(selectCategoriesError);
+    const isFetched = useSelector(state => state.categories.isFetched);
 
     useEffect(() => {
-        if (autoFetch) {
+        if (autoFetch && (!isFetched || forceFetch)) {
             dispatch(fetchCategories({ isRemoved }));
         }
-    }, [dispatch, autoFetch, isRemoved]);
+    }, [dispatch, autoFetch, isRemoved, isFetched, forceFetch]);
 
     const loadCategories = useCallback((params) => {
         return dispatch(fetchCategories(params));

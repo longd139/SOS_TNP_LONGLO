@@ -4,7 +4,8 @@ import { validateSchema } from "../utils/validationUtils";
 const categorySchema = yup.object().shape({
     tenLinhVuc: yup
         .string()
-        .required("Tên lĩnh vực là bắt buộc"),
+        .required("Tên lĩnh vực là bắt buộc")
+        .test('trim', 'Tên lĩnh vực là bắt buộc', value => value && value.trim().length > 0),
     moTa: yup
         .string()
         .nullable()

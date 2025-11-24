@@ -194,14 +194,10 @@ const WorkScheduleModal = ({
       [field]: value,
     }));
 
-    if (errors[field]) {
-      setErrors((prev) => ({
-        ...prev,
-        [field]: "",
-      }));
-    }
+    const newErrors = { ...errors };
 
     if (mode === "create" && field === "batDau") {
+      delete newErrors.batDau;
       const ngayTiepDan = formData.ngayTiepDan;
       if (ngayTiepDan && value) {
         const now = new Date();
@@ -219,16 +215,17 @@ const WorkScheduleModal = ({
           selectedDateTime.setHours(hours, minutes, 0, 0);
           
           if (selectedDateTime <= now) {
-            setErrors((prev) => ({
-              ...prev,
-              [field]: "Giờ bắt đầu phải là thời điểm trong tương lai",
-            }));
+            newErrors.batDau = "Giờ bắt đầu phải là thời điểm trong tương lai";
           }
         }
       }
     }
 
     if (mode === "create" && field === "ngayTiepDan") {
+      delete newErrors.ngayTiepDan;
+      delete newErrors.batDau;
+      delete newErrors.ketThuc;
+      
       const batDau = formData.batDau;
       if (batDau && value) {
         const now = new Date();
@@ -243,16 +240,15 @@ const WorkScheduleModal = ({
           selectedDateTime.setHours(hours, minutes, 0, 0);
           
           if (selectedDateTime <= now) {
-            setErrors((prev) => ({
-              ...prev,
-              batDau: "Giờ bắt đầu phải là thời điểm trong tương lai",
-            }));
+            newErrors.batDau = "Giờ bắt đầu phải là thời điểm trong tương lai";
           }
         }
       }
     }
 
+    // Validate ketThuc (end time) for create mode
     if (mode === "create" && field === "ketThuc") {
+      delete newErrors.ketThuc;
       const ngayTiepDan = formData.ngayTiepDan;
       if (ngayTiepDan && value) {
         const now = new Date();
@@ -270,15 +266,13 @@ const WorkScheduleModal = ({
           selectedDateTime.setHours(hours, minutes, 0, 0);
           
           if (selectedDateTime <= now) {
-            setErrors((prev) => ({
-              ...prev,
-              [field]: "Giờ kết thúc phải là thời điểm trong tương lai",
-            }));
+            newErrors.ketThuc = "Giờ kết thúc phải là thời điểm trong tương lai";
           }
         }
       }
     }
 
+    // Validate start/end time comparison
     if ((field === "batDau" || field === "ketThuc")) {
       const batDauValue = field === "batDau" ? value : formData.batDau;
       const ketThucValue = field === "ketThuc" ? value : formData.ketThuc;
@@ -293,20 +287,18 @@ const WorkScheduleModal = ({
         
         if (startTime24h >= endTime24h) {
           if (field === "batDau") {
-            setErrors((prev) => ({
-              ...prev,
-              batDau: "Giờ bắt đầu phải trước giờ kết thúc",
-            }));
+            newErrors.batDau = "Giờ bắt đầu phải trước giờ kết thúc";
           } else {
-            setErrors((prev) => ({
-              ...prev,
-              ketThuc: "Giờ kết thúc phải sau giờ bắt đầu",
-            }));
+            newErrors.ketThuc = "Giờ kết thúc phải sau giờ bắt đầu";
           }
+        } else {
+          delete newErrors.batDau;
+          delete newErrors.ketThuc;
         }
       }
     }
 
+    // Validate date field
     if (field === "ngayTiepDan" && value) {
       const today = new Date();
       today.setHours(0, 0, 0, 0);
@@ -314,17 +306,17 @@ const WorkScheduleModal = ({
       selectedDate.setHours(0, 0, 0, 0);
       
       if (mode === "create" && selectedDate < today) {
-        setErrors((prev) => ({
-          ...prev,
-          ngayTiepDan: "Không thể chọn ngày trong quá khứ",
-        }));
+        newErrors.ngayTiepDan = "Không thể chọn ngày trong quá khứ";
       } else if (mode === "edit" && selectedDate < today) {
-        setErrors((prev) => ({
-          ...prev,
-          ngayTiepDan: "Khi chỉnh sửa lịch, không được chọn ngày trong quá khứ",
-        }));
+        newErrors.ngayTiepDan = "Khi chỉnh sửa lịch, không được chọn ngày trong quá khứ";
       }
     }
+
+    if (!newErrors[field]) {
+      delete newErrors[field];
+    }
+
+    setErrors(newErrors);
   };
 
   const modalTitle =

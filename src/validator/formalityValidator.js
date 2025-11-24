@@ -154,7 +154,8 @@ const truongHopThuTucSchema = yup.object().shape({
 export const createFormalitySchema = yup.object().shape({
     idCoSoDichVuCong: yup
         .string()
-        .required("Mã cơ sở dịch vụ công là bắt buộc"),
+        .required("Mã cơ sở dịch vụ công là bắt buộc")
+        .test('trim', 'Mã cơ sở dịch vụ công là bắt buộc', value => value && value.trim().length > 0),
     tenThuTuc: yup
         .string()
         .required("Tên thủ tục là bắt buộc")
@@ -348,20 +349,24 @@ const truongHopThuTucUpdateSchema = truongHopThuTucSchema.shape({
 export const updateFormalitySchema = yup.object().shape({
     idCoSoDichVuCong: yup
         .string()
-        .required("Mã cơ sở dịch vụ công là bắt buộc"),
+        .required("Mã cơ sở dịch vụ công là bắt buộc")
+        .test('trim', 'Mã cơ sở dịch vụ công là bắt buộc', value => value && value.trim().length > 0),
     tenThuTuc: yup
         .string()
         .required("Tên thủ tục là bắt buộc")
+        .test('trim', 'Tên thủ tục là bắt buộc', value => value && value.trim().length > 0)
         .min(3, "Tên thủ tục phải có ít nhất 3 ký tự")
         .max(230, "Tên thủ tục không được vượt quá 230 ký tự"),
     maThuTuc: yup
         .string()
         .required("Mã thủ tục là bắt buộc")
+        .test('trim', 'Mã thủ tục là bắt buộc', value => value && value.trim().length > 0)
         .min(2, "Mã thủ tục phải có ít nhất 2 ký tự")
         .max(50, "Mã thủ tục không được vượt quá 50 ký tự"),
     doiTuongThucHien: yup
         .string()
         .required("Đối tượng thực hiện là bắt buộc")
+        .test('trim', 'Đối tượng thực hiện là bắt buộc', value => value && value.trim().length > 0)
         .max(230, "Đối tượng thực hiện không được vượt quá 230 ký tự"),
     // url_pdf: yup
     //     .string()
@@ -383,6 +388,7 @@ export const updateFormalitySchema = yup.object().shape({
     soQuyetDinh: yup
         .string()
         .required("Số quyết định là bắt buộc")
+        .test('trim', 'Số quyết định là bắt buộc', value => value && value.trim().length > 0)
         .max(230, "Số quyết định không được vượt quá 230 ký tự"),
     isActive: yup
         .boolean()

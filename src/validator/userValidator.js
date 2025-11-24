@@ -9,16 +9,14 @@ export const createUserSchema = yup.object().shape({
     username: yup
         .string()
         .required("Tên đăng nhập là bắt buộc")
+        .test('trim', 'Tên đăng nhập là bắt buộc', value => value && value.trim().length > 0)
         .min(3, "Tên đăng nhập phải có ít nhất 3 ký tự")
-        .max(50, "Tên đăng nhập không được vượt quá 50 ký tự")
         .matches(usernameRegex, "Tên đăng nhập chỉ được chứa chữ cái, số, dấu gạch dưới và dấu chấm"),
-
     email: yup
         .string()
         .required("Email là bắt buộc")
-        .email("Email không hợp lệ")
-        .max(100, "Email không được vượt quá 100 ký tự"),
-
+        .test('trim', 'Email là bắt buộc', value => value && value.trim().length > 0)
+        .email("Email không hợp lệ"),
     role: yup
         .string()
         .required("Vai trò là bắt buộc")
@@ -27,9 +25,8 @@ export const createUserSchema = yup.object().shape({
     password: yup
         .string()
         .required("Mật khẩu là bắt buộc")
-        .min(8, "Mật khẩu phải có ít nhất 8 ký tự")
-        .max(100, "Mật khẩu không được vượt quá 100 ký tự"),
-
+        .test('trim', 'Mật khẩu là bắt buộc', value => value && value.trim().length > 0)
+        .min(8, "Mật khẩu phải có ít nhất 8 ký tự"),
     confirmPassword: yup
         .string()
         .required("Xác nhận mật khẩu là bắt buộc")
@@ -45,12 +42,12 @@ export const updateUserSchema = yup.object().shape({
         .string()
         .required("Họ và tên là bắt buộc")
         .min(2, "Họ và tên phải có ít nhất 2 ký tự")
-        .max(100, "Họ và tên không được vượt quá 100 ký tự")
         .test('trim', 'Họ và tên là bắt buộc', value => value && value.trim().length > 0),
 
     role: yup
         .string()
         .required("Vai trò là bắt buộc")
+        .test('trim', 'Vai trò là bắt buộc', value => value && value.trim().length > 0)
         .oneOf(['ADMIN', 'NHAN_VIEN', 'LANH_DAO', 'PHO_CHU_TICH', 'CHU_TICH', 'KHU_PHO'], "Vai trò không hợp lệ"),
 
     password: yup
@@ -59,12 +56,7 @@ export const updateUserSchema = yup.object().shape({
         .test('password-length', 'Mật khẩu phải có ít nhất 8 ký tự', function(value) {
             if (!value || value.trim() === '') return true;
             return value.length >= 8;
-        })
-        .test('password-max', 'Mật khẩu không được vượt quá 100 ký tự', function(value) {
-            if (!value || value.trim() === '') return true;
-            return value.length <= 100;
         }),
-
     confirmPassword: yup
         .string()
         .notRequired()
@@ -96,12 +88,12 @@ export const updateUserWithPhoneSchema = yup.object().shape({
         .string()
         .required("Họ và tên là bắt buộc")
         .min(2, "Họ và tên phải có ít nhất 2 ký tự")
-        .max(100, "Họ và tên không được vượt quá 100 ký tự")
         .test('trim', 'Họ và tên là bắt buộc', value => value && value.trim().length > 0),
 
     role: yup
         .string()
         .required("Vai trò là bắt buộc")
+        .test('trim', 'Vai trò là bắt buộc', value => value && value.trim().length > 0)
         .oneOf(['ADMIN', 'NHAN_VIEN', 'LANH_DAO', 'PHO_CHU_TICH', 'CHU_TICH', 'KHU_PHO'], "Vai trò không hợp lệ"),
 
     password: yup
@@ -110,12 +102,7 @@ export const updateUserWithPhoneSchema = yup.object().shape({
         .test('password-length', 'Mật khẩu phải có ít nhất 8 ký tự', function(value) {
             if (!value || value.trim() === '') return true;
             return value.length >= 8;
-        })
-        .test('password-max', 'Mật khẩu không được vượt quá 100 ký tự', function(value) {
-            if (!value || value.trim() === '') return true;
-            return value.length <= 100;
         }),
-
     confirmPassword: yup
         .string()
         .notRequired()
@@ -143,13 +130,14 @@ export const updateUserWithPhoneSchema = yup.object().shape({
 export const changePasswordSchema = yup.object().shape({
     matKhauHienTai: yup
         .string()
-        .required("Mật khẩu hiện tại là bắt buộc"),
+        .required("Mật khẩu hiện tại là bắt buộc")
+        .test('trim', 'Mật khẩu hiện tại là bắt buộc', value => value && value.trim().length > 0),
 
     matKhauMoi: yup
         .string()
         .required("Mật khẩu mới là bắt buộc")
+        .test('trim', 'Mật khẩu mới là bắt buộc', value => value && value.trim().length > 0)
         .min(8, "Mật khẩu phải có ít nhất 8 ký tự")
-        .max(100, "Mật khẩu không được vượt quá 100 ký tự")
         .notOneOf([yup.ref('matKhauHienTai')], "Mật khẩu mới phải khác mật khẩu hiện tại"),
 
     confirmMatKhauMoi: yup
