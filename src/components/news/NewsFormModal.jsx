@@ -43,7 +43,8 @@ const NewsFormModal = ({ isOpen, onClose, onSubmit, initialData = null, isLoadin
         'bold', 'italic', 'underline',
         'list', 'bullet',
         'align',
-        'link', 'image'
+        'link', 'image',
+        'direction'
     ];
 
     useEffect(() => {
@@ -68,10 +69,11 @@ const NewsFormModal = ({ isOpen, onClose, onSubmit, initialData = null, isLoadin
                 isActive: initialData.is_active !== undefined ? initialData.is_active : true,
                 file: null
             });
-            if (initialData.url_anh_dai_dien) {
+            if (initialData.url_anh_dai_dien || initialData.urlAnhDaiDien) {
                 const fullImageUrl = downloadUtils.handleViewImage(initialData);
                 setFilePreview(fullImageUrl);
             }
+            setErrors({});
         } else {
             resetForm();
         }
@@ -144,14 +146,21 @@ const NewsFormModal = ({ isOpen, onClose, onSubmit, initialData = null, isLoadin
     };
 
     const validateForm = async () => {
+        const isEditMode = !!initialData;
+        const hasExistingImage = isEditMode && !!filePreview;
+
         const dataToValidate = {
             idDanhMuc: formData.idDanhMuc,
             tieuDe: formData.tieuDe,
             noiDung: formData.noiDung,
-            file: !initialData ? formData.file : (formData.file || 'existing')
+            file: formData.file
         };
 
-        const { isValid, errors: validationErrors } = await validateNewsForm(dataToValidate);
+        const { isValid, errors: validationErrors } = await validateNewsForm(
+            dataToValidate, 
+            isEditMode, 
+            hasExistingImage
+        );
 
         if (!isValid) {
             setErrors(validationErrors);
@@ -284,7 +293,6 @@ const NewsFormModal = ({ isOpen, onClose, onSubmit, initialData = null, isLoadin
         submitData.append('idDanhMuc', formData.idDanhMuc);
         submitData.append('tieuDe', formData.tieuDe);
         
-        // Replace base64 images with placeholders to maintain position
         let contentToSave = formData.noiDung;
         if (base64Images.length > 0) {
             contentToSave = replaceBase64WithPlaceholders(formData.noiDung, base64Images);
@@ -338,7 +346,6 @@ const NewsFormModal = ({ isOpen, onClose, onSubmit, initialData = null, isLoadin
     const getPreviewData = () => {
         const selectedCategory = activeCategories.find(cat => cat.id === formData.idDanhMuc);
         
-        // For preview, keep base64 images in content so they can be displayed
         let previewContent = formData.noiDung;
         
         return {

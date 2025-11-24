@@ -12,6 +12,7 @@ import {
 
 const initialState = {
     schedules: [],
+    allSchedules: [],
     currentSchedule: null,
     loading: false,
     error: null,
@@ -29,6 +30,11 @@ const initialState = {
         pageSize: 10,
         totalPages: 1,
         totalItems: 0
+    },
+    counts: {
+        all: 0,
+        active: 0,
+        inactive: 0
     }
 };
 
@@ -53,9 +59,11 @@ const workScheduleSlice = createSlice({
         },
         setSelectedMonth: (state, action) => {
             state.selectedMonth = action.payload;
+            state.allSchedules = [];
         },
         setSelectedYear: (state, action) => {
             state.selectedYear = action.payload;
+            state.allSchedules = [];
         },
         setShowActive: (state, action) => {
             state.showActive = action.payload;
@@ -71,6 +79,9 @@ const workScheduleSlice = createSlice({
         },
         removeSchedule: (state, action) => {
             state.schedules = state.schedules.filter(schedule => schedule.id !== action.payload);
+        },
+        setCounts: (state, action) => {
+            state.counts = { ...state.counts, ...action.payload };
         }
     },
     extraReducers: (builder) => {
@@ -81,6 +92,7 @@ const workScheduleSlice = createSlice({
             })
             .addCase(fetchWorkSchedules.fulfilled, (state, action) => {
                 state.loading = false;
+                state.allSchedules = action.payload || [];
                 state.schedules = action.payload || [];
             })
             .addCase(fetchWorkSchedules.rejected, (state, action) => {
@@ -176,13 +188,31 @@ const workScheduleSlice = createSlice({
             })
             .addCase(fetchWorkSchedulesPagination.fulfilled, (state, action) => {
                 state.loading = false;
-                state.schedules = action.payload.data || [];
-                state.pagination = action.payload.pagination || {
-                    currentPage: 1,
-                    pageSize: 10,
-                    totalPages: 1,
-                    totalItems: 0
-                };
+                const pageSize = action.payload.pagination?.pageSize || 10;
+                
+                // If page size is 10 or less, this is for the list display
+                // If page size is larger, this is for calendar highlighting
+                if (pageSize <= 10) {
+                    // Update schedules for list display
+                    state.schedules = action.payload.data || [];
+                    state.pagination = action.payload.pagination || {
+                        currentPage: 1,
+                        pageSize: 10,
+                        totalPages: 1,
+                        totalItems: 0
+                    };
+                }
+                
+                // Always update allSchedules for calendar highlighting
+                if (pageSize > 10) {
+                    // Large fetch for calendar - replace allSchedules
+                    state.allSchedules = action.payload.data || [];
+                } else if (action.payload.data && action.payload.data.length > 0) {
+                    // Small fetch - merge into allSchedules
+                    const existingIds = new Set(state.allSchedules.map(s => s.id));
+                    const newSchedules = action.payload.data.filter(s => !existingIds.has(s.id));
+                    state.allSchedules = [...state.allSchedules, ...newSchedules];
+                }
             })
             .addCase(fetchWorkSchedulesPagination.rejected, (state, action) => {
                 state.loading = false;
@@ -202,7 +232,8 @@ export const {
     setShowActive,
     addSchedule,
     updateSchedule,
-    removeSchedule
+    removeSchedule,
+    setCounts
 } = workScheduleSlice.actions;
 
 export default workScheduleSlice.reducer;

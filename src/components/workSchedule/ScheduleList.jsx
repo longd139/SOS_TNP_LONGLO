@@ -51,29 +51,7 @@ export default function ScheduleList({
         return isPastSchedule(scheduleDate, startTime);
     };
 
-    const sortedSchedules = [...schedules].sort((a, b) => {
-        const aDate = getFieldValue(a, "date");
-        const aTime = getStartTimeFromSchedule(a);
-        const bDate = getFieldValue(b, "date");
-        const bTime = getStartTimeFromSchedule(b);
-        
-        const aIsPast = isPastSchedule(aDate, aTime);
-        const bIsPast = isPastSchedule(bDate, bTime);
-        
-        if (aIsPast && !bIsPast) return -1;
-        if (!aIsPast && bIsPast) return 1;
-        
-        const aTime24h = convertTo24Hour(aTime);
-        const bTime24h = convertTo24Hour(bTime);
-        const aDateTime = dayjs(`${aDate} ${aTime24h}`, "YYYY-MM-DD HH:mm");
-        const bDateTime = dayjs(`${bDate} ${bTime24h}`, "YYYY-MM-DD HH:mm");
-        
-        if (aIsPast && bIsPast) {
-            return bDateTime.isBefore(aDateTime) ? -1 : 1;
-        } else {
-            return aDateTime.isBefore(bDateTime) ? -1 : 1;
-        }
-    });
+    const sortedSchedules = schedules;
 
     const getDisplayMessage = () => {
         if (selectedDate) {
@@ -192,7 +170,7 @@ export default function ScheduleList({
                     {selectedDate ? "Lịch tiếp dân trong ngày" : "Lịch tiếp dân sắp tới"}
                 </h2>
                 <span className="text-sm text-gray-500">
-                    ({selectedDate ? sortedSchedules.length : (pagination?.totalItems || sortedSchedules.length)} lịch)
+                    ({selectedDate ? sortedSchedules.length : (pagination?.totalItems || 0)} lịch)
                 </span>
             </div>
 

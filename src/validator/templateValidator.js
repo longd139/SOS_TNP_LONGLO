@@ -44,7 +44,6 @@ export const updateTemplateSchema = yup.object().shape({
         .string()
         .required("Tên biểu mẫu là bắt buộc")
         .min(3, "Tên biểu mẫu phải có ít nhất 3 ký tự")
-        .max(500, "Tên biểu mẫu không được vượt quá 500 ký tự")
         .test('trim', 'Tên biểu mẫu là bắt buộc', value => value && value.trim().length > 0),
     
     maMauDon: yup
@@ -56,9 +55,7 @@ export const updateTemplateSchema = yup.object().shape({
     
     moTa: yup
         .string()
-        .nullable()
-        .max(1000, "Mô tả không được vượt quá 1000 ký tự"),
-    
+        .nullable(),    
     file: yup
         .mixed()
         .nullable()

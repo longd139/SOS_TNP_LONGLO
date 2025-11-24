@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import BaseModal, { ModalFooter } from '../base/BaseModal';
 import { Upload, Eye, Download } from 'lucide-react';
@@ -24,6 +24,7 @@ const TemplateFormModal = ({
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [fileName, setFileName] = useState('');
     const [uploadProgress, setUploadProgress] = useState(null);
+    const fileInputRef = useRef(null);
 
     const baseUrl = process.env.REACT_APP_API_URL;
 
@@ -109,8 +110,6 @@ const TemplateFormModal = ({
         } catch (error) {
             if (error.response?.data?.message) {
                 showToast.error(error.response.data.message);
-            } else {
-                showToast.error('Có lỗi xảy ra khi lưu biểu mẫu!' || error || error.message);
             }
         } finally {
             setIsSubmitting(false);
@@ -154,6 +153,9 @@ const TemplateFormModal = ({
     const handleRemoveFile = () => {
         setFileName('');
         updateField('file', null);
+        if (fileInputRef.current) {
+            fileInputRef.current.value = '';
+        }
     };
 
     const modalTitle = mode === 'create' ? 'Thêm biểu mẫu mới' : 'Chỉnh sửa biểu mẫu';
@@ -224,6 +226,9 @@ const TemplateFormModal = ({
                         rows="3"
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
+                     {errors.moTa && (
+                            <p className="mt-1 text-sm text-red-600">{errors.moTa}</p>
+                        )}
                 </div>
 
                 <div>
@@ -297,9 +302,11 @@ const TemplateFormModal = ({
                             <label className="cursor-pointer text-blue-600 hover:text-blue-700 font-medium">
                                 {fileName ? 'Chọn file khác' : (mode === 'edit' ? 'Thay đổi file' : 'Chọn file')}
                                 <input
+                                    ref={fileInputRef}
                                     type="file"
                                     accept=".pdf,.doc,.docx"
                                     onChange={handleFileChange}
+                                    onClick={(e) => { e.target.value = null; }}
                                     className="hidden"
                                 />
                             </label>

@@ -146,7 +146,23 @@ const ReportDetailModal = ({ isOpen, onClose, report, loading = false, onStatusU
 
             onClose();
         } catch (error) {
-            showToast.error(error);
+            
+            if (error?.message) {
+                showToast.error(error.message);
+            }
+            
+            if (error?.errors && Array.isArray(error.errors) && error.errors.length > 0) {
+                error.errors.forEach((err) => {
+                    if (err?.message) {
+                        showToast.error(err.message);
+                    }
+                });
+            } else if (typeof error === 'string') {
+                showToast.error(error);
+            } else if (!error?.message && !error?.errors) {
+                showToast.error('Có lỗi xảy ra khi cập nhật trạng thái');
+            }
+            
             clearError();
         } finally {
             setIsSubmitting(false);
