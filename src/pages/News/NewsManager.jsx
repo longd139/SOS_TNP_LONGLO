@@ -412,24 +412,28 @@ export default function NewsManager() {
                 onPageChange={handlePageChange}
             />
 
-            <NewsFormModal
-                isOpen={isCreateModalOpen}
-                onClose={() => setIsCreateModalOpen(false)}
-                onSubmit={handleCreateSubmit}
-                initialData={null}
-                isLoading={isSubmitting}
-            />
+            {isCreateModalOpen && (
+                <NewsFormModal
+                    isOpen={isCreateModalOpen}
+                    onClose={() => setIsCreateModalOpen(false)}
+                    onSubmit={handleCreateSubmit}
+                    initialData={null}
+                    isLoading={isSubmitting}
+                />
+            )}
 
-            <NewsFormModal
-                isOpen={isEditModalOpen}
-                onClose={() => {
-                    setIsEditModalOpen(false);
-                    setSelectedNews(null);
-                }}
-                onSubmit={handleEditSubmit}
-                initialData={selectedNews}
-                isLoading={isSubmitting}
-            />
+            {isEditModalOpen && (
+                <NewsFormModal
+                    isOpen={isEditModalOpen}
+                    onClose={() => {
+                        setIsEditModalOpen(false);
+                        setSelectedNews(null);
+                    }}
+                    onSubmit={handleEditSubmit}
+                    initialData={selectedNews}
+                    isLoading={isSubmitting}
+                />
+            )}
 
             <ConfirmModal
                 isOpen={isDeleteModalOpen}
