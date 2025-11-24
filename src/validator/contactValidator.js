@@ -89,6 +89,7 @@ export const contactSchema = yup.object().shape({
             ghi_chu: yup
                 .string()
                 .nullable()
+                .max(500, "Ghi chú không được vượt quá 500 ký tự")
                 .transform((value) => (value === "" ? null : value)),
         })
         .test(
