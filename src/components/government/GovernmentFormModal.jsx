@@ -74,9 +74,11 @@ const GovernmentFormModal = ({
 
         setIsSubmitting(true);
         try {
-            if (mode === "edit") {
-                if (onSubmit) await onSubmit(payload);
-            } else {
+            if (onSubmit) {
+                await onSubmit(payload);
+                setForm(initialState);
+                setErrors({});
+            } else if (mode === "create") {
                 const apiCreated = await GOVERNMENT_API.createGovernment(payload);
                 if (apiCreated) {
                     if (onCreate) {
@@ -93,6 +95,7 @@ const GovernmentFormModal = ({
             }
         } catch (err) {
             if (err?.message) showToast?.error(err.message);
+            throw err;
         } finally {
             setIsSubmitting(false);
         }
