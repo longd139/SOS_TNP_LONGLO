@@ -175,10 +175,11 @@ const WorkScheduleModal = ({
       if (success) {
         resetForm();
         onClose();
+      } else {
+        setIsSubmitting(false);
       }
     } catch (error) {
       showToast.error(error?.message || "Đã có lỗi xảy ra. Vui lòng thử lại.");
-    } finally {
       setIsSubmitting(false);
     }
   };
@@ -246,7 +247,6 @@ const WorkScheduleModal = ({
       }
     }
 
-    // Validate ketThuc (end time) for create mode
     if (mode === "create" && field === "ketThuc") {
       delete newErrors.ketThuc;
       const ngayTiepDan = formData.ngayTiepDan;
@@ -272,7 +272,6 @@ const WorkScheduleModal = ({
       }
     }
 
-    // Validate start/end time comparison
     if ((field === "batDau" || field === "ketThuc")) {
       const batDauValue = field === "batDau" ? value : formData.batDau;
       const ketThucValue = field === "ketThuc" ? value : formData.ketThuc;
@@ -298,7 +297,6 @@ const WorkScheduleModal = ({
       }
     }
 
-    // Validate date field
     if (field === "ngayTiepDan" && value) {
       const today = new Date();
       today.setHours(0, 0, 0, 0);
@@ -453,16 +451,27 @@ const WorkScheduleModal = ({
             onChange={(e) => updateField("ghiChu", e.target.value)}
             placeholder="Nội dung tiếp dân, vấn đề cần giải quyết..."
             rows={4}
+            maxLength={255}
             disabled={mode === "edit" && !canEdit}
             className={`w-full px-3 py-2 bg-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-300 resize-none ${
-              mode === "edit" && !canEdit ? "opacity-50 cursor-not-allowed" : ""
-            }`}
+              errors.ghiChu ? "border-red-500" : "border-gray-300"
+            } ${mode === "edit" && !canEdit ? "opacity-50 cursor-not-allowed" : ""}`}
           />
-          {mode === "edit" && !canEdit && (
-            <p className="mt-1 text-sm text-orange-500">
-              * Lịch công tác đã qua không thể chỉnh sửa
+          <div className="flex justify-between items-center mt-1">
+            <div>
+              {errors.ghiChu && (
+                <p className="text-sm text-red-500">{errors.ghiChu}</p>
+              )}
+              {mode === "edit" && !canEdit && (
+                <p className="text-sm text-orange-500">
+                  * Lịch công tác đã qua không thể chỉnh sửa
+                </p>
+              )}
+            </div>
+            <p className="text-xs text-gray-500">
+              {formData.ghiChu.length}/255
             </p>
-          )}
+          </div>
         </div>
       </div>
     </BaseModal>
