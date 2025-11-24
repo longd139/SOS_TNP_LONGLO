@@ -383,7 +383,7 @@ const ReportDetailModal = ({ isOpen, onClose, report, loading = false, onStatusU
                                         </div>
                                         {isEditMode && (
                                             <ConfigProvider locale={viVN}>
-                                                <div>
+                                                {/* <div>
                                                     <label className={`block text-sm font-medium text-gray-700 mb-2 ${selectedStatus !== 'Đã giải quyết' && selectedStatus !== 'Đóng' ? 'required-label' : ''}`}>
                                                         Thời gian phản hồi dự kiến
                                                     </label>
@@ -403,11 +403,11 @@ const ReportDetailModal = ({ isOpen, onClose, report, loading = false, onStatusU
                                                         onChange={(date) => setExpectedCompletionDate(date)}
                                                         placeholder="Chọn ngày hoàn thành"
                                                     />
-                                                </div>
+                                                </div> */}
                                             </ConfigProvider>
                                         )}
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-2 required-label">
+                                            <label className="block text-sm font-medium text-gray-700 mb-2">
                                                 Nội dung phản hồi
                                             </label>
                                             <textarea
