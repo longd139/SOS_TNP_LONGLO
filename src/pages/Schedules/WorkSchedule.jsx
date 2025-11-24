@@ -54,6 +54,7 @@ export default function WorkSchedule() {
     const [selectedDate, setSelectedDate] = useState(null);
     const [activeFilter, setActiveFilter] = useState("all");
     const [currentPage, setCurrentPage] = useState(1);
+    const [isFetching, setIsFetching] = useState(false);
     
     const pageSize = 10;
 
@@ -75,6 +76,12 @@ export default function WorkSchedule() {
     };
 
     const fetchAllSchedulesData = async (monthYear) => {
+        if (isFetching) {
+            return;
+        }
+        
+        setIsFetching(true);
+        
         try {
             const [allResult, activeResult, inactiveResult] = await Promise.all([
                 WORK_SCHEDULE_API.getWorkSchedulesPagination(null, monthYear, null, null, 1, 1),
@@ -91,30 +98,25 @@ export default function WorkSchedule() {
             });
 
             if (totalItems > 0) {
-                await Promise.all([
-                    fetchSchedulesPagination({
-                        monthYear,
-                        isActive: null,
-                        page: 1,
-                        size: totalItems 
-                    }),
-                    fetchSchedulesPagination({
-                        monthYear,
-                        isActive: null,
-                        page: 1,
-                        size: pageSize
-                    })
-                ]);
-            } else {
                 await fetchSchedulesPagination({
                     monthYear,
                     isActive: null,
                     page: 1,
-                    size: pageSize
+                    size: totalItems 
                 });
             }
+            
+            await fetchSchedulesPagination({
+                monthYear,
+                isActive: null,
+                page: 1,
+                size: pageSize
+            });
         } catch (error) {
-            showToast.error(error || "Lỗi khi tải dữ liệu lịch tiếp dân.");
+            console.error("Error fetching work schedules:", error);
+            showToast.error("Lỗi khi tải dữ liệu lịch tiếp dân.");
+        } finally {
+            setIsFetching(false);
         }
     };
 

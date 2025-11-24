@@ -94,15 +94,12 @@ export default function GovernmontList() {
             await createGovernment(formData);
             showToast.success("Tạo cơ sở dịch vụ công thành công!");
             setIsCreateModalOpen(false);
-
-            if (pagination.currentPage !== 1) {
-                loadGovernments({
-                    page: 1,
-                    size: pagination.pageSize,
-                    isActive: showActive,
-                    search: filters.search,
-                });
-            }
+            loadGovernments({
+                page: 1,
+                size: pagination.pageSize,
+                isActive: showActive,
+                search: filters.search,
+            });
         } catch (error) {
             showToast.error(error.message || "Tạo cơ sở dịch vụ công thất bại!");
         } finally {

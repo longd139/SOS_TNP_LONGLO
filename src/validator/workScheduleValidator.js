@@ -43,6 +43,12 @@ export const createWorkScheduleSchema = yup.object().shape({
                 return selectedDate >= today;
             }
         ),
+    ghiChu: yup
+        .string()
+        .nullable()
+        .notRequired()
+        .transform((value) => value || null)
+        .max(255, "Ghi chú không được vượt quá 255 ký tự"),
     batDau: yup
         .string()
         .required("Giờ bắt đầu không được để trống")
@@ -168,6 +174,12 @@ export const createWorkScheduleSchema = yup.object().shape({
 export const updateWorkScheduleSchema = yup.object().shape({
     diaDiem: yup.string().required("Địa điểm không được để trống"),
     tenCanBo: yup.string().required("Tên cán bộ không được để trống"),
+    ghiChu: yup
+        .string()
+        .nullable()
+        .notRequired()
+        .transform((value) => value || null)
+        .max(255, "Ghi chú không được vượt quá 255 ký tự"),
     ngayTiepDan: yup
         .date()
         .required("Ngày tiếp dân không được để trống")

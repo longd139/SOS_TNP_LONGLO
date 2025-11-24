@@ -4,15 +4,18 @@ import { validateSchema } from "../utils/validationUtils";
 export const contactSchema = yup.object().shape({
     tenDonVi: yup
         .string()
-        .required("Tên đơn vị không được để trống"),
-
+        .required("Tên đơn vị không được để trống")
+        .max(255, "Tên đơn vị không được vượt quá 255 ký tự")
+        .test('trim', 'Tên đơn vị không được để trống', value => value && value.trim().length > 0),
     diaChi: yup
         .string()
         .required("Địa chỉ không được để trống")
+        .test('trim', 'Địa chỉ không được để trống', value => value && value.trim().length > 0)
         .max(255, "Địa chỉ không được vượt quá 255 ký tự"),
     soDienThoai: yup
         .string()
         .required("Số điện thoại không được để trống")
+        .test('trim', 'Số điện thoại không được để trống', value => value && value.trim().length > 0)
         .matches(
             /^(\+84|0)(3[2-9]|5[6|8|9]|7[0|6-9]|8[1-5]|9[0-4|6-9])[0-9]{7}$/,
             "Số điện thoại không hợp lệ"
@@ -20,6 +23,7 @@ export const contactSchema = yup.object().shape({
     email: yup
         .string()
         .required("Email không được để trống")
+        .test('trim', 'Email không được để trống', value => value && value.trim().length > 0)
         .email("Email không hợp lệ"),
     gioLamViec: yup
         .object()
@@ -110,6 +114,7 @@ export const contactSchema = yup.object().shape({
     linkGoogleMap: yup
         .string()
         .required("Link Google Map không được để trống")
+        .test('trim', 'Link Google Map không được để trống', value => value && value.trim().length > 0)
         .max(255, "Link Google Map không được vượt quá 255 ký tự")
         .url("Link Google Map phải là một URL hợp lệ"),
 });

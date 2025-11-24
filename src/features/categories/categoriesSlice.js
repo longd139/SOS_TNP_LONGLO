@@ -4,7 +4,8 @@ import { fetchCategories } from './categoriesThunks';
 const initialState = {
     categories: [],
     loading: false,
-    error: null
+    error: null,
+    isFetched: false
 };
 
 const categoriesSlice = createSlice({
@@ -24,6 +25,7 @@ const categoriesSlice = createSlice({
             .addCase(fetchCategories.fulfilled, (state, action) => {
                 state.loading = false;
                 state.categories = action.payload;
+                state.isFetched = true;
             })
             .addCase(fetchCategories.rejected, (state, action) => {
                 state.loading = false;

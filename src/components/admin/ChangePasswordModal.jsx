@@ -93,11 +93,11 @@ const ChangePasswordModal = ({ isOpen, onClose }) => {
     return (
         <BaseModal isOpen={isOpen} onClose={handleClose} title="Đổi mật khẩu">
             <form onSubmit={handleSubmit} className="space-y-4">
-                {apiError && (
+                {/* {apiError && (
                     <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-800 text-sm">
                         {apiError}
                     </div>
-                )}
+                )} */}
 
                 <div>
                     <label className="block text-xs md:text-sm font-medium text-gray-700 mb-1.5 required-label">
