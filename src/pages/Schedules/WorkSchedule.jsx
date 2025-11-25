@@ -113,7 +113,6 @@ export default function WorkSchedule() {
                 size: pageSize
             });
         } catch (error) {
-            console.error("Error fetching work schedules:", error);
             showToast.error("Lỗi khi tải dữ liệu lịch tiếp dân.");
         } finally {
             setIsFetching(false);
@@ -293,13 +292,9 @@ export default function WorkSchedule() {
             try {
                 showToast.info(`Đang import file ${file.name}...`);
                 const result = await importSchedule(file);
-
                 if (result.success) {
                     const monthYear = `${selectedMonth}/${selectedYear}`;
-                    showToast.success(
-                        `Import thành công! Đã import ${result.data?.importedCount || 0
-                        } lịch tiếp dân.`
-                    );
+                    showToast.success(result.data?.message);
                     fetchSchedulesPagination({
                         monthYear,
                         isActive: null,
