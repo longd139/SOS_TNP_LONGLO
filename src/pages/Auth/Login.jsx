@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { ShieldCheck, AlertCircle, Loader2, Lock, User } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
@@ -12,14 +12,21 @@ import { getRedirectPathIfDisabled } from "../../utils/routeRedirectUtils";
 import { validateAuth } from "../../validator/loginValidator";
 import { showToast } from "../../utils/toastNotification";
 
+
+
+const RECAPTCHA_SITE_KEY = process.env.REACT_APP_SITE_KEY 
+
 export default function Login() {
+
     const [tenDangNhap, setTenDangNhap] = useState("");
     const [matKhau, setMatKhau] = useState("");
     const [show2FAModal, setShow2FAModal] = useState(false);
     const [validationErrors, setValidationErrors] = useState({});
     const [hasInteracted, setHasInteracted] = useState(false);
+    const [recaptchaToken, setRecaptchaToken] = useState("");
+    const recaptchaRef = useRef();
 
-    const { login, loading, errors, apiError, requiresTwoFactorAuth, clearErrors } = useLogin();
+    const { loginWithCaptcha, loading, errors, apiError, requiresTwoFactorAuth, clearErrors } = useLogin();
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
@@ -34,7 +41,53 @@ export default function Login() {
         if (Object.keys(validationErrors).length > 0) {
             setValidationErrors({});
         }
-    }, [tenDangNhap, matKhau, hasInteracted]);
+    }, [tenDangNhap, matKhau, hasInteracted, apiError, errors, validationErrors, clearErrors]);
+
+    useEffect(() => {
+        
+        const checkRecaptcha = () => {
+            if (window.grecaptcha && window.grecaptcha.render) {
+                renderRecaptcha();
+            } else {
+                setTimeout(checkRecaptcha, 100);
+            }
+        };
+        
+        checkRecaptcha();
+        window.addEventListener('load', checkRecaptcha);
+        
+        return () => {
+            window.removeEventListener('load', checkRecaptcha);
+        };
+    }, []);
+
+    const renderRecaptcha = () => {
+        if (!RECAPTCHA_SITE_KEY) {
+            console.error('reCAPTCHA site key is missing');
+            return;
+        }
+        
+        
+        if (window.grecaptcha && window.grecaptcha.render && recaptchaRef.current && !recaptchaRef.current.hasChildNodes()) {
+            try {
+                const widgetId = window.grecaptcha.render(recaptchaRef.current, {
+                    sitekey: RECAPTCHA_SITE_KEY,
+                    callback: onRecaptchaChange,
+                    'expired-callback': onRecaptchaExpired,
+                });
+            } catch (error) {
+                console.error('Error rendering reCAPTCHA:', error);
+            }
+        }
+    };
+
+    const onRecaptchaChange = (token) => {
+        setRecaptchaToken(token);
+    };
+
+    const onRecaptchaExpired = () => {
+        setRecaptchaToken("");
+    };
 
     const handleInputChange = (setter) => (e) => {
         setHasInteracted(true);
@@ -54,15 +107,22 @@ export default function Login() {
             return;
         }
         
+        if (!recaptchaToken) {
+            showToast.error('Vui lòng xác thực reCAPTCHA');
+            return;
+        }
+        
         setValidationErrors({});
         
-        const result = await login(credentials);
+        const result = await loginWithCaptcha({
+            ...credentials,
+            recaptchaToken
+        });
         
         if (result?.requiresTwoFactorAuth) {
             setShow2FAModal(true);
             return;
         }
-        
     };
     
     const handle2FASuccess = async (result) => {
@@ -138,6 +198,10 @@ export default function Login() {
                         {(validationErrors.matKhau || errors.matKhau) && (
                             <p className="text-red-500 text-xs mt-1">{validationErrors.matKhau || errors.matKhau}</p>
                         )}
+                    </div>
+
+                    <div className="flex justify-center">
+                        <div ref={recaptchaRef}></div>
                     </div>
 
                     <button

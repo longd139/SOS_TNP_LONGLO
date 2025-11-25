@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { loginUser, verifyOtpUser, changePassword } from './authThunks';
+import { loginUser, loginUserWithCaptcha, verifyOtpUser, changePassword } from './authThunks';
 import { jwtDecode } from 'jwt-decode';
 
 const getUserFromToken = () => {
@@ -77,6 +77,26 @@ const authSlice = createSlice({
                 state.tenDangNhap = action.payload.tenDangNhap || '';
             })
             .addCase(loginUser.rejected, (state, action) => {
+                state.loading = false;
+                state.apiError = action.payload?.message || 'Đăng nhập thất bại';
+                state.errors = action.payload?.errors || {};
+            })
+
+            // Handle login with captcha
+            .addCase(loginUserWithCaptcha.pending, (state) => {
+                state.loading = true;
+                state.apiError = '';
+                state.errors = {};
+            })
+            .addCase(loginUserWithCaptcha.fulfilled, (state, action) => {
+                state.loading = false;
+                state.user = action.payload.user || null;
+                state.otpRequired = action.payload.otpRequired || false;
+                state.requiresTwoFactorAuth = action.payload.requiresTwoFactorAuth || false;
+                state.email = action.payload.email || '';
+                state.tenDangNhap = action.payload.tenDangNhap || '';
+            })
+            .addCase(loginUserWithCaptcha.rejected, (state, action) => {
                 state.loading = false;
                 state.apiError = action.payload?.message || 'Đăng nhập thất bại';
                 state.errors = action.payload?.errors || {};
