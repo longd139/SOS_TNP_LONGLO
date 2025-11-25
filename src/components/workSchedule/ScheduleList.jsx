@@ -271,7 +271,7 @@ export default function ScheduleList({
                                     ) : (
                                         <div className="flex items-start gap-2">
                                             <FileText className="w-3.5 h-3.5 md:w-4 md:h-4 text-gray-500 mt-0.5 flex-shrink-0" />
-                                            <span className="text-gray-600 text-xs md:text-sm">
+                                            <span className="text-gray-600 text-xs text-wrap md:text-sm">
                                                 {getFieldValue(schedule, "purpose")}
                                             </span>
                                         </div>
