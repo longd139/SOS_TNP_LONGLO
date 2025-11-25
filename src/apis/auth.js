@@ -21,6 +21,27 @@ const loginApi = async (credentials) => {
     }
 }
 
+const loginWithCaptchaApi = async (credentials) => {
+    try {
+        const response = await apiClient.post('/api/auths/login-with-captcha', credentials)
+        
+        if (response.data.success) return response.data.data;
+        else {
+            const error = new Error(response.data.message || "Đăng nhập thất bại");
+            error.errors = response.data.errors || [];
+            throw error;
+        }
+
+    } catch (error) {
+        if (error.response?.data) {
+            const apiError = new Error(error.response.data.message || "Đăng nhập thất bại");
+            apiError.errors = error.response.data.errors || [];
+            throw apiError;
+        }
+        throw error;
+    }
+}
+
 const logoutApi = async () => {
     try {
         const refreshToken = localStorage.getItem('refreshToken');
@@ -168,6 +189,7 @@ const verifiedStatus2FAApi = async (otp) => {
 
 export const AUTH_API = {
     login: loginApi,
+    loginWithCaptcha: loginWithCaptchaApi,
     logout: logoutApi,
     changePassword: changePasswordApi,
     status2FA: status2FA,

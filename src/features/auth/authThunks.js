@@ -75,6 +75,62 @@ export const loginUser = createAsyncThunk(
     }
 );
 
+export const loginUserWithCaptcha = createAsyncThunk(
+    'auth/loginUserWithCaptcha',
+    async (credentials, { rejectWithValue }) => {
+        try {
+            await validateAuth(credentials);
+
+            const res = await AUTH_API.loginWithCaptcha(credentials);
+            const response = res?.data || res;
+
+            if (response.requiresTwoFactorAuth || response.requires_two_factor_auth) {
+                return {
+                    requiresTwoFactorAuth: true,
+                    tenDangNhap: credentials.tenDangNhap,
+                };
+            }
+
+            if (response.requireOtp) {
+                return {
+                    otpRequired: true,
+                    email: response.email,
+                };
+            }
+
+            if (!response.access_token) throw new Error('Phản hồi không hợp lệ');
+
+            const decoded = decodeToken(response.access_token);
+            if (!decoded) throw new Error('Token không hợp lệ');
+
+            storeTokens(response.access_token, response.refresh_token);
+
+            return {
+                user: {
+                    userId: decoded.userId,
+                    role: decoded.role,
+                    email: response.email,
+                },
+            };
+        } catch (error) {
+            const fieldErrors = {};
+            if (error.errors && Array.isArray(error.errors)) {
+                error.errors.forEach(err => {
+                    if (err.field && err.message) {
+                        fieldErrors[err.field] = err.message;
+                    }
+                });
+            }
+            
+            showToast.error(error.message);
+            return rejectWithValue({ 
+                message: error.message,
+                errors: fieldErrors
+            });
+        }
+    }
+);
+
 export const verifyOtpUser = createAsyncThunk(
     'auth/verifyOtpUser',
     async ({ otp, tenDangNhap }, { rejectWithValue }) => {

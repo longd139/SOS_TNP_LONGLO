@@ -1,6 +1,6 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { loginUser, verifyOtpUser } from '../features/auth/authThunks';
+import { loginUser, loginUserWithCaptcha, verifyOtpUser } from '../features/auth/authThunks';
 import { clearErrors, logout } from '../features/auth/authSlice';
 import { selectAuthState } from '../features/auth/authSelectors';
 import { clearProfile } from '../features/userProfile/userProfileSlice';
@@ -34,6 +34,14 @@ export const useLogin = () => {
         return result.payload;
     };
 
+    const loginWithCaptcha = async (credentials) => {
+        const result = await dispatch(loginUserWithCaptcha(credentials));
+        if (result.meta.requestStatus === 'fulfilled' && result.payload?.user && !result.payload?.requiresTwoFactorAuth && !result.payload?.otpRequired) {
+            handleRedirect(result.payload.user.role);
+        }
+        return result.payload;
+    };
+
     const verifyOtp = async (data) => {
         const result = await dispatch(verifyOtpUser(data));
         if (result.meta.requestStatus === 'fulfilled') {
@@ -48,6 +56,7 @@ export const useLogin = () => {
 
     return {
         login,
+        loginWithCaptcha,
         verifyOtp,
         loading,
         errors,
