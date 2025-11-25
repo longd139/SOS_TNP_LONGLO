@@ -46,7 +46,8 @@ const cachThucHienSchema = yup.object().shape({
         .nullable(),
     thoi_gian_giai_quyet: yup
         .string()
-        .nullable(),
+        .nullable()
+        .max(255, 'Thời gian giải quyết không vượt quá 255 ký tự'),
     le_phi: yup
         .mixed()
         .nullable()
@@ -63,6 +64,7 @@ const trinhTuThucHienSchema = yup.object().shape({
     ten_buoc: yup
         .string()
         .nullable()
+        .max(255, 'Tên bước không vượt quá 255 ký tự')
         .test('required-if-any', 'Tên bước là bắt buộc', function (value) {
             const { mo_ta_buoc, thu_tu_buoc } = this.parent;
             const hasAnyData = (mo_ta_buoc && mo_ta_buoc.trim()) || 
@@ -260,7 +262,10 @@ const cachThucHienUpdateSchema = cachThucHienSchema.shape({
         .test('max-length', 'Lệ phí không được vượt quá 230 ký tự', function(value) {
             if (!value) return true;
             return String(value).length <= 230;
-        })
+        }),
+    thoiGianGiaiQuyet: yup 
+        .string()
+        .max(255, 'Thời gian giải quyết không vượt quá 255 ký tự')
 });
 
 const trinhTuThucHienUpdateSchema = trinhTuThucHienSchema.shape({
@@ -277,6 +282,7 @@ const trinhTuThucHienUpdateSchema = trinhTuThucHienSchema.shape({
             if (hasAnyData && (!value || !value.trim())) return false;
             return true;
         })
+    .max(255, 'Tên bước không vượt quá 255 ký tự')
 });
 
 const thanhPhanHoSoUpdateSchema = thanhPhanHoSoSchema.shape({
