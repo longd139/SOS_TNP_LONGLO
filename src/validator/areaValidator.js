@@ -5,7 +5,8 @@ const categorySchema = yup.object().shape({
     tenLinhVuc: yup
         .string()
         .required("Tên lĩnh vực là bắt buộc")
-        .test('trim', 'Tên lĩnh vực là bắt buộc', value => value && value.trim().length > 0),
+        .test('trim', 'Tên lĩnh vực là bắt buộc', value => value && value.trim().length > 0)
+        .max(255,'Tên lĩnh vực không được vượt quá 255 ký tự'),
     moTa: yup
         .string()
         .nullable()
