@@ -12,6 +12,7 @@ import workScheduleReducer from '../features/workSchedule/workScheduleSlice';
 import reportAreaReducer from '../features/reportAreas/reportAreasSlice';
 import reportsReducer from '../features/reports/reportSlice';
 import governmentReducer from '../features/government/governmentSlice';
+import statisticalReportReducer from '../features/statisticalReport/statisticalReportSlice';
 
 export const store = configureStore({
     reducer: {
@@ -28,5 +29,6 @@ export const store = configureStore({
         reportArea: reportAreaReducer,
         reports: reportsReducer,
         government: governmentReducer,
+        statisticalReport: statisticalReportReducer,
     },
 });
