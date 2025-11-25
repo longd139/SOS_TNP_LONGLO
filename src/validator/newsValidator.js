@@ -18,7 +18,13 @@ const baseNewsFields = {
             if (!value) return false;
             const strippedValue = value.replace(/<[^>]*>/g, '').trim();
             return strippedValue.length > 0 && strippedValue !== '';
-        })
+        }),
+    tacGia: yup
+        .string()
+        .notRequired()
+        .nullable()
+        .transform((value) => value === '' ? null : value)
+        .max(255, 'Tên tác giả không được quá 255 ký tự')
 };
 
 const createNewsSchema = yup.object().shape({

@@ -153,6 +153,7 @@ const NewsFormModal = ({ isOpen, onClose, onSubmit, initialData = null, isLoadin
             idDanhMuc: formData.idDanhMuc,
             tieuDe: formData.tieuDe,
             noiDung: formData.noiDung,
+            tacGia: formData.tacGia,
             file: formData.file
         };
 
@@ -700,6 +701,9 @@ const NewsFormModal = ({ isOpen, onClose, onSubmit, initialData = null, isLoadin
                                 placeholder="Nhập tên tác giả..."
                                 className="w-full px-2.5 py-1.5 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                             />
+                            {errors.tacGia && (
+                            <p className="mt-0.5 text-sm text-red-600">{errors.tacGia}</p>
+                        )}
                         </div>
 
                         <div>
