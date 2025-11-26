@@ -139,7 +139,7 @@ const ProcedureDetailModal = ({ isOpen, onClose, procedure }) => {
                                                 <h4 className="font-medium text-gray-900 mb-1 truncate" title={step.ten_buoc}>
                                                     {step.ten_buoc}
                                                 </h4>
-                                                <p className="text-sm text-gray-600 line-clamp-2" title={step.mo_ta_buoc}>
+                                                <p className="text-sm text-gray-600 text-wrap" title={step.mo_ta_buoc}>
                                                     {step.mo_ta_buoc}
                                                 </p>
                                             </div>
@@ -161,7 +161,7 @@ const ProcedureDetailModal = ({ isOpen, onClose, procedure }) => {
                                 <div className="space-y-2">
                                     <div>
                                         <label className="block text-sm font-medium text-gray-600 mb-1">Mô tả chi tiết</label>
-                                        <p className="text-sm text-gray-900 line-clamp-2" title={cach.mo_ta_chi_tiet}>
+                                        <p className="text-sm text-gray-900 text-wrap" title={cach.mo_ta_chi_tiet}>
                                             {cach.mo_ta_chi_tiet}
                                         </p>
                                     </div>
@@ -201,13 +201,14 @@ const ProcedureDetailModal = ({ isOpen, onClose, procedure }) => {
                             .map((caseItem, index) => (
                                 <div key={caseItem.id} className="bg-white p-3 rounded-lg border border-gray-200">
                                     <div className="mb-3">
-                                        <h4 className="font-medium text-gray-900 mb-1 truncate" title={`Trường hợp ${caseItem.thu_tu}: ${caseItem.ten_truong_hop}`}>
+                                        <h4 className="font-medium text-gray-900 mb-1 truncate text-wrap" title={`Trường hợp ${caseItem.thu_tu}: ${caseItem.ten_truong_hop}`}>
                                             Trường hợp {caseItem.thu_tu}: {caseItem.ten_truong_hop}
                                         </h4>
                                         {caseItem.mo_ta && (
-                                            <p className="text-sm text-gray-600 line-clamp-2" title={caseItem.mo_ta}>
+                                            <p className="text-sm text-gray-600 text-wrap" title={caseItem.mo_ta}>
                                                 {caseItem.mo_ta}
                                             </p>
+
                                         )}
                                     </div>
 
@@ -221,12 +222,13 @@ const ProcedureDetailModal = ({ isOpen, onClose, procedure }) => {
                                                             <span className="flex-shrink-0 w-5 h-5 bg-yellow-500 text-white rounded-full flex items-center justify-center text-xs font-semibold">
                                                                 {compIndex + 1}
                                                             </span>
-                                                            <p className="text-sm font-medium text-gray-900 truncate flex-1" title={component.ten_thanh_phan}>
+                                                            <p className="text-sm font-medium text-gray-900 flex-1 text-wrap" title={component.ten_thanh_phan}>
                                                                 {component.ten_thanh_phan}
                                                             </p>
+
                                                         </div>
                                                         {component.mo_ta_chi_tiet && (
-                                                            <p className="text-xs text-gray-600 ml-7 mb-1 line-clamp-2" title={component.mo_ta_chi_tiet}>
+                                                            <p className="text-xs text-gray-600 ml-7 mb-1 text-wrap" title={component.mo_ta_chi_tiet}>
                                                                 {component.mo_ta_chi_tiet}
                                                             </p>
                                                         )}
