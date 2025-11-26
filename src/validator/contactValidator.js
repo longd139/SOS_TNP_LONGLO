@@ -117,7 +117,11 @@ export const contactSchema = yup.object().shape({
         .required("Link Google Map không được để trống")
         .test('trim', 'Link Google Map không được để trống', value => value && value.trim().length > 0)
         .max(255, "Link Google Map không được vượt quá 255 ký tự")
-        .url("Link Google Map phải là một URL hợp lệ"),
+        .url("Link Google Map phải là một URL hợp lệ")
+        .matches(
+            /^(https?:\/\/)?(www\.)?(google\.com\/maps|goo\.gl\/maps|maps\.app\.goo\.gl)\/.+$/,
+            "Link Google Map phải là URL của Google Maps"
+        ),
 });
 
 export const contactUpdateSchema = contactSchema;
