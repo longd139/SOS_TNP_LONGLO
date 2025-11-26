@@ -38,8 +38,9 @@ export const useLogin = () => {
         const result = await dispatch(loginUserWithCaptcha(credentials));
         if (result.meta.requestStatus === 'fulfilled' && result.payload?.user && !result.payload?.requiresTwoFactorAuth && !result.payload?.otpRequired) {
             handleRedirect(result.payload.user.role);
+            return { ...result.payload, success: true };
         }
-        return result.payload;
+        return { ...result.payload, success: false };
     };
 
     const verifyOtp = async (data) => {
