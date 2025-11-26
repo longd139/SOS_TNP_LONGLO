@@ -1,4 +1,4 @@
-import { BarChart3, Calendar, FileText, FolderOpen, LayoutDashboard, MessageSquare, Newspaper, Phone, UserCog, Menu, ChevronLeft, X, ClipboardList } from 'lucide-react';
+import { BarChart3, Calendar, FileText, FolderOpen, LayoutDashboard, MessageSquare, Newspaper, Phone, UserCog, Menu, ChevronLeft, X, ClipboardList, Shield } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import ROUTE_PATH from '../../constants/routes';
@@ -87,6 +87,13 @@ const menuItems = [
         label: 'Quản lý tài khoản',
         icon: UserCog,
         path: ROUTE_PATH.ACCOUNTS,
+        hasSubmenu: false
+    },
+    {
+        id: 'permissions',
+        label: 'Quản lý quyền truy cập',
+        icon: Shield,
+        path: ROUTE_PATH.PERMISSIONS,
         hasSubmenu: false
     }
 ];

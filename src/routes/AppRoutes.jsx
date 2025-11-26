@@ -23,6 +23,7 @@ import ReportAreasManagement from "../pages/ReportAreas/ReportAreasManagement";
 import AreaManagement from "../pages/Areas/AreaManagement";
 import ForgotPassword from "../pages/ForgotPassword/ForgotPassword";
 import GovernmentManagement from "../pages/Government/GovernmentManagement";
+import PermissionsManagement from "../pages/Permissions/PermissionsManagement";
 
 function AppRoutes() {
     return (
@@ -56,6 +57,7 @@ function AppRoutes() {
                 <Route path={ROUTE_PATH.REPORT_AREAS} element={<ReportAreasManagement />} />
                 <Route path={ROUTE_PATH.AREAS} element={<AreaManagement />} />
                 <Route path={ROUTE_PATH.GOVERNMENT} element={<GovernmentManagement />} />
+                <Route path={ROUTE_PATH.PERMISSIONS} element={<PermissionsManagement />} />
             </Route>
 
             <Route path={ROUTE_PATH.NOT_FOUND} element={<NotFound />} />
