@@ -85,7 +85,7 @@ const BaseModal = ({
                       {title}
                     </h3>
                     {subtitle && (
-                      <p className="text-sm text-gray-500 mt-1">{subtitle}</p>
+                      <p className="text-sm text-gray-500 mt-1 mb-0">{subtitle}</p>
                     )}
                   </div>
                 )}
