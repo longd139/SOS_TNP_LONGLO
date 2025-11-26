@@ -136,7 +136,6 @@ export default function Login() {
             }
             setRecaptchaToken("");
 
-            showToast.error("Captcha không hợp lệ hoặc đã hết hạn, vui lòng thực hiện lại.");
             return;
         }
         if (result?.requiresTwoFactorAuth) {
