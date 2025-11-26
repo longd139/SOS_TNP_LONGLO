@@ -14,7 +14,7 @@ import { showToast } from "../../utils/toastNotification";
 
 
 
-const RECAPTCHA_SITE_KEY = process.env.REACT_APP_SITE_KEY 
+const RECAPTCHA_SITE_KEY = process.env.REACT_APP_SITE_KEY
 
 export default function Login() {
 
@@ -25,6 +25,7 @@ export default function Login() {
     const [hasInteracted, setHasInteracted] = useState(false);
     const [recaptchaToken, setRecaptchaToken] = useState("");
     const recaptchaRef = useRef();
+    const recaptchaWidgetId = useRef(null);
 
     const { loginWithCaptcha, loading, errors, apiError, requiresTwoFactorAuth, clearErrors } = useLogin();
     const dispatch = useDispatch();
@@ -34,7 +35,7 @@ export default function Login() {
 
     useEffect(() => {
         if (!hasInteracted) return;
-        
+
         if (apiError || Object.keys(errors).length > 0) {
             clearErrors();
         }
@@ -44,7 +45,7 @@ export default function Login() {
     }, [tenDangNhap, matKhau, hasInteracted, apiError, errors, validationErrors, clearErrors]);
 
     useEffect(() => {
-        
+
         const checkRecaptcha = () => {
             if (window.grecaptcha && window.grecaptcha.render) {
                 renderRecaptcha();
@@ -52,10 +53,10 @@ export default function Login() {
                 setTimeout(checkRecaptcha, 100);
             }
         };
-        
+
         checkRecaptcha();
         window.addEventListener('load', checkRecaptcha);
-        
+
         return () => {
             window.removeEventListener('load', checkRecaptcha);
         };
@@ -63,11 +64,10 @@ export default function Login() {
 
     const renderRecaptcha = () => {
         if (!RECAPTCHA_SITE_KEY) {
-            console.error('reCAPTCHA site key is missing');
+            showToast.error('RECAPTCHA_SITE_KEY không được cấu hình đúng.');
             return;
         }
-        
-        
+
         if (window.grecaptcha && window.grecaptcha.render && recaptchaRef.current && !recaptchaRef.current.hasChildNodes()) {
             try {
                 const widgetId = window.grecaptcha.render(recaptchaRef.current, {
@@ -76,7 +76,7 @@ export default function Login() {
                     'expired-callback': onRecaptchaExpired,
                 });
             } catch (error) {
-                console.error('Error rendering reCAPTCHA:', error);
+                showToast.error('Lỗi khi hiển thị reCAPTCHA.');
             }
         }
     };
@@ -87,6 +87,17 @@ export default function Login() {
 
     const onRecaptchaExpired = () => {
         setRecaptchaToken("");
+    };
+
+    const resetRecaptcha = () => {
+        setRecaptchaToken("");
+        if (window.grecaptcha && recaptchaWidgetId.current !== null) {
+            try {
+                window.grecaptcha.reset(recaptchaWidgetId.current);
+            } catch (error) {
+                showToast.error('Lỗi khi đặt lại reCAPTCHA.');
+            }
+        }
     };
 
     const handleInputChange = (setter) => (e) => {
@@ -101,35 +112,46 @@ export default function Login() {
         const credentials = { tenDangNhap, matKhau };
 
         const { valid, errors: validationErrs } = await validateAuth(credentials);
-        
+
         if (!valid) {
             setValidationErrors(validationErrs);
             return;
         }
-        
+
         if (!recaptchaToken) {
             showToast.error('Vui lòng xác thực reCAPTCHA');
             return;
         }
-        
+
         setValidationErrors({});
-        
+
         const result = await loginWithCaptcha({
             ...credentials,
             recaptchaToken
         });
-        
+
+        if (!result?.success) {
+            if (window.grecaptcha) {
+                window.grecaptcha.reset();
+            }
+            setRecaptchaToken("");
+
+            showToast.error("Captcha không hợp lệ hoặc đã hết hạn, vui lòng thực hiện lại.");
+            return;
+        }
         if (result?.requiresTwoFactorAuth) {
             setShow2FAModal(true);
             return;
         }
+
+
     };
-    
+
     const handle2FASuccess = async (result) => {
         setShow2FAModal(false);
         dispatch(restoreUser());
         await dispatch(fetchMyProfile());
-        
+
         const redirectPath = getRedirectPathIfDisabled(ROUTE_PATH.DASHBOARD);
         navigate(redirectPath, { replace: true });
     };
