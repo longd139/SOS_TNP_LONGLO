@@ -135,8 +135,6 @@ export default function Login() {
                 window.grecaptcha.reset();
             }
             setRecaptchaToken("");
-
-            return;
         }
         if (result?.requiresTwoFactorAuth) {
             setShow2FAModal(true);
