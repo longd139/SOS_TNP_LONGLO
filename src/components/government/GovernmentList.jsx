@@ -101,7 +101,8 @@ export default function GovernmontList() {
                 search: filters.search,
             });
         } catch (error) {
-            showToast.error(error.message || "Tạo cơ sở dịch vụ công thất bại!");
+            // showToast.error(error.message || "Tạo cơ sở dịch vụ công thất bại!");
+            throw error;
         } finally {
             setIsSubmitting(false);
         }
@@ -120,7 +121,7 @@ export default function GovernmontList() {
                 search: filters.search
             });
         } catch (error) {
-            showToast.error(error.message || 'Cập nhật cơ sở dịch vụ công thất bại!');
+            throw error;
         } finally {
             setIsSubmitting(false);
         }
@@ -148,7 +149,7 @@ export default function GovernmontList() {
             const newStatus = !area.is_active;
             await updateGovernmentStatus(area.id, newStatus);
             showToast.success(
-                `Cơ sở d vụ công đã được ${newStatus ? "kích hoạt" : "vô hiệu hóa"
+                `Cơ sở dịch vụ công đã được ${newStatus ? "kích hoạt" : "vô hiệu hóa"
                 } thành công!`
             );
             loadGovernments({
