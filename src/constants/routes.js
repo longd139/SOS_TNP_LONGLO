@@ -18,6 +18,7 @@ const ROUTE_PATH = {
     REPORT_AREAS: '/report-areas',
     AREAS: '/areas',
     FORGOT_PASSWORD: '/forgot-password',
-    GOVERNMENT: '/government'
+    GOVERNMENT: '/government',
+    PERMISSIONS: '/permissions',
 }
 export default ROUTE_PATH;
