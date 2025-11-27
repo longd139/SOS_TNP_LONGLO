@@ -151,9 +151,10 @@ const PermissionsManagement = () => {
         }
     }, [selectedRoleForDelete, deleteRole]);
 
-    const handleUpdateStatus = useCallback(async (record, status) => {
+    const handleUpdateStatus = useCallback(async (record) => {
         try {
-            await updateStatus(record.id, status);
+            const newStatus = !record.is_active;
+            await updateStatus(record.id, newStatus);
             showToast.success('Cập nhật trạng thái thành công');
         } catch (error) {
             showToast.error(error.message || 'Cập nhật trạng thái thất bại');
@@ -236,7 +237,8 @@ const PermissionsManagement = () => {
     const tablePagination = {
         current: pagination.currentPage,
         pageSize: currentPageSize,
-        total: pagination.totalItems
+        total: pagination.totalItems,
+        totalPages: pagination.totalPages
     };
 
     return (
@@ -294,7 +296,7 @@ const PermissionsManagement = () => {
                 onEdit={handleEdit}
                 onDelete={!showActive ? handleDelete : undefined}
                 onUpdateStatus={handleUpdateStatus}
-                // onView={handleView}
+                onView={handleView}
                 canEdit={() => canUpdate('ROLE')}
                 canDelete={() => canDelete('ROLE')}
                 canUpdateStatus={() => canUpdateStatus('ROLE')}

@@ -72,14 +72,16 @@ export const useRoles = () => {
             if (createRole.fulfilled.match(result)) {
                 await dispatch(fetchRolesByPagination({
                     page: pagination.currentPage,
-                    size: pagination.pageSize
+                    size: pagination.pageSize,
+                    search: filters?.search || '',
+                    isActive: showActive
                 }));
                 return { success: true, data: result.payload };
             } else {
                 throw new Error(result.payload || 'Không thể tạo vai trò');
             }
         },
-        [dispatch, pagination]
+        [dispatch, pagination, filters, showActive]
     );
 
     const handleUpdateRole = useCallback(
@@ -88,14 +90,16 @@ export const useRoles = () => {
             if (updateRole.fulfilled.match(result)) {
                 await dispatch(fetchRolesByPagination({
                     page: pagination.currentPage,
-                    size: pagination.pageSize
+                    size: pagination.pageSize,
+                    search: filters?.search || '',
+                    isActive: showActive
                 }));
                 return { success: true, data: result.payload };
             } else {
                 throw new Error(result.payload || 'Không thể cập nhật vai trò');
             }
         },
-        [dispatch, pagination]
+        [dispatch, pagination, filters, showActive]
     );
 
     const handleDeleteRole = useCallback(
@@ -110,12 +114,16 @@ export const useRoles = () => {
                 if (shouldGoToPreviousPage) {
                     await dispatch(fetchRolesByPagination({
                         page: pagination.currentPage - 1,
-                        size: pagination.pageSize
+                        size: pagination.pageSize,
+                        search: filters?.search || '',
+                        isActive: showActive
                     }));
                 } else {
                     await dispatch(fetchRolesByPagination({
                         page: pagination.currentPage,
-                        size: pagination.pageSize
+                        size: pagination.pageSize,
+                        search: filters?.search || '',
+                        isActive: showActive
                     }));
                 }
                 return { success: true };
@@ -123,7 +131,7 @@ export const useRoles = () => {
                 throw new Error(result.payload || 'Không thể xóa vai trò');
             }
         },
-        [dispatch, roles.length, pagination]
+        [dispatch, roles.length, pagination, filters, showActive]
     );
 
     const handleUpdateStatus = useCallback(
@@ -132,14 +140,16 @@ export const useRoles = () => {
             if (updateRoleStatus.fulfilled.match(result)) {
                 await dispatch(fetchRolesByPagination({
                     page: pagination.currentPage,
-                    size: pagination.pageSize
+                    size: pagination.pageSize,
+                    search: filters?.search || '',
+                    isActive: showActive
                 }));
                 return { success: true, data: result.payload };
             } else {
                 throw new Error(result.payload || 'Không thể cập nhật trạng thái vai trò');
             }
         },
-        [dispatch, pagination]
+        [dispatch, pagination, filters, showActive]
     );
 
     const handlePageChange = useCallback(

@@ -229,7 +229,7 @@ export default function ScheduleList({
                                                 className="p-1.5 text-blue-600 hover:bg-blue-50 rounded transition-colors"
                                                 title="Chỉnh sửa"
                                             >
-                                                <Pencil className="w-6 h-6" />
+                                                <Pencil className="w-5 h-5" />
                                             </button>
                                         )}
                                         {onStatus && (!canUpdateStatus || canUpdateStatus(schedule)) && (
@@ -238,7 +238,7 @@ export default function ScheduleList({
                                                 className="text-yellow-600 hover:text-yellow-900 p-1 rounded hover:bg-yellow-100"
                                                 title="Cập nhật trạng thái"
                                             >
-                                                <ToggleLeft className="w-6 h-6" />
+                                                <ToggleLeft className="w-5 h-5" />
                                             </button>
                                         )}
                                         {(onDelete && (schedule.is_active === false || schedule.isActive === false) && (!canDelete || canDelete(schedule))) && (
@@ -247,7 +247,7 @@ export default function ScheduleList({
                                                 className="p-1.5 text-red-600 hover:bg-red-50 rounded transition-colors"
                                                 title="Xóa"
                                             >
-                                                <Trash2 className="w-6 h-6" />
+                                                <Trash2 className="w-5 h-5" />
                                             </button>
                                         )}
                                     </div>
