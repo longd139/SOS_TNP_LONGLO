@@ -1,28 +1,81 @@
-import React, { useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import BaseModal, { ModalFooter } from '../base/BaseModal';
-import { categoryRole, permissionOptions } from '../../mockData';
 import { Search } from 'lucide-react';
 import { showToast } from '../../utils/toastNotification';
+import { usePermissions } from '../../hooks/usePermissions';
+import { validateRoleForm } from '../../validator/roleValidator';
 
 const initialState = {
-    tenRole: "",
-    moTa: "",
-    phanQuyen: [],
+    name: "",
+    description: "",
+    permissionCodes: [],
 };
 
 const PermissionFormModal = ({
     isOpen,
     onClose,
-    onCreate,
     onSubmit,
     mode = "create",
     initialData = null,
     isLoading = false,
 }) => {
-    const handleSubmit = () => {
-        // Handle form submission
-        showToast.info("Chức năng đang phát triển")
-    }
+    const { permissions, loading: permissionsLoading } = usePermissions();
+    
+    const [form, setForm] = useState(initialState);
+    const [errors, setErrors] = useState({});
+    const [selectedCategory, setSelectedCategory] = useState("all");
+    const [searchText, setSearchText] = useState("");
+    const [checkedItems, setCheckedItems] = useState([]);
+
+    useEffect(() => {
+        if (isOpen) {
+            if (mode === "edit" && initialData) {
+                setForm({
+                    name: initialData.name || "",
+                    description: initialData.description || "",
+                    permissionCodes: initialData.permissions?.map(p => p.code) || [],
+                });
+                setCheckedItems(initialData.permissions?.map(p => p.code) || []);
+            } else {
+                setForm(initialState);
+                setCheckedItems([]);
+            }
+            setErrors({});
+            setSearchText("");
+            setSelectedCategory("all");
+        }
+    }, [isOpen, mode, initialData]);
+
+    const categoryNames = useMemo(() => {
+        return Object.keys(permissions || {});
+    }, [permissions]);
+
+    const permissionList = useMemo(() => {
+        const list = [];
+        Object.keys(permissions || {}).forEach((category) => {
+            const items = permissions[category] || [];
+            items.forEach((p) => list.push({ category, ...p }));
+        });
+        return list;
+    }, [permissions]);
+
+    const filteredPermissions = useMemo(() => {
+        let list = permissionList;
+
+        if (selectedCategory !== "all") {
+            list = list.filter(p => p.category === selectedCategory);
+        }
+
+        if (searchText.trim()) {
+            const searchLower = searchText.toLowerCase();
+            list = list.filter(p =>
+                p.description?.toLowerCase().includes(searchLower) ||
+                p.code?.toLowerCase().includes(searchLower)
+            );
+        }
+
+        return list;
+    }, [permissionList, selectedCategory, searchText]);
 
     const updateField = (key, value) => {
         setForm((prev) => ({ ...prev, [key]: value }));
@@ -31,38 +84,60 @@ const PermissionFormModal = ({
         }
     };
 
-    const [form, setForm] = React.useState(initialState);
-    const [errors, setErrors] = React.useState({});
+    const toggleCheck = (code) => {
+        setCheckedItems(prev => {
+            const newItems = prev.includes(code)
+                ? prev.filter(item => item !== code)
+                : [...prev, code];
+            
+            setForm(prevForm => ({ ...prevForm, permissionCodes: newItems }));
+            
+            if (errors.permissionCodes) {
+                setErrors(prevErrors => ({ ...prevErrors, permissionCodes: null }));
+            }
+            
+            return newItems;
+        });
+    };
 
-    const [category, setCategory] = React.useState(categoryRole);
-    const [permissions, setPermissions] = React.useState(permissionOptions);
+    const handleSubmit = async () => {
+        const formData = {
+            name: form.name,
+            description: form.description,
+            permissionCodes: checkedItems
+        };
 
-    const [selectedCategory, setSelectedCategory] = useState("all");
-    const [searchText, setSearchText] = useState("");
-    const [checkedItems, setCheckedItems] = useState([]);
+        const { isValid, errors: validationErrors } = await validateRoleForm(formData, mode === "edit");
 
-    const filteredPermissions = useMemo(() => {
-        let list = permissionOptions;
-
-        if (selectedCategory !== "all") {
-            list = list.filter(p => p.categoryId === selectedCategory);
+        if (!isValid) {
+            setErrors(validationErrors);
+            return;
         }
 
-        if (searchText.trim()) {
-            list = list.filter(p =>
-                p.name.toLowerCase().includes(searchText.toLowerCase())
-            );
+        if (onSubmit) {
+            onSubmit(formData);
         }
+    };
 
-        return list;
-    }, [selectedCategory, searchText]);
-
-    const toggleCheck = (id) => {
-        setCheckedItems(prev =>
-            prev.includes(id)
-                ? prev.filter(item => item !== id)
-                : [...prev, id]
-        );
+    const getCategoryLabel = (category) => {
+        const labels = {
+            'CSV': 'Cơ sở dịch vụ công',
+            'DMTT': 'Danh mục tin tức',
+            'LTD': 'Lịch tiếp dân',
+            'LVPA': 'Lĩnh vực phản ánh',
+            'LVTTHC': 'Lĩnh vực thủ tục hành chính',
+            'MD': 'Mẫu đơn',
+            'PA': 'Phản ánh',
+            'RPT': 'Báo cáo',
+            'TT': 'Thủ tục',
+            'TTIN': 'Tin tức',
+            'UB': 'Ủy ban',
+            'VID': 'Video',
+            'ND': 'Người dùng',
+            'ROLE': 'Vai trò',
+            'PERM': 'Quyền'
+        };
+        return labels[category] || category;
     };
 
     return (
@@ -71,19 +146,19 @@ const PermissionFormModal = ({
             onClose={onClose}
             title={
                 mode === "edit"
-                    ? "Chỉnh sửa role"
-                    : "Tạo Role mới"
+                    ? "Chỉnh sửa vai trò"
+                    : "Tạo vai trò mới"
             }
             size="xl"
             className="max-w-5xl"
-            subtitle = "Nhập thông tin và chọn phân quyền cho role mới"
+            subtitle="Nhập thông tin và chọn phân quyền cho vai trò"
             footer={
                 <ModalFooter
                     onCancel={onClose}
                     onSubmit={handleSubmit}
                     cancelText="Hủy"
                     submitText={mode === "edit" ? "Cập nhật" : "Tạo mới"}
-                    submitDisabled={false}
+                    submitDisabled={isLoading || permissionsLoading}
                     submitLoading={isLoading}
                 />
             }
@@ -91,18 +166,18 @@ const PermissionFormModal = ({
             <div className="flex flex-col gap-4 md:grid md:grid-cols-2">
                 <div className='md:col-span-2'>
                     <label className="block text-sm font-medium text-gray-700 required-label">
-                        Tên role
+                        Tên vai trò
                     </label>
                     <input
                         type="text"
-                        value={form.tenRole}
-                        onChange={(e) => updateField("tenRole", e.target.value)}
-                        placeholder='Nhập tên role'
-                        className={`w-full px-3 py-2 border rounded-lg ${errors.tenRole ? "border-red-500" : "border-gray-300"
+                        value={form.name}
+                        onChange={(e) => updateField("name", e.target.value)}
+                        placeholder='Nhập tên vai trò'
+                        className={`w-full px-3 py-2 border rounded-lg ${errors.name ? "border-red-500" : "border-gray-300"
                             }`}
                     />
-                    {errors.tenRole && (
-                        <p className="mt-1 text-sm text-red-600">{errors.tenRole}</p>
+                    {errors.name && (
+                        <p className="mt-1 text-sm text-red-600">{errors.name}</p>
                     )}
                 </div>
 
@@ -111,20 +186,24 @@ const PermissionFormModal = ({
                         Mô tả
                     </label>
                     <textarea
-                        value={form.moTa}
-                        onChange={(e) => updateField("moTa", e.target.value)}
-                        placeholder='Nhập mô tả về role'
-                        className={`w-full px-3 py-2 border rounded-lg ${errors.moTa ? "border-red-500" : "border-gray-300"
+                        value={form.description}
+                        onChange={(e) => updateField("description", e.target.value)}
+                        placeholder='Nhập mô tả về vai trò'
+                        rows={3}
+                        className={`w-full px-3 py-2 border rounded-lg ${errors.description ? "border-red-500" : "border-gray-300"
                             }`}
                     />
-                    {errors.moTa && (
-                        <p className="mt-1 text-sm text-red-600">{errors.moTa}</p>
+                    {errors.description && (
+                        <p className="mt-1 text-sm text-red-600">{errors.description}</p>
                     )}
                 </div>
                 <div className='md:col-span-2'>
-                    <label className="block text-sm font-medium text-gray-700">
+                    <label className="block text-sm font-medium text-gray-700 required-label">
                         Phân quyền chức năng
                     </label>
+                    {errors.permissionCodes && (
+                        <p className="mt-1 text-sm text-red-600">{errors.permissionCodes}</p>
+                    )}
                     <div className='flex items-center gap-2 mt-1'>
                         <div className="relative w-full">
                             <Search
@@ -146,43 +225,49 @@ const PermissionFormModal = ({
                             onChange={(e) => setSelectedCategory(e.target.value)}
                         >
                             <option value="all">Tất cả danh mục</option>
-                            {categoryRole.map(c => (
-                                <option key={c.id} value={c.id}>
-                                    {c.name}
+                            {categoryNames.map(category => (
+                                <option key={category} value={category}>
+                                    {getCategoryLabel(category)}
                                 </option>
                             ))}
                         </select>
                     </div>
                 </div>
-                <div className="border rounded-xl p-4 bg-white space-y-3 max-h-72 overflow-auto flex flex-col md:col-span-2">
+                <div className={`border rounded-xl p-4 bg-white space-y-3 max-h-72 overflow-auto flex flex-col md:col-span-2 ${errors.permissionCodes ? "border-red-500" : ""}`}>
+                    {permissionsLoading && (
+                        <div className="flex items-center justify-center py-8">
+                            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+                            <span className="ml-2 text-gray-500">Đang tải quyền...</span>
+                        </div>
+                    )}
 
-                    {filteredPermissions.length === 0 && (
+                    {!permissionsLoading && filteredPermissions.length === 0 && (
                         <p className="text-gray-500 text-sm">Không có chức năng nào</p>
                     )}
 
-                    {filteredPermissions.map(item => (
+                    {!permissionsLoading && filteredPermissions.map(item => (
                         <label
-                            key={item.id}
-                            className="flex items-start gap-3 cursor-pointer"
+                            key={item.code}
+                            className="flex items-center gap-3 cursor-pointer hover:bg-gray-50 p-2 rounded-lg transition-colors"
                         >
                             <input
                                 type="checkbox"
-                                checked={checkedItems.includes(item.id)}
-                                onChange={() => toggleCheck(item.id)}
-                                className="mt-1"
+                                checked={checkedItems.includes(item.code)}
+                                onChange={() => toggleCheck(item.code)}
+                                className="w-4 h-4"
                             />
                             <div>
-                                <div className="font-medium">{item.name}</div>
-                                <div className="text-gray-500 text-sm">
-                                    {item.code}
-                                </div>
+                                <div className="font-medium">{item.description}</div>
+                                {/* <div className="text-gray-500 text-sm">
+                                    {item.code} • {getCategoryLabel(item.category)}
+                                </div> */}
                             </div>
                         </label>
                     ))}
                 </div>
 
-                <div className="text-sm text-gray-600">
-                    Đã chọn: {checkedItems.length} chức năng
+                <div className="text-sm text-gray-600 md:col-span-2">
+                    Đã chọn: <span className="font-medium text-blue-600">{checkedItems.length}</span> chức năng
                 </div>
             </div>
         </BaseModal>

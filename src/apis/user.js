@@ -120,7 +120,13 @@ const createAccount = async (accountData) => {
 
         const response = await apiClient.post("/api/users/create-account", requestData);
         if (response.data.success) return response.data.data;
-        else throw new Error(response.data.message || "Tạo tài khoản thất bại");
+        else {
+             const errorData = {
+                message: response.data.message || "Tạo tài khoản thất bại",
+                errors: response.data.errors || []
+            };
+            throw errorData;
+        }
     } catch (error) {
         if (error.response?.data?.message) {
             throw new Error(error.response.data.message);
@@ -143,7 +149,13 @@ const updateUserProfileByAdmin = async (userData) => {
 
         const response = await apiClient.put("/api/users/update-by-admin", requestData);
         if (response.data.success) return response.data.data;
-        else throw new Error(response.data.message || "Cập nhật thông tin người dùng thất bại");
+        else {
+             const errorData = {
+                message: response.data.message || "Cập nhật thông tin người dùng thất bại",
+                errors: response.data.errors || []
+            };
+            throw errorData;
+        }
     } catch (error) {
         if (error.response?.data?.message) {
             throw new Error(error.response.data.message);
