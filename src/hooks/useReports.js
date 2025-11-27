@@ -56,6 +56,13 @@ export const useReports = ({ autoFetch = false, filters = {} } = {}) => {
     }, [dispatch]);
 
     const loadExtent = useCallback(() => {
+        if (extent && Object.keys(extent).length > 0) {
+            return Promise.resolve(extent);
+        }
+        return dispatch(fetchExtent()).unwrap();
+    }, [dispatch, extent]);
+
+    const forceLoadExtent = useCallback(() => {
         return dispatch(fetchExtent()).unwrap();
     }, [dispatch]);
 
@@ -64,6 +71,13 @@ export const useReports = ({ autoFetch = false, filters = {} } = {}) => {
     }, [dispatch]);
 
     const loadStatusReport = useCallback(() => {
+        if (statusReport && Object.keys(statusReport).length > 0) {
+            return Promise.resolve(statusReport);
+        }
+        return dispatch(fetchStatusReport()).unwrap();
+    }, [dispatch, statusReport]);
+
+    const forceLoadStatusReport = useCallback(() => {
         return dispatch(fetchStatusReport()).unwrap();
     }, [dispatch]);
 
@@ -106,7 +120,9 @@ export const useReports = ({ autoFetch = false, filters = {} } = {}) => {
         loadReportById,
         loadHistoryStatus,
         loadExtent,
+        forceLoadExtent,
         loadStatusReport,
+        forceLoadStatusReport,
         updateFilters,
         clearFilters,
         setSelectedReport,

@@ -138,6 +138,10 @@ export const useProcedure = () => {
 
     const resetFilters = useCallback(() => {
         dispatch(resetFiltersAction());
+    }, [dispatch]);
+
+    const resetFiltersAndFetch = useCallback(() => {
+        dispatch(resetFiltersAction());
         dispatch(fetchProcedures({
             page: 1,
             size: pagination.pageSize,
@@ -194,6 +198,7 @@ export const useProcedure = () => {
         changePageSize,
         updateFilters,
         resetFilters,
+        resetFiltersAndFetch,
         toggleShowActive,
         clearCurrent,
         clearErrorMessage,

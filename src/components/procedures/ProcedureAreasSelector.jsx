@@ -27,10 +27,10 @@ const ProcedureAreasSelector = ({ formData, errors, areas: propAreas, toggleArea
     );
 
     useEffect(() => {
-        if (reduxAreas.length === 0) {
+        if (!reduxAreas || reduxAreas.length === 0) {
             dispatch(fetchAreas({ isActive: true }));
         }
-    }, [dispatch, reduxAreas.length]);
+    }, []);
 
     useEffect(() => {
         const timer = setTimeout(async () => {
