@@ -62,12 +62,12 @@ export default function WorkSchedule() {
 
     const pageSize = 10;
 
-    const fetchCounts = async (monthYear) => {
+    const fetchCounts = async (monthYear, date = null) => {
         try {
             const [allResult, activeResult, inactiveResult] = await Promise.all([
-                WORK_SCHEDULE_API.getWorkSchedulesPagination(null, monthYear, null, null, 1, 1),
-                WORK_SCHEDULE_API.getWorkSchedulesPagination(null, monthYear, null, true, 1, 1),
-                WORK_SCHEDULE_API.getWorkSchedulesPagination(null, monthYear, null, false, 1, 1)
+                WORK_SCHEDULE_API.getWorkSchedulesPagination(null, date ? null : monthYear, date, null, 1, 1),
+                WORK_SCHEDULE_API.getWorkSchedulesPagination(null, date ? null : monthYear, date, true, 1, 1),
+                WORK_SCHEDULE_API.getWorkSchedulesPagination(null, date ? null : monthYear, date, false, 1, 1)
             ]);
 
             setCounts({
@@ -75,7 +75,10 @@ export default function WorkSchedule() {
                 active: activeResult.pagination?.totalItems || 0,
                 inactive: inactiveResult.pagination?.totalItems || 0
             });
+
+            return allResult.pagination?.totalItems || 0;
         } catch (error) {
+            return 0;
         }
     };
 
@@ -87,34 +90,14 @@ export default function WorkSchedule() {
         setIsFetching(true);
 
         try {
-            const [allResult, activeResult, inactiveResult] = await Promise.all([
-                WORK_SCHEDULE_API.getWorkSchedulesPagination(null, monthYear, null, null, 1, 1),
-                WORK_SCHEDULE_API.getWorkSchedulesPagination(null, monthYear, null, true, 1, 1),
-                WORK_SCHEDULE_API.getWorkSchedulesPagination(null, monthYear, null, false, 1, 1)
-            ]);
+            const totalItems = await fetchCounts(monthYear);
 
-            const totalItems = allResult.pagination?.totalItems || 0;
-
-            setCounts({
-                all: totalItems,
-                active: activeResult.pagination?.totalItems || 0,
-                inactive: inactiveResult.pagination?.totalItems || 0
-            });
-
-            if (totalItems > 0) {
-                await fetchSchedulesPagination({
-                    monthYear,
-                    isActive: null,
-                    page: 1,
-                    size: totalItems
-                });
-            }
-
+            // The calendar will use allSchedules from the paginated response
             await fetchSchedulesPagination({
                 monthYear,
                 isActive: null,
                 page: 1,
-                size: pageSize
+                size: Math.max(totalItems, pageSize) // Fetch enough for both calendar and list
             });
         } catch (error) {
             showToast.error("Lỗi khi tải dữ liệu lịch tiếp dân.");
@@ -145,38 +128,29 @@ export default function WorkSchedule() {
         setSelectedDate(date);
         setCurrentPage(1);
 
+        const isActiveValue = activeFilter === "all" ? null : activeFilter === "active" ? true : false;
+
         if (date) {
-            fetchSchedulesPagination({
-                date: date,
-                isActive: activeFilter === "all" ? null : activeFilter === "active" ? true : false,
-                page: 1,
-                size: pageSize
-            });
-
-            try {
-                const [allResult, activeResult, inactiveResult] = await Promise.all([
-                    WORK_SCHEDULE_API.getWorkSchedulesPagination(null, null, date, null, 1, 1),
-                    WORK_SCHEDULE_API.getWorkSchedulesPagination(null, null, date, true, 1, 1),
-                    WORK_SCHEDULE_API.getWorkSchedulesPagination(null, null, date, false, 1, 1)
-                ]);
-
-                setCounts({
-                    all: allResult.pagination?.totalItems || 0,
-                    active: activeResult.pagination?.totalItems || 0,
-                    inactive: inactiveResult.pagination?.totalItems || 0
-                });
-            } catch (error) {
-            }
+            await Promise.all([
+                fetchSchedulesPagination({
+                    date: date,
+                    isActive: isActiveValue,
+                    page: 1,
+                    size: pageSize
+                }),
+                fetchCounts(null, date)
+            ]);
         } else {
             const monthYear = `${selectedMonth}/${selectedYear}`;
-            fetchSchedulesPagination({
-                monthYear,
-                isActive: activeFilter === "all" ? null : activeFilter === "active" ? true : false,
-                page: 1,
-                size: pageSize
-            });
-
-            fetchCounts(monthYear);
+            await Promise.all([
+                fetchSchedulesPagination({
+                    monthYear,
+                    isActive: isActiveValue,
+                    page: 1,
+                    size: pageSize
+                }),
+                fetchCounts(monthYear)
+            ]);
         }
     };
 
@@ -210,31 +184,25 @@ export default function WorkSchedule() {
                 showToast.success("Cập nhật trạng thái lịch tiếp dân thành công.");
 
                 if (selectedDate) {
-                    fetchSchedulesPagination({
-                        date: selectedDate,
-                        isActive: isActiveValue,
-                        page: currentPage,
-                        size: pageSize
-                    });
-
-                    const [allResult, activeResult, inactiveResult] = await Promise.all([
-                        WORK_SCHEDULE_API.getWorkSchedulesPagination(null, null, selectedDate, null, 1, 1),
-                        WORK_SCHEDULE_API.getWorkSchedulesPagination(null, null, selectedDate, true, 1, 1),
-                        WORK_SCHEDULE_API.getWorkSchedulesPagination(null, null, selectedDate, false, 1, 1)
+                    await Promise.all([
+                        fetchSchedulesPagination({
+                            date: selectedDate,
+                            isActive: isActiveValue,
+                            page: currentPage,
+                            size: pageSize
+                        }),
+                        fetchCounts(null, selectedDate)
                     ]);
-                    setCounts({
-                        all: allResult.pagination?.totalItems || 0,
-                        active: activeResult.pagination?.totalItems || 0,
-                        inactive: inactiveResult.pagination?.totalItems || 0
-                    });
                 } else {
-                    fetchSchedulesPagination({
-                        monthYear,
-                        isActive: isActiveValue,
-                        page: currentPage,
-                        size: pageSize
-                    });
-                    fetchCounts(monthYear);
+                    await Promise.all([
+                        fetchSchedulesPagination({
+                            monthYear,
+                            isActive: isActiveValue,
+                            page: currentPage,
+                            size: pageSize
+                        }),
+                        fetchCounts(monthYear)
+                    ]);
                 }
             } else {
                 showToast.error(
@@ -293,21 +261,23 @@ export default function WorkSchedule() {
                 return;
             }
 
-            try {
+                try {
                 showToast.info(`Đang import file ${file.name}...`);
                 const result = await importSchedule(file);
                 if (result.success) {
                     const monthYear = `${selectedMonth}/${selectedYear}`;
                     showToast.success(result.data?.message);
-                    fetchSchedulesPagination({
-                        monthYear,
-                        isActive: null,
-                        page: 1,
-                        size: pageSize
-                    });
-                    fetchCounts(monthYear);
                     setCurrentPage(1);
                     setActiveFilter("all");
+                    await Promise.all([
+                        fetchSchedulesPagination({
+                            monthYear,
+                            isActive: null,
+                            page: 1,
+                            size: pageSize
+                        }),
+                        fetchCounts(monthYear)
+                    ]);
                 } else {
                     showToast.error(
                         result.error ||
@@ -360,21 +330,26 @@ export default function WorkSchedule() {
                 );
 
                 if (selectedDate) {
-                    fetchSchedulesPagination({
-                        date: selectedDate,
-                        isActive: isActiveValue,
-                        page: currentPage,
-                        size: pageSize
-                    });
+                    await Promise.all([
+                        fetchSchedulesPagination({
+                            date: selectedDate,
+                            isActive: isActiveValue,
+                            page: currentPage,
+                            size: pageSize
+                        }),
+                        fetchCounts(monthYear)
+                    ]);
                 } else {
-                    fetchSchedulesPagination({
-                        monthYear,
-                        isActive: isActiveValue,
-                        page: currentPage,
-                        size: pageSize
-                    });
+                    await Promise.all([
+                        fetchSchedulesPagination({
+                            monthYear,
+                            isActive: isActiveValue,
+                            page: currentPage,
+                            size: pageSize
+                        }),
+                        fetchCounts(monthYear)
+                    ]);
                 }
-                fetchCounts(monthYear);
                 return true;
             } else {
                 showToast.error(result.error || "Có lỗi xảy ra!");
@@ -436,19 +411,21 @@ export default function WorkSchedule() {
         }
     };
 
-    const handleResetFilter = () => {
+    const handleResetFilter = async () => {
         const monthYear = `${selectedMonth}/${selectedYear}`;
         setActiveFilter("all");
         setSelectedDate(null);
         setCurrentPage(1);
 
-        fetchSchedulesPagination({
-            monthYear,
-            isActive: null,
-            page: 1,
-            size: pageSize
-        });
-        fetchCounts(monthYear);
+        await Promise.all([
+            fetchSchedulesPagination({
+                monthYear,
+                isActive: null,
+                page: 1,
+                size: pageSize
+            }),
+            fetchCounts(monthYear)
+        ]);
 
         showToast.success("Đã làm mới bộ lọc");
     };
