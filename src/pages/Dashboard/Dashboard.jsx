@@ -6,12 +6,14 @@ import { useReports } from '../../hooks/useReports';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import 'dayjs/locale/vi';
+import { showToast } from '../../utils/toastNotification';
 
 dayjs.extend(relativeTime);
 dayjs.locale('vi');
 
 export default function Dashboard() {
     const { statistic, loadStatisticReport, reports, loadReports } = useReports();
+    const [error, setError] = useState(null);
     const [dashboardData, setDashboardData] = useState({
         tong_hom_nay: 0,
         thong_ke_theo_trang_thai: {
@@ -26,6 +28,8 @@ export default function Dashboard() {
 
     useEffect(() => {
         loadStatisticReport().catch(error => {
+            setError(error);
+            showToast.error(error || 'Lấy dữ liệu thống kê thất bại!');
         });
 
         loadReports({
@@ -33,8 +37,10 @@ export default function Dashboard() {
             size: 5,
             mucDo: 'Khẩn cấp'
         }).catch(error => {
+            setError(error);
+            showToast.error(error || 'Lấy danh sách phản ánh thất bại!');
         });
-        
+
     }, [loadStatisticReport, loadReports]);
 
     useEffect(() => {
@@ -134,52 +140,58 @@ export default function Dashboard() {
                     Phản ánh khẩn cấp
                 </h3>
 
-                <div className="space-y-1">
-                    {recentReports.map((report) => (
-                        <div key={report?.id} className="p-2 pb-0 md:pb-3">
-                            <div className="border border-gray-200 px-2 rounded-lg flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
-                                <div className="flex-1 min-w-0 p-3">
-                                    <div className="flex items-center flex-wrap gap-2 mb-1">
-                                        <span className="text-xs text-gray-500">{report?.id}</span>
-                                        {report?.isUrgent && (
-                                            <span className="inline-flex items-center gap-1 px-2 py-1 bg-red-100 text-red-700 text-xs font-medium rounded-md">
-                                                <AlertTriangle className="w-3 h-3" />
-                                                Khẩn
+                {recentReports.length === 0 ? (
+                    <div className="flex items-center justify-center h-32">
+                        <div className="text-red-500 font-bold">{error || "Không có phản ánh khẩn cấp"}</div>
+                    </div>
+                ) : (
+                    <div className="space-y-1">
+                        {recentReports.map((report) => (
+                            <div key={report?.id} className="p-2 pb-0 md:pb-3">
+                                <div className="border border-gray-200 px-2 rounded-lg flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
+                                    <div className="flex-1 min-w-0 p-3">
+                                        <div className="flex items-center flex-wrap gap-2 mb-1">
+                                            <span className="text-xs text-gray-500">{report?.id}</span>
+                                            {report?.isUrgent && (
+                                                <span className="inline-flex items-center gap-1 px-2 py-1 bg-red-100 text-red-700 text-xs font-medium rounded-md">
+                                                    <AlertTriangle className="w-3 h-3" />
+                                                    Khẩn
+                                                </span>
+                                            )}
+                                        </div>
+
+                                        <h4 className="text-sm md:text-base font-medium text-gray-900 mb-1 leading-tight">
+                                            {report?.title}
+                                        </h4>
+
+                                        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs md:text-sm text-gray-500">
+                                            <span className="inline-flex items-center py-1 text-gray-500 rounded-full text-sm">
+                                                {report?.category}
                                             </span>
-                                        )}
+                                            <span className="hidden sm:inline text-gray-400">•</span>
+                                            {report?.reporter ? (
+                                                <span className="truncate max-w-full sm:max-w-xs">
+                                                    {report?.reporter}
+                                                    {report?.phone && <span className="hidden md:inline"> - {report?.phone}</span>}
+                                                </span>
+                                            ) : (
+                                                <span className="truncate max-w-full sm:max-w-xs">Ẩn danh</span>
+                                            )}
+                                            <span className="hidden sm:inline text-gray-400">•</span>
+                                            <span className="whitespace-nowrap">{report?.timeAgo}</span>
+                                        </div>
                                     </div>
-                                    
-                                    <h4 className="text-sm md:text-base font-medium text-gray-900 mb-1 leading-tight">
-                                        {report?.title}
-                                    </h4>
-                                    
-                                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs md:text-sm text-gray-500">
-                                        <span className="inline-flex items-center py-1 text-gray-500 rounded-full text-sm">
-                                            {report?.category}
+
+                                    <div className="flex-shrink-0 self-center mr-3">
+                                        <span className={`inline-flex items-center px-3 md:px-4 py-1.5 md:py-2 text-xs md:text-sm font-medium rounded-full ${getStatusColor(report?.status)}`}>
+                                            {report?.status}
                                         </span>
-                                        <span className="hidden sm:inline text-gray-400">•</span>
-                                        {report?.reporter ? (
-                                            <span className="truncate max-w-full sm:max-w-xs">
-                                            {report?.reporter}
-                                            {report?.phone && <span className="hidden md:inline"> - {report?.phone}</span>}
-                                        </span>
-                                        ) : (
-                                            <span className="truncate max-w-full sm:max-w-xs">Ẩn danh</span>
-                                        )}
-                                        <span className="hidden sm:inline text-gray-400">•</span>
-                                        <span className="whitespace-nowrap">{report?.timeAgo}</span>
                                     </div>
-                                </div>
-                                
-                                <div className="flex-shrink-0 self-center mr-3">
-                                    <span className={`inline-flex items-center px-3 md:px-4 py-1.5 md:py-2 text-xs md:text-sm font-medium rounded-full ${getStatusColor(report?.status)}`}>
-                                        {report?.status}
-                                    </span>
                                 </div>
                             </div>
-                        </div>
-                    ))}
-                </div>
+                        ))}
+                    </div>
+                )}
             </div>
         </div>
     );

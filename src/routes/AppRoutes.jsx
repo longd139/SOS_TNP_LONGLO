@@ -37,7 +37,7 @@ function AppRoutes() {
             </Route>
 
             <Route element={
-                <ProtectedRoute requiredRole={ROLE.ADMIN}>
+                <ProtectedRoute>
                     <AdminLayout />
                 </ProtectedRoute>
             }>

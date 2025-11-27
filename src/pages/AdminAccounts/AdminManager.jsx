@@ -246,10 +246,10 @@ export default function AdminManager() {
             title: 'Email',
             dataIndex: 'email',
             key: 'email',
-            width: '200px',
+            width: '300px',
             render: (value) => (
                 <span
-                    className="block max-w-[200px] truncate text-ellipsis overflow-hidden whitespace-nowrap text-sm"
+                    className="block max-w-[300px] truncate text-ellipsis overflow-hidden whitespace-nowrap text-sm"
                     title={value}
                 >
                     {value}
@@ -260,6 +260,7 @@ export default function AdminManager() {
             title: 'Vai trò',
             dataIndex: 'role',
             key: 'role',
+            width: '150px',
             render: (role) => (
                 <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${ROLE_COLORS[role] || 'bg-gray-100 text-gray-800'
                     }`}>

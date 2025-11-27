@@ -77,13 +77,6 @@ const TwoFALoginModal = ({ isOpen, onClose, tenDangNhap, onSuccess, onError }) =
                     Mã OTP đã được gửi. Vui lòng nhập 6 chữ số để hoàn tất đăng nhập.
                 </p>
 
-                {error && (
-                    <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg flex items-center gap-2">
-                        <AlertCircle className="w-4 h-4 flex-shrink-0" />
-                        <span className="text-sm">{error}</span>
-                    </div>
-                )}
-
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">

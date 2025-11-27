@@ -6,16 +6,16 @@ import { isPathDisabled, getDefaultEnabledRoute } from '../../utils/routeRedirec
 import { showToast } from '../../utils/toastNotification';
 import ROUTE_PATH from '../../constants/routes';
 
-const ProtectedRoute = ({ children, requiredRole = null }) => {
+const ProtectedRoute = ({ children }) => {
     const { auth, isLoading, logout } = useAuth();
     const location = useLocation();
 
-    useEffect(() => {
-        if (!isLoading && auth.isAuthenticated && requiredRole === ROLE.ADMIN && auth.role && auth.role !== ROLE.ADMIN) {
-            showToast.error('Bạn không có quyền truy cập vào hệ thống quản trị!');
-            logout();
-        }
-    }, [auth.isAuthenticated, auth.role, requiredRole, isLoading]);
+    // useEffect(() => {
+    //     if (!isLoading && auth.isAuthenticated) {
+    //         showToast.error('Bạn không có quyền truy cập vào hệ thống quản trị!');
+    //         logout();
+    //     }
+    // }, [auth.isAuthenticated, isLoading]);
 
     if (isLoading) {
         return (
@@ -29,11 +29,11 @@ const ProtectedRoute = ({ children, requiredRole = null }) => {
         return <Navigate to={ROUTE_PATH.LOGIN} state={{ from: location }} replace />;
     }
 
-    if (requiredRole) {
-        if (requiredRole === ROLE.ADMIN && auth.role && auth.role !== ROLE.ADMIN) {
-            return <Navigate to={ROUTE_PATH.HOME} replace />;
-        }
-    }
+    // if (requiredRole) {
+    //     if (requiredRole === ROLE.ADMIN && auth.role && auth.role !== ROLE.ADMIN) {
+    //         return <Navigate to={ROUTE_PATH.HOME} replace />;
+    //     }
+    // }
 
     if (isPathDisabled(location.pathname)) {
         const defaultRoute = getDefaultEnabledRoute();

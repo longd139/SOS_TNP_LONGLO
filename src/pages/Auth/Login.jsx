@@ -89,17 +89,6 @@ export default function Login() {
         setRecaptchaToken("");
     };
 
-    const resetRecaptcha = () => {
-        setRecaptchaToken("");
-        if (window.grecaptcha && recaptchaWidgetId.current !== null) {
-            try {
-                window.grecaptcha.reset(recaptchaWidgetId.current);
-            } catch (error) {
-                showToast.error('Lỗi khi đặt lại reCAPTCHA.');
-            }
-        }
-    };
-
     const handleInputChange = (setter) => (e) => {
         setHasInteracted(true);
         setter(e.target.value);
@@ -140,8 +129,6 @@ export default function Login() {
             setShow2FAModal(true);
             return;
         }
-
-
     };
 
     const handle2FASuccess = async (result) => {
@@ -154,6 +141,7 @@ export default function Login() {
     };
 
     const handle2FAError = (error) => {
+        showToast.error(error || 'Xác thực 2FA thất bại, vui lòng thử lại.');
     };
 
     return (
