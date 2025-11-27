@@ -127,13 +127,13 @@ export default function Dashboard() {
                 />
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-1 gap-3 md:gap-4 pb-4">
+            {/* <div className="grid grid-cols-1 lg:grid-cols-1 gap-3 md:gap-4 pb-4">
                 <Chart
                     type="line"
                     title="Xu hướng phản ánh"
                     data={formattedChartData?.trends}
                 />
-            </div>
+            </div> */}
 
             <div className="bg-white rounded-xl p-3 md:p-4 shadow-sm">
                 <h3 className="text-base md:text-lg font-semibold text-gray-800 mb-3 md:mb-4 ml-3 mt-2">
