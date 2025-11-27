@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from 'react';
+import { useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
     selectPermissions,
@@ -28,19 +28,35 @@ export const usePermissions = () => {
     const error = useSelector(selectPermissionError);
     const filters = useSelector(selectPermissionFilters);
 
-    useEffect(() => {
-        dispatch(fetchPermissions({ search: '', danhMuc: '' }));
-        dispatch(fetchPermissionCategories());
-    }, [dispatch]);
-
     const loadPermissions = useCallback(
+        (search = '', danhMuc = '') => {
+            if (Object.keys(permissions || {}).length === 0) {
+                return dispatch(fetchPermissions({ search, danhMuc }));
+            }
+            return Promise.resolve();
+        },
+        [dispatch, permissions]
+    );
+
+    const loadCategories = useCallback(
+        () => {
+            // Only fetch if categories are empty
+            if ((categories || []).length === 0) {
+                return dispatch(fetchPermissionCategories());
+            }
+            return Promise.resolve();
+        },
+        [dispatch, categories]
+    );
+
+    const forceLoadPermissions = useCallback(
         (search = '', danhMuc = '') => {
             return dispatch(fetchPermissions({ search, danhMuc }));
         },
         [dispatch]
     );
 
-    const loadCategories = useCallback(
+    const forceLoadCategories = useCallback(
         () => {
             return dispatch(fetchPermissionCategories());
         },
@@ -84,6 +100,8 @@ export const usePermissions = () => {
 
         loadPermissions,
         loadCategories,
+        forceLoadPermissions,
+        forceLoadCategories,
         updateFilters,
         clearFilters,
         clearError,
@@ -92,4 +110,3 @@ export const usePermissions = () => {
         getCategoryNames
     };
 };
-
