@@ -6,6 +6,8 @@ import UserViewModal from '../../components/users/UserViewModal';
 import { ConfirmModal } from '../../components/base/BaseModal';
 import { ROLE_LABELS, ROLE_COLORS } from '../../constants/role';
 import { useUsers } from '../../hooks/useUsers';
+import { usePermission } from '../../hooks/usePermission';
+import { PermissionHidden } from '../../components/PermissionGuard';
 import { showToast } from '../../utils/toastNotification';
 
 export default function AdminManager() {
@@ -25,6 +27,8 @@ export default function AdminManager() {
         getUserById,
         clearUserDetail
     } = useUsers();
+
+    const { canCreate, canUpdate, canDelete, canView, canUpdateStatus } = usePermission();
 
     const [modalLoading, setModalLoading] = useState(false);
     const [filters, setFilters] = useState({
@@ -74,9 +78,9 @@ export default function AdminManager() {
                 isOpen: true,
                 user: null
             });
-            
+
             await getUserById(user.id);
-            
+
             setViewModal({
                 isOpen: true,
                 user: user
@@ -98,7 +102,7 @@ export default function AdminManager() {
         clearUserDetail();
     };
 
-    const canDelete = (user) => {
+    const canDeleteUser = (user) => {
         return !user.active;
     };
 
@@ -125,7 +129,7 @@ export default function AdminManager() {
             if (error) {
                 showToast.error(error);
             }
-            
+
             if (error?.errors && Array.isArray(error.errors) && error.errors.length > 0) {
                 error.errors.forEach((err) => {
                     if (err?.message) {
@@ -184,7 +188,7 @@ export default function AdminManager() {
 
     const handleSearchWithFilters = (newFilters) => {
         const { searchKeyword, isActive, vaiTro, pageSize } = newFilters;
-        
+
         setFilters({
             searchKeyword: searchKeyword || '',
             isActive: isActive !== undefined ? isActive : '',
@@ -305,11 +309,10 @@ export default function AdminManager() {
             width: '150px',
             render: (value) => (
                 <span
-                    className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
-                        value 
-                            ? 'bg-green-100 text-green-800' 
+                    className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${value
+                            ? 'bg-green-100 text-green-800'
                             : 'bg-red-100 text-red-800'
-                    }`}
+                        }`}
                 >
                     {value ? 'Hoạt động' : 'Đã khóa'}
                 </span>
@@ -326,15 +329,17 @@ export default function AdminManager() {
                         Quản lý người dùng và phân quyền hệ thống
                     </p>
                 </div>
-                <button
-                    onClick={handleCreateUser}
-                    className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                >
-                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                    </svg>
-                    Thêm tài khoản mới
-                </button>
+                <PermissionHidden modulePrefix="ND" action="CREATE">
+                    <button
+                        onClick={handleCreateUser}
+                        className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                    >
+                        <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                        </svg>
+                        Thêm tài khoản mới
+                    </button>
+                </PermissionHidden>
             </div>
 
             <UserFilter
@@ -451,11 +456,11 @@ export default function AdminManager() {
                 loading={loading}
                 pagination={pagination}
                 onPageChange={handlePageChangeWithFilters}
-                onView={handleViewUser}
-                onEdit={handleEditUser}
-                onDelete={handleDeleteUser}
-                canDelete={canDelete}
-                onUpdateStatus={handleUpdateStatus}
+                onView={canView('ND') ? handleViewUser : undefined}
+                onEdit={canUpdate('ND') ? handleEditUser : undefined}
+                onDelete={canDelete('ND') ? handleDeleteUser : undefined}
+                canDelete={canDeleteUser}
+                onUpdateStatus={canUpdateStatus('ND') ? handleUpdateStatus : undefined}
                 emptyMessage="Không có tài khoản nào"
             />
 

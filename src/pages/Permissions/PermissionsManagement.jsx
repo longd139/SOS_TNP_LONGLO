@@ -6,6 +6,8 @@ import PermissionFormModal from '../../components/permissions/PermissionFormModa
 import { useRoles } from '../../hooks/useRoles';
 import { ConfirmModal } from '../../components/base/BaseModal';
 import PermisisonFilter from '../../components/permissions/PermisisonFilter';
+import { usePermission } from '../../hooks/usePermission';
+import { PermissionHidden } from '../../components/PermissionGuard';
 
 const PermissionsManagement = () => {
     const {
@@ -23,6 +25,8 @@ const PermissionsManagement = () => {
         updateFilters,
         toggleShowActive
     } = useRoles();
+
+    const { canCreate, canUpdate, canDelete, canUpdateStatus } = usePermission();
 
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -227,13 +231,15 @@ const PermissionsManagement = () => {
                     <h1 className="text-2xl font-bold text-gray-900">Quản lý phân quyền</h1>
                     <p className="text-gray-600 mt-1">Quản lý vai trò và phân quyền người dùng</p>
                 </div>
-                <button
-                    onClick={handleCreate}
-                    className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
-                >
-                    <Plus className="w-4 h-4" />
-                    Tạo vai trò mới
-                </button>
+                <PermissionHidden modulePrefix="ROLE" action="CREATE">
+                    <button
+                        onClick={handleCreate}
+                        className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                    >
+                        <Plus className="w-4 h-4" />
+                        Tạo vai trò mới
+                    </button>
+                </PermissionHidden>
             </div>
 
             <PermisisonFilter
@@ -243,7 +249,7 @@ const PermissionsManagement = () => {
                 pagination={{ pageSize: currentPageSize }}
             />
 
-            <div className="mb-3 flex flex-col mb-4 sm:flex-row sm:justify-between sm:items-center gap-2 bg-white p-3 rounded-lg shadow-sm border border-gray-200">
+            <div className="mb-4 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 bg-white p-3 rounded-lg shadow-sm border border-gray-200">
                 <div className="flex items-center gap-3">
                     <h3 className="font-semibold text-gray-900 mb-0">
                         Danh sách bài viết ({pagination.totalItems || 0})
@@ -273,6 +279,9 @@ const PermissionsManagement = () => {
                 onEdit={handleEdit}
                 onDelete={!showActive ? handleDelete : undefined}
                 onUpdateStatus={handleUpdateStatus}
+                canEdit={() => canUpdate('ROLE')}
+                canDelete={() => canDelete('ROLE')}
+                canUpdateStatus={() => canUpdateStatus('ROLE')}
                 showActions={true}
                 emptyMessage={loading ? "Đang tải dữ liệu..." : "Không có vai trò nào"}
                 pagination={tablePagination}
