@@ -6,6 +6,8 @@ import NewsFormModal from '../../components/news/NewsFormModal';
 import NewsFilter from '../../components/news/NewsFilter';
 import NewsPreviewModal from '../../components/news/NewsPreviewModal';
 import { useNews } from '../../hooks/useNews';
+import { usePermission } from '../../hooks/usePermission';
+import { PermissionHidden } from '../../components/PermissionGuard';
 import { formatDate } from '../../utils/formatDate';
 import { showToast } from '../../utils/toastNotification';
 import { getNewsById } from '../../services/newsService';
@@ -28,6 +30,8 @@ export default function NewsManager() {
         setShowActive,
         clearError
     } = useNews();
+
+    const { canCreate, canUpdate, canDelete, canView, canUpdateStatus } = usePermission();
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -246,7 +250,7 @@ export default function NewsManager() {
             setPageSize(selectedPageSize);
         }
 
-        const trimmedSearch = newFilters.search !== undefined 
+        const trimmedSearch = newFilters.search !== undefined
             ? (typeof newFilters.search === 'string' ? newFilters.search.trim() : '')
             : filters.search;
 
@@ -350,13 +354,15 @@ export default function NewsManager() {
                     <h1 className="text-2xl font-bold text-gray-900">Quản lý tin tức & thông báo</h1>
                     <p className="text-gray-600 mt-1">Đăng và quản lý tin tức cho người dân</p>
                 </div>
-                <button
-                    onClick={() => setIsCreateModalOpen(true)}
-                    className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
-                >
-                    <Plus className="w-4 h-4" />
-                    Tạo bài viết mới
-                </button>
+                <PermissionHidden modulePrefix="TTIN" action="CREATE">
+                    <button
+                        onClick={() => setIsCreateModalOpen(true)}
+                        className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                    >
+                        <Plus className="w-4 h-4" />
+                        Tạo bài viết mới
+                    </button>
+                </PermissionHidden>
             </div>
 
             <NewsFilter
@@ -368,8 +374,8 @@ export default function NewsManager() {
                 }}
                 onFilter={handleFilter}
                 onReset={handleResetFilter}
-            />            
-            <div className="mb-3 flex flex-col mb-4 sm:flex-row sm:justify-between sm:items-center gap-2 bg-white p-3 rounded-lg shadow-sm border border-gray-200">
+            />
+            <div className="mb-4 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 bg-white p-3 rounded-lg shadow-sm border border-gray-200">
                 <div className="flex items-center gap-3">
                     <h3 className="font-semibold text-gray-900 mb-0">
                         Danh sách bài viết ({pagination.totalItems || 0})
@@ -396,10 +402,10 @@ export default function NewsManager() {
             <BaseTable
                 data={news}
                 columns={columns}
-                onView={handleView}
-                onEdit={handleEdit}
-                onDelete={!showActive ? handleDelete : null}
-                onUpdateStatus={handleUpdateStatus}
+                onView={canView('TTIN') ? handleView : undefined}
+                onEdit={canUpdate('TTIN') ? handleEdit : undefined}
+                onDelete={!showActive && canDelete('TTIN') ? handleDelete : undefined}
+                onUpdateStatus={canUpdateStatus('TTIN') ? handleUpdateStatus : undefined}
                 showActions={true}
                 emptyMessage={loading ? "Đang tải dữ liệu..." : "Không có bài viết nào"}
                 pagination={pagination}

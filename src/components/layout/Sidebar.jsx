@@ -1,8 +1,10 @@
 import { BarChart3, Calendar, FileText, FolderOpen, LayoutDashboard, MessageSquare, Newspaper, Phone, UserCog, Menu, ChevronLeft, X, ClipboardList, Shield } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
+import React from 'react';
 import PropTypes from 'prop-types';
 import ROUTE_PATH from '../../constants/routes';
 import { isPathDisabled } from '../../utils/routeRedirectUtils';
+import { usePermission } from '../../hooks/usePermission';
 
 const menuItems = [
     {
@@ -10,96 +12,110 @@ const menuItems = [
         label: 'Tổng quan',
         icon: LayoutDashboard,
         path: ROUTE_PATH.DASHBOARD,
-        hasSubmenu: false
+        hasSubmenu: false,
+        requiresPermission: false
     },
     {
         id: 'reports',
         label: 'Quản lý phản ánh',
         icon: MessageSquare,
         path: ROUTE_PATH.REPORT,
-        hasSubmenu: false
+        hasSubmenu: false,
+        modulePrefix: 'PA'
     },
     {
         id: 'report-areas',
         label: 'Quản lý lĩnh vực phản ánh',
         icon: ClipboardList,
         path: ROUTE_PATH.REPORT_AREAS,
-        hasSubmenu: false
+        hasSubmenu: false,
+        modulePrefix: 'LVPA'
     },
     {
         id: 'news',
         label: 'Tin tức & Thông báo',
         icon: Newspaper,
         path: ROUTE_PATH.NEWS,
-        hasSubmenu: false
+        hasSubmenu: false,
+        modulePrefixes: ['TTIN', 'DMTT']
     },
     {
         id: 'areas',
         label: 'Quản lý lĩnh vực thủ tục',
         icon: FileText,
         path: ROUTE_PATH.AREAS,
-        hasSubmenu: false
+        hasSubmenu: false,
+        modulePrefix: 'LVTTHC'
     },
     {
         id: 'procedures',
         label: 'Thủ tục hành chính',
         icon: FileText,
         path: ROUTE_PATH.PROCEDURES,
-        hasSubmenu: false
+        hasSubmenu: false,
+        modulePrefix: 'TT' 
     },
     {
         id: 'templates',
         label: 'Biểu mẫu',
         icon: FolderOpen,
         path: ROUTE_PATH.TEMPLATES,
-        hasSubmenu: false
+        hasSubmenu: false,
+        modulePrefix: 'MD' 
     },
     {
         id: 'government',
         label: 'Quản lý cơ sở dịch vụ công',
         icon: FolderOpen,
         path: ROUTE_PATH.GOVERNMENT,
-        hasSubmenu: false
+        hasSubmenu: false,
+        modulePrefixes: ['UB', 'CSV'] 
     },
     {
         id: 'contact',
         label: 'Ủy ban Phường',
         icon: Phone,
         path: ROUTE_PATH.CONTACT,
-        hasSubmenu: false
+        hasSubmenu: false,
+        modulePrefix: 'UB' 
     },
     {
         id: 'schedule',
         label: 'Lịch tiếp dân',
         icon: Calendar,
         path: ROUTE_PATH.SCHEDULES,
-        hasSubmenu: false
+        hasSubmenu: false,
+        modulePrefix: 'LTD' 
     },
     {
         id: 'statistics',
         label: 'Báo cáo & Thống kê',
         icon: BarChart3,
         path: ROUTE_PATH.STATISTICS,
-        hasSubmenu: false
+        hasSubmenu: false,
+        modulePrefix: 'RPT' 
     },
     {
         id: 'accounts',
         label: 'Quản lý tài khoản',
         icon: UserCog,
         path: ROUTE_PATH.ACCOUNTS,
-        hasSubmenu: false
+        hasSubmenu: false,
+        modulePrefix: 'ND' 
     },
     {
         id: 'permissions',
         label: 'Quản lý quyền truy cập',
         icon: Shield,
         path: ROUTE_PATH.PERMISSIONS,
-        hasSubmenu: false
+        hasSubmenu: false,
+        modulePrefixes: ['ROLE', 'PERM'] 
     }
 ];
 
 export default function Sidebar({ collapsed, onToggle, onMobileClose }) {
     const location = useLocation();
+    const { canAccessModule, permissions } = usePermission();
 
     const handleLinkClick = () => {
         if (window.innerWidth < 768 && onMobileClose) {
@@ -107,8 +123,26 @@ export default function Sidebar({ collapsed, onToggle, onMobileClose }) {
         }
     };
 
+    const visibleMenuItems = React.useMemo(() => {
+        return menuItems.filter((item) => {
+            if (item.requiresPermission === false) {
+                return true;
+            }
+
+            if (item.modulePrefix) {
+                return canAccessModule(item.modulePrefix);
+            }
+
+            if (item.modulePrefixes && Array.isArray(item.modulePrefixes)) {
+                return item.modulePrefixes.some(prefix => canAccessModule(prefix));
+            }
+
+            return false;
+        });
+    }, [canAccessModule, permissions]); 
+
     return (
-        <aside 
+        <aside
             className={`
                 bg-white border-r border-gray-200 h-screen overflow-y-auto sidebar-scroll
                 transition-all duration-300 ease-in-out flex-shrink-0
@@ -157,11 +191,11 @@ export default function Sidebar({ collapsed, onToggle, onMobileClose }) {
 
             <nav className={`py-4 transition-all duration-300 ${collapsed ? 'px-2' : 'px-3'}`}>
                 <ul className="space-y-2">
-                    {menuItems.map((item) => {
+                    {visibleMenuItems.map((item) => {
                         const isActive = location.pathname === item.path;
                         const Icon = item.icon;
                         const isDisabled = isPathDisabled(item.path);
-                        
+
                         return (
                             <li key={item.id}>
                                 {isDisabled ? (
@@ -174,13 +208,13 @@ export default function Sidebar({ collapsed, onToggle, onMobileClose }) {
                                         `}
                                         title={`${item.label} (Chức năng chưa khả dụng)`}
                                     >
-                                        <Icon 
+                                        <Icon
                                             className={`
                                                 w-5 h-5 flex-shrink-0 text-gray-400
                                                 ${collapsed ? '' : 'mr-3'}
                                             `}
                                         />
-                                        
+
                                         {!collapsed && (
                                             <>
                                                 <span className="font-medium flex-1">{item.label}</span>
@@ -204,14 +238,14 @@ export default function Sidebar({ collapsed, onToggle, onMobileClose }) {
                                         `}
                                         title={collapsed ? item.label : ''}
                                     >
-                                        <Icon 
+                                        <Icon
                                             className={`
                                                 w-5 h-5 flex-shrink-0
                                                 ${isActive ? 'text-blue-600' : 'text-gray-500'}
                                                 ${collapsed ? '' : 'mr-3'}
                                             `}
                                         />
-                                        
+
                                         {!collapsed && (
                                             <>
                                                 <span className="font-medium flex-1">{item.label}</span>

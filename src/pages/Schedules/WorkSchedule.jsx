@@ -6,6 +6,8 @@ import { useSchedule } from "../../hooks/useSchedule";
 import MonthCalendar from "../../components/workSchedule/MonthCalendar";
 import ScheduleList from "../../components/workSchedule/ScheduleList";
 import WorkScheduleModal from "../../components/workSchedule/WorkScheduleModal";
+import { usePermission } from "../../hooks/usePermission";
+import { PermissionHidden } from "../../components/PermissionGuard";
 import dayjs from "dayjs";
 import { validateFileImport } from "../../validator/fileValidator";
 import { downloadUtils } from "../../utils/downLoadUtils";
@@ -40,6 +42,8 @@ export default function WorkSchedule() {
         setCounts,
     } = useSchedule();
 
+    const { canCreate, canUpdate, canDelete, canUpdateStatus } = usePermission();
+
     const [deleteConfirm, setDeleteConfirm] = useState({
         isOpen: false,
         schedule: null,
@@ -55,7 +59,7 @@ export default function WorkSchedule() {
     const [activeFilter, setActiveFilter] = useState("all");
     const [currentPage, setCurrentPage] = useState(1);
     const [isFetching, setIsFetching] = useState(false);
-    
+
     const pageSize = 10;
 
     const fetchCounts = async (monthYear) => {
@@ -79,9 +83,9 @@ export default function WorkSchedule() {
         if (isFetching) {
             return;
         }
-        
+
         setIsFetching(true);
-        
+
         try {
             const [allResult, activeResult, inactiveResult] = await Promise.all([
                 WORK_SCHEDULE_API.getWorkSchedulesPagination(null, monthYear, null, null, 1, 1),
@@ -90,7 +94,7 @@ export default function WorkSchedule() {
             ]);
 
             const totalItems = allResult.pagination?.totalItems || 0;
-            
+
             setCounts({
                 all: totalItems,
                 active: activeResult.pagination?.totalItems || 0,
@@ -102,10 +106,10 @@ export default function WorkSchedule() {
                     monthYear,
                     isActive: null,
                     page: 1,
-                    size: totalItems 
+                    size: totalItems
                 });
             }
-            
+
             await fetchSchedulesPagination({
                 monthYear,
                 isActive: null,
@@ -121,9 +125,9 @@ export default function WorkSchedule() {
 
     useEffect(() => {
         const monthYear = `${selectedMonth}/${selectedYear}`;
-        
+
         fetchAllSchedulesData(monthYear);
-        
+
         setCurrentPage(1);
         setActiveFilter("all");
         setSelectedDate(null);
@@ -140,7 +144,7 @@ export default function WorkSchedule() {
     const handleDateSelect = async (date) => {
         setSelectedDate(date);
         setCurrentPage(1);
-        
+
         if (date) {
             fetchSchedulesPagination({
                 date: date,
@@ -148,7 +152,7 @@ export default function WorkSchedule() {
                 page: 1,
                 size: pageSize
             });
-            
+
             try {
                 const [allResult, activeResult, inactiveResult] = await Promise.all([
                     WORK_SCHEDULE_API.getWorkSchedulesPagination(null, null, date, null, 1, 1),
@@ -171,7 +175,7 @@ export default function WorkSchedule() {
                 page: 1,
                 size: pageSize
             });
-            
+
             fetchCounts(monthYear);
         }
     };
@@ -202,9 +206,9 @@ export default function WorkSchedule() {
             if (res.success) {
                 const monthYear = `${selectedMonth}/${selectedYear}`;
                 const isActiveValue = activeFilter === "all" ? null : activeFilter === "active" ? true : false;
-                
+
                 showToast.success("Cập nhật trạng thái lịch tiếp dân thành công.");
-                
+
                 if (selectedDate) {
                     fetchSchedulesPagination({
                         date: selectedDate,
@@ -212,7 +216,7 @@ export default function WorkSchedule() {
                         page: currentPage,
                         size: pageSize
                     });
-                    
+
                     const [allResult, activeResult, inactiveResult] = await Promise.all([
                         WORK_SCHEDULE_API.getWorkSchedulesPagination(null, null, selectedDate, null, 1, 1),
                         WORK_SCHEDULE_API.getWorkSchedulesPagination(null, null, selectedDate, true, 1, 1),
@@ -348,13 +352,13 @@ export default function WorkSchedule() {
             if (result.success) {
                 const monthYear = `${selectedMonth}/${selectedYear}`;
                 const isActiveValue = activeFilter === "all" ? null : activeFilter === "active" ? true : false;
-                
+
                 showToast.success(
                     mode === "create"
                         ? "Tạo lịch tiếp dân thành công!"
                         : "Cập nhật lịch tiếp dân thành công!"
                 );
-                
+
                 if (selectedDate) {
                     fetchSchedulesPagination({
                         date: selectedDate,
@@ -384,9 +388,9 @@ export default function WorkSchedule() {
 
     const handlePageChange = (page) => {
         setCurrentPage(page);
-        
+
         const isActiveValue = activeFilter === "all" ? null : activeFilter === "active" ? true : false;
-        
+
         if (selectedDate) {
             fetchSchedulesPagination({
                 date: selectedDate,
@@ -408,12 +412,12 @@ export default function WorkSchedule() {
 
     const handleActiveFilterChange = (filter) => {
         if (filter === activeFilter) return;
-        
+
         setActiveFilter(filter);
         setCurrentPage(1);
-        
+
         const isActiveValue = filter === "all" ? null : filter === "active" ? true : false;
-        
+
         if (selectedDate) {
             fetchSchedulesPagination({
                 date: selectedDate,
@@ -437,7 +441,7 @@ export default function WorkSchedule() {
         setActiveFilter("all");
         setSelectedDate(null);
         setCurrentPage(1);
-        
+
         fetchSchedulesPagination({
             monthYear,
             isActive: null,
@@ -445,7 +449,7 @@ export default function WorkSchedule() {
             size: pageSize
         });
         fetchCounts(monthYear);
-        
+
         showToast.success("Đã làm mới bộ lọc");
     };
 
@@ -462,30 +466,36 @@ export default function WorkSchedule() {
                 </div>
 
                 <div className="flex gap-2 md:gap-3 flex-wrap">
-                    <button
-                        onClick={handleDownload}
-                        className="px-3 md:px-4 py-2 bg-white border border-gray-300 text-gray-700 text-sm md:text-base rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center justify-center gap-2"
-                    >
-                        <Download className="w-4 h-4" />
-                        <span className="hidden sm:inline">Download Template</span>
-                        <span className="sm:hidden">Excel</span>
-                    </button>
-                    <button
-                        onClick={handleImport}
-                        className="px-3 md:px-4 py-2 bg-white border border-gray-300 text-gray-700 text-sm md:text-base rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center justify-center gap-2"
-                    >
-                        <Upload className="w-4 h-4" />
-                        <span className="hidden sm:inline">Import</span>
-                        <span className="sm:hidden">Import</span>
-                    </button>
-                    <button
-                        onClick={handleAddSchedule}
-                        className="px-3 md:px-4 py-2 bg-blue-600 text-white text-sm md:text-base rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center justify-center gap-2"
-                    >
-                        <Plus className="w-4 h-4" />
-                        <span className="hidden sm:inline">Thêm lịch</span>
-                        <span className="sm:hidden">Thêm</span>
-                    </button>
+                    <PermissionHidden modulePrefix="LTD" action="CREATE">
+                        <button
+                            onClick={handleDownload}
+                            className="px-3 md:px-4 py-2 bg-white border border-gray-300 text-gray-700 text-sm md:text-base rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center justify-center gap-2"
+                        >
+                            <Download className="w-4 h-4" />
+                            <span className="hidden sm:inline">Download Template</span>
+                            <span className="sm:hidden">Excel</span>
+                        </button>
+                    </PermissionHidden>
+                    <PermissionHidden modulePrefix="LTD" action="CREATE">
+                        <button
+                            onClick={handleImport}
+                            className="px-3 md:px-4 py-2 bg-white border border-gray-300 text-gray-700 text-sm md:text-base rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center justify-center gap-2"
+                        >
+                            <Upload className="w-4 h-4" />
+                            <span className="hidden sm:inline">Import</span>
+                            <span className="sm:hidden">Import</span>
+                        </button>
+                    </PermissionHidden>
+                    <PermissionHidden modulePrefix="LTD" action="CREATE">
+                        <button
+                            onClick={handleAddSchedule}
+                            className="px-3 md:px-4 py-2 bg-blue-600 text-white text-sm md:text-base rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center justify-center gap-2"
+                        >
+                            <Plus className="w-4 h-4" />
+                            <span className="hidden sm:inline">Thêm lịch</span>
+                            <span className="sm:hidden">Thêm</span>
+                        </button>
+                    </PermissionHidden>
                 </div>
             </div>
 
@@ -499,8 +509,8 @@ export default function WorkSchedule() {
                             <button
                                 onClick={() => handleActiveFilterChange("all")}
                                 className={`px-3 md:px-4 py-1.5 md:py-2 text-xs md:text-sm rounded-lg transition-colors ${activeFilter === "all"
-                                        ? "bg-blue-600 text-white"
-                                        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                                    ? "bg-blue-600 text-white"
+                                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                                     }`}
                             >
                                 Tất cả ({counts.all})
@@ -508,8 +518,8 @@ export default function WorkSchedule() {
                             <button
                                 onClick={() => handleActiveFilterChange("active")}
                                 className={`px-3 md:px-4 py-1.5 md:py-2 text-xs md:text-sm rounded-lg transition-colors ${activeFilter === "active"
-                                        ? "bg-green-600 text-white"
-                                        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                                    ? "bg-green-600 text-white"
+                                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                                     }`}
                             >
                                 Hoạt động ({counts.active})
@@ -517,8 +527,8 @@ export default function WorkSchedule() {
                             <button
                                 onClick={() => handleActiveFilterChange("inactive")}
                                 className={`px-3 md:px-4 py-1.5 md:py-2 text-xs md:text-sm rounded-lg transition-colors ${activeFilter === "inactive"
-                                        ? "bg-red-600 text-white"
-                                        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                                    ? "bg-red-600 text-white"
+                                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                                     }`}
                             >
                                 Đã khóa ({counts.inactive})
@@ -549,6 +559,9 @@ export default function WorkSchedule() {
                         selectedDate={selectedDate}
                         pagination={pagination}
                         onPageChange={handlePageChange}
+                        canEdit={() => canUpdate('LTD')}
+                        canDelete={() => canDelete('LTD')}
+                        canUpdateStatus={() => canUpdateStatus('LTD')}
                     />
                 </div>
 

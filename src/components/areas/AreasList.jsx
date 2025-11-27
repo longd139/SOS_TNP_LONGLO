@@ -7,6 +7,8 @@ import AreaFilter from './AreaFilter';
 import { useAreas } from '../../hooks/useAreas';
 import { showToast } from '../../utils/toastNotification';
 import { formatDate } from '../../utils/formatDate';
+import { usePermission } from '../../hooks/usePermission';
+import { PermissionHidden } from '../PermissionGuard';
 
 export default function AreasList() {
     const {
@@ -22,6 +24,8 @@ export default function AreasList() {
         updateFilters,
         clearFilters
     } = useAreas();
+
+    const { canCreate, canUpdate, canDelete, canUpdateStatus } = usePermission();
 
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -41,7 +45,7 @@ export default function AreasList() {
 
     const handleFilter = (newFilters) => {
         const searchValue = typeof newFilters.search === 'string' ? newFilters.search.trim() : '';
-        
+
         updateFilters({ search: searchValue });
         setShowActive(newFilters.isActive);
 
@@ -220,8 +224,8 @@ export default function AreasList() {
             render: (value) => (
                 <span
                     className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${value
-                            ? 'bg-green-100 text-green-800'
-                            : 'bg-gray-100 text-gray-800'
+                        ? 'bg-green-100 text-green-800'
+                        : 'bg-gray-100 text-gray-800'
                         }`}
                 >
                     {value ? 'Hoạt động' : 'Không hoạt động'}
@@ -237,13 +241,15 @@ export default function AreasList() {
                     <h1 className="text-2xl font-bold text-gray-900">Quản lý lĩnh vực thủ tục</h1>
                     <p className="text-gray-600 mt-1">Quản lý các lĩnh vực của thủ tục hành chính</p>
                 </div>
-                <button
-                    onClick={handleCreate}
-                    className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
-                >
-                    <Plus className="w-4 h-4" />
-                    Thêm lĩnh vực mới
-                </button>
+                <PermissionHidden modulePrefix="LVTTHC" action="CREATE">
+                    <button
+                        onClick={handleCreate}
+                        className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                    >
+                        <Plus className="w-4 h-4" />
+                        Thêm lĩnh vực mới
+                    </button>
+                </PermissionHidden>
             </div>
 
             <AreaFilter
@@ -283,6 +289,9 @@ export default function AreasList() {
                 onEdit={handleEdit}
                 onDelete={!showActive ? handleDelete : null}
                 onUpdateStatus={handleUpdateStatus}
+                canEdit={() => canUpdate('LVTTHC')}
+                canDelete={() => canDelete('LVTTHC')}
+                canUpdateStatus={() => canUpdateStatus('LVTTHC')}
                 showActions={true}
                 emptyMessage={loading ? "Đang tải dữ liệu..." : "Không có lĩnh vực thủ tục nào"}
                 pagination={pagination}

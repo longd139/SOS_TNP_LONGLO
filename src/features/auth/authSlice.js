@@ -6,19 +6,21 @@ const getUserFromToken = () => {
     try {
         const accessToken = localStorage.getItem('accessToken');
         if (!accessToken) return null;
-        
+
         const decoded = jwtDecode(accessToken);
-        
+
         if (decoded.exp && decoded.exp <= Date.now() / 1000) {
             localStorage.removeItem('accessToken');
             localStorage.removeItem('refreshToken');
             return null;
         }
-        
+
         return {
             userId: decoded.userId,
+            username: decoded.username,
             role: decoded.role,
             email: decoded.email,
+            permissions: decoded.permissions || [],
         };
     } catch (error) {
         localStorage.removeItem('accessToken');
