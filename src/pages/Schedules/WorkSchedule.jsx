@@ -92,13 +92,23 @@ export default function WorkSchedule() {
         try {
             const totalItems = await fetchCounts(monthYear);
 
-            // The calendar will use allSchedules from the paginated response
+            // Fetch for list display first (schedules) - this also merges into allSchedules
             await fetchSchedulesPagination({
                 monthYear,
                 isActive: null,
                 page: 1,
-                size: Math.max(totalItems, pageSize) // Fetch enough for both calendar and list
+                size: pageSize
             });
+
+            // Then fetch for calendar highlighting (allSchedules) if there are more items
+            if (totalItems > pageSize) {
+                await fetchSchedulesPagination({
+                    monthYear,
+                    isActive: null,
+                    page: 1,
+                    size: Math.max(totalItems, pageSize)
+                });
+            }
         } catch (error) {
             showToast.error("Lỗi khi tải dữ liệu lịch tiếp dân.");
         } finally {
