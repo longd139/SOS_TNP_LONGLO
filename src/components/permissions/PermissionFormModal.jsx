@@ -19,13 +19,19 @@ const PermissionFormModal = ({
     initialData = null,
     isLoading = false,
 }) => {
-    const { permissions, loading: permissionsLoading } = usePermissions();
+    const { permissions, loading: permissionsLoading, loadPermissions } = usePermissions();
     
     const [form, setForm] = useState(initialState);
     const [errors, setErrors] = useState({});
     const [selectedCategory, setSelectedCategory] = useState("all");
     const [searchText, setSearchText] = useState("");
     const [checkedItems, setCheckedItems] = useState([]);
+
+    useEffect(() => {
+        if (isOpen) {
+            loadPermissions();
+        }
+    }, [isOpen, loadPermissions]);
 
     useEffect(() => {
         if (isOpen) {

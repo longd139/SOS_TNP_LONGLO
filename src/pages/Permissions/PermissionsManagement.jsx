@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react'
+import React, { useState, useCallback, useEffect } from 'react'
 import { Loader2, Plus, Shield } from 'lucide-react';
 import BaseTable from '../../components/base/BaseTable';
 import { showToast } from '../../utils/toastNotification';
@@ -36,6 +36,10 @@ const PermissionsManagement = () => {
     const [selectedRoleForDelete, setSelectedRoleForDelete] = useState(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [currentPageSize, setCurrentPageSize] = useState(pagination.pageSize || 10);
+
+    useEffect(() => {
+        loadRoles(1, 10);
+    }, [loadRoles]);
 
     const formatDate = (dateString) => {
         if (!dateString) return '-';

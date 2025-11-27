@@ -42,11 +42,17 @@ export const useRoles = () => {
     const filters = useSelector(selectRolesFilters);
     const showActive = useSelector(selectShowActive);
 
-    useEffect(() => {
-        dispatch(fetchRolesByPagination({ page: 1, size: 10 }));
-    }, [dispatch]);
-
     const loadAllRoles = useCallback(
+        (search = '') => {
+            if ((allRoles || []).length === 0) {
+                return dispatch(fetchRoles(search));
+            }
+            return Promise.resolve();
+        },
+        [dispatch, allRoles]
+    );
+
+    const forceLoadAllRoles = useCallback(
         (search = '') => {
             return dispatch(fetchRoles(search));
         },
@@ -205,6 +211,7 @@ export const useRoles = () => {
 
         loadRoles,
         loadAllRoles,
+        forceLoadAllRoles,
         createRole: handleCreateRole,
         updateRole: handleUpdateRole,
         deleteRole: handleDeleteRole,
