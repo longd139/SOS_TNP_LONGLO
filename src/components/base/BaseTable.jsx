@@ -97,7 +97,7 @@ const BaseTable = ({
                                                         className="text-blue-600 hover:text-blue-900 p-1 rounded hover:bg-blue-100"
                                                         title="Xem chi tiết"
                                                     >
-                                                        {viewIcon ? viewIcon : <Eye className="w-6 h-6" />}
+                                                        {viewIcon ? viewIcon : <Eye className="w-5 h-5" />}
                                                     </button>
                                                 )}
                                                 {onEdit && (
@@ -106,7 +106,7 @@ const BaseTable = ({
                                                         className="text-indigo-600 hover:text-indigo-900 p-1 rounded hover:bg-indigo-100"
                                                         title="Chỉnh sửa"
                                                     >
-                                                        <Pencil className="w-6 h-6" />
+                                                        <Pencil className="w-5 h-5" />
                                                     </button>
                                                 )}
                                                 {
@@ -116,7 +116,7 @@ const BaseTable = ({
                                                             className="text-yellow-600 hover:text-yellow-900 p-1 rounded hover:bg-yellow-100"
                                                             title="Cập nhật trạng thái"
                                                         >
-                                                            <ToggleLeft className="w-6 h-6" />
+                                                            <ToggleLeft className="w-5 h-5" />
                                                         </button>
                                                     )
                                                 }
@@ -126,7 +126,7 @@ const BaseTable = ({
                                                         className="text-red-600 hover:text-red-900 p-1 rounded hover:bg-red-100"
                                                         title="Xóa"
                                                     >
-                                                        <Trash2 className="w-6 h-6" />
+                                                        <Trash2 className="w-5 h-5" />
                                                     </button>
                                                 )}
                                                 
