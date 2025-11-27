@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import BaseModal from '../base/BaseModal';
 import { validateOtp } from '../../validator/otpValidator';
+import { showToast } from '../../utils/toastNotification';
 
 const TwoFactorOTPModal = ({ isOpen, onClose, onVerify, isLoading, action = 'bật' }) => {
     const [otp, setOtp] = useState('');
@@ -22,6 +23,7 @@ const TwoFactorOTPModal = ({ isOpen, onClose, onVerify, isLoading, action = 'b�
         try {
             await onVerify(otp);
             setOtp('');
+            showToast.success(`Xác thực OTP thành công, đã ${action} 2 yếu tố.`);
         } catch (err) {
             setError(err.message || 'Xác thực OTP thất bại');
         }

@@ -70,8 +70,8 @@ export default function ReportList() {
             sortTime: filters.sortTime,
         };
         
-        loadReports(params).catch(() => {
-            showToast.error("Lỗi khi tải danh sách phản ánh");
+        loadReports(params).catch((e) => {
+            showToast.error(e);
         });
     }, [currentPage, filters.pageSize, filters.trangThai, filters.idLinhVucPhanAnh, filters.mucDo, filters.maPhanAnh, filters.sortTime]);
 

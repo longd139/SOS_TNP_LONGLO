@@ -106,7 +106,7 @@ export const updateReportStatus = createAsyncThunk(
             const response = await REPORT_API.updateStatusReport(reportId, statusData);
             return { reportId, updatedData: response };
         } catch (error) {
-            return rejectWithValue(error);
+                return rejectWithValue(error?.response?.data?.message || error?.message || 'Cập nhật trạng thái thất bại');
         }
     }
 )

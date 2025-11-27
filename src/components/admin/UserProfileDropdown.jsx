@@ -92,9 +92,9 @@ const UserProfileDropdown = () => {
         setIs2FALoading(true);
         try {
             const result = await AUTH_API.verifiedStatus2FA(otp);
-            
+
             await dispatch(fetchMyProfile());
-            
+
             setIs2FAOTPModalOpen(false);
         } catch (error) {
             throw error;

@@ -162,7 +162,7 @@ export default function ReportAreasList() {
                 search: filters.search
             });
         } catch (error) {
-            showToast.error(error.message || 'Cập nhật trạng thái thất bại!');
+            showToast.error(error || 'Cập nhật trạng thái thất bại!');
         }
     };
 

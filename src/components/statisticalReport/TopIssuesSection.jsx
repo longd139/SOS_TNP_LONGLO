@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { useStatisticalReport } from '../../hooks/useStatisticalReport';
+import { showToast } from '../../utils/toastNotification';
 
 export default function TopIssuesSection({ dateRange }) {
   const { summaryReport, loading, loadSummaryReport } = useStatisticalReport();
@@ -10,6 +11,7 @@ export default function TopIssuesSection({ dateRange }) {
     if (dateRange.to) params.to = dateRange.to;
 
     loadSummaryReport(params).catch(err => {
+        showToast.error(err)
       console.error('Failed to load summary report:', err);
     });
   }, [dateRange.from, dateRange.to, loadSummaryReport]);

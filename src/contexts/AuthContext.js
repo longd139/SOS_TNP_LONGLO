@@ -11,10 +11,6 @@ export const AuthProvider = ({ children }) => {
     const dispatch = useDispatch();
     const authState = useSelector(selectAuthState);
 
-    const isAdmin = () => {
-        return authState.user?.role === ROLE.ADMIN;
-    };
-
     const handleLogout = () => {
         localStorage.removeItem('accessToken');
         localStorage.removeItem('refreshToken');
@@ -30,7 +26,6 @@ export const AuthProvider = ({ children }) => {
         },
         setAuth: () => { },
         logout: handleLogout,
-        isAdmin,
         isAuthenticated: !!authState.user,
         isLoading: authState.loading
     };
