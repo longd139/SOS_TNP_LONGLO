@@ -7,6 +7,8 @@ import ReportAreasFilter from './ReportAreasFilter';
 import { useReportAreas } from '../../hooks/useReportAreas';
 import { showToast } from '../../utils/toastNotification';
 import { formatDate } from '../../utils/formatDate';
+import { usePermission } from '../../hooks/usePermission';
+import { PermissionHidden } from '../PermissionGuard';
 
 export default function ReportAreasList() {
     const {
@@ -24,6 +26,8 @@ export default function ReportAreasList() {
         clearFilters,
         updateShowActive
     } = useReportAreas();
+
+    const { canCreate, canUpdate, canDelete, canUpdateStatus } = usePermission();
 
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -45,7 +49,7 @@ export default function ReportAreasList() {
 
     const handleFilter = (newFilters) => {
         const searchValue = (newFilters.search || '').trim();
-        
+
         updateFilters({ search: searchValue });
         updateShowActive(newFilters.isActive);
 
@@ -241,13 +245,15 @@ export default function ReportAreasList() {
                     <h1 className="text-2xl font-bold text-gray-900">Quản lý lĩnh vực phản ánh</h1>
                     <p className="text-gray-600 mt-1">Quản lý các lĩnh vực phản ánh của người dân</p>
                 </div>
-                <button
-                    onClick={handleCreate}
-                    className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
-                >
-                    <Plus className="w-4 h-4" />
-                    Thêm lĩnh vực mới
-                </button>
+                <PermissionHidden modulePrefix="LVPA" action="CREATE">
+                    <button
+                        onClick={handleCreate}
+                        className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                    >
+                        <Plus className="w-4 h-4" />
+                        Thêm lĩnh vực mới
+                    </button>
+                </PermissionHidden>
             </div>
 
             <ReportAreasFilter
@@ -287,6 +293,9 @@ export default function ReportAreasList() {
                 onEdit={handleEdit}
                 onDelete={!showActive ? handleDelete : null}
                 onUpdateStatus={handleUpdateStatus}
+                canEdit={() => canUpdate('LVPA')}
+                canDelete={() => canDelete('LVPA')}
+                canUpdateStatus={() => canUpdateStatus('LVPA')}
                 showActions={true}
                 emptyMessage={loading ? "Đang tải dữ liệu..." : "Không có lĩnh vực nào"}
                 pagination={pagination}

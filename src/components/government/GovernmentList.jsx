@@ -7,6 +7,8 @@ import GovernmentFilter from "./GovernmentFilter";
 import { useGovernment } from "../../hooks/useGovernment";
 import { showToast } from "../../utils/toastNotification";
 import { formatDate } from "../../utils/formatDate";
+import { usePermission } from "../../hooks/usePermission";
+import { PermissionHidden } from "../PermissionGuard";
 
 export default function GovernmontList() {
     const {
@@ -22,6 +24,8 @@ export default function GovernmontList() {
         updateFilters,
         clearFilters,
     } = useGovernment();
+
+    const { canCreate, canUpdate, canDelete, canUpdateStatus } = usePermission();
 
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -41,7 +45,7 @@ export default function GovernmontList() {
 
     const handleFilter = (newFilters) => {
         const searchValue = typeof newFilters.search === 'string' ? newFilters.search.trim() : '';
-        
+
         updateFilters({ search: searchValue });
         setShowActive(newFilters.isActive);
 
@@ -254,13 +258,15 @@ export default function GovernmontList() {
                         Quản lý các cơ sở dịch vụ công trên địa bàn phường
                     </p>
                 </div>
-                <button
-                    onClick={handleCreate}
-                    className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
-                >
-                    <Plus className="w-4 h-4" />
-                    Tạo mới cơ sở dịch vụ công
-                </button>
+                <PermissionHidden modulePrefix="CSV" action="CREATE">
+                    <button
+                        onClick={handleCreate}
+                        className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                    >
+                        <Plus className="w-4 h-4" />
+                        Tạo mới cơ sở dịch vụ công
+                    </button>
+                </PermissionHidden>
             </div>
 
             <GovernmentFilter
@@ -300,6 +306,9 @@ export default function GovernmontList() {
                 onEdit={handleEdit}
                 onDelete={!showActive ? handleDelete : null}
                 onUpdateStatus={handleUpdateStatus}
+                canEdit={() => canUpdate('CSV')}
+                canDelete={() => canDelete('CSV')}
+                canUpdateStatus={() => canUpdateStatus('CSV')}
                 showActions={true}
                 emptyMessage={
                     loading ? "Đang tải dữ liệu..." : "Không có cơ sở dịch vụ công nào"

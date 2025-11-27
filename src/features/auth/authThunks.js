@@ -52,8 +52,10 @@ export const loginUser = createAsyncThunk(
             return {
                 user: {
                     userId: decoded.userId,
+                    username: decoded.username,
                     role: decoded.role,
-                    email: response.email,
+                    email: decoded.email || response.email,
+                    permissions: decoded.permissions || [],
                 },
             };
         } catch (error) {
@@ -65,9 +67,9 @@ export const loginUser = createAsyncThunk(
                     }
                 });
             }
-            
+
             showToast.error(error.message);
-            return rejectWithValue({ 
+            return rejectWithValue({
                 message: error.message,
                 errors: fieldErrors
             });
@@ -108,8 +110,10 @@ export const loginUserWithCaptcha = createAsyncThunk(
             return {
                 user: {
                     userId: decoded.userId,
+                    username: decoded.username,
                     role: decoded.role,
-                    email: response.email,
+                    email: decoded.email || response.email,
+                    permissions: decoded.permissions || [],
                 },
             };
         } catch (error) {
@@ -121,9 +125,9 @@ export const loginUserWithCaptcha = createAsyncThunk(
                     }
                 });
             }
-            
+
             showToast.error(error.message);
-            return rejectWithValue({ 
+            return rejectWithValue({
                 message: error.message,
                 errors: fieldErrors
             });
@@ -137,7 +141,7 @@ export const verifyOtpUser = createAsyncThunk(
         try {
             const response = await AUTH_API.verify2FA({ otp, tenDangNhap });
             if (!response.success) throw new Error(response.message || 'OTP sai');
-            
+
             const tokenData = response.data;
             const accessToken = tokenData.access_token;
             const refreshToken = tokenData.refresh_token;
@@ -152,7 +156,10 @@ export const verifyOtpUser = createAsyncThunk(
             return {
                 user: {
                     userId: decoded.userId,
+                    username: decoded.username,
                     role: decoded.role,
+                    email: decoded.email,
+                    permissions: decoded.permissions || [],
                 },
             };
         } catch (error) {
@@ -191,8 +198,8 @@ export const changePassword = createAsyncThunk(
                 data: response,
             };
         } catch (error) {
-            return rejectWithValue({ 
-                message: error.message || 'Đổi mật khẩu thất bại' 
+            return rejectWithValue({
+                message: error.message || 'Đổi mật khẩu thất bại'
             });
         }
     }
@@ -231,7 +238,7 @@ export const sendOtpToEmail = createAsyncThunk(
             }
 
             showToast.error(error.message);
-            return rejectWithValue({ 
+            return rejectWithValue({
                 message: error.message || 'Gửi OTP thất bại',
                 errors: fieldErrors
             });
@@ -287,7 +294,7 @@ export const resetPassword = createAsyncThunk(
             }
 
             showToast.error(error.message);
-            return rejectWithValue({ 
+            return rejectWithValue({
                 message: error.message || 'Đặt lại mật khẩu thất bại',
                 errors: fieldErrors
             });

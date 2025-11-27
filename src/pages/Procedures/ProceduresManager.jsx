@@ -7,6 +7,8 @@ import ProcedureForm from "../../components/procedures/ProcedureForm";
 import ProcedureDetailModal from "../../components/procedures/ProcedureDetailModal";
 import ProceduresFilter from "../../components/procedures/ProceduresFilter";
 import { useProcedure } from "../../hooks/useProcedures";
+import { usePermission } from "../../hooks/usePermission";
+import { PermissionHidden } from "../../components/PermissionGuard";
 import { getProcedureColumns } from "../../components/procedures/columns";
 import { showToast } from "../../utils/toastNotification";
 import { ConfirmModal } from "../../components/base/BaseModal";
@@ -16,6 +18,7 @@ dayjs.locale("vi");
 
 export default function ProceduresManager() {
     const dispatch = useDispatch();
+    const { canCreate, canUpdate, canDelete, canView, canUpdateStatus } = usePermission();
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
@@ -61,7 +64,7 @@ export default function ProceduresManager() {
                 isActive: true,
             })
         );
-        
+
         dispatch(fetchAreas());
     }, []);
 
@@ -254,25 +257,27 @@ export default function ProceduresManager() {
                         Quản lý các thủ tục được hiển thị trong ứng dụng
                     </p>
                 </div>
-                <button
-                    onClick={openCreateModal}
-                    className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center"
-                >
-                    <svg
-                        className="w-4 h-4 mr-2"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
+                <PermissionHidden modulePrefix="TT" action="CREATE">
+                    <button
+                        onClick={openCreateModal}
+                        className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center"
                     >
-                        <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth="2"
-                            d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                        />
-                    </svg>
-                    Thêm thủ tục mới
-                </button>
+                        <svg
+                            className="w-4 h-4 mr-2"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth="2"
+                                d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                            />
+                        </svg>
+                        Thêm thủ tục mới
+                    </button>
+                </PermissionHidden>
             </div>
 
             <ProceduresFilter
@@ -323,13 +328,13 @@ export default function ProceduresManager() {
                 loading={loading}
                 pagination={pagination}
                 onPageChange={changePage}
-                onEdit={handleEdit}
-                onDelete={!JSON.parse(showActive) ? handleDelete : null}
-                onView={handleView}
+                onEdit={canUpdate('TT') ? handleEdit : undefined}
+                onDelete={!JSON.parse(showActive) && canDelete('TT') ? handleDelete : undefined}
+                onView={canView('TT') ? handleView : undefined}
                 showActions={true}
                 emptyMessage="Không có thủ tục nào được tìm thấy"
                 className="mb-4"
-                onUpdateStatus={handleUpdateStatus}
+                onUpdateStatus={canUpdateStatus('TT') ? handleUpdateStatus : undefined}
             />
 
             <ProcedureForm
