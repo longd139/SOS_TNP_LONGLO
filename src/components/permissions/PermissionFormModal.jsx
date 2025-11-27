@@ -248,19 +248,19 @@ const PermissionFormModal = ({
                     {!permissionsLoading && filteredPermissions.map(item => (
                         <label
                             key={item.code}
-                            className="flex items-start gap-3 cursor-pointer hover:bg-gray-50 p-2 rounded-lg transition-colors"
+                            className="flex items-center gap-3 cursor-pointer hover:bg-gray-50 p-2 rounded-lg transition-colors"
                         >
                             <input
                                 type="checkbox"
                                 checked={checkedItems.includes(item.code)}
                                 onChange={() => toggleCheck(item.code)}
-                                className="mt-1"
+                                className="w-4 h-4"
                             />
                             <div>
                                 <div className="font-medium">{item.description}</div>
-                                <div className="text-gray-500 text-sm">
+                                {/* <div className="text-gray-500 text-sm">
                                     {item.code} • {getCategoryLabel(item.category)}
-                                </div>
+                                </div> */}
                             </div>
                         </label>
                     ))}
