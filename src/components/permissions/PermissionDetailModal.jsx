@@ -148,7 +148,7 @@ const PermissionDetailModal = ({ isOpen, onClose, permisison }) => {
             isOpen={isOpen}
             onClose={onClose}
             title='Chi tiết vai trò'
-            size='xl'
+            size='3xl'
             subtitle='Xem thông tin chi tiết vai trò'
             className='max-w-5xl'
             footer={
@@ -209,7 +209,7 @@ const PermissionDetailModal = ({ isOpen, onClose, permisison }) => {
                         </h4>
                     </div>
                     {permisison.permissions.length > 0 ? (
-                        <div className="px-6 py-1 grid grid-cols-2 gap-y-4 gap-x-6">
+                        <div className="px-6 py-1 grid grid-cols-3 gap-y-4 gap-x-6">
                             {permisison.permissions.map((p) => (
                                 <label
                                     key={p.code}
