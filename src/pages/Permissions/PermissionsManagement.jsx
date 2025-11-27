@@ -271,7 +271,7 @@ const PermissionsManagement = () => {
                 data={tableData}
                 columns={column}
                 onEdit={handleEdit}
-                onDelete={handleDelete}
+                onDelete={!showActive ? handleDelete : undefined}
                 onUpdateStatus={handleUpdateStatus}
                 showActions={true}
                 emptyMessage={loading ? "Đang tải dữ liệu..." : "Không có vai trò nào"}
