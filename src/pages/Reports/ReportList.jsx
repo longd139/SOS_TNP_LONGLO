@@ -4,6 +4,7 @@ import ReportDetailModal from "../../components/report/ReportDetailModal";
 import ReportFilter from "../../components/report/ReportFilter";
 import { useReports } from "../../hooks/useReports";
 import { useReportAreas } from "../../hooks/useReportAreas";
+import { usePermission } from "../../hooks/usePermission";
 import { showToast } from "../../utils/toastNotification";
 import {
     renderStatusBadge,
@@ -28,9 +29,10 @@ export default function ReportList() {
     } = useReports({ autoFetch: false });
 
     const { reportAreas, loadReportAreas } = useReportAreas({ autoFetch: false });
+    const { canView, canUpdate, canUpdateStatus } = usePermission();
     const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
     const [selectedReport, setSelectedReport] = useState(null);
-    const [modalMode, setModalMode] = useState("view"); 
+    const [modalMode, setModalMode] = useState("view");
 
     const [filters, setFilters] = useState({
         trangThai: "",
@@ -69,7 +71,7 @@ export default function ReportList() {
             maPhanAnh: filters.maPhanAnh,
             sortTime: filters.sortTime,
         };
-        
+
         loadReports(params).catch((e) => {
             showToast.error(e);
         });
@@ -221,8 +223,8 @@ export default function ReportList() {
                 <BaseTable
                     data={reports}
                     columns={columns}
-                    onView={handleView}
-                    onEdit={handleEdit}
+                    onView={canView('PA') ? handleView : undefined}
+                    onEdit={canUpdate('PA') ? handleEdit : undefined}
                     showActions={true}
                     emptyMessage="Không có phản ánh nào"
                     pagination={{
@@ -241,7 +243,7 @@ export default function ReportList() {
                     setIsPreviewModalOpen(false);
                     setSelectedReport(null);
                     setModalMode("view");
-                    clearError(); 
+                    clearError();
                 }}
                 report={selectedReport}
                 loading={!selectedReport && isPreviewModalOpen}

@@ -4,6 +4,8 @@ import { FileText, Download, Plus, Loader2 } from "lucide-react";
 import { ConfirmModal } from "../../components/base/BaseModal";
 import TemplateFormModal from "../../components/templates/TemplateFormModal";
 import TemplateFilter from "../../components/templates/TemplateFilter";
+import { usePermission } from "../../hooks/usePermission";
+import { PermissionHidden } from "../../components/PermissionGuard";
 import dayjs from "dayjs";
 import "dayjs/locale/vi";
 import BaseTable from "../../components/base/BaseTable";
@@ -38,6 +40,8 @@ export default function TemplateManager() {
     const showRemoved = useSelector(selectShowRemoved);
     const pagination = useSelector(selectPagination);
     const filters = useSelector(selectFilters);
+
+    const { canCreate, canUpdate, canDelete, canUpdateStatus, canView } = usePermission();
 
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -361,14 +365,16 @@ export default function TemplateManager() {
                         Quản lý các biểu mẫu tải xuống cho người dân
                     </p>
                 </div>
-                <button
-                    onClick={handleCreateTemplate}
-                    className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm md:text-base"
-                >
-                    <Plus className="w-4 h-4" />
-                    <span className="hidden sm:inline">Thêm biểu mẫu mới</span>
-                    <span className="sm:hidden">Thêm mới</span>
-                </button>
+                <PermissionHidden modulePrefix="MD" action="CREATE">
+                    <button
+                        onClick={handleCreateTemplate}
+                        className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm md:text-base"
+                    >
+                        <Plus className="w-4 h-4" />
+                        <span className="hidden sm:inline">Thêm biểu mẫu mới</span>
+                        <span className="sm:hidden">Thêm mới</span>
+                    </button>
+                </PermissionHidden>
             </div>
 
             <TemplateFilter
@@ -416,6 +422,10 @@ export default function TemplateManager() {
                         onEdit={handleEdit}
                         onDelete={showRemoved ? handleDelete : null}
                         onUpdateStatus={handleUpdateStatus}
+                        canView={() => canView('MD')}
+                        canEdit={() => canUpdate('MD')}
+                        canDelete={() => canDelete('MD')}
+                        canUpdateStatus={() => canUpdateStatus('MD')}
                         viewIcon={<Download className="w-4 h-4" />}
                         showActions={true}
                         actionColumnWidth="150px"

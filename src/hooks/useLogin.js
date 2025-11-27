@@ -1,7 +1,7 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { loginUser, loginUserWithCaptcha, verifyOtpUser } from '../features/auth/authThunks';
-import { clearErrors, logout } from '../features/auth/authSlice';
+import { clearErrors, logout, restoreUser } from '../features/auth/authSlice';
 import { selectAuthState } from '../features/auth/authSelectors';
 import { clearProfile } from '../features/userProfile/userProfileSlice';
 import { ROLE } from '../constants/role';
@@ -27,7 +27,11 @@ export const useLogin = () => {
             !payload?.requiresTwoFactorAuth &&
             !payload?.otpRequired
         ) {
-            handleRedirect();
+            await dispatch(restoreUser());
+
+            requestAnimationFrame(() => {
+                handleRedirect();
+            });
         }
 
         return payload;
@@ -43,7 +47,12 @@ export const useLogin = () => {
             !payload?.requiresTwoFactorAuth &&
             !payload?.otpRequired
         ) {
-            handleRedirect();
+            await dispatch(restoreUser());
+
+            requestAnimationFrame(() => {
+                handleRedirect();
+            });
+
             return { ...payload, success: true };
         }
 

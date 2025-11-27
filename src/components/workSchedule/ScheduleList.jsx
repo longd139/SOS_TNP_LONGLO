@@ -12,7 +12,10 @@ export default function ScheduleList({
     formatDate,
     selectedDate,
     pagination,
-    onPageChange
+    onPageChange,
+    canEdit,
+    canDelete,
+    canUpdateStatus
 }) {
     const getFieldValue = (schedule, field, fallback = "N/A") => {
         const possibleFields = {
@@ -39,7 +42,7 @@ export default function ScheduleList({
         if (timeValue && typeof timeValue === "string") {
             const timeParts = timeValue.split(" - ");
             if (timeParts.length >= 1) {
-                return timeParts[0].trim(); 
+                return timeParts[0].trim();
             }
         }
         return null;
@@ -81,9 +84,9 @@ export default function ScheduleList({
 
     const renderPagination = () => {
         if (!pagination || selectedDate) return null;
-        
+
         const { currentPage, totalPages, pageSize, totalItems } = pagination;
-        
+
         if (totalPages <= 1) return null;
 
         const pages = [];
@@ -112,7 +115,7 @@ export default function ScheduleList({
                     >
                         <ChevronLeft className="w-4 h-4" />
                     </button>
-                    
+
                     {startPage > 1 && (
                         <>
                             <button
@@ -129,11 +132,10 @@ export default function ScheduleList({
                         <button
                             key={page}
                             onClick={() => onPageChange?.(page)}
-                            className={`px-3 py-1 rounded border ${
-                                page === currentPage
+                            className={`px-3 py-1 rounded border ${page === currentPage
                                     ? 'bg-blue-600 text-white border-blue-600'
                                     : 'border-gray-300 hover:bg-gray-50'
-                            }`}
+                                }`}
                         >
                             {page}
                         </button>
@@ -187,27 +189,25 @@ export default function ScheduleList({
                     </div>
                 ) : (
                     sortedSchedules.map((schedule, index) => {
-                        const displayIndex = selectedDate 
-                            ? index + 1 
+                        const displayIndex = selectedDate
+                            ? index + 1
                             : ((pagination?.currentPage || 1) - 1) * (pagination?.pageSize || 10) + index + 1;
-                        
+
                         return (
                             <div
                                 key={schedule.id}
-                                className={`bg-gray-50 rounded-lg p-2 md:p-3 border border-gray-200 hover:border-blue-300 transition-colors ${
-                                    isSchedulePassed(schedule) ? "opacity-75" : ""
-                                }`}
+                                className={`bg-gray-50 rounded-lg p-2 md:p-3 border border-gray-200 hover:border-blue-300 transition-colors ${isSchedulePassed(schedule) ? "opacity-75" : ""
+                                    }`}
                             >
                                 <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 md:gap-3 mb-2 md:mb-3">
                                     <div className="flex flex-wrap items-center gap-2 md:gap-3">
                                         <span className="text-xs md:text-sm font-medium text-gray-500">
                                             #{displayIndex}
                                         </span>
-                                        <div className={`px-2 md:px-3 py-1 rounded text-xs md:text-sm font-medium ${
-                                            isSchedulePassed(schedule) 
-                                                ? "bg-gray-100 text-gray-600" 
+                                        <div className={`px-2 md:px-3 py-1 rounded text-xs md:text-sm font-medium ${isSchedulePassed(schedule)
+                                                ? "bg-gray-100 text-gray-600"
                                                 : "bg-blue-100 text-blue-700"
-                                        }`}>
+                                            }`}>
                                             {formatDate
                                                 ? formatDate(getFieldValue(schedule, "date"))
                                                 : getFieldValue(schedule, "date")}
@@ -223,31 +223,31 @@ export default function ScheduleList({
                                         </div>
                                     </div>
                                     <div className="flex gap-2 self-end sm:self-auto">
-                                        {onEdit && !isSchedulePassed(schedule) && (
+                                        {onEdit && !isSchedulePassed(schedule) && (!canEdit || canEdit(schedule)) && (
                                             <button
                                                 onClick={() => onEdit(schedule)}
                                                 className="p-1.5 text-blue-600 hover:bg-blue-50 rounded transition-colors"
                                                 title="Chỉnh sửa"
                                             >
-                                                <Pencil className="w-3.5 h-3.5 md:w-4 md:h-4" />
+                                                <Pencil className="w-6 h-6" />
                                             </button>
                                         )}
-                                        {onStatus && (
+                                        {onStatus && (!canUpdateStatus || canUpdateStatus(schedule)) && (
                                             <button
                                                 onClick={() => onStatus(schedule)}
                                                 className="text-yellow-600 hover:text-yellow-900 p-1 rounded hover:bg-yellow-100"
                                                 title="Cập nhật trạng thái"
                                             >
-                                                <ToggleLeft className="w-4 h-4" />
+                                                <ToggleLeft className="w-6 h-6" />
                                             </button>
                                         )}
-                                        {(onDelete && (schedule.is_active === false || schedule.isActive === false)) && (
+                                        {(onDelete && (schedule.is_active === false || schedule.isActive === false) && (!canDelete || canDelete(schedule))) && (
                                             <button
                                                 onClick={() => onDelete(schedule)}
                                                 className="p-1.5 text-red-600 hover:bg-red-50 rounded transition-colors"
                                                 title="Xóa"
                                             >
-                                                <Trash2 className="w-3.5 h-3.5 md:w-4 md:h-4" />
+                                                <Trash2 className="w-6 h-6" />
                                             </button>
                                         )}
                                     </div>
@@ -282,7 +282,7 @@ export default function ScheduleList({
                     })
                 )}
             </div>
-            
+
             {renderPagination()}
         </div>
     );

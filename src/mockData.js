@@ -1,3 +1,5 @@
+import { FilePlus, LogIn, Newspaper, Square, SquarePen } from "lucide-react";
+
 export const reports = [
     {
         id: 'R-1001',
@@ -972,6 +974,54 @@ export const permissionOptions = [
         name: "Cập nhật trạng thái role",
         description: "Cập nhật trạng thái role trong hệ thống"
     },
+];
+
+export const editLogEntries = [
+    {
+        id: 'L-1005',
+        action: 'Đăng nhập xử lý phản ánh',
+        user: 'Nguyễn Văn A',
+        summary: 'Phản ánh #1234 - Vấn đề vệ sinh môi trường',
+        icon: LogIn,
+        iconColor: '#3B82F6',
+        timeAgo: '5 phút trước'
+    },
+    {
+        id: 'L-1004',
+        action: 'Chỉnh sửa phản ánh',
+        user: 'Trần Thị B',
+        summary: 'Phản ánh #1235 - Ô nhiễm môi trường',
+        icon: SquarePen,
+        iconColor: '#F97316',
+        timeAgo: '15 phút trước'
+    },
+    {
+        id: 'L-1003',
+        action: 'Thêm thủ tục',
+        user: 'Lê Văn C',
+        summary: 'Thủ tục cấp giấy phép kinh doanh',
+        icon: FilePlus,
+        iconColor: '#10B981',
+        timeAgo: '30 phút trước'
+    },
+    {
+        id: 'L-1002',
+        action: 'Thêm tin tức',
+        user: 'Phạm Thị D',
+        summary: 'Thông báo về lịch làm việc của lãnh đạo',
+        icon: Newspaper,
+        iconColor: '#A78BFA',
+        timeAgo: '1 giờ trước'
+    },
+    {
+        id: 'L-1001',
+        action: 'Chỉnh sửa phản ánh',
+        user: 'Hoàng Văn E',
+        summary: 'Phản ánh #1230 - Sụt lún đường nghiêm trọng',
+        icon: SquarePen,
+        iconColor: '#F97316',
+        timeAgo: '2 giờ trước'
+    }
 ];
 
 
