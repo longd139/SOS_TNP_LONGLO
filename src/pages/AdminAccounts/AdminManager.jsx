@@ -124,7 +124,6 @@ export default function AdminManager() {
             setUserModal({ isOpen: false, user: null });
 
         } catch (error) {
-            console.error('Error in handleUserModalSubmit:', error);
 
             if (error) {
                 showToast.error(error);

@@ -31,6 +31,7 @@ import viVN from "antd/locale/vi_VN";
 import "antd/dist/reset.css";
 import UserService from "../../services/userService";
 import { ROLE_LABELS } from "../../constants/role";
+import { usePermission } from "../../hooks/usePermission";
 
 const ReportDetailModal = ({ isOpen, onClose, report, loading = false, onStatusUpdated, mode = "edit", onModeChange }) => {
     const { statusReport, updateStatus, clearError } = useReports();
@@ -39,7 +40,7 @@ const ReportDetailModal = ({ isOpen, onClose, report, loading = false, onStatusU
     const [expectedResponseDate, setExpectedResponseDate] = useState(null);
     const [expectedCompletionDate, setExpectedCompletionDate] = useState(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
-
+    const { canUpdate } = usePermission();
     const isEditMode = mode === "edit";
 
     const [userCache, setUserCache] = useState({});
@@ -280,9 +281,11 @@ const ReportDetailModal = ({ isOpen, onClose, report, loading = false, onStatusU
                                     <h4 className="text-sm font-semibold text-gray-900 mb-2 flex items-center gap-2">
                                         Trạng thái hiện tại
                                     </h4>
-                                    <div className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 focus:ring-blue-500 text-white px-4 py-2 rounded-md text-sm font-medium">
+                                    <div className={`flex items-center gap-2 bg-blue-600 ${!canUpdate('PA') ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-700 focus:ring-blue-500'} text-white px-4 py-2 rounded-md text-sm font-medium`} disabled={!canUpdate('PA')}>
                                         <SquarePen className="w-4 h-4 flex-shrink-0" />
-                                        <button onClick={handleEditMode}>
+                                        <button 
+                                            disabled={!canUpdate('PA')}
+                                            onClick={handleEditMode}>
                                             Cập nhật trạng thái
                                         </button>
                                     </div>
