@@ -2,7 +2,6 @@ import React from 'react';
 import { User, Mail, Phone, Shield, Calendar, ToggleLeft } from 'lucide-react';
 import BaseModal from '../base/BaseModal';
 import { formatDate } from '../../utils/formatDate';
-import { ROLE_LABELS, ROLE_COLORS } from '../../constants/role';
 
 const UserViewModal = ({ isOpen, onClose, userData, loading = false }) => {
     if (!userData) return null;
@@ -81,11 +80,8 @@ const UserViewModal = ({ isOpen, onClose, userData, loading = false }) => {
                                 icon={Shield}
                                 label="Vai trò"
                                 value={
-                                    <span
-                                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${ROLE_COLORS[userData.vai_tro] || 'bg-gray-100 text-gray-800'
-                                            }`}
-                                    >
-                                        {ROLE_LABELS[userData.vai_tro] || userData.vai_tro}
+                                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                        {userData.vai_tro || userData.role || '-'}
                                     </span>
                                 }
                             />

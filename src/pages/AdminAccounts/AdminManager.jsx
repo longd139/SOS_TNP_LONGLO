@@ -120,7 +120,23 @@ export default function AdminManager() {
             setUserModal({ isOpen: false, user: null });
 
         } catch (error) {
-            showToast.error(error.message || 'Có lỗi xảy ra!' || error);
+            console.error('Error in handleUserModalSubmit:', error);
+
+            if (error) {
+                showToast.error(error);
+            }
+            
+            if (error?.errors && Array.isArray(error.errors) && error.errors.length > 0) {
+                error.errors.forEach((err) => {
+                    if (err?.message) {
+                        showToast.error(err.message);
+                    }
+                });
+            } else if (typeof error === 'string') {
+                showToast.error(error);
+            } else if (!error?.message && !error?.errors) {
+                showToast.error('Có lỗi xảy ra khi cập nhật trạng thái');
+            }
         } finally {
             setModalLoading(false);
         }
@@ -264,7 +280,7 @@ export default function AdminManager() {
             render: (role) => (
                 <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${ROLE_COLORS[role] || 'bg-gray-100 text-gray-800'
                     }`}>
-                    {ROLE_LABELS[role] || role}
+                    {ROLE_LABELS[role.toUpperCase()] || role}
                 </span>
             )
         },

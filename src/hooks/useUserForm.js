@@ -1,5 +1,4 @@
 import { useState, useEffect, useCallback } from 'react';
-import { ROLE } from '../constants/role';
 import { validateUserForm } from '../validator/userValidator';
 
 const INITIAL_FORM_STATE = {
@@ -7,7 +6,7 @@ const INITIAL_FORM_STATE = {
     fullName: '',
     email: '',
     phone: '',
-    role: ROLE.NHAN_VIEN,
+    role: '',
     password: '',
     confirmPassword: '',
     active: true
@@ -28,7 +27,7 @@ export const useUserForm = ({ initialUser = null, isOpen = false }) => {
                     fullName: initialUser.fullName || '',
                     email: initialUser.email || '',
                     phone: initialUser.phone || '',
-                    role: initialUser.role || ROLE.NHAN_VIEN,
+                    role: initialUser.role || initialUser.vai_tro || '',
                     password: '',
                     confirmPassword: '',
                     active: initialUser.active !== false
