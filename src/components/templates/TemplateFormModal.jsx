@@ -166,6 +166,7 @@ const TemplateFormModal = ({
             isOpen={isOpen}
             onClose={handleClose}
             title={modalTitle}
+            subtitle='Tải lên file PDF biểu mẫu (tối đa 10MB)'
             size="3xl"
             className="max-w-5xl"
             footer={

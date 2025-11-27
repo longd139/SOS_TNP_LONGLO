@@ -78,6 +78,7 @@ const GovernmentFormModal = ({
                 await onSubmit(payload);
                 setForm(initialState);
                 setErrors({});
+                onClose();
             } else if (mode === "create") {
                 const apiCreated = await GOVERNMENT_API.createGovernment(payload);
                 if (apiCreated) {
@@ -94,8 +95,11 @@ const GovernmentFormModal = ({
                 }
             }
         } catch (err) {
-            if (err?.message) showToast?.error(err.message);
-            throw err;
+            if (err?.message) {
+                showToast?.error(err.message);
+            } else {
+                showToast?.error("Có lỗi xảy ra, vui lòng thử lại!");
+            }
         } finally {
             setIsSubmitting(false);
         }

@@ -140,6 +140,9 @@ export default function ProceduresManager() {
         if (result.success) {
             setSelectedProcedure(result.data);
             openEditModal();
+        } else {
+            const errorMessage = result.error?.message || result.error || "Có lỗi xảy ra khi lấy thông tin thủ tục!";
+            showToast.error(errorMessage);
         }
     };
 
@@ -180,6 +183,9 @@ export default function ProceduresManager() {
         if (result.success) {
             setSelectedProcedure(result.data);
             openDetailModal();
+        } else {
+            const errorMessage = result.error?.message || result.error || "Có lỗi xảy ra khi lấy thông tin thủ tục!";
+            showToast.error(errorMessage);
         }
     };
 

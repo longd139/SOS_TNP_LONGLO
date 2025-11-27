@@ -13,33 +13,41 @@ export const useLogin = () => {
     const navigate = useNavigate();
     const { loading, errors, apiError, otpRequired, requiresTwoFactorAuth, email, tenDangNhap, user } = useSelector(selectAuthState);
 
-    const handleRedirect = (role) => {
-        if (role === ROLE.ADMIN) {
-            navigate(ROUTE_PATH.DASHBOARD, { replace: true });
-        } else {
-            localStorage.removeItem('accessToken');
-            localStorage.removeItem('refreshToken');
-            dispatch(logout());
-            dispatch(clearProfile());
-            showToast.error('Bạn không có quyền truy cập vào hệ thống quản trị!');
-            navigate(ROUTE_PATH.LOGIN, { replace: true });
-        }
+    const handleRedirect = () => {
+        navigate(ROUTE_PATH.DASHBOARD, { replace: true });
     };
 
     const login = async (credentials) => {
         const result = await dispatch(loginUser(credentials));
-        if (result.meta.requestStatus === 'fulfilled' && result.payload?.user && !result.payload?.requiresTwoFactorAuth && !result.payload?.otpRequired) {
-            handleRedirect(result.payload.user.role);
+        const payload = result.payload;
+
+        if (
+            result.meta.requestStatus === 'fulfilled' &&
+            payload?.user &&
+            !payload?.requiresTwoFactorAuth &&
+            !payload?.otpRequired
+        ) {
+            handleRedirect();
         }
-        return result.payload;
+
+        return payload;
     };
 
     const loginWithCaptcha = async (credentials) => {
         const result = await dispatch(loginUserWithCaptcha(credentials));
-        if (result.meta.requestStatus === 'fulfilled' && result.payload?.user && !result.payload?.requiresTwoFactorAuth && !result.payload?.otpRequired) {
-            handleRedirect(result.payload.user.role);
+        const payload = result.payload;
+
+        if (
+            result.meta.requestStatus === 'fulfilled' &&
+            payload?.user &&
+            !payload?.requiresTwoFactorAuth &&
+            !payload?.otpRequired
+        ) {
+            handleRedirect();
+            return { ...payload, success: true };
         }
-        return result.payload;
+
+        return { ...payload, success: false };
     };
 
     const verifyOtp = async (data) => {

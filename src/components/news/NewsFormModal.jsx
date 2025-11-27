@@ -364,6 +364,7 @@ const NewsFormModal = ({ isOpen, onClose, onSubmit, initialData = null, isLoadin
                 isOpen={isOpen}
                 onClose={handleClose}
                 title={initialData ? "Chỉnh sửa bài viết" : "Tạo bài viết mới"}
+                subtitle='Nhập thông tin bài viết để đăng tải'
                 size="3xl"
                 className="max-w-5xl"
                 footer={

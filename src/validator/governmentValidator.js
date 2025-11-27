@@ -18,7 +18,7 @@ const governmentSchema = yup.object().shape({
         .test('trim', 'Số điện thoại là bắt buộc', value => value && value.trim().length > 0)
         .max(20, "Số điện thoại không được vượt quá 20 ký tự")
         .matches(/^[0-9]{10,11}$/, "Số điện thoại phải có 10-11 chữ số")
-        .test('starts-with-zero', 'Số điện thoại phải bắt đầu bằng số 0', function(value) {
+        .test('starts-with-zero', 'Số điện thoại phải bắt đầu bằng số 0', function (value) {
             if (!value) return true;
             return value.startsWith('0');
         }),
@@ -39,6 +39,10 @@ const governmentSchema = yup.object().shape({
                 return false;
             }
         })
+        .matches(
+            /^(https?:\/\/)?(www\.)?(google\.com\/maps|goo\.gl\/maps|maps\.app\.goo\.gl)\/.+$/,
+            "Link Google Map phải là URL của Google Maps"
+        ),
 });
 
 export async function validateGovernmentForm(data) {

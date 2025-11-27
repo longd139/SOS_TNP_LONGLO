@@ -20,7 +20,7 @@ export const createUserSchema = yup.object().shape({
     role: yup
         .string()
         .required("Vai trò là bắt buộc")
-        .oneOf(['ADMIN', 'NHAN_VIEN', 'LANH_DAO', 'PHO_CHU_TICH', 'CHU_TICH', 'KHU_PHO'], "Vai trò không hợp lệ"),
+        .test('trim', 'Vai trò là bắt buộc', value => value && value.trim().length > 0),
 
     password: yup
         .string()
@@ -47,8 +47,7 @@ export const updateUserSchema = yup.object().shape({
     role: yup
         .string()
         .required("Vai trò là bắt buộc")
-        .test('trim', 'Vai trò là bắt buộc', value => value && value.trim().length > 0)
-        .oneOf(['ADMIN', 'NHAN_VIEN', 'LANH_DAO', 'PHO_CHU_TICH', 'CHU_TICH', 'KHU_PHO'], "Vai trò không hợp lệ"),
+        .test('trim', 'Vai trò là bắt buộc', value => value && value.trim().length > 0),
 
     password: yup
         .string()
@@ -93,8 +92,7 @@ export const updateUserWithPhoneSchema = yup.object().shape({
     role: yup
         .string()
         .required("Vai trò là bắt buộc")
-        .test('trim', 'Vai trò là bắt buộc', value => value && value.trim().length > 0)
-        .oneOf(['ADMIN', 'NHAN_VIEN', 'LANH_DAO', 'PHO_CHU_TICH', 'CHU_TICH', 'KHU_PHO'], "Vai trò không hợp lệ"),
+        .test('trim', 'Vai trò là bắt buộc', value => value && value.trim().length > 0),
 
     password: yup
         .string()
