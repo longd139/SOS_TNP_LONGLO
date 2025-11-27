@@ -20,8 +20,10 @@ export default function ProceduresFilter({
     const areas = useSelector(selectAreas);
 
     useEffect(() => {
-        dispatch(fetchAreas({ isActive: true }));
-    }, [dispatch]);
+        if (!areas || areas.length === 0) {
+            dispatch(fetchAreas({ isActive: true }));
+        }
+    }, []);
 
     const initialFilters = {
         searchKeyword: currentFilters.searchKeyword !== undefined ? currentFilters.searchKeyword : (filters.searchKeyword || ''),
