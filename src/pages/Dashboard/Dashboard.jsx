@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import StatCard from '../../components/dashboard/StatCard';
 import Chart from '../../components/dashboard/Chart';
-import { AlertTriangle, CheckCircle, Clock, FileCheck, FileText, MessageSquare, Send } from 'lucide-react';
+import { AlertTriangle, CheckCircle, Clock, FileCheck, FileText, MessageSquare, Send, LogIn, Edit, FilePlus, Newspaper } from 'lucide-react';
+import { editLogEntries } from '../../mockData';
 import { useReports } from '../../hooks/useReports';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
@@ -190,6 +191,52 @@ export default function Dashboard() {
                                 </div>
                             </div>
                         ))}
+                    </div>
+                )}
+            </div>
+
+            <div className="bg-white rounded-xl p-3 md:p-4 shadow-sm">
+                <h3 className="text-base md:text-lg font-semibold text-gray-800 mb-3 md:mb-4 ml-3 mt-2">
+                    Nhật ký chỉnh sửa
+                </h3>
+
+                {editLogEntries.length === 0 ? (
+                    <div className="flex items-center justify-center h-32">
+                        <div className="text-gray-500">Không có nhật ký</div>
+                    </div>
+                ) : (
+                    <div className="space-y-1">
+                        {editLogEntries.map((log) => {
+                            
+                            const Icon = log.icon || FileText;
+
+                            return (
+                                <div key={log.id} className="p-2 pb-0 md:pb-3">
+                                    <div className="border border-gray-200 px-2 rounded-lg flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
+                                        <div className="flex-1 min-w-0 p-3 flex items-start gap-3">
+                                            <div className="flex-shrink-0">
+                                                <div style={{ backgroundColor: `${log.iconColor}14`, border: `1px solid ${log.iconColor}22` }} className="w-10 h-10 rounded-lg flex items-center justify-center text-sm font-semibold">
+                                                    <Icon className="w-5 h-5" style={{ color: log.iconColor }} />
+                                                </div>
+                                            </div>
+
+                                            <div className="flex-1 min-w-0">
+                                                <div className="flex items-center gap-2 mb-1">
+                                                    <h4 className="text-sm md:text-base font-medium text-gray-900 truncate mb-0">{log.action}</h4>
+                                                    <span className="text-xs text-gray-500">•</span>
+                                                    <span className="text-xs text-gray-500 truncate">{log.user}</span>
+                                                </div>
+                                                <div className="text-sm text-gray-500 truncate">{log.summary}</div>
+                                            </div>
+                                        </div>
+
+                                        <div className="flex-shrink-0 self-center mr-3 text-sm text-gray-500 whitespace-nowrap">
+                                            {log.timeAgo}
+                                        </div>
+                                    </div>
+                                </div>
+                            );
+                        })}
                     </div>
                 )}
             </div>
