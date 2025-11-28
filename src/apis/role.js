@@ -132,5 +132,5 @@ export const ROLE_API = {
     getRoleById,
     updateRole,
     deleteRole,
-    updateStatusRole,
+    updateRoleStatus: updateStatusRole,
 }

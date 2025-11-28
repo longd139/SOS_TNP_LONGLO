@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import StatCard from '../../components/dashboard/StatCard';
 import Chart from '../../components/dashboard/Chart';
-import { AlertTriangle, CheckCircle, Clock, FileCheck, FileText, MessageSquare, Send, LogIn, Edit, FilePlus, Newspaper } from 'lucide-react';
+import { AlertTriangle, CheckCircle, Clock, FileCheck, FileText, MessageSquare, Send, LogIn, Edit, FilePlus, Newspaper, History, BookOpen, Building2, Home, ClipboardList, CalendarCheck, Shield } from 'lucide-react';
 import { editLogEntries } from '../../mockData';
 import { useReports } from '../../hooks/useReports';
 import dayjs from 'dayjs';
@@ -24,7 +24,7 @@ export default function Dashboard() {
             'Đã tiếp nhận': 0,
             'Đóng': 0
         },
-        xu_huong_phan_anh: []
+        nhat_ky_hoat_dong: []
     });
 
     useEffect(() => {
@@ -81,6 +81,70 @@ export default function Dashboard() {
             status: report?.lich_su_trang_thai[0]?.ten || '',
             isUrgent: 'Khẩn'
         };
+    });
+
+    const renderName = (data) => {
+        switch (data) {
+            case 'phan_anh':
+                return 'Phản ánh';
+            case 'lich_su_trang_thai':
+                return 'Lịch sử trạng thái';
+            default:
+                return data;
+        }
+    }
+
+    const renderIcon = (text = "") => {
+        const lower = text.toLowerCase();
+
+        if (lower.includes("phan_anh") || lower.includes("phản ánh")) return MessageSquare;
+        if (lower.includes("lich_su_trang_thai") || lower.includes("lịch sử trạng thái")) return History;
+        if (lower.includes("người dùng")) return LogIn;
+        if (lower.includes("chỉnh sửa")) return Edit;
+        if (lower.includes("tạo mới")) return FilePlus;
+        if (lower.includes("báo cáo")) return Newspaper;
+        if (lower.includes("danh mục")) return BookOpen;
+        if (lower.includes("mẫu đơn")) return FileText;
+        if (lower.includes("uỷ ban")) return Building2;
+        if (lower.includes("cơ sở dịch vụ")) return Home;
+        if (lower.includes("đăng nhập")) return LogIn;
+        if (lower.includes("thủ tục") || lower.includes("thủ tục hành chính")) return ClipboardList;
+        if (lower.includes("tin tức") || lower.includes("tin tuc")) return Newspaper;
+        if (lower.includes("lịch")) return CalendarCheck;
+        if (lower.includes("phân quyền") || lower.includes("phan quyen") || lower.includes("phan_quyen") || lower.includes("vai trò") || lower.includes("vai tro")) return Shield;
+        return FileText;
+    };
+
+
+    const iconColors = new Map([
+        [MessageSquare, "#3b82f6"],    
+        [History, "#10b981"],       
+        [LogIn, "#ef4444"],       
+        [Edit, "#f97316"],        
+        [FilePlus, "#6366f1"],         
+        [Newspaper, "#0ea5e9"],    
+        [BookOpen, "#8b5cf6"],          
+        [FileText, "#6b7280"],          
+        [Building2, "#dc2626"],         
+        [Home, "#22c55e"], 
+        [ClipboardList, "#f59e0b"],     
+        [CalendarCheck, "#14b8a6"],     
+        [Shield, "#64748b"]             
+    ]);
+
+    const getColorByIcon = (icon) => {
+        return iconColors.get(icon) || "#6b7280"; 
+    };
+
+    const historyReport = (dashboardData.nhat_ky_hoat_dong || []).map(history => {
+        return {
+            id: history.timestamp,
+            name: history.hanh_dong?.split(',').map((item) => renderName(item.trim())).join(', '),
+            user: history?.nguoi_dung?.ho_va_ten,
+            timeAgo: dayjs(history.timestamp).fromNow(),
+            icon: renderIcon(history.hanh_dong),
+            iconColor: getColorByIcon(renderIcon(history.hanh_dong))
+        }
     });
 
     return (
@@ -200,36 +264,42 @@ export default function Dashboard() {
                     Nhật ký chỉnh sửa
                 </h3>
 
-                {editLogEntries.length === 0 ? (
+                {historyReport.length === 0 ? (
                     <div className="flex items-center justify-center h-32">
                         <div className="text-gray-500">Không có nhật ký</div>
                     </div>
                 ) : (
                     <div className="space-y-1">
-                        {editLogEntries.map((log) => {
-                            
+                        {historyReport.map((log) => {
+
                             const Icon = log.icon || FileText;
 
                             return (
                                 <div key={log.id} className="p-2 pb-0 md:pb-3">
                                     <div className="border border-gray-200 px-2 rounded-lg flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
-                                        <div className="flex-1 min-w-0 p-3 flex items-start gap-3">
+                                        <div className="flex-1 min-w-0 p-3 flex items-center gap-3">
                                             <div className="flex-shrink-0">
-                                                <div style={{ backgroundColor: `${log.iconColor}14`, border: `1px solid ${log.iconColor}22` }} className="w-10 h-10 rounded-lg flex items-center justify-center text-sm font-semibold">
+                                                <div
+                                                    style={{
+                                                        backgroundColor: `${log.iconColor}14`,
+                                                        border: `1px solid ${log.iconColor}22`,
+                                                    }}
+                                                    className="w-10 h-10 rounded-lg flex items-center justify-center text-sm font-semibold"
+                                                >
                                                     <Icon className="w-5 h-5" style={{ color: log.iconColor }} />
                                                 </div>
                                             </div>
 
                                             <div className="flex-1 min-w-0">
-                                                <div className="flex items-center gap-2 mb-1">
-                                                    <h4 className="text-sm md:text-base font-medium text-gray-900 truncate mb-0">{log.action}</h4>
+                                                <div className="flex items-center gap-2 mb-0">
+                                                    <h3 className="text-sm md:text-base font-medium text-gray-900 truncate mb-0">
+                                                        {log.name}
+                                                    </h3>
                                                     <span className="text-xs text-gray-500">•</span>
-                                                    <span className="text-xs text-gray-500 truncate">{log.user}</span>
+                                                    <span className="text-xs text-gray-500 truncate">{log.user ? log.user : 'Chưa cập nhật'}</span>
                                                 </div>
-                                                <div className="text-sm text-gray-500 truncate">{log.summary}</div>
                                             </div>
                                         </div>
-
                                         <div className="flex-shrink-0 self-center mr-3 text-sm text-gray-500 whitespace-nowrap">
                                             {log.timeAgo}
                                         </div>

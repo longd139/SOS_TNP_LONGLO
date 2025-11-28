@@ -12,7 +12,7 @@ import { PermissionHidden } from "../../components/PermissionGuard";
 import { getProcedureColumns } from "../../components/procedures/columns";
 import { showToast } from "../../utils/toastNotification";
 import { ConfirmModal } from "../../components/base/BaseModal";
-import { fetchProcedures, fetchAreas } from "../../features/procedures/proceduresThunks";
+import { fetchProcedures } from "../../features/procedures/proceduresThunks";
 import { Loader2 } from "lucide-react";
 dayjs.locale("vi");
 
@@ -64,8 +64,7 @@ export default function ProceduresManager() {
                 isActive: true,
             })
         );
-
-        dispatch(fetchAreas());
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const openCreateModal = () => {

@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react'
+import React, { useState, useCallback, useEffect } from 'react'
 import { Loader2, Plus, Shield } from 'lucide-react';
 import BaseTable from '../../components/base/BaseTable';
 import { showToast } from '../../utils/toastNotification';
@@ -8,6 +8,7 @@ import { ConfirmModal } from '../../components/base/BaseModal';
 import PermisisonFilter from '../../components/permissions/PermisisonFilter';
 import { usePermission } from '../../hooks/usePermission';
 import { PermissionHidden } from '../../components/PermissionGuard';
+import PermissionDetailModal from '../../components/permissions/PermissionDetailModal';
 
 const PermissionsManagement = () => {
     const {
@@ -35,6 +36,10 @@ const PermissionsManagement = () => {
     const [selectedRoleForDelete, setSelectedRoleForDelete] = useState(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [currentPageSize, setCurrentPageSize] = useState(pagination.pageSize || 10);
+
+    useEffect(() => {
+        loadRoles(1, 10);
+    }, [loadRoles]);
 
     const formatDate = (dateString) => {
         if (!dateString) return '-';
@@ -146,9 +151,10 @@ const PermissionsManagement = () => {
         }
     }, [selectedRoleForDelete, deleteRole]);
 
-    const handleUpdateStatus = useCallback(async (record, status) => {
+    const handleUpdateStatus = useCallback(async (record) => {
         try {
-            await updateStatus(record.id, status);
+            const newStatus = !record.is_active;
+            await updateStatus(record.id, newStatus);
             showToast.success('Cập nhật trạng thái thành công');
         } catch (error) {
             showToast.error(error.message || 'Cập nhật trạng thái thất bại');
@@ -184,6 +190,16 @@ const PermissionsManagement = () => {
         setSelectedRoleForEdit(null);
     }
 
+    const handleView = async (permission) => {
+        const result = await getRoleById(permission.id);
+        if (result.success) {
+            setSelectedRoleForEdit(result.data);
+            setIsCreateModalOpen(true);
+        } else {
+            const errorMessage = result.error?.message || result.error || "Có lỗi xảy ra khi lấy thông tin thủ tục!";
+            showToast.error(errorMessage);
+        }
+    };
     const handleCreateSubmit = useCallback(async (formData) => {
         try {
             setIsSubmitting(true);
@@ -221,7 +237,8 @@ const PermissionsManagement = () => {
     const tablePagination = {
         current: pagination.currentPage,
         pageSize: currentPageSize,
-        total: pagination.totalItems
+        total: pagination.totalItems,
+        totalPages: pagination.totalPages
     };
 
     return (
@@ -279,6 +296,7 @@ const PermissionsManagement = () => {
                 onEdit={handleEdit}
                 onDelete={!showActive ? handleDelete : undefined}
                 onUpdateStatus={handleUpdateStatus}
+                onView={handleView}
                 canEdit={() => canUpdate('ROLE')}
                 canDelete={() => canDelete('ROLE')}
                 canUpdateStatus={() => canUpdateStatus('ROLE')}
@@ -290,12 +308,19 @@ const PermissionsManagement = () => {
             />
 
             <PermissionFormModal
-                isOpen={isCreateModalOpen}
+                isOpen={isCreateModalOpen && selectedRoleForEdit === null}
                 onClose={() => setIsCreateModalOpen(false)}
                 onSubmit={handleCreateSubmit}
                 mode="create"
                 isLoading={isSubmitting}
             />
+
+            <PermissionDetailModal
+                isOpen={isCreateModalOpen && selectedRoleForEdit !== null}
+                onClose={() => setIsCreateModalOpen(false)}
+                permisison={selectedRoleForEdit}
+            />
+
 
             <PermissionFormModal
                 isOpen={isEditModalOpen}

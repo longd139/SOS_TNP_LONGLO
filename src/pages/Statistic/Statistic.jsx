@@ -28,20 +28,23 @@ export default function Statistic() {
                 <ExportButtons dateRange={dateRange} reportType={reportType} />
             </div>
 
-            <DateRangeFilter
-                dateRange={dateRange}
-                onDateRangeChange={setDateRange}
-                reportType={reportType}
-                onReportTypeChange={setReportType}
-            />
+            <div id="statistic-content">
+                <DateRangeFilter
+                    dateRange={dateRange}
+                    onDateRangeChange={setDateRange}
+                    reportType={reportType}
+                    onReportTypeChange={setReportType}
+                />
 
-            <ReportTabs activeTab={activeTab} onTabChange={setActiveTab} />
+                <ReportTabs activeTab={activeTab} onTabChange={setActiveTab} />
 
-            {activeTab === 'reports' ? (
-                <ReportsTab dateRange={dateRange} />
-            ) : (
-                <UserActivityTab />
-            )}
+
+                {activeTab === 'reports' ? (
+                    <ReportsTab dateRange={dateRange} />
+                ) : (
+                    <UserActivityTab />
+                )}
+            </div>
         </div>
     );
 }

@@ -124,7 +124,6 @@ export default function AdminManager() {
             setUserModal({ isOpen: false, user: null });
 
         } catch (error) {
-            console.error('Error in handleUserModalSubmit:', error);
 
             if (error) {
                 showToast.error(error);
@@ -282,9 +281,8 @@ export default function AdminManager() {
             key: 'role',
             width: '150px',
             render: (role) => (
-                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${ROLE_COLORS[role] || 'bg-gray-100 text-gray-800'
-                    }`}>
-                    {ROLE_LABELS[role.toUpperCase()] || role}
+                <span className='inline-flex items-center px-2.5 py-0.5 text-gray-800'>
+                    {role}
                 </span>
             )
         },
