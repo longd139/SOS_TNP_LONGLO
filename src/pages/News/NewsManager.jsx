@@ -400,7 +400,7 @@ export default function NewsManager() {
             <BaseTable
                 data={news}
                 columns={columns}
-                onView={canView('TTIN') ? handleView : undefined}
+                onView={handleView}
                 onEdit={canUpdate('TTIN') ? handleEdit : undefined}
                 onDelete={!showActive && canDelete('TTIN') ? handleDelete : undefined}
                 onUpdateStatus={canUpdateStatus('TTIN') ? handleUpdateStatus : undefined}
