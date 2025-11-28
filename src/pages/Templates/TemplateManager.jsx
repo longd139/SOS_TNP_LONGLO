@@ -422,7 +422,6 @@ export default function TemplateManager() {
                         onEdit={handleEdit}
                         onDelete={showRemoved ? handleDelete : null}
                         onUpdateStatus={handleUpdateStatus}
-                        canView={() => canView('MD')}
                         canEdit={() => canUpdate('MD')}
                         canDelete={() => canDelete('MD')}
                         canUpdateStatus={() => canUpdateStatus('MD')}

@@ -328,7 +328,7 @@ export default function ProceduresManager() {
                 onPageChange={changePage}
                 onEdit={canUpdate('TT') ? handleEdit : undefined}
                 onDelete={!JSON.parse(showActive) && canDelete('TT') ? handleDelete : undefined}
-                onView={canView('TT') ? handleView : undefined}
+                onView={handleView}
                 showActions={true}
                 emptyMessage="Không có thủ tục nào được tìm thấy"
                 className="mb-4"
