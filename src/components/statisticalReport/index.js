@@ -11,3 +11,5 @@ export { default as CategoryDetails } from './CategoryDetails';
 export { default as FieldReportChart } from './FieldReportChart';
 export { default as StatusReportChart } from './StatusReportChart';
 export { default as NewsDetailsTable } from './NewsDetailsTable';
+export { default as ProceduresPieChart } from './ProceduresPieChart';
+export { default as ProceduresBarChart } from './ProceduresBarChart';

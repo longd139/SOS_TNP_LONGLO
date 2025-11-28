@@ -159,13 +159,13 @@ export const chartData = {
 
 // Mock data for Dashboard trends - used in ReportsTab (5-day intervals)
 export const mockTrendsData = [
-    { date: '2025-10-01', tong_phan_anh: 2400, da_giai_quyet: 0 },
-    { date: '2025-10-05', tong_phan_anh: 3100, da_giai_quyet: 0 },
-    { date: '2025-10-10', tong_phan_anh: 2800, da_giai_quyet: 0 },
-    { date: '2025-10-15', tong_phan_anh: 3800, da_giai_quyet: 0 },
-    { date: '2025-10-20', tong_phan_anh: 3200, da_giai_quyet: 0 },
-    { date: '2025-10-25', tong_phan_anh: 4100, da_giai_quyet: 0 },
-    { date: '2025-10-31', tong_phan_anh: 3600, da_giai_quyet: 0 }
+    { date: '2025-10-01', tong_phan_anh: 195, da_giai_quyet: 135 },
+    { date: '2025-10-05', tong_phan_anh: 215, da_giai_quyet: 155 },
+    { date: '2025-10-10', tong_phan_anh: 195, da_giai_quyet: 145 },
+    { date: '2025-10-15', tong_phan_anh: 235, da_giai_quyet: 190 },
+    { date: '2025-10-20', tong_phan_anh: 205, da_giai_quyet: 155 },
+    { date: '2025-10-25', tong_phan_anh: 250, da_giai_quyet: 200 },
+    { date: '2025-10-31', tong_phan_anh: 220, da_giai_quyet: 185 }
 ];
 
 // Mock data for monthly trends (separate chart)

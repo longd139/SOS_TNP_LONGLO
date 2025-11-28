@@ -41,12 +41,12 @@ export default function NewsDetailsTable({ data }) {
                 {item.date}
               </td>
               <td className="py-3 px-4 text-center">
-                <span className="inline-flex items-center justify-center min-w-[2rem] h-6 px-2 text-sm font-medium text-green-700 rounded-md">
+                <span className="inline-flex items-center justify-center min-w-[2rem] h-6 px-2 text-sm font-medium text-green-500 rounded-md">
                   {item.daXuatBan}
                 </span>
               </td>
               <td className="py-3 px-4 text-center">
-                <span className="inline-flex items-center justify-center min-w-[2rem] h-6 px-2 text-sm font-medium text-orange-700  rounded-md">
+                <span className="inline-flex items-center justify-center min-w-[2rem] h-6 px-2 text-sm font-medium text-orange-500  rounded-md">
                   {item.banNhap}
                 </span>
               </td>
@@ -56,7 +56,7 @@ export default function NewsDetailsTable({ data }) {
                 </span>
               </td>
               <td className="py-3 px-4 text-center">
-                <span className="inline-flex items-center justify-center min-w-[3rem] h-6 px-2 text-sm font-medium text-blue-700 rounded-md">
+                <span className="inline-flex items-center justify-center min-w-[3rem] h-6 px-2 text-sm font-medium text-blue-500 rounded-md">
                   {item.luotXem.toLocaleString()}
                 </span>
               </td>

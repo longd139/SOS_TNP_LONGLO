@@ -66,16 +66,16 @@ export default function StatusReportChart({ dateRange }) {
           <XAxis
             dataKey="status"
             tick={{ fontSize: 11, fill: '#6b7280' }}
-            axisLine={false}
-            tickLine={false}
+            axisLine={{ stroke: '#000000', strokeWidth: 1 }}
+            tickLine={{ stroke: '#000000' }}
             angle={-45}
             textAnchor="end"
             height={60}
           />
           <YAxis
             tick={{ fontSize: 11, fill: '#6b7280' }}
-            axisLine={false}
-            tickLine={false}
+            axisLine={{ stroke: '#000000', strokeWidth: 1 }}
+            tickLine={{ stroke: '#000000' }}
             domain={[0, 1000]}
           />
           <Tooltip
