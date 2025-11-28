@@ -49,15 +49,15 @@ const CustomLineChart = ({ data, title }) => {
                         />
                         <XAxis
                             dataKey="date"
-                            axisLine={false}
-                            tickLine={false}
+                            axisLine={{ stroke: '#000000', strokeWidth: 1 }}
+                            tickLine={{ stroke: '#000000' }}
                             tick={{ fontSize: 12, fill: '#6b7280' }}
                             dy={10}
                         />
                         <YAxis
                             domain={[0, 'auto']}
-                            axisLine={false}
-                            tickLine={false}
+                            axisLine={{ stroke: '#000000', strokeWidth: 1 }}
+                            tickLine={{ stroke: '#000000' }}
                             tick={{ fontSize: 12, fill: '#6b7280' }}
                             dx={-10}
                         />

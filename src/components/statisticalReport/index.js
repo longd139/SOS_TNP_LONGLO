@@ -1,9 +1,12 @@
 export { default as DateRangeFilter } from './DateRangeFilter';
 export { default as ExportButtons } from './ExportButtons';
 export { default as ReportTabs } from './ReportTabs';
+export { default as DomainFilter } from './DomainFilter';
 export { default as ReportsTab } from './ReportsTab';
-export { default as UserActivityTab } from './UserActivityTab';
+export { default as NewsTab } from './NewsTab';
+export { default as ProceduresTab } from './ProceduresTab';
+export { default as ReportDetails } from './ReportDetails';
+export { default as StatisticsByCategory } from './StatisticsByCategory';
+export { default as CategoryDetails } from './CategoryDetails';
 export { default as FieldReportChart } from './FieldReportChart';
 export { default as StatusReportChart } from './StatusReportChart';
-export { default as TrendChart } from './TrendChart';
-export { default as TopIssuesSection } from './TopIssuesSection';

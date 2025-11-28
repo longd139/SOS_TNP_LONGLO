@@ -90,41 +90,41 @@ export const newsList = [
 ];
 
 export const procedures = [
-    { 
-        id: '#1', 
-        name: 'Đăng ký kinh doanh', 
-        field: 'Kinh tế', 
-        processingTime: '7 ngày', 
-        status: 'Cập nhật', 
-        fee: 'Miễn phí', 
-        contact: '028-1234-5678' 
+    {
+        id: '#1',
+        name: 'Đăng ký kinh doanh',
+        field: 'Kinh tế',
+        processingTime: '7 ngày',
+        status: 'Cập nhật',
+        fee: 'Miễn phí',
+        contact: '028-1234-5678'
     },
-    { 
-        id: '#2', 
-        name: 'Cấp chứng minh', 
-        field: 'Hành chính', 
-        processingTime: '10 ngày', 
-        status: 'Cập nhật', 
-        fee: '100.000 VNĐ', 
-        contact: '028-1234-5678' 
+    {
+        id: '#2',
+        name: 'Cấp chứng minh',
+        field: 'Hành chính',
+        processingTime: '10 ngày',
+        status: 'Cập nhật',
+        fee: '100.000 VNĐ',
+        contact: '028-1234-5678'
     },
-    { 
-        id: '#3', 
-        name: 'Đăng ký kết hôn', 
-        field: 'Xã hội', 
-        processingTime: '5 ngày', 
-        status: 'Cập nhật', 
-        fee: '50.000 VNĐ', 
-        contact: '028-1234-5679' 
+    {
+        id: '#3',
+        name: 'Đăng ký kết hôn',
+        field: 'Xã hội',
+        processingTime: '5 ngày',
+        status: 'Cập nhật',
+        fee: '50.000 VNĐ',
+        contact: '028-1234-5679'
     },
-    { 
-        id: '#4', 
-        name: 'Cấp giấy phép xây dựng', 
-        field: 'Xây dựng', 
-        processingTime: '15 ngày', 
-        status: 'Cập nhật', 
-        fee: '200.000 VNĐ', 
-        contact: '028-1234-5680' 
+    {
+        id: '#4',
+        name: 'Cấp giấy phép xây dựng',
+        field: 'Xây dựng',
+        processingTime: '15 ngày',
+        status: 'Cập nhật',
+        fee: '200.000 VNĐ',
+        contact: '028-1234-5680'
     }
 ];
 
@@ -138,12 +138,13 @@ export const dashboardStats = {
 
 export const chartData = {
     trends: [
-        { date: '01/10', tongPhanAnh: 45, daGiaiQuyet: 33 },
-        { date: '05/10', tongPhanAnh: 52, daGiaiQuyet: 37 },
-        { date: '10/10', tongPhanAnh: 47, daGiaiQuyet: 40 },
-        { date: '15/10', tongPhanAnh: 61, daGiaiQuyet: 44 },
-        { date: '20/10', tongPhanAnh: 58, daGiaiQuyet: 47 },
-        { date: '22/10', tongPhanAnh: 69, daGiaiQuyet: 51 }
+        { date: '01/10', tongPhanAnh: 195, daGiaiQuyet: 135 },
+        { date: '05/10', tongPhanAnh: 215, daGiaiQuyet: 155 },
+        { date: '10/10', tongPhanAnh: 195, daGiaiQuyet: 145 },
+        { date: '15/10', tongPhanAnh: 235, daGiaiQuyet: 190 },
+        { date: '20/10', tongPhanAnh: 205, daGiaiQuyet: 155 },
+        { date: '25/10', tongPhanAnh: 250, daGiaiQuyet: 200 },
+        { date: '31/10', tongPhanAnh: 220, daGiaiQuyet: 185 }
     ],
     visits: [
         { day: 'T2', visits: 1200 },
@@ -155,6 +156,26 @@ export const chartData = {
         { day: 'CN', visits: 1450 }
     ]
 };
+
+// Mock data for Dashboard trends - used in ReportsTab (5-day intervals)
+export const mockTrendsData = [
+    { date: '2025-10-01', tong_phan_anh: 195, da_giai_quyet: 135 },
+    { date: '2025-10-05', tong_phan_anh: 215, da_giai_quyet: 155 },
+    { date: '2025-10-10', tong_phan_anh: 195, da_giai_quyet: 145 },
+    { date: '2025-10-15', tong_phan_anh: 235, da_giai_quyet: 190 },
+    { date: '2025-10-20', tong_phan_anh: 205, da_giai_quyet: 155 },
+    { date: '2025-10-25', tong_phan_anh: 250, da_giai_quyet: 200 },
+    { date: '2025-10-31', tong_phan_anh: 220, da_giai_quyet: 185 }
+];
+
+// Mock data for monthly trends (separate chart)
+export const mockMonthlyTrendsData = [
+    { date: '2025-06-01', so_phan_anh: 140 },
+    { date: '2025-07-01', so_phan_anh: 165 },
+    { date: '2025-08-01', so_phan_anh: 200 },
+    { date: '2025-09-01', so_phan_anh: 175 },
+    { date: '2025-10-01', so_phan_anh: 215 }
+];
 
 export const recentReports = [
     {
@@ -974,6 +995,230 @@ export const permissionOptions = [
         name: "Cập nhật trạng thái role",
         description: "Cập nhật trạng thái role trong hệ thống"
     },
+];
+
+// Mock data for Report Details
+export const reportDetailsData = [
+    {
+        id: "PA-2025-1234",
+        title: "Đường xuống cấp tại phường 1",
+        category: "Giao thông vận tải",
+        status: "Đã giải quyết",
+        statusColor: "#059669",
+        statusBg: "#D1FAE5",
+        createdDate: "2025-11-25 10:30"
+    },
+    {
+        id: "PA-2025-1235",
+        title: "Ô nhiễm môi trường khu vực công nghiệp",
+        category: "Môi trường",
+        status: "Đang xử lý",
+        statusColor: "#2563EB",
+        statusBg: "#DBEAFE",
+        createdDate: "2025-11-25 09:15"
+    },
+    {
+        id: "PA-2025-1236",
+        title: "Mất an ninh tại khu chung cư",
+        category: "An ninh trật tự",
+        status: "Đã tiếp nhận",
+        statusColor: "#D97706",
+        statusBg: "#FEF3C7",
+        createdDate: "2025-11-24 16:45"
+    },
+    {
+        id: "PA-2025-1237",
+        title: "Thiếu y tế tuyến cơ sở",
+        category: "Y tế",
+        status: "Đã giải quyết",
+        statusColor: "#059669",
+        statusBg: "#D1FAE5",
+        createdDate: "2025-11-24 14:20"
+    },
+    {
+        id: "PA-2025-1238",
+        title: "Vỉa hè bị chiếm dụng",
+        category: "Hạ tầng đô thị",
+        status: "Đang xử lý",
+        statusColor: "#2563EB",
+        statusBg: "#DBEAFE",
+        createdDate: "2025-11-24 11:00"
+    },
+    {
+        id: "PA-2025-1239",
+        title: "Tiếng ồn quá mức từ công trình xây dựng",
+        category: "Môi trường",
+        status: "Đã gửi",
+        statusColor: "#6B7280",
+        statusBg: "#F3F4F6",
+        createdDate: "2025-11-23 15:30"
+    },
+    {
+        id: "PA-2025-1240",
+        title: "Cần sửa chữa đèn đường",
+        category: "Hạ tầng đô thị",
+        status: "Đóng",
+        statusColor: "#7C3AED",
+        statusBg: "#E9D5FF",
+        createdDate: "2025-11-23 10:15"
+    }
+];
+
+// Mock data for Statistics by Category
+export const statisticsByCategoryData = [
+    {
+        category: "Giao thông vận tải",
+        totalReports: 450,
+        resolved: 320,
+        unresolved: 130,
+        averageProcessingTime: 2.5,
+        percentage: 36.0
+    },
+    {
+        category: "An ninh trật tự",
+        totalReports: 310,
+        resolved: 220,
+        unresolved: 90,
+        averageProcessingTime: 2.2,
+        percentage: 24.8
+    },
+    {
+        category: "Hạ tầng đô thị",
+        totalReports: 200,
+        resolved: 145,
+        unresolved: 55,
+        averageProcessingTime: 2.8,
+        percentage: 16.0
+    },
+    {
+        category: "Y tế",
+        totalReports: 150,
+        resolved: 110,
+        unresolved: 40,
+        averageProcessingTime: 2.0,
+        percentage: 12.0
+    },
+    {
+        category: "Khác",
+        totalReports: 90,
+        resolved: 60,
+        unresolved: 30,
+        averageProcessingTime: 2.3,
+        percentage: 7.2
+    }
+];
+
+// Mock data for Category Details (Bar chart component)
+export const categoryDetailsData = [
+    {
+        category: "Giao thông vận tải",
+        count: 450,
+        percentage: 36.0,
+        color: "#3B82F6"
+    },
+    {
+        category: "An ninh trật tự",
+        count: 310,
+        percentage: 24.8,
+        color: "#3B82F6"
+    },
+    {
+        category: "Hạ tầng đô thị",
+        count: 200,
+        percentage: 16.0,
+        color: "#22C55E"
+    },
+    {
+        category: "Y tế",
+        count: 150,
+        percentage: 12.0,
+        color: "#F59E0B"
+    },
+    {
+        category: "Khác",
+        count: 90,
+        percentage: 7.2,
+        color: "#8B5CF6"
+    },
+    {
+        category: "Môi trường",
+        count: 50,
+        percentage: 4.0,
+        color: "#EF4444"
+    }
+];
+
+// Mock data for News Trends Chart
+export const newsTrendsData = [
+    {
+        date: "01/10",
+        banNhap: 45,
+        luotXem: 2400,
+        daXuatBan: 38
+    },
+    {
+        date: "05/10", 
+        banNhap: 55,
+        luotXem: 3100,
+        daXuatBan: 42
+    },
+    {
+        date: "10/10",
+        banNhap: 48,
+        luotXem: 2800,
+        daXuatBan: 35
+    },
+    {
+        date: "15/10",
+        banNhap: 62,
+        luotXem: 3800,
+        daXuatBan: 48
+    },
+    {
+        date: "20/10",
+        banNhap: 58,
+        luotXem: 3200,
+        daXuatBan: 45
+    },
+    {
+        date: "25/10",
+        banNhap: 68,
+        luotXem: 4100,
+        daXuatBan: 52
+    },
+    {
+        date: "31/10",
+        banNhap: 65,
+        luotXem: 3600,
+        daXuatBan: 49
+    }
+];
+
+// Total count for percentage calculations
+export const totalReportsCount = 1250;
+
+// Mock data for Status Report Chart (Bar chart)
+export const statusReportData = [
+    {
+        status: "Đã giải quyết",
+        count: 980
+    },
+    {
+        status: "Đang xử lý",
+        count: 150
+    },
+    {
+        status: "Đã tiếp nhận",
+        count: 100
+    },
+    {
+        status: "Đã gửi",
+        count: 50
+    },
+    {
+        status: "Đóng",
+        count: 30
+    }
 ];
 
 export const editLogEntries = [
