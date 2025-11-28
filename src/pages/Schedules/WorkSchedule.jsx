@@ -92,7 +92,6 @@ export default function WorkSchedule() {
         try {
             const totalItems = await fetchCounts(monthYear);
 
-            // Fetch for list display first (schedules) - this also merges into allSchedules
             await fetchSchedulesPagination({
                 monthYear,
                 isActive: null,
@@ -100,7 +99,6 @@ export default function WorkSchedule() {
                 size: pageSize
             });
 
-            // Then fetch for calendar highlighting (allSchedules) if there are more items
             if (totalItems > pageSize) {
                 await fetchSchedulesPagination({
                     monthYear,

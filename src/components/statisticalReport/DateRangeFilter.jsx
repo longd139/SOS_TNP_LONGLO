@@ -13,6 +13,7 @@ export default function DateRangeFilter({ dateRange, onDateRangeChange, reportTy
             value={reportType}
             onChange={(e) => onReportTypeChange(e.target.value)}
             className="w-full px-3 py-2 text-sm md:text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            style={{ textAlign: 'left' }}
           >
             <option value="overview">Tổng quan</option>
             <option value="reports">Phản ánh</option>
@@ -29,6 +30,7 @@ export default function DateRangeFilter({ dateRange, onDateRangeChange, reportTy
             value={dateRange.from}
             onChange={(e) => onDateRangeChange({ ...dateRange, from: e.target.value })}
             className="w-full px-3 py-2 text-sm md:text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            style={{ textAlign: 'left' }}
           />
         </div>
         <div>
