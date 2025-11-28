@@ -1,7 +1,8 @@
 import jsPDF from "jspdf";
-import html2canvas from "html2canvas";
+import * as htmlToImage from "html-to-image";
 
 export async function exportPDF(elementId, fileName, options = {}) {
+        document.body.classList.add('pdf-exporting');
     const input = document.getElementById(elementId);
     
     if (!input) {
@@ -10,8 +11,25 @@ export async function exportPDF(elementId, fileName, options = {}) {
 
     const originalDisplay = input.style.display;
     const originalStyles = new Map();
+    const truncateElements = new Map();
     
     const inputs = input.querySelectorAll('input, select, textarea');
+    
+    const elementsWithOverflow = input.querySelectorAll('.truncate, .overflow-hidden, .text-ellipsis, [class*="truncate"], [class*="overflow"]');
+    elementsWithOverflow.forEach((el, index) => {
+        truncateElements.set(el, {
+            overflow: el.style.overflow,
+            textOverflow: el.style.textOverflow,
+            whiteSpace: el.style.whiteSpace,
+            maxWidth: el.style.maxWidth,
+            lineHeight: el.style.lineHeight
+        });
+        el.setAttribute('data-pdf-truncate-id', `pdf-truncate-${index}`);
+        
+        el.style.overflow = 'visible';
+        el.style.textOverflow = 'clip';
+        el.style.whiteSpace = 'normal';
+    });
     
     input.style.display = 'block';
     input.style.visibility = 'visible';
@@ -24,107 +42,68 @@ export async function exportPDF(elementId, fileName, options = {}) {
             textIndent: el.style.textIndent,
             visibility: el.style.visibility,
             opacity: el.style.opacity,
-            direction: el.style.direction
+            direction: el.style.direction,
+            lineHeight: el.style.lineHeight
         });
-        
+
         el.setAttribute('data-pdf-export-id', `pdf-input-${index}`);
-        
-        el.style.textAlign = 'left';
+
         el.style.visibility = 'visible';
         el.style.opacity = '1';
-        el.style.direction = 'ltr';
-        
-        if (!el.style.paddingLeft || el.style.paddingLeft === '') {
-            const computedStyle = window.getComputedStyle(el);
-            el.style.paddingLeft = computedStyle.paddingLeft || '12px';
+
+        if (el.tagName !== 'SELECT') {
+            el.style.textAlign = 'left';
+            el.style.direction = 'ltr';
+            if (!el.style.paddingLeft || el.style.paddingLeft === '') {
+                const computedStyle = window.getComputedStyle(el);
+                el.style.paddingLeft = computedStyle.paddingLeft || '12px';
+            }
         }
-        
+
         if (el.type === 'date' && el.value) {
             el.setAttribute('value', el.value);
         }
-        
-        if (el.tagName === 'SELECT') {
-            el.style.appearance = 'none';
-            el.style.webkitAppearance = 'none';
-            el.style.mozAppearance = 'none';
-        }
+
     });
     
     void input.offsetHeight;
     
-    await new Promise(resolve => setTimeout(resolve, 100));
+    await new Promise(resolve => setTimeout(resolve, 150));
 
     try {
-        const canvas = await html2canvas(input, {
-            scale: 2,
-            useCORS: true,
-            logging: false,
+        const dataUrl = await htmlToImage.toPng(input, {
             backgroundColor: '#ffffff',
-            removeContainer: false,
-            onclone: (clonedDoc) => {
-                const clonedInputs = clonedDoc.querySelectorAll('input, select, textarea');
-                clonedInputs.forEach((el) => {
-                    const exportId = el.getAttribute('data-pdf-export-id');
-                    const originalEl = exportId ? input.querySelector(`[data-pdf-export-id="${exportId}"]`) : null;
-                    
-                    el.style.textAlign = 'left';
-                    el.style.visibility = 'visible';
-                    el.style.opacity = '1';
-                    el.style.direction = 'ltr';
-                    
-                    if (originalEl) {
-                        const computedStyle = window.getComputedStyle(originalEl);
-                        el.style.paddingLeft = computedStyle.paddingLeft || '12px';
-                    } else if (!el.style.paddingLeft || el.style.paddingLeft === '') {
-                        el.style.paddingLeft = '12px';
-                    }
-                    
-                    if (el.type === 'date' && el.value) {
-                        el.setAttribute('value', el.value);
-                    }
-                    
-                    if (el.tagName === 'SELECT') {
-                        el.style.appearance = 'none';
-                        el.style.webkitAppearance = 'none';
-                        el.style.mozAppearance = 'none';
-                    }
-                });
-            },
-            ...options.html2canvas
+            quality: 1,
+            pixelRatio: 2
         });
+    document.body.classList.remove('pdf-exporting');
 
-        const imgData = canvas.toDataURL("image/png", 1.0);
+        const img = new window.Image();
+        img.src = dataUrl;
+        await new Promise((resolve) => { img.onload = resolve; });
+
         const pdf = new jsPDF("p", "mm", "a4");
-        
         const pdfWidth = pdf.internal.pageSize.getWidth();
         const pdfHeight = pdf.internal.pageSize.getHeight();
-        
-        const imgWidth = canvas.width / 2; 
-        const imgHeight = canvas.height / 2;
-        
-        const dpi = 96;
-        const mmPerInch = 25.4;
-        const pxToMm = mmPerInch / dpi;
-        const imgWidthMm = imgWidth * pxToMm;
-        const imgHeightMm = imgHeight * pxToMm;
-        
-        const widthRatio = pdfWidth / imgWidthMm;
+
+        const imgWidthPx = img.width;
+        const imgHeightPx = img.height;
+
+        const ratio = pdfWidth / imgWidthPx;
         const imgScaledWidth = pdfWidth;
-        const imgScaledHeight = imgHeightMm * widthRatio;
-        
+        const imgScaledHeight = imgHeightPx * ratio;
+
         if (imgScaledHeight <= pdfHeight) {
-            pdf.addImage(imgData, "PNG", 0, 0, imgScaledWidth, imgScaledHeight);
+            pdf.addImage(dataUrl, "PNG", 0, 0, imgScaledWidth, imgScaledHeight);
         } else {
             let heightLeft = imgScaledHeight;
             let position = 0;
-            
-            pdf.addImage(imgData, "PNG", 0, position, imgScaledWidth, imgScaledHeight);
+            pdf.addImage(dataUrl, "PNG", 0, position, imgScaledWidth, imgScaledHeight);
             heightLeft -= pdfHeight;
-            
             while (heightLeft > 0) {
                 position = heightLeft - imgScaledHeight;
                 pdf.addPage();
-                pdf.addImage(imgData, "PNG", 0, position, imgScaledWidth, imgScaledHeight);
+                pdf.addImage(dataUrl, "PNG", 0, position, imgScaledWidth, imgScaledHeight);
                 heightLeft -= pdfHeight;
             }
         }
@@ -136,6 +115,15 @@ export async function exportPDF(elementId, fileName, options = {}) {
     } finally {
         input.style.display = originalDisplay;
         
+        truncateElements.forEach((originalStyle, el) => {
+            el.style.overflow = originalStyle.overflow;
+            el.style.textOverflow = originalStyle.textOverflow;
+            el.style.whiteSpace = originalStyle.whiteSpace;
+            el.style.maxWidth = originalStyle.maxWidth;
+            el.style.lineHeight = originalStyle.lineHeight;
+            el.removeAttribute('data-pdf-truncate-id');
+        });
+        
         inputs.forEach((el) => {
             const originalStyle = originalStyles.get(el);
             if (originalStyle) {
@@ -146,15 +134,11 @@ export async function exportPDF(elementId, fileName, options = {}) {
                 el.style.visibility = originalStyle.visibility;
                 el.style.opacity = originalStyle.opacity;
                 el.style.direction = originalStyle.direction;
+                el.style.lineHeight = originalStyle.lineHeight;
             }
             
             el.removeAttribute('data-pdf-export-id');
             
-            if (el.tagName === 'SELECT') {
-                el.style.appearance = '';
-                el.style.webkitAppearance = '';
-                el.style.mozAppearance = '';
-            }
         });
     }
 }
