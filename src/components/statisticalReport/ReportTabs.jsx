@@ -1,5 +1,5 @@
 import React from 'react';
-import { MessageSquare, Newspaper, FileText } from 'lucide-react';
+import { MessageSquare, FileText } from 'lucide-react';
 
 export default function ReportTabs({ activeTab, onTabChange }) {
   const tabs = [

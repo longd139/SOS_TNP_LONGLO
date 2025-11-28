@@ -1,6 +1,5 @@
 import React from 'react';
 import BaseFilter from '../base/BaseFilter';
-import { useDispatch } from 'react-redux';
 
 const GovernmentFilter = ({ 
     onFilter, 

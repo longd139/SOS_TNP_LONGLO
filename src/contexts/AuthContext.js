@@ -3,7 +3,6 @@ import { useSelector, useDispatch } from 'react-redux';
 import { logout } from '../features/auth/authSlice';
 import { selectAuthState } from '../features/auth/authSelectors';
 import { clearProfile } from '../features/userProfile/userProfileSlice';
-import { ROLE } from '../constants/role';
 import {
     hasPermission,
     hasAnyPermission,

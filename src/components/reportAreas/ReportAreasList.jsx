@@ -27,7 +27,7 @@ export default function ReportAreasList() {
         updateShowActive
     } = useReportAreas();
 
-    const { canCreate, canUpdate, canDelete, canUpdateStatus } = usePermission();
+    const { canUpdate, canDelete, canUpdateStatus } = usePermission();
 
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);

@@ -1,12 +1,7 @@
-import React from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { PieChart as PieChartIcon } from 'lucide-react';
 // import { useStatisticalReport } from '../../hooks/useStatisticalReport';
-import { categoryDetailsData, totalReportsCount } from '../../mockData';
-
-const COLORS = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899', '#14B8A6', '#F97316'];
-
-export default function FieldReportChart({ dateRange }) {
+export default function FieldReportChart({ dateRange, total, cateData }) {
   // Comment API usage, use mockData instead
   // const { fieldReport, loading, loadFieldReport } = useStatisticalReport();
 
@@ -20,7 +15,7 @@ export default function FieldReportChart({ dateRange }) {
   //   });
   // }, [dateRange.from, dateRange.to, loadFieldReport]);
 
-  const chartData = categoryDetailsData.map((item, index) => ({
+  const chartData = cateData.map((item, index) => ({
     name: item.category,
     value: item.count,
     percentage: item.percentage,
@@ -60,7 +55,7 @@ export default function FieldReportChart({ dateRange }) {
       </div>
 
       <div className="text-sm mb-4">
-        Tổng số phản ánh: {totalReportsCount.toLocaleString()}
+        Tổng số phản ánh: {total.toLocaleString()}
       </div>
 
       <ResponsiveContainer width="100%" height={250}>

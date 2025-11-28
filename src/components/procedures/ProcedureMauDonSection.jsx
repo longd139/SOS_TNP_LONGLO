@@ -2,13 +2,12 @@ import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchTemplates } from '../../features/templates/templatesThunks';
-import { selectTemplates, selectTemplatesLoading } from '../../features/templates/templatesSelectors';
+import { selectTemplates } from '../../features/templates/templatesSelectors';
 import TemplateSelector from './TemplateSelector';
 
 const ProcedureMauDonSection = ({ items, addItem, removeItem, updateItem, errors }) => {
     const dispatch = useDispatch();
     const templates = useSelector(selectTemplates);
-    const loading = useSelector(selectTemplatesLoading);
 
     useEffect(() => {
         if (templates.length === 0) {

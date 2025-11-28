@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import BaseModal, { ModalFooter } from '../base/BaseModal';
 import ReactQuill from 'react-quill';

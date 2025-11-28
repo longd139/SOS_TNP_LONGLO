@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useSelector } from "react-redux";
-import { Search, X, Filter, RotateCcw } from "lucide-react";
+import { Search, X, Filter } from "lucide-react";
 import { selectShowRemoved } from "../../features/templates/templatesSelectors";
 
 export default function TemplateFilter({
@@ -54,11 +54,6 @@ export default function TemplateFilter({
       }
       onSearch?.();
     }
-  };
-
-  const handleResetFilters = () => {
-    setLocalFilters(initialFilters);
-    onReset?.();
   };
 
   const hasActiveFilters = () => {

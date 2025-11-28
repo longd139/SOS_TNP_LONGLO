@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { ShieldCheck, AlertCircle, Loader2, Lock, User } from "lucide-react";
+import { ShieldCheck, Loader2, Lock, User } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { useLogin } from "../../hooks/useLogin";
@@ -12,12 +12,9 @@ import { getRedirectPathIfDisabled } from "../../utils/routeRedirectUtils";
 import { validateAuth } from "../../validator/loginValidator";
 import { showToast } from "../../utils/toastNotification";
 
-
-
 const RECAPTCHA_SITE_KEY = process.env.REACT_APP_SITE_KEY
 
 export default function Login() {
-
     const [tenDangNhap, setTenDangNhap] = useState("");
     const [matKhau, setMatKhau] = useState("");
     const [show2FAModal, setShow2FAModal] = useState(false);
@@ -25,9 +22,9 @@ export default function Login() {
     const [hasInteracted, setHasInteracted] = useState(false);
     const [recaptchaToken, setRecaptchaToken] = useState("");
     const recaptchaRef = useRef();
-    const recaptchaWidgetId = useRef(null);
+    // const recaptchaWidgetId = useRef(null);
 
-    const { loginWithCaptcha, loading, errors, apiError, requiresTwoFactorAuth, clearErrors } = useLogin();
+    const { loginWithCaptcha, loading, errors, apiError, clearErrors } = useLogin();
     const dispatch = useDispatch();
     const navigate = useNavigate();
 

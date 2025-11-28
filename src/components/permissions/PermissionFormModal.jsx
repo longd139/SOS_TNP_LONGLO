@@ -1,7 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import BaseModal, { ModalFooter } from '../base/BaseModal';
 import { Search } from 'lucide-react';
-import { showToast } from '../../utils/toastNotification';
 import { usePermissions } from '../../hooks/usePermissions';
 import { validateRoleForm } from '../../validator/roleValidator';
 

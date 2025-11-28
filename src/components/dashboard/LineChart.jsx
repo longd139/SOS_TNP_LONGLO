@@ -27,7 +27,6 @@ const CustomLineChart = ({ data, title, lines, yAxisDomain }) => {
         return null;
     };
 
-    // Default lines configuration for backward compatibility
     const defaultLines = [
         { key: 'tongPhanAnh', color: '#3B82F6', name: 'Tổng phản ánh' },
         { key: 'daGiaiQuyet', color: '#22C55E', name: 'Đã giải quyết' }

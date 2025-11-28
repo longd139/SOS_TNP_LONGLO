@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import BaseModal, { ModalFooter } from '../base/BaseModal';
-import { Upload, Eye, Download } from 'lucide-react';
+import { Upload, Download } from 'lucide-react';
 import { validateTemplateForm } from '../../validator/templateValidator';
 import { showToast } from '../../utils/toastNotification';
 import { downloadUtils } from '../../utils/downLoadUtils';
@@ -25,8 +25,6 @@ const TemplateFormModal = ({
     const [fileName, setFileName] = useState('');
     const [uploadProgress, setUploadProgress] = useState(null);
     const fileInputRef = useRef(null);
-
-    const baseUrl = process.env.REACT_APP_API_URL;
 
     useEffect(() => {
         if (initialData && mode === 'edit') {

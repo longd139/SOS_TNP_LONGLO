@@ -16,7 +16,6 @@ export default function NewsManager() {
     const {
         news,
         loading,
-        error,
         pagination,
         filters,
         showActive,
@@ -28,10 +27,9 @@ export default function NewsManager() {
         deleteNews,
         setFilters,
         setShowActive,
-        clearError
     } = useNews();
 
-    const { canCreate, canUpdate, canDelete, canView, canUpdateStatus } = usePermission();
+    const { canUpdate, canDelete, canView, canUpdateStatus } = usePermission();
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);

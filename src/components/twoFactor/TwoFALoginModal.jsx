@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { AlertCircle, Loader2 } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { AUTH_API } from '../../apis/auth';
 import { jwtDecode } from 'jwt-decode';
 

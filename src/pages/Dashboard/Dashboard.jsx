@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import StatCard from '../../components/dashboard/StatCard';
-import Chart from '../../components/dashboard/Chart';
 import { AlertTriangle, CheckCircle, Clock, FileCheck, FileText, MessageSquare, Send, LogIn, Edit, FilePlus, Newspaper, History, BookOpen, Building2, Home, ClipboardList, CalendarCheck, Shield } from 'lucide-react';
-import { editLogEntries } from '../../mockData';
 import { useReports } from '../../hooks/useReports';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
@@ -62,13 +60,13 @@ export default function Dashboard() {
         return colors[status] || 'bg-gray-100 text-gray-800';
     };
 
-    const formattedChartData = {
-        trends: dashboardData?.xu_huong_phan_anh?.map(item => ({
-            date: new Date(item?.date).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' }),
-            tongPhanAnh: item?.tong_phan_anh,
-            daGiaiQuyet: item?.da_giai_quyet
-        })) || []
-    };
+    // const formattedChartData = {
+    //     trends: dashboardData?.xu_huong_phan_anh?.map(item => ({
+    //         date: new Date(item?.date).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' }),
+    //         tongPhanAnh: item?.tong_phan_anh,
+    //         daGiaiQuyet: item?.da_giai_quyet
+    //     })) || []
+    // };
 
     const recentReports = (reports || []).map(report => {
         return {
