@@ -10,3 +10,4 @@ export { default as StatisticsByCategory } from './StatisticsByCategory';
 export { default as CategoryDetails } from './CategoryDetails';
 export { default as FieldReportChart } from './FieldReportChart';
 export { default as StatusReportChart } from './StatusReportChart';
+export { default as NewsDetailsTable } from './NewsDetailsTable';

@@ -159,13 +159,13 @@ export const chartData = {
 
 // Mock data for Dashboard trends - used in ReportsTab (5-day intervals)
 export const mockTrendsData = [
-    { date: '2025-10-01', tong_phan_anh: 195, da_giai_quyet: 135 },
-    { date: '2025-10-05', tong_phan_anh: 215, da_giai_quyet: 155 },
-    { date: '2025-10-10', tong_phan_anh: 195, da_giai_quyet: 145 },
-    { date: '2025-10-15', tong_phan_anh: 235, da_giai_quyet: 190 },
-    { date: '2025-10-20', tong_phan_anh: 205, da_giai_quyet: 155 },
-    { date: '2025-10-25', tong_phan_anh: 250, da_giai_quyet: 200 },
-    { date: '2025-10-31', tong_phan_anh: 220, da_giai_quyet: 185 }
+    { date: '2025-10-01', tong_phan_anh: 2400, da_giai_quyet: 0 },
+    { date: '2025-10-05', tong_phan_anh: 3100, da_giai_quyet: 0 },
+    { date: '2025-10-10', tong_phan_anh: 2800, da_giai_quyet: 0 },
+    { date: '2025-10-15', tong_phan_anh: 3800, da_giai_quyet: 0 },
+    { date: '2025-10-20', tong_phan_anh: 3200, da_giai_quyet: 0 },
+    { date: '2025-10-25', tong_phan_anh: 4100, da_giai_quyet: 0 },
+    { date: '2025-10-31', tong_phan_anh: 3600, da_giai_quyet: 0 }
 ];
 
 // Mock data for monthly trends (separate chart)
@@ -1152,47 +1152,204 @@ export const categoryDetailsData = [
 export const newsTrendsData = [
     {
         date: "01/10",
-        banNhap: 45,
+        banNhap: 0,
         luotXem: 2400,
-        daXuatBan: 38
+        daXuatBan: 0
     },
     {
-        date: "05/10", 
-        banNhap: 55,
+        date: "05/10",
+        banNhap: 0,
         luotXem: 3100,
-        daXuatBan: 42
+        daXuatBan: 0
     },
     {
         date: "10/10",
-        banNhap: 48,
+        banNhap: 0,
         luotXem: 2800,
-        daXuatBan: 35
+        daXuatBan: 0
     },
     {
         date: "15/10",
-        banNhap: 62,
+        banNhap: 0,
         luotXem: 3800,
-        daXuatBan: 48
+        daXuatBan: 0
     },
     {
         date: "20/10",
-        banNhap: 58,
+        banNhap: 0,
         luotXem: 3200,
-        daXuatBan: 45
+        daXuatBan: 0
     },
     {
         date: "25/10",
-        banNhap: 68,
+        banNhap: 0,
         luotXem: 4100,
-        daXuatBan: 52
+        daXuatBan: 0
     },
     {
         date: "31/10",
-        banNhap: 65,
+        banNhap: 0,
         luotXem: 3600,
-        daXuatBan: 49
+        daXuatBan: 0
     }
 ];
+
+// Mock data for News Details Statistics
+export const newsDetailsData = [
+    {
+        date: "01/10",
+        daXuatBan: 12,
+        banNhap: 5,
+        tongBaiViet: 17,
+        luotXem: 2450
+    },
+    {
+        date: "05/10",
+        daXuatBan: 15,
+        banNhap: 3,
+        tongBaiViet: 18,
+        luotXem: 3120
+    },
+    {
+        date: "10/10",
+        daXuatBan: 10,
+        banNhap: 7,
+        tongBaiViet: 17,
+        luotXem: 2680
+    },
+    {
+        date: "15/10",
+        daXuatBan: 18,
+        banNhap: 4,
+        tongBaiViet: 22,
+        luotXem: 3850
+    },
+    {
+        date: "20/10",
+        daXuatBan: 14,
+        banNhap: 6,
+        tongBaiViet: 20,
+        luotXem: 3200
+    },
+    {
+        date: "25/10",
+        daXuatBan: 20,
+        banNhap: 2,
+        tongBaiViet: 22,
+        luotXem: 4100
+    },
+    {
+        date: "31/10",
+        daXuatBan: 16,
+        banNhap: 5,
+        tongBaiViet: 21,
+        luotXem: 3600
+    }
+];
+
+// Mock data for Procedures Statistics
+export const proceduresStatsData = [
+    {
+        title: "Tổng thủ tục",
+        value: 438,
+        icon: "FileText",
+        color: "blue"
+    },
+    {
+        title: "Có biểu mẫu",
+        value: 394,
+        icon: "FileCheck",
+        color: "green"
+    },
+    {
+        title: "Không biểu mẫu",
+        value: 44,
+        icon: "FileX",
+        color: "orange"
+    }
+];
+
+// Mock data for Procedures Pie Chart (Biểu đồ tròn theo lĩnh vực)
+export const proceduresPieData = [
+    {
+        category: "Đăng ký doanh nghiệp",
+        count: 125,
+        percentage: 28.5,
+        color: "#3B82F6"
+    },
+    {
+        category: "Xây dựng & Quy hoạch",
+        count: 98,
+        percentage: 22.4,
+        color: "#3B82F6"
+    },
+    {
+        category: "Đất đai",
+        count: 87,
+        percentage: 19.9,
+        color: "#22C55E"
+    },
+    {
+        category: "Y tế & Sức khỏe",
+        count: 65,
+        percentage: 14.8,
+        color: "#F59E0B"
+    },
+    {
+        category: "Giáo dục & Đào tạo",
+        count: 38,
+        percentage: 8.7,
+        color: "#8B5CF6"
+    },
+    {
+        category: "Khác",
+        count: 25,
+        percentage: 5.7,
+        color: "#EF4444"
+    }
+];
+
+// Mock data for Procedures Bar Chart (Chi tiết theo lĩnh vực)
+export const proceduresBarData = [
+    {
+        category: "Đăng ký doanh nghiệp",
+        count: 125,
+        percentage: 28.5,
+        color: "#3B82F6"
+    },
+    {
+        category: "Xây dựng & Quy hoạch",
+        count: 98,
+        percentage: 22.4,
+        color: "#3B82F6"
+    },
+    {
+        category: "Đất đai",
+        count: 87,
+        percentage: 19.9,
+        color: "#22C55E"
+    },
+    {
+        category: "Y tế & Sức khỏe",
+        count: 65,
+        percentage: 14.8,
+        color: "#F59E0B"
+    },
+    {
+        category: "Giáo dục & Đào tạo",
+        count: 38,
+        percentage: 8.7,
+        color: "#8B5CF6"
+    },
+    {
+        category: "Khác",
+        count: 25,
+        percentage: 5.7,
+        color: "#EF4444"
+    }
+];
+
+export const totalProceduresCount = 438;
 
 // Total count for percentage calculations
 export const totalReportsCount = 1250;
