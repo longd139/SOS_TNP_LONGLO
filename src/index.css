@@ -1,3 +1,9 @@
+.pdf-exporting select {
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    background-image: none !important;
+}
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -12,7 +18,7 @@
     body {
         font-size: 12px;
         line-height: 1.5;
-        overflow-x: hidden; /* Prevent horizontal scrolling globally */
+        overflow-x: hidden; 
     }
 
     h1 {

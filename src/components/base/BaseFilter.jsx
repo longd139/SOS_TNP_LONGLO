@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, X, Filter, RotateCcw } from 'lucide-react';
+import { Search, X, Filter } from 'lucide-react';
 
 export default function BaseFilter({
     fields = [],
@@ -34,10 +34,10 @@ export default function BaseFilter({
         onFilter?.(filters);
     };
 
-    const handleResetFilters = () => {
-        setFilters(initialFilters);
-        onReset?.();
-    };
+    // const handleResetFilters = () => {
+    //     setFilters(initialFilters);
+    //     onReset?.();
+    // };
 
     const hasActiveFilters = () => {
         return Object.entries(filters).some(([key, value]) => {
@@ -46,12 +46,12 @@ export default function BaseFilter({
         });
     };
 
-    const activeFilterCount = () => {
-        return Object.entries(filters).filter(([key, value]) => {
-            if (initialFilters[key] === undefined) return !!value;
-            return value !== initialFilters[key] && value !== '' && value !== false;
-        }).length;
-    };
+    // const activeFilterCount = () => {
+    //     return Object.entries(filters).filter(([key, value]) => {
+    //         if (initialFilters[key] === undefined) return !!value;
+    //         return value !== initialFilters[key] && value !== '' && value !== false;
+    //     }).length;
+    // };
 
     const renderField = (field) => {
         const { name, label, type, options, placeholder, className } = field;

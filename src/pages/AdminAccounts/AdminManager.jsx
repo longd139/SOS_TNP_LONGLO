@@ -4,7 +4,6 @@ import UserModal from '../../components/users/UserModal';
 import UserFilter from '../../components/admin/UserFilter';
 import UserViewModal from '../../components/users/UserViewModal';
 import { ConfirmModal } from '../../components/base/BaseModal';
-import { ROLE_LABELS, ROLE_COLORS } from '../../constants/role';
 import { useUsers } from '../../hooks/useUsers';
 import { usePermission } from '../../hooks/usePermission';
 import { PermissionHidden } from '../../components/PermissionGuard';
@@ -28,7 +27,7 @@ export default function AdminManager() {
         clearUserDetail
     } = useUsers();
 
-    const { canCreate, canUpdate, canDelete, canView, canUpdateStatus } = usePermission();
+    const { canUpdate, canDelete, canView, canUpdateStatus } = usePermission();
 
     const [modalLoading, setModalLoading] = useState(false);
     const [filters, setFilters] = useState({

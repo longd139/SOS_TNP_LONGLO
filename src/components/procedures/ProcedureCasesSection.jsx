@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import PropTypes from "prop-types";
-import { ChevronDown, ChevronUp, X, Edit2 } from "lucide-react";
+import { X, Edit2 } from "lucide-react";
 import BaseModal, { ModalFooter } from "../base/BaseModal";
 import PortalModal from "../base/PortalModal";
 import { validateSchema } from "../../utils/validationUtils";
@@ -12,9 +12,7 @@ const ProcedureCasesSection = ({
   removeCase,
   updateCase,
   addCaseComponent,
-  removeCaseComponent,
-  updateCaseComponent,
-  errors = {},
+  removeCaseComponent
 }) => {
   const [expandedCases, setExpandedCases] = useState({});
   const [isAddCaseModalOpen, setIsAddCaseModalOpen] = useState(false);

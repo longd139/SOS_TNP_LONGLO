@@ -36,25 +36,25 @@ const MediaGallery = ({ images = [], videos = [], apiUrl }) => {
         });
     };
 
-    const openAllMediaPreview = (startIndex, type) => {
-        const imageItems = images.map((img) => ({
-            type: 'image',
-            url: `${apiUrl}${img.url_file}`,
-        }));
-        const videoItems = videos.map((video) => ({
-            type: 'video',
-            url: `${apiUrl}${video.final_hls_url}`,
-        }));
+    // const openAllMediaPreview = (startIndex, type) => {
+    //     const imageItems = images.map((img) => ({
+    //         type: 'image',
+    //         url: `${apiUrl}${img.url_file}`,
+    //     }));
+    //     const videoItems = videos.map((video) => ({
+    //         type: 'video',
+    //         url: `${apiUrl}${video.final_hls_url}`,
+    //     }));
         
-        const allMedia = [...imageItems, ...videoItems];
-        const adjustedIndex = type === 'image' ? startIndex : imageItems.length + startIndex;
+    //     const allMedia = [...imageItems, ...videoItems];
+    //     const adjustedIndex = type === 'image' ? startIndex : imageItems.length + startIndex;
         
-        setPreviewModal({
-            isOpen: true,
-            mediaItems: allMedia,
-            initialIndex: adjustedIndex,
-        });
-    };
+    //     setPreviewModal({
+    //         isOpen: true,
+    //         mediaItems: allMedia,
+    //         initialIndex: adjustedIndex,
+    //     });
+    // };
 
     const closePreview = () => {
         setPreviewModal({

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import BaseTable from "../../components/base/BaseTable";
 import ReportDetailModal from "../../components/report/ReportDetailModal";
 import ReportFilter from "../../components/report/ReportFilter";
@@ -29,7 +29,7 @@ export default function ReportList() {
     } = useReports({ autoFetch: false });
 
     const { reportAreas, loadReportAreas } = useReportAreas({ autoFetch: false });
-    const { canView, canUpdate, canUpdateStatus } = usePermission();
+    const { canView, canUpdate } = usePermission();
     const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
     const [selectedReport, setSelectedReport] = useState(null);
     const [modalMode, setModalMode] = useState("view");

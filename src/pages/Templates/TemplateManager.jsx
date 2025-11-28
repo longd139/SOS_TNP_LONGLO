@@ -41,7 +41,7 @@ export default function TemplateManager() {
     const pagination = useSelector(selectPagination);
     const filters = useSelector(selectFilters);
 
-    const { canCreate, canUpdate, canDelete, canUpdateStatus, canView } = usePermission();
+    const { canUpdate, canDelete, canUpdateStatus, canView } = usePermission();
 
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);

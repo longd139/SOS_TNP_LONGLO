@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import StatCard from '../../components/dashboard/StatCard';
-import Chart from '../../components/dashboard/Chart';
-import { AlertTriangle, CheckCircle, Clock, FileCheck, FileText, MessageSquare, Send, LogIn, Edit, FilePlus, Newspaper, History } from 'lucide-react';
-import { editLogEntries } from '../../mockData';
+import { AlertTriangle, CheckCircle, Clock, FileCheck, FileText, MessageSquare, Send, LogIn, Edit, FilePlus, Newspaper, History, BookOpen, Building2, Home, ClipboardList, CalendarCheck, Shield } from 'lucide-react';
 import { useReports } from '../../hooks/useReports';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
@@ -62,13 +60,13 @@ export default function Dashboard() {
         return colors[status] || 'bg-gray-100 text-gray-800';
     };
 
-    const formattedChartData = {
-        trends: dashboardData?.xu_huong_phan_anh?.map(item => ({
-            date: new Date(item?.date).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' }),
-            tongPhanAnh: item?.tong_phan_anh,
-            daGiaiQuyet: item?.da_giai_quyet
-        })) || []
-    };
+    // const formattedChartData = {
+    //     trends: dashboardData?.xu_huong_phan_anh?.map(item => ({
+    //         date: new Date(item?.date).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' }),
+    //         tongPhanAnh: item?.tong_phan_anh,
+    //         daGiaiQuyet: item?.da_giai_quyet
+    //     })) || []
+    // };
 
     const recentReports = (reports || []).map(report => {
         return {
@@ -94,18 +92,56 @@ export default function Dashboard() {
         }
     }
 
+    const renderIcon = (text = "") => {
+        const lower = text.toLowerCase();
+
+        if (lower.includes("phan_anh") || lower.includes("phản ánh")) return MessageSquare;
+        if (lower.includes("lich_su_trang_thai") || lower.includes("lịch sử trạng thái")) return History;
+        if (lower.includes("người dùng")) return LogIn;
+        if (lower.includes("chỉnh sửa")) return Edit;
+        if (lower.includes("tạo mới")) return FilePlus;
+        if (lower.includes("báo cáo")) return Newspaper;
+        if (lower.includes("danh mục")) return BookOpen;
+        if (lower.includes("mẫu đơn")) return FileText;
+        if (lower.includes("uỷ ban")) return Building2;
+        if (lower.includes("cơ sở dịch vụ")) return Home;
+        if (lower.includes("đăng nhập")) return LogIn;
+        if (lower.includes("thủ tục") || lower.includes("thủ tục hành chính")) return ClipboardList;
+        if (lower.includes("tin tức") || lower.includes("tin tuc")) return Newspaper;
+        if (lower.includes("lịch")) return CalendarCheck;
+        if (lower.includes("phân quyền") || lower.includes("phan quyen") || lower.includes("phan_quyen") || lower.includes("vai trò") || lower.includes("vai tro")) return Shield;
+        return FileText;
+    };
+
+
+    const iconColors = new Map([
+        [MessageSquare, "#3b82f6"],    
+        [History, "#10b981"],       
+        [LogIn, "#ef4444"],       
+        [Edit, "#f97316"],        
+        [FilePlus, "#6366f1"],         
+        [Newspaper, "#0ea5e9"],    
+        [BookOpen, "#8b5cf6"],          
+        [FileText, "#6b7280"],          
+        [Building2, "#dc2626"],         
+        [Home, "#22c55e"], 
+        [ClipboardList, "#f59e0b"],     
+        [CalendarCheck, "#14b8a6"],     
+        [Shield, "#64748b"]             
+    ]);
+
+    const getColorByIcon = (icon) => {
+        return iconColors.get(icon) || "#6b7280"; 
+    };
+
     const historyReport = (dashboardData.nhat_ky_hoat_dong || []).map(history => {
         return {
             id: history.timestamp,
             name: history.hanh_dong?.split(',').map((item) => renderName(item.trim())).join(', '),
             user: history?.nguoi_dung?.ho_va_ten,
             timeAgo: dayjs(history.timestamp).fromNow(),
-            icon: history.hanh_dong?.includes('phan_anh') ? MessageSquare
-                : history.hanh_dong?.includes('lich_su_trang_thai') ? History
-                    : FileText,
-            iconColor: history.hanh_dong?.includes('phan_anh') ? '#3b82f6'
-                : history.hanh_dong?.includes('lich_su_trang_thai') ? '#10b981'
-                    : '#6b7280'
+            icon: renderIcon(history.hanh_dong),
+            iconColor: getColorByIcon(renderIcon(history.hanh_dong))
         }
     });
 
@@ -258,7 +294,7 @@ export default function Dashboard() {
                                                         {log.name}
                                                     </h3>
                                                     <span className="text-xs text-gray-500">•</span>
-                                                    <span className="text-xs text-gray-500 truncate">{log.user}</span>
+                                                    <span className="text-xs text-gray-500 truncate">{log.user ? log.user : 'Chưa cập nhật'}</span>
                                                 </div>
                                             </div>
                                         </div>

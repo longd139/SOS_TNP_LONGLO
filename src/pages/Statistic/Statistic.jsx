@@ -3,7 +3,8 @@ import DateRangeFilter from '../../components/statisticalReport/DateRangeFilter'
 import ExportButtons from '../../components/statisticalReport/ExportButtons';
 import ReportTabs from '../../components/statisticalReport/ReportTabs';
 import ReportsTab from '../../components/statisticalReport/ReportsTab';
-import UserActivityTab from '../../components/statisticalReport/UserActivityTab';
+import NewsTab from '../../components/statisticalReport/NewsTab';
+import ProceduresTab from '../../components/statisticalReport/ProceduresTab';
 
 export default function Statistic() {
     const [activeTab, setActiveTab] = useState('reports');
@@ -11,7 +12,24 @@ export default function Statistic() {
         from: '',
         to: ''
     });
-    const [reportType, setReportType] = useState('overview');
+
+    const handleApplyFilter = () => {
+        // Handle filter application logic here
+        console.log('Applying filter with date range:', dateRange);
+    };
+
+    const renderTabContent = () => {
+        switch (activeTab) {
+            case 'reports':
+                return <ReportsTab dateRange={dateRange} />;
+            case 'news':
+                return <NewsTab />;
+            case 'procedures':
+                return <ProceduresTab />;
+            default:
+                return <ReportsTab dateRange={dateRange} />;
+        }
+    };
 
     return (
         <div className="min-h-screen">
@@ -25,23 +43,20 @@ export default function Statistic() {
                     </p>
                 </div>
 
-                <ExportButtons dateRange={dateRange} reportType={reportType} />
+                <ExportButtons dateRange={dateRange} reportType={activeTab} />
             </div>
 
-            <DateRangeFilter
-                dateRange={dateRange}
-                onDateRangeChange={setDateRange}
-                reportType={reportType}
-                onReportTypeChange={setReportType}
-            />
+            <div id="statistic-content">
+                <DateRangeFilter
+                    dateRange={dateRange}
+                    onDateRangeChange={setDateRange}
+                    onApplyFilter={handleApplyFilter}
+                />
 
-            <ReportTabs activeTab={activeTab} onTabChange={setActiveTab} />
+                <ReportTabs activeTab={activeTab} onTabChange={setActiveTab} />
 
-            {activeTab === 'reports' ? (
-                <ReportsTab dateRange={dateRange} />
-            ) : (
-                <UserActivityTab />
-            )}
+                {renderTabContent()}
+            </div>
         </div>
     );
 }

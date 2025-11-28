@@ -1,6 +1,5 @@
 import { Clock, MapPin, User, FileText, Pencil, Trash2, ToggleLeft, Calendar, ChevronLeft, ChevronRight } from "lucide-react";
-import { isPastSchedule, convertTo24Hour } from "../../validator/workScheduleValidator";
-import dayjs from "dayjs";
+import { isPastSchedule } from "../../validator/workScheduleValidator";
 
 export default function ScheduleList({
     schedules,

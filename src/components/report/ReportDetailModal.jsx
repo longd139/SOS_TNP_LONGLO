@@ -1,12 +1,8 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import {
-    X,
     Calendar,
     User,
     MapPin,
-    FileText,
-    Image as ImageIcon,
-    MessageCircle,
     MessageSquare,
     Clock4,
     SquarePen,
@@ -25,7 +21,7 @@ import { validateReport } from "../../validator/reportValidator";
 import dayjs from "dayjs";
 import MediaGallery from "./MediaGallery";
 import BaseModal, { ModalFooter } from "../base/BaseModal";
-import { DateTimePicker, utcToVietnamTime, vietnamTimeToUTC } from "../../utils/datePicker";
+import { utcToVietnamTime, vietnamTimeToUTC } from "../../utils/datePicker";
 import { ConfigProvider } from "antd";
 import viVN from "antd/locale/vi_VN";
 import "antd/dist/reset.css";

@@ -1,12 +1,9 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { loginUser, loginUserWithCaptcha, verifyOtpUser } from '../features/auth/authThunks';
-import { clearErrors, logout, restoreUser } from '../features/auth/authSlice';
+import { clearErrors, restoreUser } from '../features/auth/authSlice';
 import { selectAuthState } from '../features/auth/authSelectors';
-import { clearProfile } from '../features/userProfile/userProfileSlice';
-import { ROLE } from '../constants/role';
 import ROUTE_PATH from '../constants/routes';
-import { showToast } from '../utils/toastNotification';
 
 export const useLogin = () => {
     const dispatch = useDispatch();
