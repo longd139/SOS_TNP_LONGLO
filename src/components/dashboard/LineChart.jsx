@@ -10,7 +10,7 @@ import {
     ResponsiveContainer
 } from 'recharts';
 
-const CustomLineChart = ({ data, title }) => {
+const CustomLineChart = ({ data, title, lines, yAxisDomain }) => {
     const CustomTooltip = ({ active, payload, label }) => {
         if (active && payload && payload.length) {
             return (
@@ -18,7 +18,7 @@ const CustomLineChart = ({ data, title }) => {
                     <p className="text-sm font-medium text-gray-700 mb-2">{`Ngày: ${label}`}</p>
                     {payload.map((entry, index) => (
                         <p key={index} className="text-sm" style={{ color: entry.color }}>
-                            {entry.name}: {entry.value}
+                            {entry.name}: {entry.value?.toLocaleString?.() || entry.value}
                         </p>
                     ))}
                 </div>
@@ -26,6 +26,15 @@ const CustomLineChart = ({ data, title }) => {
         }
         return null;
     };
+
+    // Default lines configuration for backward compatibility
+    const defaultLines = [
+        { key: 'tongPhanAnh', color: '#3B82F6', name: 'Tổng phản ánh' },
+        { key: 'daGiaiQuyet', color: '#22C55E', name: 'Đã giải quyết' }
+    ];
+
+    const chartLines = lines || defaultLines;
+    const domain = yAxisDomain || [0, 'auto'];
 
     return (
         <div className="bg-white shadow-sm rounded-2xl p-6">
@@ -49,15 +58,15 @@ const CustomLineChart = ({ data, title }) => {
                         />
                         <XAxis
                             dataKey="date"
-                            axisLine={false}
-                            tickLine={false}
+                            axisLine={{ stroke: '#000000', strokeWidth: 1 }}
+                            tickLine={{ stroke: '#000000' }}
                             tick={{ fontSize: 12, fill: '#6b7280' }}
                             dy={10}
                         />
                         <YAxis
-                            domain={[0, 'auto']}
-                            axisLine={false}
-                            tickLine={false}
+                            domain={domain}
+                            axisLine={{ stroke: '#000000', strokeWidth: 1 }}
+                            tickLine={{ stroke: '#000000' }}
                             tick={{ fontSize: 12, fill: '#6b7280' }}
                             dx={-10}
                         />
@@ -66,26 +75,19 @@ const CustomLineChart = ({ data, title }) => {
                             wrapperStyle={{ paddingTop: '20px' }}
                             iconType="line"
                         />
-                        <Line
-                            type="monotone"
-                            dataKey="tongPhanAnh"
-                            name="Tổng phản ánh"
-                            stroke="#3B82F6"
-                            strokeWidth={3}
-                            dot={{ fill: '#3B82F6', strokeWidth: 2, r: 4 }}
-                            activeDot={{ r: 6, stroke: '#3B82F6', strokeWidth: 2, fill: '#ffffff' }}
-                            connectNulls={false}
-                        />
-                        <Line
-                            type="monotone"
-                            dataKey="daGiaiQuyet"
-                            name="Đã giải quyết"
-                            stroke="#22C55E"
-                            strokeWidth={3}
-                            dot={{ fill: '#22C55E', strokeWidth: 2, r: 4 }}
-                            activeDot={{ r: 6, stroke: '#22C55E', strokeWidth: 2, fill: '#ffffff' }}
-                            connectNulls={false}
-                        />
+                        {chartLines.map((line, index) => (
+                            <Line
+                                key={index}
+                                type="monotone"
+                                dataKey={line.key}
+                                name={line.name}
+                                stroke={line.color}
+                                strokeWidth={3}
+                                dot={{ fill: line.color, strokeWidth: 2, r: 4 }}
+                                activeDot={{ r: 6, stroke: line.color, strokeWidth: 2, fill: '#ffffff' }}
+                                connectNulls={false}
+                            />
+                        ))}
                     </LineChart>
                 </ResponsiveContainer>
             </div>
