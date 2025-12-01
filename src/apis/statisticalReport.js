@@ -1,12 +1,13 @@
 import apiClient from "../utils/apiClient";
 
-const getSummaryReport = async (params) => {
+
+const getPhanAnhReport = async (params) => {
     try {
-        const response = await apiClient.get("/api/report/tong-hop", { params });
+        const response = await apiClient.get("/api/report/phan-anh", { params });
         if (response.data.success) {
             return response.data.data;
         } else {
-            throw new Error(response.data.message || "Lấy báo cáo tổng hợp thất bại");
+            throw new Error(response.data.message || "Lấy báo cáo phản ánh thất bại");
         }
     } catch (error) {
         if (error.response?.data?.message) {
@@ -16,9 +17,9 @@ const getSummaryReport = async (params) => {
     }
 };
 
-const exportSummaryReportExcel = async (params) => {
+const exportPhanAnhReport = async (params) => {
     try {
-        const response = await apiClient.get("/api/report/tong-hop/export-excel", {
+        const response = await apiClient.get("/api/report/phan-anh/export", {
             params,
             responseType: 'blob'
         });
@@ -31,13 +32,13 @@ const exportSummaryReportExcel = async (params) => {
     }
 };
 
-const getFieldReport = async (params) => {
+const getThuTucReport = async (params) => {
     try {
-        const response = await apiClient.get("/api/report/linh-vuc", { params });
+        const response = await apiClient.get("/api/report/thu-tuc", { params });
         if (response.data.success) {
             return response.data.data;
         } else {
-            throw new Error(response.data.message || "Lấy báo cáo lĩnh vực thất bại");
+            throw new Error(response.data.message || "Lấy báo cáo thủ tục thất bại");
         }
     } catch (error) {
         if (error.response?.data?.message) {
@@ -47,9 +48,9 @@ const getFieldReport = async (params) => {
     }
 };
 
-const exportFieldReportExcel = async (params) => {
+const exportThuTucReport = async (params) => {
     try {
-        const response = await apiClient.get("/api/report/linh-vuc/export-excel", {
+        const response = await apiClient.get("/api/report/thu-tuc/export", {
             params,
             responseType: 'blob'
         });
@@ -62,13 +63,13 @@ const exportFieldReportExcel = async (params) => {
     }
 };
 
-const getStatusReport = async (params) => {
+const getTinTucReport = async (params) => {
     try {
-        const response = await apiClient.get("/api/report/trang-thai", { params });
+        const response = await apiClient.get("/api/report/tin-tuc", { params });
         if (response.data.success) {
             return response.data.data;
         } else {
-            throw new Error(response.data.message || "Lấy báo cáo trạng thái thất bại");
+            throw new Error(response.data.message || "Lấy báo cáo tin tức thất bại");
         }
     } catch (error) {
         if (error.response?.data?.message) {
@@ -78,9 +79,9 @@ const getStatusReport = async (params) => {
     }
 };
 
-const exportStatusReportExcel = async (params) => {
+const exportTinTucReport = async (params) => {
     try {
-        const response = await apiClient.get("/api/report/trang-thai/export-excel", {
+        const response = await apiClient.get("/api/report/tin-tuc/export", {
             params,
             responseType: 'blob'
         });
@@ -94,10 +95,10 @@ const exportStatusReportExcel = async (params) => {
 };
 
 export const STATISTICAL_REPORT_API = {
-    getSummaryReport,
-    exportSummaryReportExcel,
-    getFieldReport,
-    exportFieldReportExcel,
-    getStatusReport,
-    exportStatusReportExcel
+    getPhanAnhReport,
+    exportPhanAnhReport,
+    getThuTucReport,
+    exportThuTucReport,
+    getTinTucReport,
+    exportTinTucReport
 };

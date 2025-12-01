@@ -1,17 +1,17 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { useCallback } from 'react';
 import {
-  fetchSummaryReport,
-  exportSummaryReportExcel,
-  fetchFieldReport,
-  exportFieldReportExcel,
-  fetchStatusReport,
-  exportStatusReportExcel
+  fetchPhanAnhReport,
+  exportPhanAnhReportExcel,
+  fetchThuTucReport,
+  exportThuTucReportExcel,
+  fetchTinTucReport,
+  exportTinTucReportExcel
 } from '../features/statisticalReport/statisticalReportThunk';
 import {
-  selectSummaryReport,
-  selectFieldReport,
-  selectStatusReport,
+  selectPhanAnhReport,
+  selectThuTucReport,
+  selectTinTucReport,
   selectStatisticalReportLoading,
   selectStatisticalReportError,
   selectStatisticalReportExportLoading,
@@ -22,33 +22,33 @@ import {
   clearError,
   setFilters,
   resetFilters,
-  clearSummaryReport,
-  clearFieldReport,
-  clearStatusReport
+  clearPhanAnhReport,
+  clearThuTucReport,
+  clearTinTucReport
 } from '../features/statisticalReport/statisticalReportSlice';
 
 export const useStatisticalReport = () => {
   const dispatch = useDispatch();
 
-  const summaryReport = useSelector(selectSummaryReport);
-  const fieldReport = useSelector(selectFieldReport);
-  const statusReport = useSelector(selectStatusReport);
+  const phanAnhReport = useSelector(selectPhanAnhReport);
+  const thuTucReport = useSelector(selectThuTucReport);
+  const tinTucReport = useSelector(selectTinTucReport);
   const loading = useSelector(selectStatisticalReportLoading);
   const error = useSelector(selectStatisticalReportError);
   const exportLoading = useSelector(selectStatisticalReportExportLoading);
   const exportError = useSelector(selectStatisticalReportExportError);
   const currentFilters = useSelector(selectStatisticalReportFilters);
 
-  const loadSummaryReport = useCallback((params = {}) => {
-    return dispatch(fetchSummaryReport(params)).unwrap();
+  const loadPhanAnhReport = useCallback((params = {}) => {
+    return dispatch(fetchPhanAnhReport(params)).unwrap();
   }, [dispatch]);
 
-  const exportSummaryExcel = useCallback(async (params = {}) => {
-    const blob = await dispatch(exportSummaryReportExcel(params)).unwrap();
+  const exportPhanAnhExcel = useCallback(async (params = {}) => {
+    const blob = await dispatch(exportPhanAnhReportExcel(params)).unwrap();
     const url = window.URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `bao-cao-tong-hop-${new Date().getTime()}.xlsx`;
+    link.download = `bao-cao-phan-anh-${new Date().getTime()}.xlsx`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -56,16 +56,16 @@ export const useStatisticalReport = () => {
     return blob;
   }, [dispatch]);
 
-  const loadFieldReport = useCallback((params = {}) => {
-    return dispatch(fetchFieldReport(params)).unwrap();
+  const loadThuTucReport = useCallback((params = {}) => {
+    return dispatch(fetchThuTucReport(params)).unwrap();
   }, [dispatch]);
 
-  const exportFieldExcel = useCallback(async (params = {}) => {
-    const blob = await dispatch(exportFieldReportExcel(params)).unwrap();
+  const exportThuTucExcel = useCallback(async (params = {}) => {
+    const blob = await dispatch(exportThuTucReportExcel(params)).unwrap();
     const url = window.URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `bao-cao-linh-vuc-${new Date().getTime()}.xlsx`;
+    link.download = `bao-cao-thu-tuc-${new Date().getTime()}.xlsx`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -73,16 +73,16 @@ export const useStatisticalReport = () => {
     return blob;
   }, [dispatch]);
 
-  const loadStatusReport = useCallback((params = {}) => {
-    return dispatch(fetchStatusReport(params)).unwrap();
+  const loadTinTucReport = useCallback((params = {}) => {
+    return dispatch(fetchTinTucReport(params)).unwrap();
   }, [dispatch]);
 
-  const exportStatusExcel = useCallback(async (params = {}) => {
-    const blob = await dispatch(exportStatusReportExcel(params)).unwrap();
+  const exportTinTucExcel = useCallback(async (params = {}) => {
+    const blob = await dispatch(exportTinTucReportExcel(params)).unwrap();
     const url = window.URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `bao-cao-trang-thai-${new Date().getTime()}.xlsx`;
+    link.download = `bao-cao-tin-tuc-${new Date().getTime()}.xlsx`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -102,39 +102,42 @@ export const useStatisticalReport = () => {
     dispatch(clearError());
   }, [dispatch]);
 
-  const clearSummaryData = useCallback(() => {
-    dispatch(clearSummaryReport());
+  const clearPhanAnhData = useCallback(() => {
+    dispatch(clearPhanAnhReport());
   }, [dispatch]);
 
-  const clearFieldData = useCallback(() => {
-    dispatch(clearFieldReport());
+  const clearThuTucData = useCallback(() => {
+    dispatch(clearThuTucReport());
   }, [dispatch]);
 
-  const clearStatusData = useCallback(() => {
-    dispatch(clearStatusReport());
+  const clearTinTucData = useCallback(() => {
+    dispatch(clearTinTucReport());
   }, [dispatch]);
 
   return {
-    summaryReport,
-    fieldReport,
-    statusReport,
+    phanAnhReport,
+    thuTucReport,
+    tinTucReport,
     loading,
     error,
     exportLoading,
     exportError,
     filters: currentFilters,
 
-    loadSummaryReport,
-    exportSummaryExcel,
-    loadFieldReport,
-    exportFieldExcel,
-    loadStatusReport,
-    exportStatusExcel,
+    loadPhanAnhReport,
+    loadThuTucReport,
+    loadTinTucReport,
+
+    exportPhanAnhExcel,
+    exportThuTucExcel,
+    exportTinTucExcel,
+
     updateFilters,
     clearFilters,
+
     clearError: clearStatisticalReportError,
-    clearSummaryData,
-    clearFieldData,
-    clearStatusData
+    clearPhanAnhData,
+    clearThuTucData,
+    clearTinTucData
   };
 };

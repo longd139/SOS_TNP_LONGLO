@@ -12,22 +12,25 @@ export default function Statistic() {
         from: '',
         to: ''
     });
+    const [appliedDateRange, setAppliedDateRange] = useState({
+        from: '',
+        to: ''
+    });
 
     const handleApplyFilter = () => {
-        // Handle filter application logic here
-        console.log('Applying filter with date range:', dateRange);
+        setAppliedDateRange({ ...dateRange });
     };
 
     const renderTabContent = () => {
         switch (activeTab) {
             case 'reports':
-                return <ReportsTab dateRange={dateRange} />;
+                return <ReportsTab dateRange={appliedDateRange} />;
             case 'news':
-                return <NewsTab />;
+                return <NewsTab dateRange={appliedDateRange} />;
             case 'procedures':
-                return <ProceduresTab />;
+                return <ProceduresTab dateRange={appliedDateRange} />;
             default:
-                return <ReportsTab dateRange={dateRange} />;
+                return <ReportsTab dateRange={appliedDateRange} />;
         }
     };
 
@@ -43,7 +46,7 @@ export default function Statistic() {
                     </p>
                 </div>
 
-                <ExportButtons dateRange={dateRange} reportType={activeTab} />
+                <ExportButtons dateRange={appliedDateRange} reportType={activeTab} />
             </div>
 
             <div >
