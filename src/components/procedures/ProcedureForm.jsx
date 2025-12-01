@@ -1,4 +1,3 @@
-import React from 'react';
 import PropTypes from 'prop-types';
 import BaseModal, { ModalFooter } from '../base/BaseModal';
 import { useProcedureForm } from '../../hooks/useProcedureForm';
@@ -27,7 +26,6 @@ const ProcedureForm = ({
         addStep,
         removeStep,
         updateStep,
-        moveStep,
         reorderSteps,
         addMauDon,
         removeMauDon,

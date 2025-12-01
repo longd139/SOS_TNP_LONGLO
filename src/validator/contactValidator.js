@@ -1,6 +1,8 @@
 import * as yup from "yup";
 import { validateSchema } from "../utils/validationUtils";
 
+const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
 export const contactSchema = yup.object().shape({
     tenDonVi: yup
         .string()
@@ -24,7 +26,8 @@ export const contactSchema = yup.object().shape({
         .string()
         .required("Email không được để trống")
         .test('trim', 'Email không được để trống', value => value && value.trim().length > 0)
-        .email("Email không hợp lệ"),
+        .email("Email không hợp lệ")
+        .matches(emailRegex, "Email không hợp lệ"),
     gioLamViec: yup
         .object()
         .shape({

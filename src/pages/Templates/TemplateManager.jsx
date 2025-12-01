@@ -41,7 +41,7 @@ export default function TemplateManager() {
     const pagination = useSelector(selectPagination);
     const filters = useSelector(selectFilters);
 
-    const { canCreate, canUpdate, canDelete, canUpdateStatus, canView } = usePermission();
+    const { canUpdate, canDelete, canUpdateStatus, canView } = usePermission();
 
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -253,7 +253,7 @@ export default function TemplateManager() {
             width: "20px",
             render: (value, record, index) => (
                 <span className="text-sm font-medium text-gray-900">
-                    #{((pagination?.currentPage || 1) - 1) * (pagination?.pageSize || filters.pageSize) + index + 1}
+                    #{((pagination?.current || 1) - 1) * (pagination?.pageSize || 10) + index + 1}
                 </span>
             ),
         },
@@ -422,7 +422,6 @@ export default function TemplateManager() {
                         onEdit={handleEdit}
                         onDelete={showRemoved ? handleDelete : null}
                         onUpdateStatus={handleUpdateStatus}
-                        canView={() => canView('MD')}
                         canEdit={() => canUpdate('MD')}
                         canDelete={() => canDelete('MD')}
                         canUpdateStatus={() => canUpdateStatus('MD')}

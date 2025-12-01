@@ -1,7 +1,6 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { useCallback, useEffect } from 'react';
 import {
-    fetchAreas,
     createArea,
     updateArea,
     deleteArea,

@@ -5,6 +5,8 @@ const vietnamesePhoneRegex = /^(\+84|84|0)?([3578])[0-9]{8}$|^(\+84|84|0)?([2-9]
 
 const usernameRegex = /^[a-zA-Z0-9_.]+$/;
 
+const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
 export const createUserSchema = yup.object().shape({
     username: yup
         .string()
@@ -16,7 +18,7 @@ export const createUserSchema = yup.object().shape({
         .string()
         .required("Email là bắt buộc")
         .test('trim', 'Email là bắt buộc', value => value && value.trim().length > 0)
-        .email("Email không hợp lệ"),
+        .matches(emailRegex, "Email không hợp lệ"),
     role: yup
         .string()
         .required("Vai trò là bắt buộc")

@@ -18,7 +18,7 @@ dayjs.locale("vi");
 
 export default function ProceduresManager() {
     const dispatch = useDispatch();
-    const { canCreate, canUpdate, canDelete, canView, canUpdateStatus } = usePermission();
+    const { canUpdate, canDelete, canView, canUpdateStatus } = usePermission();
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
@@ -45,7 +45,6 @@ export default function ProceduresManager() {
         deleteProcedure,
         getProcedureById,
         toggleShowActive,
-        clearCurrent,
         handleUpdateStatus: updateStatus,
     } = useProcedure();
 
@@ -329,7 +328,7 @@ export default function ProceduresManager() {
                 onPageChange={changePage}
                 onEdit={canUpdate('TT') ? handleEdit : undefined}
                 onDelete={!JSON.parse(showActive) && canDelete('TT') ? handleDelete : undefined}
-                onView={canView('TT') ? handleView : undefined}
+                onView={handleView}
                 showActions={true}
                 emptyMessage="Không có thủ tục nào được tìm thấy"
                 className="mb-4"

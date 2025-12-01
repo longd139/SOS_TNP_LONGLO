@@ -1,13 +1,10 @@
-import React, { useEffect } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import { ROLE } from '../../constants/role';
 import { isPathDisabled, getDefaultEnabledRoute } from '../../utils/routeRedirectUtils';
-import { showToast } from '../../utils/toastNotification';
 import ROUTE_PATH from '../../constants/routes';
 
 const ProtectedRoute = ({ children }) => {
-    const { auth, isLoading, logout } = useAuth();
+    const { auth, isLoading } = useAuth();
     const location = useLocation();
 
     // useEffect(() => {

@@ -27,7 +27,7 @@ const PermissionsManagement = () => {
         toggleShowActive
     } = useRoles();
 
-    const { canCreate, canUpdate, canDelete, canUpdateStatus } = usePermission();
+    const { canUpdate, canDelete, canUpdateStatus } = usePermission();
 
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);

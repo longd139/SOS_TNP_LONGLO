@@ -1,5 +1,4 @@
-import React from 'react';
-import { User, Mail, Phone, Shield, Calendar, ToggleLeft } from 'lucide-react';
+import { Mail, Phone, Shield, Calendar, ToggleLeft } from 'lucide-react';
 import BaseModal from '../base/BaseModal';
 import { formatDate } from '../../utils/formatDate';
 

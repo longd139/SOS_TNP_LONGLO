@@ -11,7 +11,6 @@ import { PermissionHidden } from "../../components/PermissionGuard";
 import dayjs from "dayjs";
 import { validateFileImport } from "../../validator/fileValidator";
 import { downloadUtils } from "../../utils/downLoadUtils";
-import { isPastDate } from "../../validator/workScheduleValidator";
 import { WORK_SCHEDULE_API } from "../../apis/workSchedule";
 
 export default function WorkSchedule() {
@@ -21,16 +20,12 @@ export default function WorkSchedule() {
         selectedMonth,
         selectedYear,
         schedules,
-        allSchedules,
         pagination,
         counts,
-        fetchSchedules,
         fetchSchedulesPagination,
         importSchedule,
         deleteSchedule,
         hasScheduleForDay,
-        getSchedulesForDisplay,
-        getSchedulesForDate,
         updateStatus,
         formatDate,
         clearError,
@@ -42,7 +37,7 @@ export default function WorkSchedule() {
         setCounts,
     } = useSchedule();
 
-    const { canCreate, canUpdate, canDelete, canUpdateStatus } = usePermission();
+    const { canUpdate, canDelete, canUpdateStatus } = usePermission();
 
     const [deleteConfirm, setDeleteConfirm] = useState({
         isOpen: false,

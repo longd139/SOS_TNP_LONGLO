@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Plus, Loader2 } from 'lucide-react';
 import BaseTable from '../base/BaseTable';
 import { ConfirmModal } from '../base/BaseModal';
@@ -25,7 +25,7 @@ export default function AreasList() {
         clearFilters
     } = useAreas();
 
-    const { canCreate, canUpdate, canDelete, canUpdateStatus } = usePermission();
+    const { canUpdate, canDelete, canUpdateStatus } = usePermission();
 
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);

@@ -6,21 +6,19 @@ export const createTemplateSchema = yup.object().shape({
         .string()
         .required("Tên biểu mẫu là bắt buộc")
         .min(3, "Tên biểu mẫu phải có ít nhất 3 ký tự")
-        .max(500, "Tên biểu mẫu không được vượt quá 500 ký tự")
+        .max(200, "Tên biểu mẫu không được vượt quá 200 ký tự")
         .test('trim', 'Tên biểu mẫu là bắt buộc', value => value && value.trim().length > 0),
     
     maMauDon: yup
         .string()
         .required("Mã biểu mẫu là bắt buộc")
         .min(2, "Mã biểu mẫu phải có ít nhất 2 ký tự")
-        .max(50, "Mã biểu mẫu không được vượt quá 50 ký tự")
+        .max(45, "Mã biểu mẫu không được vượt quá 45 ký tự")
         .test('trim', 'Mã biểu mẫu là bắt buộc', value => value && value.trim().length > 0),
     
     moTa: yup
         .string()
-        .nullable()
-        .max(1000, "Mô tả không được vượt quá 1000 ký tự"),
-    
+        .nullable(),    
     file: yup
         .mixed()
         .required("Vui lòng chọn file")
@@ -44,13 +42,14 @@ export const updateTemplateSchema = yup.object().shape({
         .string()
         .required("Tên biểu mẫu là bắt buộc")
         .min(3, "Tên biểu mẫu phải có ít nhất 3 ký tự")
+        .max(200, "Tên biểu mẫu không được vượt quá 200 ký tự")
         .test('trim', 'Tên biểu mẫu là bắt buộc', value => value && value.trim().length > 0),
     
     maMauDon: yup
         .string()
         .required("Mã biểu mẫu là bắt buộc")
         .min(2, "Mã biểu mẫu phải có ít nhất 2 ký tự")
-        .max(50, "Mã biểu mẫu không được vượt quá 50 ký tự")
+        .max(45, "Mã biểu mẫu không được vượt quá 45 ký tự")
         .test('trim', 'Mã biểu mẫu là bắt buộc', value => value && value.trim().length > 0),
     
     moTa: yup

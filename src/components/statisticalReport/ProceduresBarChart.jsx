@@ -1,8 +1,23 @@
 import React from 'react';
 import { BarChart3 } from 'lucide-react';
-import { proceduresBarData, totalProceduresCount } from '../../mockData';
 
-export default function ProceduresBarChart() {
+export default function ProceduresBarChart({ data = [], total = 0 }) {
+  if (!data || data.length === 0) {
+    return (
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+        <div className="flex items-center gap-2 mb-4">
+          <BarChart3 className="w-5 h-5 text-gray-700" />
+          <h3 className="text-lg font-semibold text-gray-900">
+            Chi tiết theo lĩnh vực
+          </h3>
+        </div>
+        <div className="text-center py-8 text-gray-500">
+          Không có dữ liệu để hiển thị
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
       <div className="flex items-center gap-2 mb-4">
@@ -13,11 +28,11 @@ export default function ProceduresBarChart() {
       </div>
 
       <div className="text-sm text-gray-600 mb-4">
-        Tổng: {totalProceduresCount.toLocaleString()} thủ tục
+        Tổng: {total.toLocaleString()} thủ tục
       </div>
 
       <div className="space-y-6">
-        {proceduresBarData.map((item, index) => (
+        {data.map((item, index) => (
           <div key={item.category} className="flex items-center gap-3">
             <div
               className="w-3 h-3 rounded-full flex-shrink-0"
@@ -42,7 +57,7 @@ export default function ProceduresBarChart() {
                   className="h-2 rounded-full transition-all duration-500"
                   style={{
                     backgroundColor: item.color,
-                    width: `${item.percentage}%`
+                    width: `${Math.min(item.percentage, 100)}%`
                   }}
                 ></div>
               </div>

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Mail, AlertCircle, Loader2, Lock, CheckCircle, ArrowLeft } from "lucide-react";
+import { Mail, Loader2, Lock, CheckCircle, ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { sendOtpToEmail, resetPassword } from "../../features/auth/authThunks";

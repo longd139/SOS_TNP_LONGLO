@@ -4,7 +4,6 @@ import UserModal from '../../components/users/UserModal';
 import UserFilter from '../../components/admin/UserFilter';
 import UserViewModal from '../../components/users/UserViewModal';
 import { ConfirmModal } from '../../components/base/BaseModal';
-import { ROLE_LABELS, ROLE_COLORS } from '../../constants/role';
 import { useUsers } from '../../hooks/useUsers';
 import { usePermission } from '../../hooks/usePermission';
 import { PermissionHidden } from '../../components/PermissionGuard';
@@ -28,7 +27,7 @@ export default function AdminManager() {
         clearUserDetail
     } = useUsers();
 
-    const { canCreate, canUpdate, canDelete, canView, canUpdateStatus } = usePermission();
+    const { canUpdate, canDelete, canView, canUpdateStatus } = usePermission();
 
     const [modalLoading, setModalLoading] = useState(false);
     const [filters, setFilters] = useState({
@@ -123,22 +122,19 @@ export default function AdminManager() {
 
             setUserModal({ isOpen: false, user: null });
 
-        } catch (error) {
-
-            if (error) {
-                showToast.error(error);
-            }
-
+        } catch (error) {            
             if (error?.errors && Array.isArray(error.errors) && error.errors.length > 0) {
                 error.errors.forEach((err) => {
                     if (err?.message) {
                         showToast.error(err.message);
                     }
                 });
+            } else if (error?.message) {
+                showToast.error(error.message);
             } else if (typeof error === 'string') {
                 showToast.error(error);
-            } else if (!error?.message && !error?.errors) {
-                showToast.error('Có lỗi xảy ra khi cập nhật trạng thái');
+            } else {
+                showToast.error('Có lỗi xảy ra khi thực hiện thao tác');
             }
         } finally {
             setModalLoading(false);

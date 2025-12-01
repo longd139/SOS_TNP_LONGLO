@@ -1,4 +1,4 @@
-import { FilePlus, LogIn, Newspaper, Square, SquarePen } from "lucide-react";
+import { FilePlus, LogIn, Newspaper, SquarePen } from "lucide-react";
 
 export const reports = [
     {

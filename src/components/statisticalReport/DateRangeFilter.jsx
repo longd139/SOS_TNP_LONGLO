@@ -1,22 +1,6 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 
 export default function DateRangeFilter({ dateRange, onDateRangeChange, onApplyFilter }) {
-  // Set default dates on component mount
-  useEffect(() => {
-    if (!dateRange.from || !dateRange.to) {
-      const today = new Date();
-      const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
-
-      const fromDate = firstDayOfMonth.toISOString().split('T')[0];
-      const toDate = today.toISOString().split('T')[0];
-
-      onDateRangeChange({
-        from: dateRange.from || fromDate,
-        to: dateRange.to || toDate
-      });
-    }
-  }, [dateRange, onDateRangeChange]);
-
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-4">
       <div className="flex flex-col sm:flex-row items-center gap-4">

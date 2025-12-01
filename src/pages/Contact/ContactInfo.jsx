@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { MapPin, Phone, Clock, Square, SquarePen, X, Save } from "lucide-react";
+import { MapPin, Phone, Clock, SquarePen, X, Save } from "lucide-react";
 import { fetchContact, updateContact } from "../../features/contact/contactThunks";
 import { clearError, clearUpdateSuccess } from "../../features/contact/contactSlice";
 import {
