@@ -41,10 +41,11 @@ const NewsFormModal = ({ isOpen, onClose, onSubmit, initialData = null, isLoadin
     const formats = [
         'header',
         'bold', 'italic', 'underline',
-        'list', 'bullet',
+        'list',
         'align',
         'link', 'image',
-        'direction'
+        'direction',
+        'indent'
     ];
 
     useEffect(() => {
@@ -214,9 +215,17 @@ const NewsFormModal = ({ isOpen, onClose, onSubmit, initialData = null, isLoadin
                 a.setAttribute('rel', 'noopener noreferrer');
             });
             const updated = doc.body.innerHTML;
-            return DOMPurify.sanitize(updated, { ADD_ATTR: ['target'] });
+            return DOMPurify.sanitize(updated, { 
+                ADD_ATTR: ['target', 'rel', 'class', 'style'],
+                ADD_TAGS: ['ol', 'ul', 'li', 'img', 'a', 'p', 'br', 'h1', 'h2', 'h3', 'strong', 'em', 'u'],
+                ALLOW_DATA_ATTR: true
+            });
         } catch (e) {
-            return DOMPurify.sanitize(html, { ADD_ATTR: ['target'] });
+            return DOMPurify.sanitize(html, { 
+                ADD_ATTR: ['target', 'rel', 'class', 'style'],
+                ADD_TAGS: ['ol', 'ul', 'li', 'img', 'a', 'p', 'br', 'h1', 'h2', 'h3', 'strong', 'em', 'u'],
+                ALLOW_DATA_ATTR: true
+            });
         }
     };
 
