@@ -122,22 +122,19 @@ export default function AdminManager() {
 
             setUserModal({ isOpen: false, user: null });
 
-        } catch (error) {
-
-            if (error) {
-                showToast.error(error);
-            }
-
+        } catch (error) {            
             if (error?.errors && Array.isArray(error.errors) && error.errors.length > 0) {
                 error.errors.forEach((err) => {
                     if (err?.message) {
                         showToast.error(err.message);
                     }
                 });
+            } else if (error?.message) {
+                showToast.error(error.message);
             } else if (typeof error === 'string') {
                 showToast.error(error);
-            } else if (!error?.message && !error?.errors) {
-                showToast.error('Có lỗi xảy ra khi cập nhật trạng thái');
+            } else {
+                showToast.error('Có lỗi xảy ra khi thực hiện thao tác');
             }
         } finally {
             setModalLoading(false);
