@@ -44,10 +44,10 @@ const NewsPreviewModal = ({ isOpen, onClose, newsData, isPreview = false }) => {
     const sanitizeHtml = (rawHtml) => {
         if (!rawHtml) return '';
         return DOMPurify.sanitize(rawHtml, {
-            ADD_ATTR: ['target', 'class', 'style', 'alt', 'width', 'height'],
-            ADD_TAGS: ['img'],
+            ADD_ATTR: ['target', 'class', 'style', 'alt', 'width', 'height', 'rel'],
+            ADD_TAGS: ['img', 'ol', 'ul', 'li'],
             ALLOW_DATA_ATTR: true,
-            FORBID_TAGS: ['script', 'style'],
+            FORBID_TAGS: ['script'],
             transformTags: {
                 'a': (tagName, attribs) => ({
                     tagName: 'a',
@@ -153,6 +153,38 @@ const NewsPreviewModal = ({ isOpen, onClose, newsData, isPreview = false }) => {
                         .quill-content img {
                             max-width: 100% !important;
                             height: auto !important;
+                        }
+                        
+                        /* Ordered list styling */
+                        .quill-content ol {
+                            list-style-type: decimal !important;
+                            padding-left: 1.5em !important;
+                            margin: 0.5em 0 !important;
+                        }
+                        .quill-content ol li {
+                            display: list-item !important;
+                            list-style-type: decimal !important;
+                        }
+                        
+                        /* Unordered list styling */
+                        .quill-content ul {
+                            list-style-type: disc !important;
+                            padding-left: 1.5em !important;
+                            margin: 0.5em 0 !important;
+                        }
+                        .quill-content ul li {
+                            display: list-item !important;
+                            list-style-type: disc !important;
+                        }
+                        
+                        /* Nested list styling */
+                        .quill-content ol ol,
+                        .quill-content ul ol {
+                            list-style-type: lower-alpha !important;
+                        }
+                        .quill-content ul ul,
+                        .quill-content ol ul {
+                            list-style-type: circle !important;
                         }
                     `}</style>
                     <div 
