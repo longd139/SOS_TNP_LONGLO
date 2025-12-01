@@ -49,6 +49,17 @@ export const useReportAreas = ({ autoFetch = false, filters = {}, isActive } = {
     }, [autoFetch]);
 
     const loadReportAreas = useCallback((params = {}) => {
+        const requestParams = {
+            page: params.page || pagination.currentPage,
+            size: params.size || pagination.pageSize,
+            search: params.search !== undefined ? params.search : (currentFilters.search || ''),
+            isActive: params.isActive !== undefined ? params.isActive : showActive
+        };
+
+        return dispatch(fetchReportAreas(requestParams)).unwrap();
+    }, [dispatch, pagination, currentFilters, showActive]);
+
+    const loadReportAreasIfEmpty = useCallback((params = {}) => {
         if (reportAreas && reportAreas.length > 0) {
             return Promise.resolve(reportAreas);
         }
@@ -62,17 +73,6 @@ export const useReportAreas = ({ autoFetch = false, filters = {}, isActive } = {
 
         return dispatch(fetchReportAreas(requestParams)).unwrap();
     }, [dispatch, pagination, currentFilters, showActive, reportAreas]);
-
-    const forceLoadReportAreas = useCallback((params = {}) => {
-        const requestParams = {
-            page: params.page || pagination.currentPage,
-            size: params.size || pagination.pageSize,
-            search: params.search !== undefined ? params.search : (currentFilters.search || ''),
-            isActive: params.isActive !== undefined ? params.isActive : showActive
-        };
-
-        return dispatch(fetchReportAreas(requestParams)).unwrap();
-    }, [dispatch, pagination, currentFilters, showActive]);
 
     const createArea = useCallback((formData) => {
         return dispatch(createReportArea(formData)).unwrap();
@@ -128,7 +128,7 @@ export const useReportAreas = ({ autoFetch = false, filters = {}, isActive } = {
         showActive,
 
         loadReportAreas,
-        forceLoadReportAreas,
+        loadReportAreasIfEmpty,
         createArea,
         updateArea,
         deleteArea,
