@@ -33,7 +33,7 @@ export default function DomainFilter({ selectedDomain, onDomainChange }) {
                     <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" />
                 </div>
 
-                <ExportButtons dateRange={{selectedDomain}} reportType="overview" />
+                {/* <ExportButtons dateRange={{selectedDomain}} reportType="overview" /> */}
             </div>
         </div>
     );

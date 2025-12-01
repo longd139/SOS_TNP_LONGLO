@@ -46,7 +46,7 @@ export default function Statistic() {
                 <ExportButtons dateRange={dateRange} reportType={activeTab} />
             </div>
 
-            <div id="statistic-content">
+            <div >
                 <DateRangeFilter
                     dateRange={dateRange}
                     onDateRangeChange={setDateRange}
@@ -54,8 +54,10 @@ export default function Statistic() {
                 />
 
                 <ReportTabs activeTab={activeTab} onTabChange={setActiveTab} />
-
-                {renderTabContent()}
+                <div id="statistic-content">
+                    {renderTabContent()}
+                </div>
+                
             </div>
         </div>
     );
