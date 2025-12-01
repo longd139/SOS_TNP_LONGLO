@@ -1,24 +1,60 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import Chart from '../dashboard/Chart';
-import { newsTrendsData, newsDetailsData } from '../../mockData';
 import NewsDetailsTable from './NewsDetailsTable';
+import { useStatisticalReport } from '../../hooks/useStatisticalReport';
 
-export default function NewsTab() {
-    const [dashboardData, setDashboardData] = useState({
-        xu_huong_tin_tuc: newsTrendsData
-    });
+export default function NewsTab({ dateRange }) {
+    const { tinTucReport, loading, loadTinTucReport } = useStatisticalReport();
 
     useEffect(() => {
-        // Use mock data - in real app this would be API data
-        setDashboardData({ xu_huong_tin_tuc: newsTrendsData });
-    }, []);
+        const params = {};
+        if (dateRange?.from) params.from = dateRange.from;
+        if (dateRange?.to) params.to = dateRange.to;
 
-    const formattedChartData = dashboardData?.xu_huong_tin_tuc?.map(item => ({
-        date: item.date,
-        banNhap: item.banNhap,
-        luotXem: item.luotXem,
-        daXuatBan: item.daXuatBan
-    })) || [];
+        loadTinTucReport(params).catch(error => {
+            console.error('Error loading tin tuc report:', error);
+        });
+    }, [loadTinTucReport, dateRange?.from, dateRange?.to]);
+
+    const { chartData, tableData } = useMemo(() => {
+        if (!tinTucReport || typeof tinTucReport !== 'object') return { chartData: [], tableData: [] };
+
+        const entries = Object.entries(tinTucReport);
+        if (entries.length === 0) return { chartData: [], tableData: [] };
+        
+        const chartData = entries.map(([date, data]) => {
+            const dateObj = new Date(date);
+            const formattedDate = `${dateObj.getDate().toString().padStart(2, '0')}/${(dateObj.getMonth() + 1).toString().padStart(2, '0')}`;
+            return {
+                date: formattedDate,
+                banNhap: data.ban_nhap || 0,
+                luotXem: data.luot_xem || 0,
+                daXuatBan: data.da_xuat_ban || 0
+            };
+        });
+
+        const tableData = entries.map(([date, data]) => {
+            const dateObj = new Date(date);
+            const formattedDate = `${dateObj.getDate().toString().padStart(2, '0')}/${(dateObj.getMonth() + 1).toString().padStart(2, '0')}`;
+            return {
+                date: formattedDate,
+                daXuatBan: data.da_xuat_ban || 0,
+                banNhap: data.ban_nhap || 0,
+                tongBaiViet: data.tong || 0,
+                luotXem: data.luot_xem || 0
+            };
+        });
+
+        return { chartData, tableData };
+    }, [tinTucReport]);
+
+    if (loading) {
+        return (
+            <div className="flex items-center justify-center h-64">
+                <div className="text-gray-500">Đang tải dữ liệu...</div>
+            </div>
+        );
+    }
 
     return (
         <div className="space-y-3 md:space-y-4">
@@ -26,7 +62,7 @@ export default function NewsTab() {
                 <Chart
                     type="line"
                     title="Xu hướng tin tức"
-                    data={formattedChartData}
+                    data={chartData}
                     lines={[
                         { key: 'banNhap', color: '#FF8C00', name: 'Bản nháp' },
                         { key: 'luotXem', color: '#3B82F6', name: 'Lượt xem' },
@@ -39,7 +75,7 @@ export default function NewsTab() {
                 <h3 className="text-lg font-semibold text-gray-900 mb-6">
                     Thống kê tin tức chi tiết
                 </h3>
-                <NewsDetailsTable data={newsDetailsData} />
+                <NewsDetailsTable data={tableData} />
             </div>
         </div>
     );

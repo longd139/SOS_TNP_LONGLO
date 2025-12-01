@@ -1,47 +1,24 @@
 import React from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { BarChart3 } from 'lucide-react';
-// import { useStatisticalReport } from '../../hooks/useStatisticalReport';
-import { statusReportData } from '../../mockData';
 
-export default function StatusReportChart({ dateRange }) {
-  // Comment API usage, use mockData instead
-  // const { statusReport, loading, loadStatusReport } = useStatisticalReport();
+export default function StatusReportChart({ dateRange, data = [] }) {
+  if (!data || data.length === 0) {
+    return (
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+        <div className="flex items-center gap-2 mb-2">
+          <BarChart3 className="w-5 h-5 text-gray-700" />
+          <h3 className="text-lg font-semibold text-gray-900">Phân Bố Theo Trạng Thái</h3>
+        </div>
+        <div className="flex items-center justify-center h-[250px]">
+          <div className="text-gray-500">Không có dữ liệu</div>
+        </div>
+      </div>
+    );
+  }
 
-  // useEffect(() => {
-  //   const params = {};
-  //   if (dateRange.from) params.from = dateRange.from;
-  //   if (dateRange.to) params.to = dateRange.to;
-
-  //   loadStatusReport(params).catch(err => {
-  //     console.error('Failed to load status report:', err);
-  //   });
-  // }, [dateRange.from, dateRange.to, loadStatusReport]);
-
-  const chartData = statusReportData;
-
-  // Remove loading and empty state checks for mockData
-  // if (loading) {
-  //   return (
-  //     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3 md:p-4">
-  //       <h3 className="text-base md:text-lg font-semibold text-gray-900 mb-3 md:mb-4">Phản ánh theo trạng thái</h3>
-  //       <div className="flex items-center justify-center h-[250px]">
-  //         <div className="text-gray-500">Đang tải dữ liệu...</div>
-  //       </div>
-  //     </div>
-  //   );
-  // }
-
-  // if (!chartData.length) {
-  //   return (
-  //     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3 md:p-4">
-  //       <h3 className="text-base md:text-lg font-semibold text-gray-900 mb-3 md:mb-4">Phản ánh theo trạng thái</h3>
-  //       <div className="flex items-center justify-center h-[250px]">
-  //         <div className="text-gray-500">Không có dữ liệu</div>
-  //       </div>
-  //     </div>
-  //   );
-  // }
+  const maxCount = Math.max(...data.map(item => item.count), 100);
+  const yAxisMax = Math.ceil(maxCount * 1.1); 
 
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
@@ -54,7 +31,7 @@ export default function StatusReportChart({ dateRange }) {
 
       <ResponsiveContainer width="100%" height={400}>
         <BarChart
-          data={chartData}
+          data={data}
           margin={{
             top: 20,
             right: 30,
@@ -76,7 +53,7 @@ export default function StatusReportChart({ dateRange }) {
             tick={{ fontSize: 11, fill: '#6b7280' }}
             axisLine={{ stroke: '#000000', strokeWidth: 1 }}
             tickLine={{ stroke: '#000000' }}
-            domain={[0, 1000]}
+            domain={[0, yAxisMax]}
           />
           <Tooltip
             formatter={(value) => [value, 'Số lượng']}

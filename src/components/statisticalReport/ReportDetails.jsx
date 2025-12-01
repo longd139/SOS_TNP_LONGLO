@@ -1,8 +1,23 @@
 import React from 'react';
 import { FileText } from 'lucide-react';
-import { reportDetailsData } from '../../mockData';
 
-export default function ReportDetails() {
+export default function ReportDetails({ data = [] }) {
+  if (!data || data.length === 0) {
+    return (
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+        <div className="flex items-center gap-2 mb-4">
+          <FileText className="w-5 h-5 text-gray-700" />
+          <h3 className="text-lg font-semibold text-gray-900">
+            Chi tiết phản ánh (Cập nhật mới nhất)
+          </h3>
+        </div>
+        <div className="text-center py-8 text-gray-500">
+          Không có dữ liệu để hiển thị
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
       <div className="flex items-center gap-2 mb-4">
@@ -34,7 +49,7 @@ export default function ReportDetails() {
             </tr>
           </thead>
           <tbody>
-            {reportDetailsData.map((report, index) => (
+            {data.map((report, index) => (
               <tr
                 key={report.id}
                 className={`border-b border-gray-100 hover:bg-gray-50 transition-colors ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'

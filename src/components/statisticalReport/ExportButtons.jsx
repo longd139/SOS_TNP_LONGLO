@@ -6,18 +6,36 @@ import { exportPDF } from '../../utils/pdfUtils';
 import dayjs from 'dayjs';
 
 export default function ExportButtons({ dateRange, reportType }) {
-    const { exportSummaryExcel, exportLoading } = useStatisticalReport();
+    const { 
+        exportPhanAnhExcel, 
+        exportThuTucExcel, 
+        exportTinTucExcel, 
+        exportLoading 
+    } = useStatisticalReport();
     const [pdfLoading, setPdfLoading] = useState(false);
 
     const handleExportExcel = async () => {
         try {
             const params = {};
-            if (dateRange.from) params.from = dateRange.from;
-            if (dateRange.to) params.to = dateRange.to;
+            if (dateRange?.from) params.from = dateRange.from;
+            if (dateRange?.to) params.to = dateRange.to;
 
-            if (reportType === 'overview' || reportType === 'reports') {
-                await exportSummaryExcel(params);
-                showToast.success('Xuất báo cáo tổng hợp thành công');
+            switch (reportType) {
+                case 'reports':
+                    await exportPhanAnhExcel(params);
+                    showToast.success('Xuất báo cáo phản ánh thành công');
+                    break;
+                case 'news':
+                    await exportTinTucExcel(params);
+                    showToast.success('Xuất báo cáo tin tức thành công');
+                    break;
+                case 'procedures':
+                    await exportThuTucExcel(params);
+                    showToast.success('Xuất báo cáo thủ tục thành công');
+                    break;
+                default:
+                    await exportPhanAnhExcel(params);
+                    showToast.success('Xuất báo cáo thành công');
             }
         } catch (error) {
             showToast.error(error.message || 'Xuất Excel thất bại');
@@ -30,7 +48,7 @@ export default function ExportButtons({ dateRange, reportType }) {
 
             await new Promise(resolve => setTimeout(resolve, 500));
 
-            const dateRangeStr = dateRange.from && dateRange.to
+            const dateRangeStr = dateRange?.from && dateRange?.to
                 ? `_${dayjs(dateRange.from).format('DD-MM-YYYY')}_${dayjs(dateRange.to).format('DD-MM-YYYY')}`
                 : '';
 
