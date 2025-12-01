@@ -45,7 +45,7 @@ export default function FieldReportChart({ dateRange, total = 0, cateData = [] }
             cx="50%"
             cy="50%"
             labelLine={false}
-            label={({ percentage }) => `${percentage}%`}
+            label={false}
             outerRadius={80}
             fill="#8884d8"
             dataKey="value"
