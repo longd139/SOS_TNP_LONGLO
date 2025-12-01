@@ -1,24 +1,26 @@
 import { createSlice } from "@reduxjs/toolkit";
 import {
-  fetchSummaryReport,
-  exportSummaryReportExcel,
-  fetchFieldReport,
-  exportFieldReportExcel,
-  fetchStatusReport,
-  exportStatusReportExcel
+  fetchPhanAnhReport,
+  exportPhanAnhReportExcel,
+  fetchThuTucReport,
+  exportThuTucReportExcel,
+  fetchTinTucReport,
+  exportTinTucReportExcel
 } from "./statisticalReportThunk";
 
 const initialState = {
-  summaryReport: null,
-  fieldReport: [],
-  statusReport: [],
+  phanAnhReport: null,
+  thuTucReport: null,
+  tinTucReport: null,
+  
   loading: false,
   error: null,
   exportLoading: false,
   exportError: null,
   filters: {
     from: '',
-    to: ''
+    to: '',
+    id_linh_vuc: null
   }
 };
 
@@ -36,91 +38,91 @@ const statisticalReportSlice = createSlice({
     resetFilters: (state) => {
       state.filters = initialState.filters;
     },
-    clearSummaryReport: (state) => {
-      state.summaryReport = null;
+    clearPhanAnhReport: (state) => {
+      state.phanAnhReport = null;
     },
-    clearFieldReport: (state) => {
-      state.fieldReport = [];
+    clearThuTucReport: (state) => {
+      state.thuTucReport = null;
     },
-    clearStatusReport: (state) => {
-      state.statusReport = [];
+    clearTinTucReport: (state) => {
+      state.tinTucReport = null;
     }
   },
   extraReducers: (builder) => {
     builder
-      .addCase(fetchSummaryReport.pending, (state) => {
+      .addCase(fetchPhanAnhReport.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(fetchSummaryReport.fulfilled, (state, action) => {
+      .addCase(fetchPhanAnhReport.fulfilled, (state, action) => {
         state.loading = false;
-        state.summaryReport = action.payload;
+        state.phanAnhReport = action.payload;
       })
-      .addCase(fetchSummaryReport.rejected, (state, action) => {
+      .addCase(fetchPhanAnhReport.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload || 'Lấy báo cáo tổng hợp thất bại';
+        state.error = action.payload || 'Lấy báo cáo phản ánh thất bại';
       })
 
-      .addCase(exportSummaryReportExcel.pending, (state) => {
+      .addCase(exportPhanAnhReportExcel.pending, (state) => {
         state.exportLoading = true;
         state.exportError = null;
       })
-      .addCase(exportSummaryReportExcel.fulfilled, (state) => {
+      .addCase(exportPhanAnhReportExcel.fulfilled, (state) => {
         state.exportLoading = false;
       })
-      .addCase(exportSummaryReportExcel.rejected, (state, action) => {
+      .addCase(exportPhanAnhReportExcel.rejected, (state, action) => {
         state.exportLoading = false;
-        state.exportError = action.payload || 'Xuất báo cáo tổng hợp thất bại';
+        state.exportError = action.payload || 'Xuất báo cáo phản ánh thất bại';
       })
 
-      .addCase(fetchFieldReport.pending, (state) => {
+      .addCase(fetchThuTucReport.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(fetchFieldReport.fulfilled, (state, action) => {
+      .addCase(fetchThuTucReport.fulfilled, (state, action) => {
         state.loading = false;
-        state.fieldReport = action.payload || [];
+        state.thuTucReport = action.payload;
       })
-      .addCase(fetchFieldReport.rejected, (state, action) => {
+      .addCase(fetchThuTucReport.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload || 'Lấy báo cáo lĩnh vực thất bại';
+        state.error = action.payload || 'Lấy báo cáo thủ tục thất bại';
       })
 
-      .addCase(exportFieldReportExcel.pending, (state) => {
+      .addCase(exportThuTucReportExcel.pending, (state) => {
         state.exportLoading = true;
         state.exportError = null;
       })
-      .addCase(exportFieldReportExcel.fulfilled, (state) => {
+      .addCase(exportThuTucReportExcel.fulfilled, (state) => {
         state.exportLoading = false;
       })
-      .addCase(exportFieldReportExcel.rejected, (state, action) => {
+      .addCase(exportThuTucReportExcel.rejected, (state, action) => {
         state.exportLoading = false;
-        state.exportError = action.payload || 'Xuất báo cáo lĩnh vực thất bại';
+        state.exportError = action.payload || 'Xuất báo cáo thủ tục thất bại';
       })
 
-      .addCase(fetchStatusReport.pending, (state) => {
+      .addCase(fetchTinTucReport.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(fetchStatusReport.fulfilled, (state, action) => {
+      .addCase(fetchTinTucReport.fulfilled, (state, action) => {
         state.loading = false;
-        state.statusReport = action.payload || [];
+        state.tinTucReport = action.payload;
       })
-      .addCase(fetchStatusReport.rejected, (state, action) => {
+      .addCase(fetchTinTucReport.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload || 'Lấy báo cáo trạng thái thất bại';
+        state.error = action.payload || 'Lấy báo cáo tin tức thất bại';
       })
 
-      .addCase(exportStatusReportExcel.pending, (state) => {
+      .addCase(exportTinTucReportExcel.pending, (state) => {
         state.exportLoading = true;
         state.exportError = null;
       })
-      .addCase(exportStatusReportExcel.fulfilled, (state) => {
+      .addCase(exportTinTucReportExcel.fulfilled, (state) => {
         state.exportLoading = false;
       })
-      .addCase(exportStatusReportExcel.rejected, (state, action) => {
+      .addCase(exportTinTucReportExcel.rejected, (state, action) => {
         state.exportLoading = false;
-        state.exportError = action.payload || 'Xuất báo cáo trạng thái thất bại';
+        state.exportError = action.payload || 'Xuất báo cáo tin tức thất bại';
       });
   }
 });
@@ -129,9 +131,9 @@ export const {
   clearError,
   setFilters,
   resetFilters,
-  clearSummaryReport,
-  clearFieldReport,
-  clearStatusReport
+  clearPhanAnhReport,
+  clearThuTucReport,
+  clearTinTucReport
 } = statisticalReportSlice.actions;
 
 export default statisticalReportSlice.reducer;

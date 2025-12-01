@@ -84,7 +84,6 @@ const authSlice = createSlice({
                 state.errors = action.payload?.errors || {};
             })
 
-            // Handle login with captcha
             .addCase(loginUserWithCaptcha.pending, (state) => {
                 state.loading = true;
                 state.apiError = '';

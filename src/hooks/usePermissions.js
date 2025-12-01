@@ -40,7 +40,6 @@ export const usePermissions = () => {
 
     const loadCategories = useCallback(
         () => {
-            // Only fetch if categories are empty
             if ((categories || []).length === 0) {
                 return dispatch(fetchPermissionCategories());
             }
