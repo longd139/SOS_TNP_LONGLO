@@ -44,7 +44,7 @@ export default function StatisticsByCategory({ data = [] }) {
                 Chưa xử lý
               </th>
               <th className="text-center py-3 px-2 text-base font-bold text-gray-700">
-                Thời gian xử lý TB (ngày)
+                Thời gian xử lý TB (giờ)
               </th>
               <th className="text-center py-3 px-2 text-base font-bold text-gray-700">
                 Tỷ lệ
@@ -59,7 +59,7 @@ export default function StatisticsByCategory({ data = [] }) {
                   }`}
               >
                 <td className="py-3 px-2 text-sm font-medium text-gray-900">
-                  {item.category}
+                  {item.nameArea.toLocaleString()}
                 </td>
                 <td className="py-3 px-2 text-sm text-center font-medium text-gray-900">
                   {item.totalReports.toLocaleString()}
