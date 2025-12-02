@@ -1,7 +1,7 @@
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { PieChart as PieChartIcon } from 'lucide-react';
 
-export default function FieldReportChart({ dateRange, total = 0, cateData = [] }) {
+export default function FieldReportChart({ dateRange, total = 0, cateData = [], title, subTotal }) {
   const chartData = cateData.map((item, index) => ({
     name: item.category,
     value: item.count,
@@ -15,7 +15,7 @@ export default function FieldReportChart({ dateRange, total = 0, cateData = [] }
         <div className="flex items-center gap-2 mb-4">
           <PieChartIcon className="w-5 h-5 text-gray-700" />
           <h3 className="text-lg font-semibold text-gray-900">
-            Biểu Đồ Tròn Phản Ánh
+            {title}
           </h3>
         </div>
         <div className="flex items-center justify-center h-[250px]">
@@ -30,12 +30,12 @@ export default function FieldReportChart({ dateRange, total = 0, cateData = [] }
       <div className="flex items-center gap-2 mb-4">
         <PieChartIcon className="w-5 h-5 text-gray-700" />
         <h3 className="text-lg font-semibold text-gray-900">
-          Biểu Đồ Tròn Phản Ánh
+          {title}
         </h3>
       </div>
 
       <div className="text-sm mb-4">
-        Tổng số phản ánh: {total.toLocaleString()}
+        {subTotal}: {total.toLocaleString()}
       </div>
 
       <ResponsiveContainer width="100%" height={250}>
@@ -45,7 +45,7 @@ export default function FieldReportChart({ dateRange, total = 0, cateData = [] }
             cx="50%"
             cy="50%"
             labelLine={false}
-            label={({ percentage }) => `${percentage}%`}
+            label={false}
             outerRadius={80}
             fill="#8884d8"
             dataKey="value"

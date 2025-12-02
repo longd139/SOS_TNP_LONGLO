@@ -142,6 +142,8 @@ export default function ProceduresTab({ dateRange }) {
                     dateRange={dateRange}
                     total={totalProceduresCount}
                     cateData={pieChartData}
+                    title="Biểu Đồ Tròn Thủ Tục"
+                    subTotal="Tổng số thủ tục"
                 />
                 <ProceduresBarChart data={pieChartData} total={totalProceduresCount} />
             </div>
