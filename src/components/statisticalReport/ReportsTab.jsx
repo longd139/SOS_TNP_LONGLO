@@ -157,6 +157,7 @@ export default function ReportsTab({ dateRange }) {
                     cateData={pieChartData} 
                     title="Biểu Đồ Tròn Phản Ánh"
                     subTotal="Tổng số phản ánh"
+                    nameCate="phản ánh"
                 />
                 <CategoryDetails data={pieChartData} total={totalReportsCount} />
             </div>
