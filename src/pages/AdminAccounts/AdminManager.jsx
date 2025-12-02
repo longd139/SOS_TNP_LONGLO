@@ -275,9 +275,9 @@ export default function AdminManager() {
             title: 'Vai trò',
             dataIndex: 'role',
             key: 'role',
-            width: '150px',
+            width: '100px',
             render: (role) => (
-                <span className='inline-flex items-center px-2.5 py-0.5 text-gray-800'>
+                <span className='block max-w-[300px] truncate text-ellipsis overflow-hidden whitespace-nowrap text-sm'>
                     {role}
                 </span>
             )
