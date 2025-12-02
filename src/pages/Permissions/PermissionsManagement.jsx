@@ -52,6 +52,18 @@ const PermissionsManagement = () => {
     };
 
     const column = [
+      {
+            title: "STT",
+            key: "stt",
+            render: (value, record, index) => (
+                <span className="text-sm font-medium text-gray-900">
+                    #
+                    {((pagination?.currentPage || 1) - 1) * (pagination?.pageSize || 10) +
+                        index +
+                        1}
+                </span>
+            ),
+        },
         {
             title: 'Tên vai trò',
             dataIndex: 'name',

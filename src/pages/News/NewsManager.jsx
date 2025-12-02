@@ -318,6 +318,14 @@ export default function NewsManager() {
             )
         },
         {
+            title: 'Lượt xem',
+            dataIndex: '_count',
+            key: '_count',
+            render: (value) => (
+                <span className="text-sm text-gray-600">{value?.tin_tuc_view}</span>
+            )
+        },
+        {
             title: 'Ngày tạo',
             dataIndex: 'thoi_gian_tao',
             key: 'thoi_gian_tao',
