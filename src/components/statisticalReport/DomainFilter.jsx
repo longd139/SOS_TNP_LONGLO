@@ -1,18 +1,38 @@
-import React from 'react';
-import { ChevronDown } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { ChevronDown, Loader2 } from 'lucide-react';
+import { REPORT_AREAS_API } from '../../apis/reportAreas';
+import { showToast } from '../../utils/toastNotification';
 
 export default function DomainFilter({ selectedDomain, onDomainChange }) {
-    const domains = [
-        { value: 'all', label: 'Tất cả lĩnh vực' },
-        { value: 'infrastructure', label: 'Cơ sở hạ tầng' },
-        { value: 'environment', label: 'Môi trường' },
-        { value: 'education', label: 'Giáo dục' },
-        { value: 'healthcare', label: 'Y tế' },
-        { value: 'transport', label: 'Giao thông' },
-        { value: 'security', label: 'An ninh trật tự' },
-        { value: 'social', label: 'Xã hội' },
-        { value: 'economy', label: 'Kinh tế' }
-    ];
+    const [domains, setDomains] = useState([]);
+    const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+        const fetchDomains = async () => {
+            setLoading(true);
+            try {
+                const response = await REPORT_AREAS_API.getAllReportAreas(1, 100, true, '');
+                if (response?.data) {
+                    const domainList = response.data.map(item => ({
+                        value: item.id,
+                        label: item.ten || item.name
+                    }));
+                    setDomains(domainList);
+                }
+            } catch (error) {
+                showToast.error('Không thể tải danh sách lĩnh vực báo cáo.');
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchDomains();
+    }, []);
+
+    const handleChange = (e) => {
+        const value = e.target.value;
+        onDomainChange(value);
+    };
 
     return (
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-4">
@@ -20,19 +40,23 @@ export default function DomainFilter({ selectedDomain, onDomainChange }) {
                 <div className="relative">
                     <select
                         value={selectedDomain}
-                        onChange={(e) => onDomainChange(e.target.value)}
-                        className="px-3 py-2 bg-gray-100 border border-gray-300 rounded-lg text-base text-gray-700 appearance-none cursor-pointer hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors min-w-48"
+                        onChange={handleChange}
+                        disabled={loading}
+                        className="px-3 py-2 pr-10 bg-gray-100 border border-gray-300 rounded-lg text-base text-gray-700 appearance-none cursor-pointer hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors min-w-48 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
+                        <option value="all">Tất cả lĩnh vực</option>
                         {domains.map((domain) => (
                             <option key={domain.value} value={domain.value}>
                                 {domain.label}
                             </option>
                         ))}
                     </select>
-                    <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" />
+                    {loading ? (
+                        <Loader2 className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none animate-spin" />
+                    ) : (
+                        <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" />
+                    )}
                 </div>
-
-                {/* <ExportButtons dateRange={{selectedDomain}} reportType="overview" /> */}
             </div>
         </div>
     );
