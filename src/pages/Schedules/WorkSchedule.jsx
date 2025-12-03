@@ -157,12 +157,28 @@ export default function WorkSchedule() {
         }
     };
 
-    const handleMonthChange = (newMonth) => {
-        setSelectedMonth(newMonth);
+    const handleMonthChange = (newMonth, forceRefresh = false) => {
+        if (forceRefresh && newMonth === selectedMonth) {
+            const monthYear = `${newMonth}/${selectedYear}`;
+            setCurrentPage(1);
+            setActiveFilter("all");
+            setSelectedDate(null);
+            fetchAllSchedulesData(monthYear);
+        } else {
+            setSelectedMonth(newMonth);
+        }
     };
 
-    const handleYearChange = (newYear) => {
-        setSelectedYear(newYear);
+    const handleYearChange = (newYear, forceRefresh = false) => {
+        if (forceRefresh && newYear === selectedYear) {
+            const monthYear = `${selectedMonth}/${newYear}`;
+            setCurrentPage(1);
+            setActiveFilter("all");
+            setSelectedDate(null);
+            fetchAllSchedulesData(monthYear);
+        } else {
+            setSelectedYear(newYear);
+        }
     };
 
     const handleEdit = (schedule) => {

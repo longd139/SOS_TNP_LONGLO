@@ -138,12 +138,12 @@ export default function MonthCalendar({
     };
 
     const handleMonthSelect = (selectedMonth) => {
-        onMonthChange?.(selectedMonth);
+        onMonthChange?.(selectedMonth, true); 
         setIsMonthYearPickerOpen(false);
     };
 
     const handleYearSelect = (selectedYear) => {
-        onYearChange?.(selectedYear);
+        onYearChange?.(selectedYear, true); 
     };
 
     const months = [
