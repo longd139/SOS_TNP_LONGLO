@@ -5,6 +5,7 @@ import ReportTabs from '../../components/statisticalReport/ReportTabs';
 import ReportsTab from '../../components/statisticalReport/ReportsTab';
 import NewsTab from '../../components/statisticalReport/NewsTab';
 import ProceduresTab from '../../components/statisticalReport/ProceduresTab';
+import { validateStatisticalReportForm } from '../../validator/statisticalValidator';
 
 export default function Statistic() {
     const [activeTab, setActiveTab] = useState('reports');
@@ -16,9 +17,15 @@ export default function Statistic() {
         from: '',
         to: ''
     });
+    const [errors, setErrors] = useState({});
 
-    const handleApplyFilter = () => {
-        setAppliedDateRange({ ...dateRange });
+    const handleApplyFilter = async () => {
+        const { isValid, errors: validationErrors } = await validateStatisticalReportForm(dateRange);
+        setErrors(validationErrors);
+        
+        if (isValid) {
+            setAppliedDateRange({ ...dateRange });
+        }
     };
 
     const renderTabContent = () => {
@@ -52,8 +59,12 @@ export default function Statistic() {
             <div >
                 <DateRangeFilter
                     dateRange={dateRange}
-                    onDateRangeChange={setDateRange}
+                    onDateRangeChange={(newDateRange) => {
+                        setDateRange(newDateRange);
+                        setErrors({});
+                    }}
                     onApplyFilter={handleApplyFilter}
+                    errors={errors}
                 />
 
                 <ReportTabs activeTab={activeTab} onTabChange={setActiveTab} />

@@ -21,7 +21,7 @@ export default function ProceduresFilter({
 
     useEffect(() => {
         if (!areas || areas.length === 0) {
-            dispatch(fetchAreas({ isActive: true }));
+            dispatch(fetchAreas({ isActive: true, size: 10000 }));
         }
     }, []);
 
