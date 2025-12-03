@@ -38,8 +38,12 @@ const PermissionsManagement = () => {
     const [currentPageSize, setCurrentPageSize] = useState(pagination.pageSize || 10);
 
     useEffect(() => {
-        loadRoles(1, 10);
-    }, [loadRoles]);
+        updateFilters({ search: '' });
+        toggleShowActive(true);
+        setCurrentPageSize(10);
+        
+        loadRoles(1, 10, { search: '', isActive: true });
+    }, []);
 
     const formatDate = (dateString) => {
         if (!dateString) return '-';
@@ -282,7 +286,7 @@ const PermissionsManagement = () => {
             <div className="mb-4 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 bg-white p-3 rounded-lg shadow-sm border border-gray-200">
                 <div className="flex items-center gap-3">
                     <h3 className="font-semibold text-gray-900 mb-0">
-                        Danh sách bài viết ({pagination.totalItems || 0})
+                        Danh sách quyền ({pagination.totalItems || 0})
                     </h3>
                     {!showActive && (
                         <span className="px-2 md:px-3 py-1 bg-red-100 text-red-800 text-xs font-medium rounded-full">
