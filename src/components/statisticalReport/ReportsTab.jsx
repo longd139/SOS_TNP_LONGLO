@@ -107,20 +107,37 @@ export default function ReportsTab({ dateRange }) {
     }, [phanAnhReport?.phan_anh_moi_cap_nhat]);
 
     const categoryStats = useMemo(() => {
-        if (!phanAnhReport?.chi_tiet_theo_linh_vuc || typeof phanAnhReport.chi_tiet_theo_linh_vuc !== 'object') return [];
+        if (!phanAnhReport?.top_5_linh_vuc_theo_phan_anh) return [];
         
-        const entries = Object.entries(phanAnhReport.chi_tiet_theo_linh_vuc);
-        if (entries.length === 0) return [];
+        if (Array.isArray(phanAnhReport.top_5_linh_vuc_theo_phan_anh)) {
+            return phanAnhReport.top_5_linh_vuc_theo_phan_anh.map((data) => ({
+                category: data.ten_linh_vuc || data.category || '',
+                nameArea: data.ten_linh_vuc || '',
+                totalReports: data.tong_phan_anh || 0,
+                resolved: data.da_xu_ly || 0,
+                unresolved: data.chua_xu_ly || 0,
+                averageProcessingTime: data.thoi_gian_xu_ly_tb || 0,
+                percentage: data.ty_le || 0
+            }));
+        }
 
-        return entries.map(([category, data]) => ({
-            category,
-            totalReports: data.tong_phan_anh || 0,
-            resolved: data.da_xu_ly || 0,
-            unresolved: data.chua_xu_ly || 0,
-            averageProcessingTime: data.thoi_gian_xu_ly_tb || 0,
-            percentage: data.ty_le || 0
-        }));
-    }, [phanAnhReport?.chi_tiet_theo_linh_vuc]);
+        if (typeof phanAnhReport.top_5_linh_vuc_theo_phan_anh === 'object') {
+            const entries = Object.entries(phanAnhReport.top_5_linh_vuc_theo_phan_anh);
+            if (entries.length === 0) return [];
+
+            return entries.map(([category, data]) => ({
+                category,
+                nameArea: data.ten_linh_vuc || '',
+                totalReports: data.tong_phan_anh || 0,
+                resolved: data.da_xu_ly || 0,
+                unresolved: data.chua_xu_ly || 0,
+                averageProcessingTime: data.thoi_gian_xu_ly_tb || 0,
+                percentage: data.ty_le || 0
+            }));
+        }
+
+        return [];
+    }, [phanAnhReport?.top_5_linh_vuc_theo_phan_anh]);
 
     if (loading) {
         return (
@@ -156,6 +173,7 @@ export default function ReportsTab({ dateRange }) {
                     cateData={pieChartData} 
                     title="Biểu Đồ Tròn Phản Ánh"
                     subTotal="Tổng số phản ánh"
+                    nameCate="phản ánh"
                 />
                 <CategoryDetails data={pieChartData} total={totalReportsCount} />
             </div>

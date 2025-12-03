@@ -1,4 +1,4 @@
-import { Calendar, FolderOpen, User } from 'lucide-react';
+import { Calendar, Eye, FolderOpen, User } from 'lucide-react';
 import BaseModal from '../base/BaseModal';
 import { downloadUtils } from '../../utils/downLoadUtils';
 import { formatDate } from '../../utils/formatDate';
@@ -15,6 +15,7 @@ const NewsPreviewModal = ({ isOpen, onClose, newsData, isPreview = false }) => {
         danh_muc_tin_tuc: {
             ten_danh_muc: newsData.categoryName
         },
+        luot_xem: newsData?._count?.tin_tuc_view || 0,
         thoi_gian_tao: new Date().toISOString(),
         dinh_kem_tin_tuc: []
     } : newsData;
@@ -113,6 +114,14 @@ const NewsPreviewModal = ({ isOpen, onClose, newsData, isPreview = false }) => {
                             {data.tac_gia}
                         </span>
                     )}
+
+                    {data._count?.tin_tuc_view !== undefined && (
+                        <span className="flex items-center gap-1.5 text-gray-600">
+                            <Eye className="w-4 h-4" />
+                            {data._count?.tin_tuc_view || 0} 
+                        </span>
+                    )}
+
                 </div>
 
                 <div className="prose max-w-none news-content">

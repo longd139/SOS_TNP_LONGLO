@@ -1,7 +1,7 @@
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { PieChart as PieChartIcon } from 'lucide-react';
 
-export default function FieldReportChart({ dateRange, total = 0, cateData = [], title, subTotal }) {
+export default function FieldReportChart({ dateRange, total = 0, cateData = [], title, subTotal, nameCate }) {
   const chartData = cateData.map((item, index) => ({
     name: item.category,
     value: item.count,
@@ -54,7 +54,7 @@ export default function FieldReportChart({ dateRange, total = 0, cateData = [], 
               <Cell key={`cell-${index}`} fill={entry.color} />
             ))}
           </Pie>
-          <Tooltip formatter={(value, name, props) => [`${value} phản ánh (${props.payload.percentage}%)`, props.payload.name]} />
+          <Tooltip formatter={(value, name, props) => [`${value} ${nameCate} (${props.payload.percentage}%)`, props.payload.name]} />
         </PieChart>
       </ResponsiveContainer>
 
