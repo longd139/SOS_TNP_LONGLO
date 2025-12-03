@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { ChevronDown, Loader2 } from 'lucide-react';
 import { REPORT_AREAS_API } from '../../apis/reportAreas';
 import { showToast } from '../../utils/toastNotification';
@@ -6,8 +6,12 @@ import { showToast } from '../../utils/toastNotification';
 export default function DomainFilter({ selectedDomain, onDomainChange }) {
     const [domains, setDomains] = useState([]);
     const [loading, setLoading] = useState(false);
+    const hasFetched = useRef(false);
 
     useEffect(() => {
+        if (hasFetched.current) return;
+        hasFetched.current = true;
+
         const fetchDomains = async () => {
             setLoading(true);
             try {
