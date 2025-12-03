@@ -51,7 +51,7 @@ export default function ReportList() {
                 await Promise.all([
                     loadExtent(),
                     loadStatusReport(),
-                    loadReportAreas({ page: 1, size: 10, isActive: true }),
+                    loadReportAreas({ page: 1, size: 10000, isActive: true }),
                 ]);
             } catch (error) {
                 showToast.error("Lỗi khi tải dữ liệu khởi tạo");
