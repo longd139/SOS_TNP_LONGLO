@@ -55,6 +55,7 @@ const PermissionsManagement = () => {
       {
             title: "STT",
             key: "stt",
+            width: "60px",
             render: (value, record, index) => (
                 <span className="text-sm font-medium text-gray-900">
                     #
