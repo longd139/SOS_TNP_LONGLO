@@ -106,15 +106,16 @@ export default function ProceduresManager() {
                     isActive: showActive,
                 })
             );
+            return { success: true };
         } else {
             const errorMessage = result.error?.message || result.error || "Có lỗi xảy ra khi tạo thủ tục!";
             showToast.error(errorMessage);
-            throw new Error(errorMessage);
+            return { success: false, error: errorMessage };
         }
     };
 
     const handleSubmitEditProcedure = async (formData) => {
-        if (!selectedProcedure) return;
+        if (!selectedProcedure) return { success: false };
 
         const result = await updateProcedure(selectedProcedure.id, formData);
         if (result.success) {
@@ -129,10 +130,11 @@ export default function ProceduresManager() {
                     isActive: showActive,
                 })
             );
+            return { success: true };
         } else {
             const errorMessage = result.error?.message || result.error || "Có lỗi xảy ra khi cập nhật thủ tục!";
             showToast.error(errorMessage);
-            throw new Error(errorMessage);
+            return { success: false, error: errorMessage };
         }
     };
 

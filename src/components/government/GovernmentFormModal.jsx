@@ -61,6 +61,7 @@ const GovernmentFormModal = ({
 
         if (!isValid) {
             setErrors(validationErrors);
+            showToast.error('Vui lòng kiểm tra lại các trường bắt buộc!');
             return;
         }
 

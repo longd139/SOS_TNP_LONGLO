@@ -175,9 +175,13 @@ export const useProcedureForm = ({ initialData, mode, isOpen, onSubmit }) => {
         updateField('truongHopThuTuc', newTruongHop);
     };
 
-    const updateTruongHop = (index, field, value) => {
+    const updateTruongHop = (index, fieldOrUpdates, value) => {
         const newTruongHop = [...formData.truongHopThuTuc];
-        newTruongHop[index] = { ...newTruongHop[index], [field]: value };
+        if (typeof fieldOrUpdates === 'object') {
+            newTruongHop[index] = { ...newTruongHop[index], ...fieldOrUpdates };
+        } else {
+            newTruongHop[index] = { ...newTruongHop[index], [fieldOrUpdates]: value };
+        }
         updateField('truongHopThuTuc', newTruongHop);
     };
 
@@ -238,8 +242,10 @@ export const useProcedureForm = ({ initialData, mode, isOpen, onSubmit }) => {
         setErrors({});
 
         try {
-            await onSubmit(cleanedData);
-            resetForm();
+            const result = await onSubmit(cleanedData);
+            if (result?.success !== false) {
+                resetForm();
+            }
         } catch (error) {
             showToast.error('Có lỗi xảy ra khi lưu thủ tục!');
         } finally {
