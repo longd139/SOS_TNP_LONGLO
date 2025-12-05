@@ -314,9 +314,9 @@ const PermissionsManagement = () => {
                 onDelete={!showActive ? handleDelete : undefined}
                 onUpdateStatus={handleUpdateStatus}
                 onView={handleView}
-                canEdit={() => canUpdate('ROLE')}
-                canDelete={() => canDelete('ROLE')}
-                canUpdateStatus={() => canUpdateStatus('ROLE')}
+                // canEdit={() => canUpdate('ROLE')}
+                // canDelete={() => canDelete('ROLE')}
+                // canUpdateStatus={() => canUpdateStatus('ROLE')}
                 showActions={true}
                 emptyMessage={loading ? "Đang tải dữ liệu..." : "Không có vai trò nào"}
                 pagination={tablePagination}

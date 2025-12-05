@@ -328,13 +328,13 @@ export default function ProceduresManager() {
                 loading={loading}
                 pagination={pagination}
                 onPageChange={changePage}
-                onEdit={canUpdate('TT') ? handleEdit : undefined}
-                onDelete={!JSON.parse(showActive) && canDelete('TT') ? handleDelete : undefined}
+                onEdit={handleEdit}
+                onDelete={!JSON.parse(showActive) ? handleDelete : undefined}
                 onView={handleView}
                 showActions={true}
                 emptyMessage="Không có thủ tục nào được tìm thấy"
                 className="mb-4"
-                onUpdateStatus={canUpdateStatus('TT') ? handleUpdateStatus : undefined}
+                onUpdateStatus={handleUpdateStatus}
             />
 
             <ProcedureForm

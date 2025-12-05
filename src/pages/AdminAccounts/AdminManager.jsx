@@ -450,11 +450,11 @@ export default function AdminManager() {
                 loading={loading}
                 pagination={pagination}
                 onPageChange={handlePageChangeWithFilters}
-                onView={canView('ND') ? handleViewUser : undefined}
-                onEdit={canUpdate('ND') ? handleEditUser : undefined}
-                onDelete={canDelete('ND') ? handleDeleteUser : undefined}
+                onView={handleViewUser}
+                onEdit={handleEditUser}
+                onDelete={handleDeleteUser}
                 canDelete={canDeleteUser}
-                onUpdateStatus={canUpdateStatus('ND') ? handleUpdateStatus : undefined}
+                onUpdateStatus={handleUpdateStatus}
                 emptyMessage="Không có tài khoản nào"
             />
 

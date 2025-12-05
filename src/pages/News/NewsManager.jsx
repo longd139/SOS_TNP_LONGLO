@@ -409,9 +409,9 @@ export default function NewsManager() {
                 data={news}
                 columns={columns}
                 onView={handleView}
-                onEdit={canUpdate('TTIN') ? handleEdit : undefined}
-                onDelete={!showActive && canDelete('TTIN') ? handleDelete : undefined}
-                onUpdateStatus={canUpdateStatus('TTIN') ? handleUpdateStatus : undefined}
+                onEdit={handleEdit}
+                onDelete={!showActive ? handleDelete : undefined}
+                onUpdateStatus={handleUpdateStatus}
                 showActions={true}
                 emptyMessage={loading ? "Đang tải dữ liệu..." : "Không có bài viết nào"}
                 pagination={pagination}

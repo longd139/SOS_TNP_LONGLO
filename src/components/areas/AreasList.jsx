@@ -289,9 +289,9 @@ export default function AreasList() {
                 onEdit={handleEdit}
                 onDelete={!showActive ? handleDelete : null}
                 onUpdateStatus={handleUpdateStatus}
-                canEdit={() => canUpdate('LVTTHC')}
-                canDelete={() => canDelete('LVTTHC')}
-                canUpdateStatus={() => canUpdateStatus('LVTTHC')}
+                // canEdit={() => canUpdate('LVTTHC')}
+                // canDelete={() => canDelete('LVTTHC')}
+                // canUpdateStatus={() => canUpdateStatus('LVTTHC')}
                 showActions={true}
                 emptyMessage={loading ? "Đang tải dữ liệu..." : "Không có lĩnh vực thủ tục nào"}
                 pagination={pagination}

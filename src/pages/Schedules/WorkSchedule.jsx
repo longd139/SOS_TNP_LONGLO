@@ -555,9 +555,9 @@ export default function WorkSchedule() {
                         selectedDate={selectedDate}
                         pagination={pagination}
                         onPageChange={handlePageChange}
-                        canEdit={() => canUpdate('LTD')}
-                        canDelete={() => canDelete('LTD')}
-                        canUpdateStatus={() => canUpdateStatus('LTD')}
+                        // canEdit={() => canUpdate('LTD')}
+                        // canDelete={() => canDelete('LTD')}
+                        // canUpdateStatus={() => canUpdateStatus('LTD')}
                     />
                 </div>
 
