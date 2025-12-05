@@ -293,9 +293,9 @@ export default function ReportAreasList() {
                 onEdit={handleEdit}
                 onDelete={!showActive ? handleDelete : null}
                 onUpdateStatus={handleUpdateStatus}
-                canEdit={() => canUpdate('LVPA')}
-                canDelete={() => canDelete('LVPA')}
-                canUpdateStatus={() => canUpdateStatus('LVPA')}
+                // canEdit={() => canUpdate('LVPA')}
+                // canDelete={() => canDelete('LVPA')}
+                // canUpdateStatus={() => canUpdateStatus('LVPA')}
                 showActions={true}
                 emptyMessage={loading ? "Đang tải dữ liệu..." : "Không có lĩnh vực nào"}
                 pagination={pagination}

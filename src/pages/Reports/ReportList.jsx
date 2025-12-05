@@ -223,8 +223,8 @@ export default function ReportList() {
                 <BaseTable
                     data={reports}
                     columns={columns}
-                    onView={canView('PA') ? handleView : undefined}
-                    onEdit={canUpdate('PA') ? handleEdit : undefined}
+                    onView={handleView}
+                    onEdit={handleEdit}
                     showActions={true}
                     emptyMessage="Không có phản ánh nào"
                     pagination={{
