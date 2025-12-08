@@ -76,8 +76,10 @@ const ProcedureCasesSection = ({
       const isEdit = editingCaseIndex !== null;
 
       if (isEdit) {
-        updateCase(editingCaseIndex, "ten_truong_hop", caseForm.ten_truong_hop);
-        updateCase(editingCaseIndex, "mo_ta", caseForm.mo_ta);
+        updateCase(editingCaseIndex, {
+          ten_truong_hop: caseForm.ten_truong_hop,
+          mo_ta: caseForm.mo_ta
+        });
         setExpandedCases(prev => ({ ...prev, [editingCaseIndex]: true }));
       } else {
         const newIndex = cases.length;

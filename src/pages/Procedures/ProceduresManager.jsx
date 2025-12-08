@@ -106,15 +106,16 @@ export default function ProceduresManager() {
                     isActive: showActive,
                 })
             );
+            return { success: true };
         } else {
             const errorMessage = result.error?.message || result.error || "Có lỗi xảy ra khi tạo thủ tục!";
             showToast.error(errorMessage);
-            throw new Error(errorMessage);
+            return { success: false, error: errorMessage };
         }
     };
 
     const handleSubmitEditProcedure = async (formData) => {
-        if (!selectedProcedure) return;
+        if (!selectedProcedure) return { success: false };
 
         const result = await updateProcedure(selectedProcedure.id, formData);
         if (result.success) {
@@ -129,10 +130,11 @@ export default function ProceduresManager() {
                     isActive: showActive,
                 })
             );
+            return { success: true };
         } else {
             const errorMessage = result.error?.message || result.error || "Có lỗi xảy ra khi cập nhật thủ tục!";
             showToast.error(errorMessage);
-            throw new Error(errorMessage);
+            return { success: false, error: errorMessage };
         }
     };
 
@@ -326,13 +328,13 @@ export default function ProceduresManager() {
                 loading={loading}
                 pagination={pagination}
                 onPageChange={changePage}
-                onEdit={canUpdate('TT') ? handleEdit : undefined}
-                onDelete={!JSON.parse(showActive) && canDelete('TT') ? handleDelete : undefined}
+                onEdit={handleEdit}
+                onDelete={!JSON.parse(showActive) ? handleDelete : undefined}
                 onView={handleView}
                 showActions={true}
                 emptyMessage="Không có thủ tục nào được tìm thấy"
                 className="mb-4"
-                onUpdateStatus={canUpdateStatus('TT') ? handleUpdateStatus : undefined}
+                onUpdateStatus={handleUpdateStatus}
             />
 
             <ProcedureForm

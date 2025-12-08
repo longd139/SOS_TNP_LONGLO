@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import BaseModal, { ModalFooter } from '../base/BaseModal';
 import { validateAreaForm } from '../../validator/areaValidator';
+import { showToast } from '../../utils/toastNotification';
 
 let _persistedAreaForm = null;
 let _persistedAreaId = null;
@@ -67,6 +68,7 @@ const AreaFormModal = ({ isOpen, onClose, onSubmit, initialData = null, mode = '
 
             if (!validation.isValid) {
                 setErrors(validation.errors);
+                showToast.error('Vui lòng kiểm tra lại các trường bắt buộc!');
                 setIsSubmitting(false);
                 return;
             }

@@ -136,6 +136,9 @@ const WorkScheduleModal = ({
     if (mode === "create") {
       const { isValid, errors: validationErrors } = await validateCreateWorkScheduleForm(formData);
       setErrors(validationErrors || {});
+      if (!isValid) {
+        showToast.error('Vui lòng kiểm tra lại các trường bắt buộc!');
+      }
       return isValid;
     } else {
       const { isValid, errors: validationErrors } = await validateUpdateWorkScheduleForm(
@@ -144,6 +147,9 @@ const WorkScheduleModal = ({
         originalStartTime
       );
       setErrors(validationErrors || {});
+      if (!isValid) {
+        showToast.error('Vui lòng kiểm tra lại các trường bắt buộc!');
+      }
       return isValid;
     }
   };

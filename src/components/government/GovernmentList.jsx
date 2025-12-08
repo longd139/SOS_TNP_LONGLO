@@ -306,9 +306,9 @@ export default function GovernmontList() {
                 onEdit={handleEdit}
                 onDelete={!showActive ? handleDelete : null}
                 onUpdateStatus={handleUpdateStatus}
-                canEdit={() => canUpdate('CSV')}
-                canDelete={() => canDelete('CSV')}
-                canUpdateStatus={() => canUpdateStatus('CSV')}
+                // canEdit={() => canUpdate('CSV')}
+                // canDelete={() => canDelete('CSV')}
+                // canUpdateStatus={() => canUpdateStatus('CSV')}
                 showActions={true}
                 emptyMessage={
                     loading ? "Đang tải dữ liệu..." : "Không có cơ sở dịch vụ công nào"

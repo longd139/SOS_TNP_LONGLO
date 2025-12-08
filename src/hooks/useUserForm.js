@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { validateUserForm } from '../validator/userValidator';
+import { showToast } from '../utils/toastNotification';
 
 const INITIAL_FORM_STATE = {
     username: '',
@@ -65,6 +66,9 @@ export const useUserForm = ({ initialUser = null, isOpen = false }) => {
         try {
             const result = await validateUserForm(formData, isEditMode, true);
             setErrors(result.errors || {});
+            if (!result.isValid) {
+                showToast.error('Vui lòng kiểm tra lại các trường bắt buộc!');
+            }
             return result.isValid;
         } catch (error) {
             return false;

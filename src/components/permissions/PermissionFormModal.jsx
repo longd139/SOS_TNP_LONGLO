@@ -3,6 +3,7 @@ import BaseModal, { ModalFooter } from '../base/BaseModal';
 import { Search } from 'lucide-react';
 import { usePermissions } from '../../hooks/usePermissions';
 import { validateRoleForm } from '../../validator/roleValidator';
+import { showToast } from '../../utils/toastNotification';
 
 const initialState = {
     name: "",
@@ -116,6 +117,7 @@ const PermissionFormModal = ({
 
         if (!isValid) {
             setErrors(validationErrors);
+            showToast.error('Vui lòng kiểm tra lại các trường bắt buộc!');
             return;
         }
 

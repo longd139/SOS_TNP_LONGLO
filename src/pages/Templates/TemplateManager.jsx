@@ -422,9 +422,9 @@ export default function TemplateManager() {
                         onEdit={handleEdit}
                         onDelete={showRemoved ? handleDelete : null}
                         onUpdateStatus={handleUpdateStatus}
-                        canEdit={() => canUpdate('MD')}
-                        canDelete={() => canDelete('MD')}
-                        canUpdateStatus={() => canUpdateStatus('MD')}
+                        // canEdit={() => canUpdate('MD')}
+                        // canDelete={() => canDelete('MD')}
+                        // canUpdateStatus={() => canUpdateStatus('MD')}
                         viewIcon={<Download className="w-4 h-4" />}
                         showActions={true}
                         actionColumnWidth="150px"

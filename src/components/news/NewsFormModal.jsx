@@ -166,6 +166,7 @@ const NewsFormModal = ({ isOpen, onClose, onSubmit, initialData = null, isLoadin
 
         if (!isValid) {
             setErrors(validationErrors);
+            showToast.error('Vui lòng kiểm tra lại các trường bắt buộc!');
             return false;
         }
 
