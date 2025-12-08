@@ -6,13 +6,13 @@ import {
     MessageSquare,
     Clock4,
     SquarePen,
+    Phone,
 } from "lucide-react";
 import { formatDate } from "../../utils/formatDate";
 import {
     renderStatusBadge,
     renderCategoryBadgeStyled,
     renderUrgencyBadge,
-    renderContactInfo,
     getStatusStyle,
 } from "../../utils/badgeUtils";
 import { useReports } from "../../hooks/useReports";
@@ -25,8 +25,6 @@ import { utcToVietnamTime, vietnamTimeToUTC } from "../../utils/datePicker";
 import { ConfigProvider } from "antd";
 import viVN from "antd/locale/vi_VN";
 import "antd/dist/reset.css";
-import UserService from "../../services/userService";
-import { ROLE_LABELS } from "../../constants/role";
 import { usePermission } from "../../hooks/usePermission";
 
 const ReportDetailModal = ({ isOpen, onClose, report, loading = false, onStatusUpdated, mode = "edit", onModeChange }) => {
@@ -39,39 +37,11 @@ const ReportDetailModal = ({ isOpen, onClose, report, loading = false, onStatusU
     const { canUpdate } = usePermission();
     const isEditMode = mode === "edit";
 
-    const [userCache, setUserCache] = useState({});
-
     const handleEditMode = () => {
         if (onModeChange) {
             onModeChange("edit");
         }
     };
-
-    useEffect(() => {
-    async function fetchUsers() {
-        const map = {};
-
-        const entries = report?.lich_su_trang_thai || [];
-        for (const item of entries) {
-            if (item.nguoi_tao && !map[item.nguoi_tao]) {
-                try {
-                    const user = await UserService.getUserById(item.nguoi_tao);
-
-                    const role = user?.vai_tro;
-                    const roleLabel = ROLE_LABELS[role] || "Không xác định";
-
-                    map[item.nguoi_tao] = `${user?.ho_va_ten || "Không xác định"} - ${roleLabel}`;
-                } catch (e) {
-                    map[item.nguoi_tao] = "Không xác định";
-                }
-            }
-        }
-
-        setUserCache(map);
-    }
-
-    fetchUsers();
-}, [report?.lich_su_trang_thai]);
 
 
     useEffect(() => {
@@ -143,11 +113,11 @@ const ReportDetailModal = ({ isOpen, onClose, report, loading = false, onStatusU
 
             onClose();
         } catch (error) {
-            
+
             if (error?.message) {
                 showToast.error(error.message);
             }
-            
+
             if (error?.errors && Array.isArray(error.errors) && error.errors.length > 0) {
                 error.errors.forEach((err) => {
                     if (err?.message) {
@@ -159,7 +129,7 @@ const ReportDetailModal = ({ isOpen, onClose, report, loading = false, onStatusU
             } else if (!error?.message && !error?.errors) {
                 showToast.error('Có lỗi xảy ra khi cập nhật trạng thái');
             }
-            
+
             clearError();
         } finally {
             setIsSubmitting(false);
@@ -229,18 +199,22 @@ const ReportDetailModal = ({ isOpen, onClose, report, loading = false, onStatusU
                                 {formatDate(report.thoi_gian_tao)}
                             </span>
                         </div>
-                        <div className="flex items-start gap-2 min-w-0 flex-shrink">
-                            <User className="w-4 h-4 text-gray-600 flex-shrink-0 mt-0.5" />
-                            <span className="text-sm text-gray-600 flex-shrink-0">
-                                Người gửi:
-                            </span>
-                            <div className="min-w-0 flex-1">
-                                {renderContactInfo({
-                                    name: report.ten_nguoi_phan_anh,
-                                    phone: report.so_dien_thoai_nguoi_phan_anh,
-                                })}
-                            </div>
-                        </div>
+                        {report.ten_nguoi_phan_anh && (
+                            <div className="flex items-start gap-2 min-w-0 flex-shrink">
+                                <User className="w-4 h-4 text-gray-600 flex-shrink-0 mt-0.5" />
+                                <span className="text-sm text-gray-600 flex-shrink-0">
+                                    Người gửi: {report.ten_nguoi_phan_anh}
+                                </span>
+                            </div>)
+                        }
+                        {report.sdt_nguoi_phan_anh && (
+                            <div className="flex items-start gap-2 min-w-0 flex-shrink">
+                                <Phone className="w-4 h-4 text-gray-600 flex-shrink-0 mt-0.5" />
+                                <span className="text-sm text-gray-600 flex-shrink-0">
+                                    Sô điện thoại: {report.sdt_nguoi_phan_anh}
+                                </span>
+                            </div>)
+                        }
                     </div>
 
                     <div className="mb-6">
@@ -279,7 +253,7 @@ const ReportDetailModal = ({ isOpen, onClose, report, loading = false, onStatusU
                                     </h4>
                                     <div className={`flex items-center gap-2 bg-blue-600 ${!canUpdate('PA') ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-700 focus:ring-blue-500'} text-white px-4 py-2 rounded-md text-sm font-medium`} disabled={!canUpdate('PA')}>
                                         <SquarePen className="w-4 h-4 flex-shrink-0" />
-                                        <button 
+                                        <button
                                             disabled={!canUpdate('PA')}
                                             onClick={handleEditMode}>
                                             Cập nhật trạng thái
@@ -329,10 +303,10 @@ const ReportDetailModal = ({ isOpen, onClose, report, loading = false, onStatusU
                                                                 {formatDate(item.thoi_gian_tao)}
                                                             </span>
                                                         </div>
-                                                        {item.nguoi_tao && (
+                                                        {item.nguoi_dung && (
                                                             <p className="text-sm text-gray-700">
                                                                 <User className="inline-block mr-2 text-gray-400 w-4 h-4" />
-                                                                {userCache[item.nguoi_tao] || "Đang tải..."}
+                                                                {item.nguoi_dung.ten_dang_nhap || "Đang tải..."}
                                                             </p>
                                                         )}
 
@@ -435,11 +409,11 @@ const ReportDetailModal = ({ isOpen, onClose, report, loading = false, onStatusU
                                                         <Clock4 className="w-4 h-4" />
                                                         <span>{formatDate(item.thoi_gian_tao)}</span>
                                                     </div>
-                                                    
-                                                    {item.nguoi_tao && (
+
+                                                    {item.nguoi_dung && (
                                                         <div className="flex items-center gap-2 text-sm text-gray-600">
                                                             <User className="w-4 h-4" />
-                                                            <span>{userCache[item.nguoi_tao] || "Đang tải..."}</span>
+                                                            <span>{item.nguoi_dung.ten_dang_nhap || "Đang tải..."}</span>
                                                         </div>
                                                     )}
 
