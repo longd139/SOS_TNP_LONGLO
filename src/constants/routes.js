@@ -20,5 +20,7 @@ const ROUTE_PATH = {
     FORGOT_PASSWORD: '/forgot-password',
     GOVERNMENT: '/government',
     PERMISSIONS: '/permissions',
+    ROLE_CREATE: '/permissions/create',
+    ROLE_EDIT: '/permissions/:roleId/edit',
 }
 export default ROUTE_PATH;

@@ -7,7 +7,7 @@ const getAllPermissions = async (search = '', danhMuc) => {
         if (danhMuc) params.append('danhMuc', danhMuc);
         const response = await apiClient.get('/api/permission', { params });
         if (response.data.success) {
-            return response.data.data || [];
+            return response.data.data || {};
         } else {
             throw new Error(response.data.message || 'Lấy danh sách quyền thất bại');
         }
@@ -23,7 +23,7 @@ const getPermissionCategory = async () => {
     try {
         const response = await apiClient.get('/api/permission/cate');
         if (response.data.success) {
-            return response.data.data || [];
+            return response.data.data || {};
         } else {
             throw new Error(response.data.message || 'Lấy danh mục quyền thất bại');
         }

@@ -23,6 +23,7 @@ import AreaManagement from "../pages/Areas/AreaManagement";
 import ForgotPassword from "../pages/ForgotPassword/ForgotPassword";
 import GovernmentManagement from "../pages/Government/GovernmentManagement";
 import PermissionsManagement from "../pages/Permissions/PermissionsManagement";
+import RoleFormPage from "../pages/Permissions/RoleFormPage";
 
 function AppRoutes() {
     return (
@@ -57,6 +58,8 @@ function AppRoutes() {
                 <Route path={ROUTE_PATH.AREAS} element={<AreaManagement />} />
                 <Route path={ROUTE_PATH.GOVERNMENT} element={<GovernmentManagement />} />
                 <Route path={ROUTE_PATH.PERMISSIONS} element={<PermissionsManagement />} />
+                <Route path={ROUTE_PATH.ROLE_CREATE} element={<RoleFormPage />} />
+                <Route path={ROUTE_PATH.ROLE_EDIT} element={<RoleFormPage />} />
             </Route>
 
             <Route path={ROUTE_PATH.NOT_FOUND} element={<NotFound />} />

@@ -1,16 +1,18 @@
 import React, { useState, useCallback, useEffect } from 'react'
 import { Loader2, Plus, Shield } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import BaseTable from '../../components/base/BaseTable';
 import { showToast } from '../../utils/toastNotification';
-import PermissionFormModal from '../../components/permissions/PermissionFormModal';
 import { useRoles } from '../../hooks/useRoles';
 import { ConfirmModal } from '../../components/base/BaseModal';
 import PermisisonFilter from '../../components/permissions/PermisisonFilter';
 import { usePermission } from '../../hooks/usePermission';
 import { PermissionHidden } from '../../components/PermissionGuard';
+import ROUTE_PATH from '../../constants/routes';
 import PermissionDetailModal from '../../components/permissions/PermissionDetailModal';
 
 const PermissionsManagement = () => {
+    const navigate = useNavigate();
     const {
         roles,
         loading,
@@ -21,21 +23,20 @@ const PermissionsManagement = () => {
         updateRole,
         deleteRole,
         updateStatus,
-        getRoleById,
         loadRoles,
         updateFilters,
-        toggleShowActive
+        toggleShowActive,
+        getRoleById
     } = useRoles();
 
     const { canUpdate, canDelete, canUpdateStatus } = usePermission();
 
-    const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-    const [selectedRoleForEdit, setSelectedRoleForEdit] = useState(null);
     const [selectedRoleForDelete, setSelectedRoleForDelete] = useState(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [currentPageSize, setCurrentPageSize] = useState(pagination.pageSize || 10);
+    const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+    const [selectedRoleForDetail, setSelectedRoleForDetail] = useState(null);
 
     useEffect(() => {
         updateFilters({ search: '' });
@@ -132,20 +133,9 @@ const PermissionsManagement = () => {
         }
     ]
 
-    const handleEdit = useCallback(async (record) => {
-        try {
-            setIsSubmitting(true);
-            const result = await getRoleById(record.id);
-            if (result.success) {
-                setSelectedRoleForEdit(result.data);
-                setIsEditModalOpen(true);
-            }
-        } catch (error) {
-            showToast.error(error.message || 'Không thể tải thông tin vai trò');
-        } finally {
-            setIsSubmitting(false);
-        }
-    }, [getRoleById]);
+    const handleEdit = useCallback((record) => {
+        navigate(ROUTE_PATH.ROLE_EDIT.replace(':roleId', record.id));
+    }, [navigate]);
 
     const handleDelete = useCallback((record) => {
         setSelectedRoleForDelete(record);
@@ -203,48 +193,22 @@ const PermissionsManagement = () => {
     }, [loadRoles, updateFilters, toggleShowActive]);
 
     const handleCreate = () => {
-        setIsCreateModalOpen(true);
-        setSelectedRoleForEdit(null);
+        navigate(ROUTE_PATH.ROLE_CREATE);
     }
 
-    const handleView = async (permission) => {
-        const result = await getRoleById(permission.id);
-        if (result.success) {
-            setSelectedRoleForEdit(result.data);
-            setIsCreateModalOpen(true);
-        } else {
-            const errorMessage = result.error?.message || result.error || "Có lỗi xảy ra khi lấy thông tin thủ tục!";
-            showToast.error(errorMessage);
-        }
-    };
-    const handleCreateSubmit = useCallback(async (formData) => {
+    const handleView = useCallback(async (role) => {
         try {
-            setIsSubmitting(true);
-            await createRole(formData);
-            showToast.success('Tạo vai trò thành công');
-            setIsCreateModalOpen(false);
+            const result = await getRoleById(role.id);
+            if (result.success) {
+                setSelectedRoleForDetail(result.data);
+                setIsDetailModalOpen(true);
+            } else {
+                showToast.error('Không thể tải dữ liệu vai trò');
+            }
         } catch (error) {
-            showToast.error(error.message || 'Tạo vai trò thất bại');
-        } finally {
-            setIsSubmitting(false);
+            showToast.error(error.message || 'Có lỗi xảy ra');
         }
-    }, [createRole]);
-
-    const handleEditSubmit = useCallback(async (formData) => {
-        if (!selectedRoleForEdit) return;
-
-        try {
-            setIsSubmitting(true);
-            await updateRole(selectedRoleForEdit.id, formData);
-            showToast.success('Cập nhật vai trò thành công');
-            setIsEditModalOpen(false);
-            setSelectedRoleForEdit(null);
-        } catch (error) {
-            showToast.error(error.message || 'Cập nhật vai trò thất bại');
-        } finally {
-            setIsSubmitting(false);
-        }
-    }, [selectedRoleForEdit, updateRole]);
+    }, [getRoleById]);
 
     const tableData = roles.map(role => ({
         ...role,
@@ -324,33 +288,6 @@ const PermissionsManagement = () => {
                 loading={loading}
             />
 
-            <PermissionFormModal
-                isOpen={isCreateModalOpen && selectedRoleForEdit === null}
-                onClose={() => setIsCreateModalOpen(false)}
-                onSubmit={handleCreateSubmit}
-                mode="create"
-                isLoading={isSubmitting}
-            />
-
-            <PermissionDetailModal
-                isOpen={isCreateModalOpen && selectedRoleForEdit !== null}
-                onClose={() => setIsCreateModalOpen(false)}
-                permisison={selectedRoleForEdit}
-            />
-
-
-            <PermissionFormModal
-                isOpen={isEditModalOpen}
-                onClose={() => {
-                    setIsEditModalOpen(false);
-                    setSelectedRoleForEdit(null);
-                }}
-                onSubmit={handleEditSubmit}
-                mode="edit"
-                initialData={selectedRoleForEdit}
-                isLoading={isSubmitting}
-            />
-
             <ConfirmModal
                 isOpen={isDeleteModalOpen}
                 onClose={() => {
@@ -363,6 +300,15 @@ const PermissionsManagement = () => {
                 confirmText="Xóa"
                 cancelText="Hủy"
                 type="danger"
+            />
+
+            <PermissionDetailModal
+                isOpen={isDetailModalOpen}
+                onClose={() => {
+                    setIsDetailModalOpen(false);
+                    setSelectedRoleForDetail(null);
+                }}
+                permisison={selectedRoleForDetail}
             />
         </div>
     )
