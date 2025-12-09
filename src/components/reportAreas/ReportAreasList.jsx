@@ -24,7 +24,8 @@ export default function ReportAreasList() {
         updateAreaStatus,
         updateFilters,
         clearFilters,
-        updateShowActive
+        updateShowActive,
+        loadReportAreaById
     } = useReportAreas();
 
     const { canUpdate, canDelete, canUpdateStatus } = usePermission();
@@ -86,9 +87,16 @@ export default function ReportAreasList() {
         setIsCreateModalOpen(true);
     };
 
-    const handleEdit = (item) => {
-        setSelectedArea(item);
-        setIsEditModalOpen(true);
+    const handleEdit = async (item) => {
+        try {
+            const fullData = await loadReportAreaById(item.id);
+            setSelectedArea(fullData);
+            setIsEditModalOpen(true);
+        } catch (error) {
+            console.error('Failed to load report area details:', error);
+            setSelectedArea(item);
+            setIsEditModalOpen(true);
+        }
     };
 
     const handleDelete = (item) => {

@@ -3,6 +3,9 @@ import PropTypes from 'prop-types';
 import BaseModal, { ModalFooter } from '../base/BaseModal';
 import { validateReportArea } from '../../validator/reportAreaValidator';
 import { showToast } from '../../utils/toastNotification';
+import { USER_API } from '../../apis/user';
+import { X } from 'lucide-react';
+import { handleSearchDropdownKeyDown } from '../../utils/keyboardNavigation';
 
 let _persistedReportAreaForm = null;
 let _persistedReportAreaId = null;
@@ -17,11 +20,93 @@ const ReportAreaFormModal = ({
 }) => {
     const [formData, setFormData] = useState({
         ten: '',
-        moTa: ''
+        moTa: '',
+        nguoiQuanLyIds: []
     });
     const [errors, setErrors] = useState({});
+    const [users, setUsers] = useState([]);
+    const [searchResults, setSearchResults] = useState([]);
+    const [showDropdown, setShowDropdown] = useState(false);
+    const [searchUser, setSearchUser] = useState('');
+    const [highlightedIndex, setHighlightedIndex] = useState(-1);
+    const [loading, setLoading] = useState(false);
+    const containerRef = useRef(null);
 
     const prevIsOpen = useRef(false);
+
+    const selectedUsers = formData.nguoiQuanLyIds.map(id => {
+        const userFromState = users.find(u => u.id === id);
+        if (userFromState) return userFromState;
+        
+        if (initialData?.nguoi_quan_ly) {
+            const userFromInitial = initialData.nguoi_quan_ly.find(u => u.id === id);
+            if (userFromInitial) {
+                return {
+                    id: userFromInitial.id,
+                    fullName: userFromInitial.ho_va_ten || userFromInitial.ho_ten || userFromInitial.fullName || userFromInitial.ten
+                };
+            }
+        }
+        return null;
+    }).filter(Boolean);
+
+    useEffect(() => {
+        if (isOpen) {
+            fetchUsers();
+        }
+    }, [isOpen]);
+
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (containerRef.current && !containerRef.current.contains(event.target)) {
+                setShowDropdown(false);
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
+
+    useEffect(() => {
+        if (!showDropdown) return;
+        
+        const timer = setTimeout(async () => {
+            setLoading(true);
+            try {
+                const result = await USER_API.getAllUsersWithPagination({ 
+                    page: 1, 
+                    size: 100, 
+                    isActive: true,
+                    search: searchUser || ''
+                });
+                const allUsers = result.content || [];
+                const filtered = allUsers.filter(
+                    user => !formData.nguoiQuanLyIds.includes(user.id) && user.fullName && user.fullName.trim() !== ''
+                );
+                setUsers(allUsers.filter(u => u.fullName && u.fullName.trim() !== ''));
+                setSearchResults(filtered);
+            } catch (error) {
+                console.error('Failed to fetch users:', error);
+                setSearchResults([]);
+            } finally {
+                setLoading(false);
+            }
+        }, searchUser ? 300 : 0);
+
+        return () => clearTimeout(timer);
+    }, [searchUser, formData.nguoiQuanLyIds, showDropdown]);
+
+    useEffect(() => {
+        setHighlightedIndex(-1);
+    }, [searchResults]);
+
+    const fetchUsers = async () => {
+        try {
+            const result = await USER_API.getAllUsersWithPagination({ page: 1, size: 100, isActive: true });
+            setUsers(result.content || []);
+        } catch (error) {
+            console.error('Failed to fetch users:', error);
+        }
+    };
 
     useEffect(() => {
         if (!prevIsOpen.current && isOpen) {
@@ -38,14 +123,17 @@ const ReportAreaFormModal = ({
             if (_persistedReportAreaForm) {
                 setFormData(_persistedReportAreaForm);
             } else if (initialData && mode === 'edit') {
+                const quanLyIds = initialData.nguoi_quan_ly?.map(item => item.id) || initialData.nguoiQuanLyIds || [];
                 setFormData({
                     ten: initialData.ten || '',
-                    moTa: initialData.mo_ta || initialData.moTa || ''
+                    moTa: initialData.mo_ta || initialData.moTa || '',
+                    nguoiQuanLyIds: Array.isArray(quanLyIds) ? quanLyIds : []
                 });
             } else {
                 setFormData({
                     ten: '',
-                    moTa: ''
+                    moTa: '',
+                    nguoiQuanLyIds: []
                 });
             }
             setErrors({});
@@ -56,7 +144,8 @@ const ReportAreaFormModal = ({
     const resetForm = () => {
         setFormData({
             ten: '',
-            moTa: ''
+            moTa: '',
+            nguoiQuanLyIds: []
         });
         setErrors({});
         _persistedReportAreaForm = null;
@@ -80,7 +169,8 @@ const ReportAreaFormModal = ({
         try {
             await onSubmit({
                 ten: formData.ten.trim(),
-                moTa: formData.moTa?.trim() || null
+                moTa: formData.moTa?.trim() || null,
+                nguoiQuanLyIds: formData.nguoiQuanLyIds || []
             });
             resetForm();
         } catch (error) {
@@ -105,6 +195,30 @@ const ReportAreaFormModal = ({
         }
     };
 
+    const handleSelectUser = (user) => {
+        const newIds = [...formData.nguoiQuanLyIds, user.id];
+        updateField('nguoiQuanLyIds', newIds);
+        setSearchUser('');
+        setSearchResults([]);
+        setShowDropdown(false);
+    };
+
+    const handleRemoveUser = (userId) => {
+        const newIds = formData.nguoiQuanLyIds.filter(id => id !== userId);
+        updateField('nguoiQuanLyIds', newIds);
+    };
+
+    const handleKeyDown = (e) => {
+        handleSearchDropdownKeyDown(e, {
+            items: searchResults,
+            highlightedIndex,
+            showDropdown,
+            setHighlightedIndex,
+            setShowDropdown,
+            onSelect: handleSelectUser
+        });
+    };
+
     const modalTitle = mode === 'create' ? 'Thêm lĩnh vực mới' : 'Chỉnh sửa lĩnh vực';
     const submitText = mode === 'create' ? 'Tạo lĩnh vực' : 'Cập nhật';
 
@@ -114,7 +228,6 @@ const ReportAreaFormModal = ({
             onClose={handleClose}
             title={modalTitle}
             size="xl"
-            className="max-w-5xl"
             footer={
                 <ModalFooter
                     onCancel={handleClose}
@@ -126,7 +239,7 @@ const ReportAreaFormModal = ({
                 />
             }
         >
-            <div className="space-y-4">
+            <div className="space-y-4 max-h-[70vh] overflow-y-auto px-1">
                 <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2 required-label">
                         Tên lĩnh vực
@@ -158,6 +271,99 @@ const ReportAreaFormModal = ({
                     />
                     {errors.moTa && (
                         <p className="mt-1 text-sm text-red-600">{errors.moTa}</p>
+                    )}
+                </div>
+
+                <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Người quản lý
+                    </label>
+
+                    <div ref={containerRef} className="relative">
+                        <input
+                            type="text"
+                            value={searchUser}
+                            onChange={(e) => setSearchUser(e.target.value)}
+                            onFocus={async () => { 
+                                setShowDropdown(true);
+                                if (searchResults.length === 0 && !loading) {
+                                    setLoading(true);
+                                    try {
+                                        const result = await USER_API.getAllUsersWithPagination({ 
+                                            page: 1, 
+                                            size: 100, 
+                                            isActive: true,
+                                            search: ''
+                                        });
+                                        const allUsers = result.content || [];
+                                        const filtered = allUsers.filter(
+                                            user => !formData.nguoiQuanLyIds.includes(user.id) && user.fullName && user.fullName.trim() !== ''
+                                        );
+                                        setUsers(allUsers.filter(u => u.fullName && u.fullName.trim() !== ''));
+                                        setSearchResults(filtered);
+                                    } catch (error) {
+                                        console.error('Failed to fetch users:', error);
+                                    } finally {
+                                        setLoading(false);
+                                    }
+                                }
+                            }}
+                            onKeyDown={handleKeyDown}
+                            placeholder="Tìm kiếm người quản lý..."
+                            className="w-full px-3 bg-gray-200 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 border-gray-300"
+                        />
+
+                        {showDropdown && (
+                            <div className="absolute z-40 left-0 right-0 mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-40 overflow-auto">
+                                {loading && (
+                                    <div className="px-3 py-2 text-sm text-gray-500">Đang tìm...</div>
+                                )}
+                                {!loading && searchResults.length === 0 && (
+                                    <div className="px-3 py-2 text-sm text-gray-500">Không tìm thấy kết quả</div>
+                                )}
+                                {!loading && searchResults.map((user, idx) => (
+                                    <button
+                                        key={user.id}
+                                        type="button"
+                                        onClick={() => handleSelectUser(user)}
+                                        onMouseEnter={() => setHighlightedIndex(idx)}
+                                        className={`w-full text-left px-3 py-2 hover:bg-gray-100 transition-colors border-b border-gray-100 last:border-b-0 ${
+                                            highlightedIndex === idx ? 'bg-blue-100' : ''
+                                        }`}
+                                    >
+                                        <span className="font-medium text-sm">{user.fullName}</span>
+                                    </button>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+
+                    {selectedUsers.length > 0 && (
+                        <div className="mt-3 bg-gray-50 p-3 rounded-lg border border-gray-200">
+                            <div className="flex flex-wrap gap-2">
+                                {selectedUsers.map((user) => (
+                                    <span
+                                        key={user.id}
+                                        className="inline-flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm"
+                                    >
+                                        <span>{user.fullName}</span>
+                                        <button
+                                            type="button"
+                                            onClick={() => handleRemoveUser(user.id)}
+                                            className="hover:bg-blue-200 rounded-full p-0.5 transition-colors"
+                                            title="Xóa"
+                                        >
+                                            <X className="w-3 h-3" />
+                                        </button>
+                                    </span>
+                                ))}
+                            </div>
+                            <div className="mt-2 pt-2 border-t border-gray-300">
+                                <p className="text-xs text-gray-600">
+                                    Đã chọn: <span className="font-medium">{selectedUsers.length}</span> người quản lý
+                                </p>
+                            </div>
+                        </div>
                     )}
                 </div>
             </div>
