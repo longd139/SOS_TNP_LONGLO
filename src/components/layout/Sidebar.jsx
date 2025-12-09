@@ -40,6 +40,14 @@ const menuItems = [
         modulePrefixes: ['TTIN', 'DMTT']
     },
     {
+        id: 'category-news',
+        label: 'Danh mục tin tức',
+        icon: Newspaper,
+        path: ROUTE_PATH.CATEGORY_NEWS,
+        hasSubmenu: false,
+        modulePrefix: 'DMTT'
+    },
+    {
         id: 'areas',
         label: 'Quản lý lĩnh vực thủ tục',
         icon: FileText,
@@ -110,6 +118,14 @@ const menuItems = [
         path: ROUTE_PATH.PERMISSIONS,
         hasSubmenu: false,
         modulePrefixes: ['ROLE', 'PERM'] 
+    },
+    {
+        id: 'audit-log',
+        label: 'Nhật ký hệ thống',
+        icon: ClipboardList,
+        path: ROUTE_PATH.AUDIT_LOG,
+        hasSubmenu: false,
+        modulePrefix: 'ADL'
     }
 ];
 

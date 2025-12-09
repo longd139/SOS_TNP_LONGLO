@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState, useCallback, useRef } from 'react'
+import React, { useEffect, useMemo, useState, useRef } from 'react'
 import { useNavigate, useParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { usePermissions } from '../../hooks/usePermissions';
@@ -25,8 +25,8 @@ const RoleFormPage = () => {
     permissionCodes: [],
   });
   const [errors, setErrors] = useState({});
-  const [selectedCategory, setSelectedCategory] = useState("all");
-  const [searchText, setSearchText] = useState("");
+  const [filterSearch, setFilterSearch] = useState("");
+  const [filterCategory, setFilterCategory] = useState("");
   const [checkedItems, setCheckedItems] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -41,6 +41,18 @@ const RoleFormPage = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const handleFilterPermissions = () => {
+    const search = filterSearch.trim();
+    const danhMuc = filterCategory;
+    loadPermissions(search, danhMuc, true);
+  };
+
+  const handleResetFilter = () => {
+    setFilterSearch("");
+    setFilterCategory("");
+    loadPermissions("", "", true); 
+  };
 
   useEffect(() => {
     if (isEditMode && roleId && roleLoadedRef.current !== roleId) {
@@ -84,17 +96,18 @@ const RoleFormPage = () => {
     return permissionRawData.cate;
   }, [permissionRawData]);
 
+  const typeLabels = useMemo(() => {
+    if (!permissionRawData || !permissionRawData.type) return {};
+    return permissionRawData.type;
+  }, [permissionRawData]);
+
+  const permissionTypes = useMemo(() => {
+    if (!permissionRawData || !permissionRawData.type) return [];
+    return Object.keys(permissionRawData.type);
+  }, [permissionRawData]);
+
   const categoryNames = useMemo(() => {
     return Object.keys(permissionsByCategory || {});
-  }, [permissionsByCategory]);
-
-  const permissionList = useMemo(() => {
-    const list = [];
-    Object.keys(permissionsByCategory || {}).forEach((category) => {
-      const items = permissionsByCategory[category] || [];
-      items.forEach((p) => list.push({ category, ...p }));
-    });
-    return list;
   }, [permissionsByCategory]);
 
   const permissionsTable = useMemo(() => {
@@ -115,24 +128,8 @@ const RoleFormPage = () => {
   }, [permissionsByCategory, categoryLabels]);
 
   const filteredTable = useMemo(() => {
-    let result = { ...permissionsTable };
-
-    if (selectedCategory !== "all") {
-      result = { [selectedCategory]: permissionsTable[selectedCategory] };
-    }
-
-    if (searchText.trim()) {
-      const searchLower = searchText.toLowerCase();
-      result = Object.keys(result).reduce((acc, category) => {
-        if (result[category].label.toLowerCase().includes(searchLower)) {
-          acc[category] = result[category];
-        }
-        return acc;
-      }, {});
-    }
-
-    return result;
-  }, [permissionsTable, selectedCategory, searchText]);
+    return permissionsTable;
+  }, [permissionsTable]);
 
   const updateField = (key, value) => {
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -231,27 +228,6 @@ const RoleFormPage = () => {
     }
   };
 
-  const getCategoryLabel = (category) => {
-    const labels = {
-      'CSV': 'Cơ sở dịch vụ công',
-      'DMTT': 'Danh mục tin tức',
-      'LTD': 'Lịch tiếp dân',
-      'LVPA': 'Lĩnh vực phản ánh',
-      'LVTTHC': 'Lĩnh vực thủ tục hành chính',
-      'MD': 'Mẫu đơn',
-      'PA': 'Phản ánh',
-      'RPT': 'Báo cáo',
-      'TT': 'Thủ tục',
-      'TTIN': 'Tin tức',
-      'UB': 'Ủy ban',
-      'ND': 'Người dùng',
-      'ROLE': 'Vai trò',
-      'PERM': 'Quyền',
-      'ADL': 'Nhật ký hệ thống'
-    };
-    return labels[category] || category;
-  };
-
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -348,34 +324,57 @@ const RoleFormPage = () => {
               <p className="text-sm text-red-600 mt-2">{errors.permissionCodes}</p>
             )}
 
-            {/* <div className='flex flex-col md:flex-row gap-3 mb-6 mt-4'>
-                            <div className="flex-1 relative">
-                                <Search
-                                    size={16}
-                                    className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500"
-                                />
-                                <input
-                                    value={searchText}
-                                    onChange={(e) => setSearchText(e.target.value)}
-                                    type="text"
-                                    className="w-full border border-gray-300 rounded-lg pl-9 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                    placeholder="Tìm kiếm chức năng..."
-                                />
-                            </div>
+            <div className='flex flex-col lg:flex-row gap-3 mb-4 mt-4'>
+              <div className="flex-1 relative">
+                <Search
+                  size={16}
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500"
+                />
+                <input
+                  value={filterSearch}
+                  onChange={(e) => setFilterSearch(e.target.value)}
+                  type="text"
+                  className="w-full border border-gray-300 rounded-lg pl-9 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                  placeholder="Tìm kiếm theo mô tả quyền..."
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      handleFilterPermissions();
+                    }
+                  }}
+                />
+              </div>
 
-                            <select
-                                className="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                value={selectedCategory}
-                                onChange={(e) => setSelectedCategory(e.target.value)}
-                            >
-                                <option value="all">Tất cả danh mục</option>
-                                {categoryNames.map(category => (
-                                    <option key={category} value={category}>
-                                        {getCategoryLabel(category)}
-                                    </option>
-                                ))}
-                            </select>
-                        </div> */}
+              <select
+                className="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm w-[250px]"
+                style={{ width: '250px' }}
+                value={filterCategory}
+                onChange={(e) => setFilterCategory(e.target.value)}
+              >
+                <option value="">Tất cả danh mục</option>
+                {categoryNames.map(category => (
+                  <option key={category} value={category} className="w-full">
+                    {categoryLabels[category] || category}
+                  </option>
+                ))}
+              </select>
+
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={handleFilterPermissions}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium whitespace-nowrap"
+                >
+                  Lọc
+                </button>
+                <button
+                  type="button"
+                  onClick={handleResetFilter}
+                  className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-sm font-medium whitespace-nowrap"
+                >
+                  Đặt lại
+                </button>
+              </div>
+            </div>
 
             {permissionsLoading ? (
               <div className="flex items-center justify-center py-12">
@@ -386,36 +385,24 @@ const RoleFormPage = () => {
                 Không có chức năng nào
               </div>
             ) : (
-              <div className="overflow-x-auto border rounded-lg mt-4">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider w-50">
-                        Chức năng
-                      </th>
-                      <th className="px-4 py-3 text-center text-xs font-medium text-gray-700 uppercase tracking-wider whitespace-nowrap">
-                        Chọn tất cả
-                      </th>
-                      <th className="px-4 py-3 text-center text-xs font-medium text-gray-700 uppercase tracking-wider whitespace-nowrap">
-                        Tạo mới
-                      </th>
-                      <th className="px-4 py-3 text-center text-xs font-medium text-gray-700 uppercase tracking-wider whitespace-nowrap">
-                        Cập nhật
-                      </th>
-                      <th className="px-4 py-3 text-center text-xs font-medium text-gray-700 uppercase tracking-wider whitespace-nowrap">
-                        Xóa
-                      </th>
-                      <th className="px-4 py-3 text-center text-xs font-medium text-gray-700 uppercase tracking-wider whitespace-nowrap">
-                        Xem danh sách
-                      </th>
-                      <th className="px-4 py-3 text-center text-xs font-medium text-gray-700 uppercase tracking-wider whitespace-nowrap">
-                        Xem chi tiết
-                      </th>
-                      <th className="px-4 py-3 text-center text-xs font-medium text-gray-700 uppercase tracking-wider whitespace-nowrap">
-                        Cập nhật trạng thái
-                      </th>
-                    </tr>
-                  </thead>
+              <div className="border rounded-lg mt-4">
+                <div className="overflow-x-auto overflow-y-auto max-h-[600px]">
+                  <table className="min-w-full divide-y divide-gray-200">
+                    <thead className="bg-gray-50 sticky top-0 z-10">
+                      <tr>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider w-50 bg-gray-50">
+                          Chức năng
+                        </th>
+                        <th className="px-4 py-3 text-center text-xs font-medium text-gray-700 uppercase tracking-wider whitespace-nowrap bg-gray-50">
+                          Chọn tất cả
+                        </th>
+                        {permissionTypes.map((type) => (
+                          <th key={type} className="px-4 py-3 text-center text-xs font-medium text-gray-700 uppercase tracking-wider whitespace-nowrap bg-gray-50">
+                            {typeLabels[type] || type}
+                          </th>
+                        ))}
+                      </tr>
+                    </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
                     {Object.keys(filteredTable).map((category) => {
                       const categoryData = filteredTable[category];
@@ -432,120 +419,33 @@ const RoleFormPage = () => {
                               className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-2 focus:ring-blue-500"
                             />
                           </td>
-                          <td className="px-4 py-3 text-center">
-                            {categoryData.permissions.CREATE ? (
-                              <input
-                                type="checkbox"
-                                checked={isPermissionChecked(category, 'CREATE')}
-                                onChange={() => toggleCheck(categoryData.permissions.CREATE)}
-                                className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-2 focus:ring-blue-500"
-                              />
-                            ) : (
-                              <div className="inline-block" title="Quyền này không tồn tại trong hệ thống">
+                          {permissionTypes.map((type) => (
+                            <td key={type} className="px-4 py-3 text-center">
+                              {categoryData.permissions[type] ? (
                                 <input
                                   type="checkbox"
-                                  disabled
-                                  className="w-4 h-4 rounded border-gray-300 text-gray-400 cursor-not-allowed"
+                                  checked={isPermissionChecked(category, type)}
+                                  onChange={() => toggleCheck(categoryData.permissions[type])}
+                                  className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-2 focus:ring-blue-500"
                                 />
-                              </div>
-                            )}
-                          </td>
-                          <td className="px-4 py-3 text-center">
-                            {categoryData.permissions.UPDATE ? (
-                              <input
-                                type="checkbox"
-                                checked={isPermissionChecked(category, 'UPDATE')}
-                                onChange={() => toggleCheck(categoryData.permissions.UPDATE)}
-                                className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-2 focus:ring-blue-500"
-                              />
-                            ) : (
-                              <div className="inline-block" title="Quyền này không tồn tại trong hệ thống">
-                                <input
-                                  type="checkbox"
-                                  disabled
-                                  className="w-4 h-4 rounded border-gray-300 text-gray-400 cursor-not-allowed"
-                                />
-                              </div>
-                            )}
-                          </td>
-                          <td className="px-4 py-3 text-center">
-                            {categoryData.permissions.DELETE ? (
-                              <input
-                                type="checkbox"
-                                checked={isPermissionChecked(category, 'DELETE')}
-                                onChange={() => toggleCheck(categoryData.permissions.DELETE)}
-                                className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-2 focus:ring-blue-500"
-                              />
-                            ) : (
-                              <div className="inline-block" title="Quyền này không tồn tại trong hệ thống">
-                                <input
-                                  type="checkbox"
-                                  disabled
-                                  className="w-4 h-4 rounded border-gray-300 text-gray-400 cursor-not-allowed"
-                                />
-                              </div>
-                            )}
-                          </td>
-                          <td className="px-4 py-3 text-center">
-                            {categoryData.permissions.GET_ALL ? (
-                              <input
-                                type="checkbox"
-                                checked={isPermissionChecked(category, 'GET_ALL')}
-                                onChange={() => toggleCheck(categoryData.permissions.GET_ALL)}
-                                className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-2 focus:ring-blue-500"
-                              />
-                            ) : (
-                              <div className="inline-block" title="Quyền này không tồn tại trong hệ thống">
-                                <input
-                                  type="checkbox"
-                                  disabled
-                                  className="w-4 h-4 rounded border-gray-300 text-gray-400 cursor-not-allowed"
-                                />
-                              </div>
-                            )}
-                          </td>
-                          <td className="px-4 py-3 text-center">
-                            {categoryData.permissions.GET_DETAIL ? (
-                              <input
-                                type="checkbox"
-                                checked={isPermissionChecked(category, 'GET_DETAIL')}
-                                onChange={() => toggleCheck(categoryData.permissions.GET_DETAIL)}
-                                className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-2 focus:ring-blue-500"
-                              />
-                            ) : (
-                              <div className="inline-block" title="Quyền này không tồn tại trong hệ thống">
-                                <input
-                                  type="checkbox"
-                                  disabled
-                                  className="w-4 h-4 rounded border-gray-300 text-gray-400 cursor-not-allowed"
-                                />
-                              </div>
-                            )}
-                          </td>
-                          <td className="px-4 py-3 text-center">
-                            {categoryData.permissions.UPDATE_STATUS ? (
-                              <input
-                                type="checkbox"
-                                checked={isPermissionChecked(category, 'UPDATE_STATUS')}
-                                onChange={() => toggleCheck(categoryData.permissions.UPDATE_STATUS)}
-                                className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-2 focus:ring-blue-500"
-                              />
-                            ) : (
-                              <div className="inline-block" title="Quyền này không tồn tại trong hệ thống">
-                                <input
-                                  type="checkbox"
-                                  disabled
-                                  className="w-4 h-4 rounded border-gray-300 text-gray-400 cursor-not-allowed"
-                                />
-                              </div>
-                            )}
-                          </td>
+                              ) : (
+                                <div className="inline-block" title="Quyền này không tồn tại trong hệ thống">
+                                  <input
+                                    type="checkbox"
+                                    disabled
+                                    className="w-4 h-4 rounded border-gray-300 text-gray-400 cursor-not-allowed"
+                                  />
+                                </div>
+                              )}
+                            </td>
+                          ))}
                         </tr>
                       );
                     })}
                   </tbody>
                 </table>
               </div>
+            </div>
             )}
 
             <div className="mt-4 text-sm text-gray-600">
