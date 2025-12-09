@@ -24,6 +24,7 @@ import ForgotPassword from "../pages/ForgotPassword/ForgotPassword";
 import GovernmentManagement from "../pages/Government/GovernmentManagement";
 import PermissionsManagement from "../pages/Permissions/PermissionsManagement";
 import RoleFormPage from "../pages/Permissions/RoleFormPage";
+import AuditLogManagement from "../pages/AuditLog/AuditLogManagement";
 
 function AppRoutes() {
     return (
@@ -60,6 +61,7 @@ function AppRoutes() {
                 <Route path={ROUTE_PATH.PERMISSIONS} element={<PermissionsManagement />} />
                 <Route path={ROUTE_PATH.ROLE_CREATE} element={<RoleFormPage />} />
                 <Route path={ROUTE_PATH.ROLE_EDIT} element={<RoleFormPage />} />
+                <Route path={ROUTE_PATH.AUDIT_LOG} element={<AuditLogManagement />} />
             </Route>
 
             <Route path={ROUTE_PATH.NOT_FOUND} element={<NotFound />} />

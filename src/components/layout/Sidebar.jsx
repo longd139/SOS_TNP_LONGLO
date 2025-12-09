@@ -110,6 +110,14 @@ const menuItems = [
         path: ROUTE_PATH.PERMISSIONS,
         hasSubmenu: false,
         modulePrefixes: ['ROLE', 'PERM'] 
+    },
+    {
+        id: 'audit-log',
+        label: 'Nhật ký hệ thống',
+        icon: ClipboardList,
+        path: ROUTE_PATH.AUDIT_LOG,
+        hasSubmenu: false,
+        modulePrefix: 'ADL'
     }
 ];
 
