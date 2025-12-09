@@ -80,11 +80,46 @@ const updateStatusCategory = async (categoryId, isActive) => {
     }
 }
 
+const countNewsByCategory = async () => {
+    try {
+        const response = await apiClient.get("/api/danh-muc-tin-tuc/count-tin-tuc");
+        if (response.data.success) return response.data.data;
+        else throw new Error(response.data.message || "Đếm số lượng tin tức theo danh mục thất bại");
+    } catch (error) {
+        if (error.response?.data?.message) {
+            throw new Error(error.response.data.message);
+        }
+        throw error;
+    }
+}
+
+const getCategoriesWithPagination = async (page, pageSize, isRemoved = false, search = '') => {
+    try {
+        const response = await apiClient.get("/api/danh-muc-tin-tuc/pagination", {
+            params: { page, size: pageSize, isActive: !isRemoved, search }
+        });
+        if (response.data.success) {
+            return {
+                data: response.data.data,
+                pagination: response.data.pagination
+            };
+        }
+        else throw new Error(response.data.message || "Lấy danh sách danh mục tin tức thất bại");
+    } catch (error) {
+        if (error.response?.data?.message) {
+            throw new Error(error.response.data.message);
+        }
+        throw error;
+    }
+}
+
 export const CATEGORY_API = {
     createCategory,
     getAllCategories,
     updateCategory,
     getCategoryById,
     deleteCategory,
-    updateStatusCategory
+    updateStatusCategory,
+    countNewsByCategory,
+    getCategoriesWithPagination
 }
