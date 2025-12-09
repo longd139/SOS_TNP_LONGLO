@@ -29,8 +29,8 @@ export const usePermissions = () => {
     const filters = useSelector(selectPermissionFilters);
 
     const loadPermissions = useCallback(
-        (search = '', danhMuc = '') => {
-            if (Object.keys(permissions || {}).length === 0) {
+        (search = '', danhMuc = '', forceReload = false) => {
+            if (forceReload || search || danhMuc || Object.keys(permissions || {}).length === 0) {
                 return dispatch(fetchPermissions({ search, danhMuc }));
             }
             return Promise.resolve();
