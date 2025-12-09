@@ -15,6 +15,7 @@ import governmentReducer from '../features/government/governmentSlice';
 import statisticalReportReducer from '../features/statisticalReport/statisticalReportSlice';
 import roleReducer from '../features/roles/roleSlice';
 import permissionReducer from '../features/permissions/permissionSlice';
+import auditLogReducer from '../features/auditLog/auditLogSlice';
 export const store = configureStore({
     reducer: {
         auth: authReducer,
@@ -33,5 +34,6 @@ export const store = configureStore({
         statisticalReport: statisticalReportReducer,
         role: roleReducer,
         permission: permissionReducer,
+        auditLog: auditLogReducer,
     },
 });
