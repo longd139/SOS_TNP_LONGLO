@@ -78,11 +78,7 @@ const UserViewModal = ({ isOpen, onClose, userData, loading = false }) => {
                             <InfoRow
                                 icon={Shield}
                                 label="Vai trò"
-                                value={
-                                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                                        {userData.vai_tro || userData.role || '-'}
-                                    </span>
-                                }
+                                value={userData.vai_tro || userData.role || '-'}
                             />
                             <InfoRow
                                 icon={ToggleLeft}

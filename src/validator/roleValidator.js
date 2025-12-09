@@ -6,7 +6,7 @@ export const createRoleSchema = yup.object().shape({
         .string()
         .required("Tên vai trò là bắt buộc")
         .test('trim', 'Tên vai trò là bắt buộc', value => value && value.trim().length > 0)
-        .min(2, "Tên vai trò phải có ít nhất 2 ký tự")
+        .min(3, "Tên vai trò phải có ít nhất 3 ký tự")
         .max(100, "Tên vai trò không được vượt quá 100 ký tự"),
     description: yup
         .string()

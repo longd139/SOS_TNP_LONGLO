@@ -59,19 +59,15 @@ export default function WorkSchedule() {
 
     const fetchCounts = async (monthYear, date = null) => {
         try {
-            const [allResult, activeResult, inactiveResult] = await Promise.all([
-                WORK_SCHEDULE_API.getWorkSchedulesPagination(null, date ? null : monthYear, date, null, 1, 1),
-                WORK_SCHEDULE_API.getWorkSchedulesPagination(null, date ? null : monthYear, date, true, 1, 1),
-                WORK_SCHEDULE_API.getWorkSchedulesPagination(null, date ? null : monthYear, date, false, 1, 1)
-            ]);
-
+            const result = await WORK_SCHEDULE_API.countWorkSchedules(null, date ? null : monthYear, date);
+            
             setCounts({
-                all: allResult.pagination?.totalItems || 0,
-                active: activeResult.pagination?.totalItems || 0,
-                inactive: inactiveResult.pagination?.totalItems || 0
+                all: result.total || 0,
+                active: result.active || 0,
+                inactive: result.inactive || 0
             });
 
-            return allResult.pagination?.totalItems || 0;
+            return result.total || 0;
         } catch (error) {
             return 0;
         }
@@ -404,7 +400,7 @@ export default function WorkSchedule() {
 
     const displaySchedules = schedules;
 
-    const handleActiveFilterChange = (filter) => {
+    const handleActiveFilterChange = async (filter) => {
         if (filter === activeFilter) return;
 
         setActiveFilter(filter);
@@ -412,8 +408,9 @@ export default function WorkSchedule() {
 
         const isActiveValue = filter === "all" ? null : filter === "active" ? true : false;
 
+        // Chỉ fetch danh sách, không fetch count vì count đã có sẵn
         if (selectedDate) {
-            fetchSchedulesPagination({
+            await fetchSchedulesPagination({
                 date: selectedDate,
                 isActive: isActiveValue,
                 page: 1,
@@ -421,7 +418,7 @@ export default function WorkSchedule() {
             });
         } else {
             const monthYear = `${selectedMonth}/${selectedYear}`;
-            fetchSchedulesPagination({
+            await fetchSchedulesPagination({
                 monthYear,
                 isActive: isActiveValue,
                 page: 1,
