@@ -22,5 +22,6 @@ const ROUTE_PATH = {
     PERMISSIONS: '/permissions',
     ROLE_CREATE: '/permissions/create',
     ROLE_EDIT: '/permissions/:roleId/edit',
+    AUDIT_LOG: '/audit-log',  
 }
 export default ROUTE_PATH;
