@@ -1,4 +1,4 @@
-import { BarChart3, Calendar, FileText, FolderOpen, LayoutDashboard, MessageSquare, Newspaper, Phone, UserCog, Menu, ChevronLeft, X, ClipboardList, Shield } from 'lucide-react';
+import { BarChart3, Calendar, FileText, FolderOpen, LayoutDashboard, MessageSquare, Newspaper, Phone, UserCog, Menu, ChevronLeft, X, ClipboardList, Shield, FileCheck } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import React from 'react';
 import PropTypes from 'prop-types';
@@ -121,8 +121,8 @@ const menuItems = [
     },
     {
         id: 'audit-log',
-        label: 'Nhật ký hệ thống',
-        icon: ClipboardList,
+        label: 'Chi tiết hoạt động',
+        icon: FileCheck,
         path: ROUTE_PATH.AUDIT_LOG,
         hasSubmenu: false,
         modulePrefix: 'ADL'
