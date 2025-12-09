@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { validateAuditLogFilter } from '../../validator/auditLogValidator';
 
 const AuditLogFilter = ({ onFilter, onReset, initialFilters }) => {
   const [filters, setFilters] = useState(initialFilters || {
@@ -6,18 +7,30 @@ const AuditLogFilter = ({ onFilter, onReset, initialFilters }) => {
     from: '',
     to: ''
   });
+  const [errors, setErrors] = useState({});
 
   const handleChange = (key, value) => {
     setFilters(prev => ({ ...prev, [key]: value }));
+    if (errors[key]) {
+      setErrors(prev => ({ ...prev, [key]: undefined }));
+    }
   };
 
-  const handleApplyFilter = () => {
-    onFilter(filters);
+  const handleApplyFilter = async () => {
+    const { isValid, errors: validationErrors } = await validateAuditLogFilter(filters);
+
+    if (isValid) {
+      setErrors({});
+      onFilter(filters);
+    } else {
+      setErrors(validationErrors);
+    }
   };
 
   const handleResetFilter = () => {
     const resetFilters = { search: '', from: '', to: '' };
     setFilters(resetFilters);
+    setErrors({});
     onReset();
   };
 
@@ -44,8 +57,12 @@ const AuditLogFilter = ({ onFilter, onReset, initialFilters }) => {
             type="date"
             value={filters.from}
             onChange={(e) => handleChange('from', e.target.value)}
-            className="w-full px-3 py-2 text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className={`w-full px-3 py-2 text-base border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.from ? 'border-red-500' : 'border-gray-300'
+              }`}
           />
+          {errors.from && (
+            <p className="mt-1 text-sm text-red-600">{errors.from}</p>
+          )}
         </div>
         <div className="flex-1">
           <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -55,8 +72,12 @@ const AuditLogFilter = ({ onFilter, onReset, initialFilters }) => {
             type="date"
             value={filters.to}
             onChange={(e) => handleChange('to', e.target.value)}
-            className="w-full px-3 py-2 text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className={`w-full px-3 py-2 text-base border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.to ? 'border-red-500' : 'border-gray-300'
+              }`}
           />
+          {errors.to && (
+            <p className="mt-1 text-sm text-red-600">{errors.to}</p>
+          )}
         </div>
         <div className="flex gap-2 pt-0 sm:pt-7">
           <button
