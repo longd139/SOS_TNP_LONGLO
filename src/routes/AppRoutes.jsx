@@ -25,6 +25,7 @@ import GovernmentManagement from "../pages/Government/GovernmentManagement";
 import PermissionsManagement from "../pages/Permissions/PermissionsManagement";
 import RoleFormPage from "../pages/Permissions/RoleFormPage";
 import AuditLogManagement from "../pages/AuditLog/AuditLogManagement";
+import CategoryNewsManagement from "../pages/CategoryNews/CategoryNewsManagement";
 
 function AppRoutes() {
     return (
@@ -62,6 +63,7 @@ function AppRoutes() {
                 <Route path={ROUTE_PATH.ROLE_CREATE} element={<RoleFormPage />} />
                 <Route path={ROUTE_PATH.ROLE_EDIT} element={<RoleFormPage />} />
                 <Route path={ROUTE_PATH.AUDIT_LOG} element={<AuditLogManagement />} />
+                <Route path={ROUTE_PATH.CATEGORY_NEWS} element={<CategoryNewsManagement />} />
             </Route>
 
             <Route path={ROUTE_PATH.NOT_FOUND} element={<NotFound />} />
