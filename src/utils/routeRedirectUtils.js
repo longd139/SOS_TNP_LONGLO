@@ -1,13 +1,22 @@
+import ROUTE_PATH from "../constants/routes";
+
 const menuItems = [
-    { id: 'overview', path: '/dashboard', disabled: false },
-    { id: 'reports', path: '/reports', disabled: false },
-    { id: 'news', path: '/news', disabled: false },
-    { id: 'procedures', path: '/procedures', disabled: false },
-    { id: 'templates', path: '/templates', disabled: false },
-    { id: 'contact', path: '/contact', disabled: false },
-    { id: 'schedule', path: '/schedules', disabled: false },
-    { id: 'statistics', path: '/statistics', disabled: false },
-    { id: 'accounts', path: '/accounts', disabled: false }
+    { id: 'overview', path: ROUTE_PATH.DASHBOARD, disabled: false },
+    { id: 'reports', path: ROUTE_PATH.REPORT, disabled: false },
+    { id: 'news', path: ROUTE_PATH.NEWS, disabled: false },
+    { id: 'procedures', path: ROUTE_PATH.PROCEDURES, disabled: false },
+    { id: 'templates', path: ROUTE_PATH.TEMPLATES, disabled: false },
+    { id: 'contact', path: ROUTE_PATH.CONTACT, disabled: false },
+    { id: 'schedule', path: ROUTE_PATH.SCHEDULES, disabled: false },
+    { id: 'statistics', path: ROUTE_PATH.STATISTICS, disabled: false },
+    { id: 'accounts', path: ROUTE_PATH.ACCOUNTS, disabled: false },
+    { id: 'roles', path: ROUTE_PATH.ROLES, disabled: false },
+    { id: 'permissions', path: ROUTE_PATH.PERMISSIONS, disabled: false },
+    { id: 'auditLogs', path: ROUTE_PATH.AUDIT_LOG, disabled: false },
+    { id: 'areas', path: ROUTE_PATH.AREAS, disabled: false },
+    { id: 'government', path: ROUTE_PATH.GOVERNMENT, disabled: false },
+    { id: 'categoryNews', path: ROUTE_PATH.CATEGORY_NEWS, disabled: false },
+    { id: 'reportAreas', path: ROUTE_PATH.REPORT_AREAS, disabled: false },
 ];
 
 export const getDefaultEnabledRoute = () => {
