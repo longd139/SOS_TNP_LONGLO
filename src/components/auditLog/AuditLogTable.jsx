@@ -33,12 +33,21 @@ const AuditLogTable = ({ data, loading, onView, pagination, onPageChange }) => {
 
   const columns = [
     {
+        title: 'STT',
+        dataIndex: 'id',
+        key: 'id',
+        width: '50px',
+        render: (value, record, index) => `#${index + 1 + (pagination.currentPage - 1) * pagination.pageSize}`
+    },
+    {
       title: 'Thời gian',
       dataIndex: 'timestamp',
       key: 'timestamp',
-      width: '180px',
+      width: '150px',
       render: (timestamp) => (
-        <span className="text-sm text-gray-900 whitespace-nowrap">
+        <span
+          className="block max-w-[150px] truncate text-ellipsis overflow-hidden whitespace-nowrap text-sm text-gray-900"
+          title={formatDate(timestamp)}>
           {formatDate(timestamp)}
         </span>
       )
@@ -47,9 +56,11 @@ const AuditLogTable = ({ data, loading, onView, pagination, onPageChange }) => {
       title: 'Người dùng',
       dataIndex: 'ten_nguoi_dung',
       key: 'ten_nguoi_dung',
-      width: '200px',
+      width: '150px',
       render: (name) => (
-        <span className="text-sm font-medium text-gray-900">
+        <span 
+        className="block max-w-[150px] truncate text-ellipsis overflow-hidden whitespace-nowrap text-sm text-gray-900"
+          title={name || 'N/A'}>
           {name || 'N/A'}
         </span>
       )
@@ -58,12 +69,15 @@ const AuditLogTable = ({ data, loading, onView, pagination, onPageChange }) => {
       title: 'Vai trò',
       dataIndex: 'roles',
       key: 'roles',
-      width: '120px',
+      width: '150px',
       render: (roles) => (
         <div className="flex flex-wrap gap-1">
           {roles && roles.length > 0 ? (
             roles.map((role, index) => (
-              <span key={index}>{getRoleBadge(role)}</span>
+              <span
+                title={role}
+                className='block max-w-[150px] truncate text-ellipsis overflow-hidden whitespace-nowrap text-sm text-gray-900'
+                key={index}>{getRoleBadge(role)}</span>
             ))
           ) : (
             <span className="text-sm text-gray-500">-</span>
@@ -84,7 +98,10 @@ const AuditLogTable = ({ data, loading, onView, pagination, onPageChange }) => {
       key: 'table_name',
       width: '250px',
       render: (tableName) => (
-        <span className="text-sm text-gray-900">
+        <span 
+          className="block max-w-[250px] truncate text-ellipsis overflow-hidden whitespace-nowrap text-sm text-gray-900"
+          title={tableName || '-'}
+        >
           {tableName || '-'}
         </span>
       )
@@ -95,7 +112,10 @@ const AuditLogTable = ({ data, loading, onView, pagination, onPageChange }) => {
       key: 'remote_address',
       width: '150px',
       render: (ip) => (
-        <span className="text-sm font-mono text-gray-700">
+        <span 
+          className="block max-w-[150px] truncate text-ellipsis overflow-hidden whitespace-nowrap text-sm font-mono text-gray-700"
+          title={ip || '-'}
+        >
           {ip || '-'}
         </span>
       )
