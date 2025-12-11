@@ -82,6 +82,7 @@ export const createUserWithPhoneSchema = createUserSchema.shape({
             const cleanPhone = value.replace(/[\s\-()]/g, '');
             return vietnamesePhoneRegex.test(cleanPhone);
         })
+        .matches(/^[0-9]{10,15}$/, "Số điện thoại phải có từ 10 chữ số")
 });
 
 export const updateUserWithPhoneSchema = yup.object().shape({
@@ -120,7 +121,8 @@ export const updateUserWithPhoneSchema = yup.object().shape({
             if (!value || value.trim() === '') return true;
             const cleanPhone = value.replace(/[\s\-()]/g, '');
             return vietnamesePhoneRegex.test(cleanPhone);
-        }),
+        })
+        .matches(/^[0-9]{10,15}$/, "Số điện thoại phải có từ 10 chữ số"),
 
     active: yup
         .boolean()
