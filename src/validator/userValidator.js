@@ -18,7 +18,8 @@ export const createUserSchema = yup.object().shape({
         .string()
         .required("Email là bắt buộc")
         .test('trim', 'Email là bắt buộc', value => value && value.trim().length > 0)
-        .matches(emailRegex, "Email không hợp lệ"),
+        .matches(emailRegex, "Email không hợp lệ")
+        .max(100, "Email không được vượt quá 100 ký tự"),
     role: yup
         .string()
         .required("Vai trò là bắt buộc")
