@@ -116,10 +116,10 @@ export const updateUserWithPhoneSchema = yup.object().shape({
 
     phone: yup
         .string()
-        .nullable()
-        .notRequired()
+        .required("Số điện thoại là bắt buộc")
+        .test('trim', 'Số điện thoại là bắt buộc', value => value && value.trim().length > 0)
         .test('phone-format', 'Số điện thoại không hợp lệ', function (value) {
-            if (!value || value.trim() === '') return true;
+            if (!value || value.trim() === '') return false;
             const cleanPhone = value.replace(/[\s\-()]/g, '');
             return vietnamesePhoneRegex.test(cleanPhone);
         })

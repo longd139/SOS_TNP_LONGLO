@@ -93,7 +93,6 @@ export default function ReportAreasList() {
             setSelectedArea(fullData);
             setIsEditModalOpen(true);
         } catch (error) {
-            console.error('Failed to load report area details:', error);
             setSelectedArea(item);
             setIsEditModalOpen(true);
         }

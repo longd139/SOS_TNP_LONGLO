@@ -6,7 +6,6 @@ const INITIAL_FORM_STATE = {
     username: '',
     fullName: '',
     email: '',
-    phone: '',
     role: '',
     password: '',
     confirmPassword: '',
@@ -92,6 +91,7 @@ export const useUserForm = ({ initialUser = null, isOpen = false }) => {
                 password: formData.password.trim() || undefined,
             };
         } else {
+            // Create mode - no phone field
             return {
                 username: formData.username?.trim() || '',
                 email: formData.email?.trim() || '',
