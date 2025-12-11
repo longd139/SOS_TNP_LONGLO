@@ -1,21 +1,22 @@
 import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom';
 
 export default function NotFound() {
   const [countdown, setCountdown] = useState(5);
-  
+  const navigate = useNavigate();
+
   useEffect(() => {
-    if (countdown === 0) {
-      window.location.href = '/';
+    if (countdown <= 0) {
+      navigate('/');
       return;
     }
 
-  const countdownFunc = setInterval(() => {
-    setCountdown((prev) => prev - 1);
-  }, 1000)
+    const timer = setInterval(() => {
+      setCountdown((prev) => prev - 1);
+    }, 1000);
 
-  return () => clearInterval(countdownFunc);
-
-  }, [countdown]);
+    return () => clearInterval(timer);
+  }, [countdown, navigate]);
 
   return (
     <div className="text-center mt-20">

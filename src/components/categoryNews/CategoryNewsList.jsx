@@ -37,13 +37,19 @@ export default function CategoryNewsList() {
         updateShowActive(true);
         clearFilters();
 
-        loadCategoriesWithPagination({
-            page: 1,
-            pageSize: 10,
-            isActive: true,
-            search: ''
-        });
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+        (async () => {
+            try {
+                await loadCategoriesWithPagination({
+                    page: 1,
+                    pageSize: 10,
+                    isActive: true,
+                    search: ''
+                });
+            } catch (err) {
+                const message = err?.message || 'Không tải được danh mục';
+                showToast.error(message);
+            }
+        })();
     }, []);
 
     const handleFilter = (newFilters) => {
