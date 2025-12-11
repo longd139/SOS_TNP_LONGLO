@@ -110,7 +110,6 @@ export async function exportPDF(elementId, fileName, options = {}) {
 
         pdf.save(`${fileName || 'export'}.pdf`);
     } catch (error) {
-        console.error('Error exporting PDF:', error);
         throw error;
     } finally {
         input.style.display = originalDisplay;

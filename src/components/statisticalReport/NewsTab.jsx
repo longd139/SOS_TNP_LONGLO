@@ -12,7 +12,7 @@ export default function NewsTab({ dateRange }) {
         if (dateRange?.to) params.to = dateRange.to;
 
         loadTinTucReport(params).catch(error => {
-            console.error('Error loading tin tuc report:', error);
+            //console.error('Error loading tin tuc report:', error);
         });
     }, [loadTinTucReport, dateRange?.from, dateRange?.to]);
 

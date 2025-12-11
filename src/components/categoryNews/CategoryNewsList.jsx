@@ -91,7 +91,7 @@ export default function CategoryNewsList() {
             setSelectedCategory(fullData);
             setIsEditModalOpen(true);
         } catch (error) {
-            console.error('Failed to load category details:', error);
+          showToast.error(error?.message || 'Không thể tải chi tiết danh mục');
             setSelectedCategory(item);
             setIsEditModalOpen(true);
         }

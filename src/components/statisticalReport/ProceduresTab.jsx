@@ -42,7 +42,7 @@ export default function ProceduresTab({ dateRange }) {
         if (dateRange?.to) params.to = dateRange.to;
 
         loadThuTucReport(params).catch(error => {
-            console.error('Error loading thu tuc report:', error);
+            // console.error('Error loading thu tuc report:', error);
         });
     }, [loadThuTucReport, dateRange?.from, dateRange?.to]);
 

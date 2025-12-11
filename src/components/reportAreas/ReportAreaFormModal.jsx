@@ -85,7 +85,6 @@ const ReportAreaFormModal = ({
                 setUsers(allUsers.filter(u => u.fullName && u.fullName.trim() !== ''));
                 setSearchResults(filtered);
             } catch (error) {
-                console.error('Failed to fetch users:', error);
                 setSearchResults([]);
             } finally {
                 setLoading(false);
@@ -104,7 +103,7 @@ const ReportAreaFormModal = ({
             const result = await USER_API.getAllUsersWithPagination({ page: 1, size: 100, isActive: true });
             setUsers(result.content || []);
         } catch (error) {
-            console.error('Failed to fetch users:', error);
+
         }
     };
 
@@ -302,7 +301,6 @@ const ReportAreaFormModal = ({
                                         setUsers(allUsers.filter(u => u.fullName && u.fullName.trim() !== ''));
                                         setSearchResults(filtered);
                                     } catch (error) {
-                                        console.error('Failed to fetch users:', error);
                                     } finally {
                                         setLoading(false);
                                     }

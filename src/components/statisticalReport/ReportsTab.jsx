@@ -35,7 +35,7 @@ export default function ReportsTab({ dateRange }) {
         }
 
         loadPhanAnhReport(params).catch(error => {
-            console.error('Error loading phan anh report:', error);
+            // console.error('Error loading phan anh report:', error);
         });
     }, [loadPhanAnhReport, dateRange?.from, dateRange?.to, selectedDomain]);
 
