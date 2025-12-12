@@ -30,6 +30,7 @@ export default function ReportAreasList() {
 
     const { canUpdate, canDelete, canUpdateStatus } = usePermission();
 
+    const [isViewModalOpen, setIsViewModalOpen] = useState(false);
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -86,6 +87,17 @@ export default function ReportAreasList() {
         setSelectedArea(null);
         setIsCreateModalOpen(true);
     };
+
+    const handleView = async (item) => {
+        try {
+            const fullData = await loadReportAreaById(item.id);
+            setSelectedArea(fullData);
+        } catch (error) {
+            setSelectedArea(item);
+        } finally {
+            setIsViewModalOpen(true);
+        }
+    }
 
     const handleEdit = async (item) => {
         try {
@@ -297,6 +309,7 @@ export default function ReportAreasList() {
             <BaseTable
                 data={reportAreas}
                 columns={columns}
+                onView={handleView}
                 onEdit={handleEdit}
                 onDelete={!showActive ? handleDelete : null}
                 onUpdateStatus={handleUpdateStatus}
@@ -307,6 +320,17 @@ export default function ReportAreasList() {
                 emptyMessage={loading ? "Đang tải dữ liệu..." : "Không có lĩnh vực nào"}
                 pagination={pagination}
                 onPageChange={handlePageChange}
+            />
+
+            <ReportAreaFormModal
+                isOpen={isViewModalOpen}
+                onClose={() => {
+                    setIsViewModalOpen(false);
+                    setSelectedArea(null);
+                }}
+                onSubmit={() => { }}
+                initialData={selectedArea}
+                mode="view"
             />
 
             <ReportAreaFormModal
