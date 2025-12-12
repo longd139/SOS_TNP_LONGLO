@@ -52,6 +52,10 @@ const ReportAreaFormModal = ({
               userFromInitial.ho_ten ||
               userFromInitial.fullName ||
               userFromInitial.ten,
+            email:
+              userFromInitial.email ||
+              userFromInitial.email_dang_nhap ||
+              userFromInitial.username,
           };
         }
       }
@@ -404,8 +408,11 @@ const ReportAreaFormModal = ({
                         highlightedIndex === idx ? "bg-blue-100" : ""
                       }`}
                     >
-                      <span className="font-medium text-sm">
+                      <span className="font-medium text-sm block">
                         {user.fullName}
+                      </span>
+                      <span className="text-xs text-gray-500">
+                        {user.email || "Chưa có email"}
                       </span>
                     </button>
                   ))}
@@ -421,7 +428,10 @@ const ReportAreaFormModal = ({
                     key={user.id}
                     className="inline-flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm"
                   >
-                    <span>{user.fullName}</span>
+                    <span className="font-medium">{user.fullName}</span>
+                    <span className="text-xs text-blue-700">
+                      {user.email ? `(${user.email})` : "(Chưa có email)"}
+                    </span>
                     {!isViewMode && (
                       <button
                         type="button"
@@ -434,13 +444,6 @@ const ReportAreaFormModal = ({
                     )}
                   </span>
                 ))}
-              </div>
-              <div className="mt-2 pt-2 border-t border-gray-300">
-                <p className="text-xs text-gray-600">
-                  Đã chọn:{" "}
-                  <span className="font-medium">{selectedUsers.length}</span>{" "}
-                  người quản lý
-                </p>
               </div>
             </div>
           )}
