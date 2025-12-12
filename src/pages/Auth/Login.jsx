@@ -11,6 +11,7 @@ import ROUTE_PATH from "../../constants/routes";
 import { getRedirectPathIfDisabled } from "../../utils/routeRedirectUtils";
 import { validateAuth } from "../../validator/loginValidator";
 import { showToast } from "../../utils/toastNotification";
+import { useAuth } from "../../contexts/AuthContext";
 
 const RECAPTCHA_SITE_KEY = process.env.REACT_APP_SITE_KEY
 
@@ -21,14 +22,24 @@ export default function Login() {
     const [validationErrors, setValidationErrors] = useState({});
     const [hasInteracted, setHasInteracted] = useState(false);
     const [recaptchaToken, setRecaptchaToken] = useState("");
+    const [redirecting, setRedirecting] = useState(false);
     const recaptchaRef = useRef();
     // const recaptchaWidgetId = useRef(null);
 
     const { loginWithCaptcha, loading, errors, apiError, clearErrors } = useLogin();
     const dispatch = useDispatch();
     const navigate = useNavigate();
+    const { isAuthenticated } = useAuth();
 
     useAuthRedirect();
+
+    useEffect(() => {
+        if (isAuthenticated && !redirecting) {
+            setRedirecting(true);
+            const redirectPath = getRedirectPathIfDisabled(ROUTE_PATH.DASHBOARD);
+            navigate(redirectPath, { replace: true });
+        }
+    }, [isAuthenticated, redirecting, navigate]);
 
     useEffect(() => {
         if (!hasInteracted) return;
@@ -42,6 +53,7 @@ export default function Login() {
     }, [tenDangNhap, matKhau, hasInteracted, apiError, errors, validationErrors, clearErrors]);
 
     useEffect(() => {
+        if (redirecting || isAuthenticated) return;
 
         const checkRecaptcha = () => {
             if (window.grecaptcha && window.grecaptcha.render) {
@@ -57,7 +69,7 @@ export default function Login() {
         return () => {
             window.removeEventListener('load', checkRecaptcha);
         };
-    }, []);
+    }, [redirecting, isAuthenticated]);
 
     const renderRecaptcha = () => {
         if (!RECAPTCHA_SITE_KEY) {
@@ -93,6 +105,7 @@ export default function Login() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        if (redirecting || isAuthenticated) return;
         setHasInteracted(true);
 
         const credentials = { tenDangNhap, matKhau };
@@ -140,6 +153,10 @@ export default function Login() {
     const handle2FAError = (error) => {
         showToast.error(error || 'Xác thực 2FA thất bại, vui lòng thử lại.');
     };
+
+    if (redirecting || isAuthenticated) {
+        return null;
+    }
 
     return (
         <div className="flex items-center justify-center min-h-screen bg-gray-100">

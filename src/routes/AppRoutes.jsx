@@ -64,6 +64,8 @@ function AppRoutes() {
                 <Route path={ROUTE_PATH.ROLE_EDIT} element={<RoleFormPage />} />
                 <Route path={ROUTE_PATH.AUDIT_LOG} element={<AuditLogManagement />} />
                 <Route path={ROUTE_PATH.CATEGORY_NEWS} element={<CategoryNewsManagement />} />
+
+                <Route path="/reports/:id" element={<ReportList />} />
             </Route>
 
             <Route path={ROUTE_PATH.NOT_FOUND} element={<NotFound />} />
