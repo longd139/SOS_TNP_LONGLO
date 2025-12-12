@@ -69,7 +69,7 @@ export default function Login() {
         return () => {
             window.removeEventListener('load', checkRecaptcha);
         };
-    }, []);
+    }, [redirecting, isAuthenticated]);
 
     const renderRecaptcha = () => {
         if (!RECAPTCHA_SITE_KEY) {
@@ -153,6 +153,10 @@ export default function Login() {
     const handle2FAError = (error) => {
         showToast.error(error || 'Xác thực 2FA thất bại, vui lòng thử lại.');
     };
+
+    if (redirecting || isAuthenticated) {
+        return null;
+    }
 
     return (
         <div className="flex items-center justify-center min-h-screen bg-gray-100">
