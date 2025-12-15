@@ -16,10 +16,8 @@ export const contactSchema = yup.object().shape({
         .max(255, "Địa chỉ không được vượt quá 255 ký tự"),
     soDienThoai: yup
         .string()
-        .required("Số điện thoại không được để trống")
-        .test('trim', 'Số điện thoại không được để trống', value => value && value.trim().length > 0)
         .matches(
-            /^(\+84|0)(3[2-9]|5[6|8|9]|7[0|6-9]|8[1-5]|9[0-4|6-9])[0-9]{7}$/,
+            /^(0\d{9,10}|\+84\d{9,10})$/,
             "Số điện thoại không hợp lệ"
         ),
     email: yup
