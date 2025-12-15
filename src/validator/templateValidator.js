@@ -6,20 +6,30 @@ export const createTemplateSchema = yup.object().shape({
         .string()
         .required("Tên biểu mẫu là bắt buộc")
         .min(3, "Tên biểu mẫu phải có ít nhất 3 ký tự")
-        .max(500, "Tên biểu mẫu không được vượt quá 500 ký tự")
+        .max(200, "Tên biểu mẫu không được vượt quá 200 ký tự")
         .test('trim', 'Tên biểu mẫu là bắt buộc', value => value && value.trim().length > 0),
+    
+    maMauDon: yup
+        .string()
+        .required("Mã biểu mẫu là bắt buộc")
+        .min(2, "Mã biểu mẫu phải có ít nhất 2 ký tự")
+        .max(45, "Mã biểu mẫu không được vượt quá 45 ký tự")
+        .test('trim', 'Mã biểu mẫu là bắt buộc', value => value && value.trim().length > 0),
     
     moTa: yup
         .string()
-        .nullable()
-        .max(1000, "Mô tả không được vượt quá 1000 ký tự"),
-    
+        .nullable(),    
     file: yup
         .mixed()
-        .required("Vui lòng chọn file PDF")
-        .test('fileType', 'Chỉ chấp nhận file PDF', (value) => {
+        .required("Vui lòng chọn file")
+        .test('fileType', 'Chỉ chấp nhận file PDF, DOC, DOCX', (value) => {
             if (!value) return false;
-            return value.type === 'application/pdf';
+            const allowedTypes = [
+                'application/pdf',
+                'application/msword',
+                'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+            ];
+            return allowedTypes.includes(value.type);
         })
         .test('fileSize', 'Kích thước file không được vượt quá 10MB', (value) => {
             if (!value) return false;
@@ -32,20 +42,30 @@ export const updateTemplateSchema = yup.object().shape({
         .string()
         .required("Tên biểu mẫu là bắt buộc")
         .min(3, "Tên biểu mẫu phải có ít nhất 3 ký tự")
-        .max(500, "Tên biểu mẫu không được vượt quá 500 ký tự")
+        .max(200, "Tên biểu mẫu không được vượt quá 200 ký tự")
         .test('trim', 'Tên biểu mẫu là bắt buộc', value => value && value.trim().length > 0),
+    
+    maMauDon: yup
+        .string()
+        .required("Mã biểu mẫu là bắt buộc")
+        .min(2, "Mã biểu mẫu phải có ít nhất 2 ký tự")
+        .max(45, "Mã biểu mẫu không được vượt quá 45 ký tự")
+        .test('trim', 'Mã biểu mẫu là bắt buộc', value => value && value.trim().length > 0),
     
     moTa: yup
         .string()
-        .nullable()
-        .max(1000, "Mô tả không được vượt quá 1000 ký tự"),
-    
+        .nullable(),    
     file: yup
         .mixed()
         .nullable()
-        .test('fileType', 'Chỉ chấp nhận file PDF', (value) => {
+        .test('fileType', 'Chỉ chấp nhận file PDF, DOC, DOCX', (value) => {
             if (!value) return true;
-            return value.type === 'application/pdf';
+            const allowedTypes = [
+                'application/pdf',
+                'application/msword',
+                'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+            ];
+            return allowedTypes.includes(value.type);
         })
         .test('fileSize', 'Kích thước file không được vượt quá 10MB', (value) => {
             if (!value) return true;
@@ -58,15 +78,11 @@ export const updateTemplateSchema = yup.object().shape({
 });
 
 export async function validateTemplateForm(templateData, isEditMode = false) {
-    console.log('validateTemplateForm called with:', { templateData, isEditMode });
     
     const schema = isEditMode ? updateTemplateSchema : createTemplateSchema;
-    
-    console.log('Schema selected:', isEditMode ? 'update' : 'create');
-    
+        
     const result = await validateSchema(schema, templateData);
-    console.log('Validation result:', result);
-    
+        
     return { isValid: result.valid, errors: result.errors };
 }
 

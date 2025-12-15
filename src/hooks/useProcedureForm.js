@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { validateFormalityForm } from '../validator/formalityValidator';
 import { INITIAL_FORM_STATE, transformInitialData, cleanFormData } from '../components/procedures/transformProcedureData';
+import { showToast } from '../utils/toastNotification';
 
 export const useProcedureForm = ({ initialData, mode, isOpen, onSubmit }) => {
     const [formData, setFormData] = useState(INITIAL_FORM_STATE);
@@ -49,7 +50,7 @@ export const useProcedureForm = ({ initialData, mode, isOpen, onSubmit }) => {
             {
                 ten_buoc: '',
                 mo_ta_buoc: '',
-                thu_tu_buoc: formData.trinhTuThucHien.length + 1
+                thu_tu_buoc: null
             }
         ];
         updateField('trinhTuThucHien', newSteps);
@@ -68,6 +69,37 @@ export const useProcedureForm = ({ initialData, mode, isOpen, onSubmit }) => {
         updateField('trinhTuThucHien', newSteps);
     };
 
+    const moveStep = (index, direction) => {
+        const newSteps = [...formData.trinhTuThucHien];
+        const targetIndex = direction === 'up' ? index - 1 : index + 1;
+        
+        if (targetIndex < 0 || targetIndex >= newSteps.length) {
+            return;
+        }
+
+        [newSteps[index], newSteps[targetIndex]] = [newSteps[targetIndex], newSteps[index]];
+        
+        const reorderedSteps = newSteps.map((step, i) => ({
+            ...step,
+            thu_tu_buoc: i + 1
+        }));
+        
+        updateField('trinhTuThucHien', reorderedSteps);
+    };
+
+    const reorderSteps = (oldIndex, newIndex) => {
+        const newSteps = [...formData.trinhTuThucHien];
+        const [movedStep] = newSteps.splice(oldIndex, 1);
+        newSteps.splice(newIndex, 0, movedStep);
+        
+        const reorderedSteps = newSteps.map((step, i) => ({
+            ...step,
+            thu_tu_buoc: i + 1
+        }));
+        
+        updateField('trinhTuThucHien', reorderedSteps);
+    };
+
     const addCachThucHien = () => {
         const newCachThucHien = [
             ...formData.cachThuThucHien,
@@ -75,7 +107,7 @@ export const useProcedureForm = ({ initialData, mode, isOpen, onSubmit }) => {
                 hinh_thuc_ap_dung: '',
                 mo_ta_chi_tiet: '',
                 thoi_gian_giai_quyet: '',
-                le_phi: 0,
+                le_phi: '',
                 ghi_chu_le_phi: ''
             }
         ];
@@ -98,8 +130,8 @@ export const useProcedureForm = ({ initialData, mode, isOpen, onSubmit }) => {
             ...formData.danhSachMauDon,
             {
                 id: '',
-                so_luong_ban_chinh: 0,
-                so_luong_ban_sao: 0,
+                so_luong_ban_chinh: null,
+                so_luong_ban_sao: null,
                 ghi_chu: ''
             }
         ];
@@ -117,12 +149,90 @@ export const useProcedureForm = ({ initialData, mode, isOpen, onSubmit }) => {
         updateField('danhSachMauDon', newMauDon);
     };
 
+    const addTruongHop = (initialValues = {}) => {
+        const current = formData.truongHopThuTuc || [];
+        const newIndex = current.length;
+        const defaultItem = {
+            ten_truong_hop: '',
+            mo_ta: '',
+            thu_tu: newIndex + 1,
+            thanh_phan_ho_so: []
+        };
+
+        const newItem = {
+            ...defaultItem,
+            ...(initialValues || {})
+        };
+
+        const newTruongHop = [...current, newItem];
+        updateField('truongHopThuTuc', newTruongHop);
+    };
+
+    const removeTruongHop = (index) => {
+        const newTruongHop = formData.truongHopThuTuc
+            .filter((_, i) => i !== index)
+            .map((item, i) => ({ ...item, thu_tu: i + 1 }));
+        updateField('truongHopThuTuc', newTruongHop);
+    };
+
+    const updateTruongHop = (index, fieldOrUpdates, value) => {
+        const newTruongHop = [...formData.truongHopThuTuc];
+        if (typeof fieldOrUpdates === 'object') {
+            newTruongHop[index] = { ...newTruongHop[index], ...fieldOrUpdates };
+        } else {
+            newTruongHop[index] = { ...newTruongHop[index], [fieldOrUpdates]: value };
+        }
+        updateField('truongHopThuTuc', newTruongHop);
+    };
+
+    const addThanhPhanHoSo = (caseIndex, initialValues = {}) => {
+        const newTruongHop = [...formData.truongHopThuTuc];
+        if (!newTruongHop[caseIndex]) {
+            return;
+        }
+        if (!newTruongHop[caseIndex].thanh_phan_ho_so) {
+            newTruongHop[caseIndex].thanh_phan_ho_so = [];
+        }
+
+        const defaultComponent = {
+            ten_thanh_phan: '',
+            mo_ta_chi_tiet: '',
+            so_luong_ban_chinh: null,
+            so_luong_ban_sao: null,
+            ghi_chu: ''
+        };
+
+        const newComponent = {
+            ...defaultComponent,
+            ...(initialValues || {})
+        };
+
+        newTruongHop[caseIndex].thanh_phan_ho_so.push(newComponent);
+        updateField('truongHopThuTuc', newTruongHop);
+    };
+
+    const removeThanhPhanHoSo = (caseIndex, componentIndex) => {
+        const newTruongHop = [...formData.truongHopThuTuc];
+        newTruongHop[caseIndex].thanh_phan_ho_so = newTruongHop[caseIndex].thanh_phan_ho_so.filter(
+            (_, i) => i !== componentIndex
+        );
+        updateField('truongHopThuTuc', newTruongHop);
+    };
+
+    const updateThanhPhanHoSo = (caseIndex, componentIndex, field, value) => {
+        const newTruongHop = [...formData.truongHopThuTuc];
+        newTruongHop[caseIndex].thanh_phan_ho_so[componentIndex] = {
+            ...newTruongHop[caseIndex].thanh_phan_ho_so[componentIndex],
+            [field]: value
+        };
+        updateField('truongHopThuTuc', newTruongHop);
+    };
+
     const handleSubmit = async () => {
         const validation = await validateFormalityForm(formData, mode === 'edit');
-
         if (!validation.isValid) {
             setErrors(validation.errors);
-            alert('Vui lòng kiểm tra lại các trường bắt buộc!');
+            showToast.error('Vui lòng kiểm tra lại các trường bắt buộc!');
             return;
         }
 
@@ -132,10 +242,12 @@ export const useProcedureForm = ({ initialData, mode, isOpen, onSubmit }) => {
         setErrors({});
 
         try {
-            await onSubmit(cleanedData);
-            resetForm();
+            const result = await onSubmit(cleanedData);
+            if (result?.success !== false) {
+                resetForm();
+            }
         } catch (error) {
-            alert('Có lỗi xảy ra khi lưu thủ tục!');
+            showToast.error('Có lỗi xảy ra khi lưu thủ tục!');
         } finally {
             setIsSubmitting(false);
         }
@@ -151,12 +263,20 @@ export const useProcedureForm = ({ initialData, mode, isOpen, onSubmit }) => {
         addStep,
         removeStep,
         updateStep,
+        moveStep,
+        reorderSteps,
         addMauDon,
         removeMauDon,
         updateMauDon,
         addCachThucHien,
         removeCachThucHien,
         updateCachThucHien,
+        addTruongHop,
+        removeTruongHop,
+        updateTruongHop,
+        addThanhPhanHoSo,
+        removeThanhPhanHoSo,
+        updateThanhPhanHoSo,
         handleSubmit,
         resetForm
     };

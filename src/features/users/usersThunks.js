@@ -3,9 +3,9 @@ import UserService from '../../services/userService';
 
 export const fetchUsers = createAsyncThunk(
     'users/fetchUsers',
-    async ({ page = 1, size = 10 } = {}, { rejectWithValue }) => {
+    async ({ page = 1, size = 10, isActive, vaiTro, search } = {}, { rejectWithValue }) => {
         try {
-            const response = await UserService.getAllUsers({ page, size });
+            const response = await UserService.getAllUsers({ page, size, isActive, vaiTro, search });
             return {
                 users: response.content || [],
                 pagination: {
@@ -53,6 +53,30 @@ export const deleteUser = createAsyncThunk(
             return userId;
         } catch (error) {
             return rejectWithValue(error.message || 'Không thể xóa tài khoản');
+        }
+    }
+);
+
+export const updateUserStatus = createAsyncThunk(
+    'users/updateUserStatus',
+    async ({ userId, isActive }, { rejectWithValue }) => {
+        try {
+            await UserService.updateUserStatus(userId, isActive);
+            return { userId, isActive };
+        } catch (error) {
+            return rejectWithValue(error.message || 'Không thể cập nhật trạng thái tài khoản');
+        }
+    }
+);
+
+export const getUserById = createAsyncThunk(
+    'users/getUserById',
+    async (userId, { rejectWithValue }) => {
+        try {
+            const result = await UserService.getUserById(userId);
+            return result;
+        } catch (error) {
+            return rejectWithValue(error.message || 'Không thể tải thông tin người dùng');
         }
     }
 );

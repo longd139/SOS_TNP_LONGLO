@@ -1,13 +1,12 @@
 import { useState, useEffect, useCallback } from 'react';
-import { ROLE } from '../constants/role';
 import { validateUserForm } from '../validator/userValidator';
+import { showToast } from '../utils/toastNotification';
 
 const INITIAL_FORM_STATE = {
     username: '',
     fullName: '',
     email: '',
-    phone: '',
-    role: ROLE.NHAN_VIEN,
+    role: '',
     password: '',
     confirmPassword: '',
     active: true
@@ -28,7 +27,7 @@ export const useUserForm = ({ initialUser = null, isOpen = false }) => {
                     fullName: initialUser.fullName || '',
                     email: initialUser.email || '',
                     phone: initialUser.phone || '',
-                    role: initialUser.role || ROLE.NHAN_VIEN,
+                    role: initialUser.role || initialUser.vai_tro || '',
                     password: '',
                     confirmPassword: '',
                     active: initialUser.active !== false
@@ -66,9 +65,11 @@ export const useUserForm = ({ initialUser = null, isOpen = false }) => {
         try {
             const result = await validateUserForm(formData, isEditMode, true);
             setErrors(result.errors || {});
+            if (!result.isValid) {
+                showToast.error('Vui lòng kiểm tra lại các trường bắt buộc!');
+            }
             return result.isValid;
         } catch (error) {
-            console.error('Validation error:', error);
             return false;
         }
     }, [formData, isEditMode]);
@@ -80,25 +81,24 @@ export const useUserForm = ({ initialUser = null, isOpen = false }) => {
     }, []);
 
     const prepareSubmitData = useCallback(() => {
-        const submitData = { ...formData };
-
         if (isEditMode) {
-            delete submitData.username;
-            delete submitData.email;
-            delete submitData.password;
-            delete submitData.confirmPassword;
+            return {
+                fullName: formData.fullName?.trim() || '',
+                phone: formData.phone?.trim() || '',
+                role: formData.role,
+                username: formData.username?.trim() || '',
+                email: formData.email?.trim() || '',
+                password: formData.password.trim() || undefined,
+            };
         } else {
-            delete submitData.fullName;
-            delete submitData.phone;
-            delete submitData.active;
-            delete submitData.confirmPassword;
+            // Create mode - no phone field
+            return {
+                username: formData.username?.trim() || '',
+                email: formData.email?.trim() || '',
+                password: formData.password,
+                role: formData.role
+            };
         }
-
-        if (submitData.phone) {
-            submitData.phone = submitData.phone.trim();
-        }
-
-        return submitData;
     }, [formData, isEditMode]);
 
     return {

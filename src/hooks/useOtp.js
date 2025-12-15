@@ -39,7 +39,6 @@ export const useOtp = () => {
         setMessage("Xác thực OTP thành công!");
         return { success: true, data };
       }
-
       const msg = data?.message || "OTP không hợp lệ hoặc đã hết hạn.";
       setError(msg);
       return { success: false, message: msg };

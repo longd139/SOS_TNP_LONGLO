@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { jwtDecode } from 'jwt-decode';
@@ -7,8 +7,11 @@ import ROUTE_PATH from '../constants/routes';
 export const useAuthRedirect = () => {
     const { isAuthenticated } = useAuth();
     const navigate = useNavigate();
+    const hasChecked = useRef(false);
 
     useEffect(() => {
+        if (hasChecked.current) return;
+        
         const checkAuth = () => {
             const accessToken = localStorage.getItem('accessToken');
 
@@ -19,7 +22,6 @@ export const useAuthRedirect = () => {
                         navigate(ROUTE_PATH.DASHBOARD, { replace: true });
                     }
                 } catch (error) {
-                    console.error('Invalid token:', error);
                     localStorage.removeItem('accessToken');
                     localStorage.removeItem('refreshToken');
                 }
@@ -27,5 +29,6 @@ export const useAuthRedirect = () => {
         };
 
         checkAuth();
-    }, [isAuthenticated, navigate]);
+        hasChecked.current = true;
+    }, []);
 };

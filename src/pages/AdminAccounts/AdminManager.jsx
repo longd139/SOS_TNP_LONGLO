@@ -1,9 +1,13 @@
 import { useState } from 'react';
-import BaseTable from '../../components/BaseTable';
+import BaseTable from '../../components/base/BaseTable';
 import UserModal from '../../components/users/UserModal';
-import { ConfirmModal } from '../../components/BaseModal';
-import { ROLE_LABELS, ROLE_COLORS } from '../../constants/role';
+import UserFilter from '../../components/admin/UserFilter';
+import UserViewModal from '../../components/users/UserViewModal';
+import { ConfirmModal } from '../../components/base/BaseModal';
 import { useUsers } from '../../hooks/useUsers';
+import { usePermission } from '../../hooks/usePermission';
+import { PermissionHidden } from '../../components/PermissionGuard';
+import { showToast } from '../../utils/toastNotification';
 
 export default function AdminManager() {
     const {
@@ -11,19 +15,37 @@ export default function AdminManager() {
         loading,
         pagination,
         statistics,
+        selectedUserDetail,
+        detailLoading,
         handlePageChange,
+        loadUsers,
         createUser,
         updateUser,
-        deleteUser: deleteUserAction
+        updateStatus,
+        deleteUser: deleteUserAction,
+        getUserById,
+        clearUserDetail
     } = useUsers();
 
+    const { canUpdate, canDelete, canView, canUpdateStatus } = usePermission();
+
     const [modalLoading, setModalLoading] = useState(false);
+    const [filters, setFilters] = useState({
+        searchKeyword: '',
+        isActive: '',
+        vaiTro: ''
+    });
     const [userModal, setUserModal] = useState({
         isOpen: false,
         user: null
     });
 
     const [deleteModal, setDeleteModal] = useState({
+        isOpen: false,
+        user: null
+    });
+
+    const [viewModal, setViewModal] = useState({
         isOpen: false,
         user: null
     });
@@ -49,6 +71,40 @@ export default function AdminManager() {
         });
     };
 
+    const handleViewUser = async (user) => {
+        try {
+            setViewModal({
+                isOpen: true,
+                user: null
+            });
+
+            await getUserById(user.id);
+
+            setViewModal({
+                isOpen: true,
+                user: user
+            });
+        } catch (error) {
+            showToast.error(error.message || 'Không thể tải thông tin người dùng');
+            setViewModal({
+                isOpen: false,
+                user: null
+            });
+        }
+    };
+
+    const handleViewModalClose = () => {
+        setViewModal({
+            isOpen: false,
+            user: null
+        });
+        clearUserDetail();
+    };
+
+    const canDeleteUser = (user) => {
+        return !user.active;
+    };
+
     const handleUserModalSubmit = async (userData) => {
         try {
             setModalLoading(true);
@@ -58,16 +114,28 @@ export default function AdminManager() {
                     ...userData,
                     id: userModal.user.id
                 });
-                alert('Cập nhật tài khoản thành công!');
+                showToast.success('Cập nhật tài khoản thành công!');
             } else {
                 await createUser(userData);
-                alert('Tạo tài khoản thành công!');
+                showToast.success('Tạo tài khoản thành công!');
             }
 
             setUserModal({ isOpen: false, user: null });
 
-        } catch (error) {
-            alert(error.message || 'Có lỗi xảy ra!');
+        } catch (error) {            
+            if (error?.errors && Array.isArray(error.errors) && error.errors.length > 0) {
+                error.errors.forEach((err) => {
+                    if (err?.message) {
+                        showToast.error(err.message);
+                    }
+                });
+            } else if (error?.message) {
+                showToast.error(error.message);
+            } else if (typeof error === 'string') {
+                showToast.error(error);
+            } else {
+                showToast.error('Có lỗi xảy ra khi thực hiện thao tác');
+            }
         } finally {
             setModalLoading(false);
         }
@@ -80,16 +148,77 @@ export default function AdminManager() {
     const handleDeleteConfirm = async () => {
         try {
             await deleteUserAction(deleteModal.user.id);
-            alert('Xóa tài khoản thành công.');
+            showToast.success('Xóa tài khoản thành công.');
             setDeleteModal({ isOpen: false, user: null });
 
         } catch (error) {
-            alert(error.message || 'Có lỗi xảy ra khi xóa tài khoản!');
+            showToast.error(error.message || 'Có lỗi xảy ra khi xóa tài khoản!' || error);
         }
     };
 
     const handleDeleteCancel = () => {
         setDeleteModal({ isOpen: false, user: null });
+    };
+
+    const handleUpdateStatus = async (user) => {
+        try {
+            await updateStatus(user.id, !user.active);
+            showToast.success(`Tài khoản đã được ${!user.active ? 'kích hoạt' : 'vô hiệu hóa'} thành công!`);
+        } catch (error) {
+            showToast.error(error.message || 'Có lỗi xảy ra khi cập nhật trạng thái tài khoản!' || error);
+        }
+    };
+
+    const handleFilterChange = (key, value) => {
+        setFilters(prev => ({ ...prev, [key]: value }));
+    };
+
+    const handleSearch = () => {
+        loadUsers(1, pagination.pageSize, {
+            isActive: filters.isActive !== '' ? filters.isActive : undefined,
+            vaiTro: filters.vaiTro !== '' ? filters.vaiTro : undefined,
+            search: filters.searchKeyword !== '' ? filters.searchKeyword : undefined
+        });
+    };
+
+    const handleSearchWithFilters = (newFilters) => {
+        const { searchKeyword, isActive, vaiTro, pageSize } = newFilters;
+
+        setFilters({
+            searchKeyword: searchKeyword || '',
+            isActive: isActive !== undefined ? isActive : '',
+            vaiTro: vaiTro || ''
+        });
+
+        loadUsers(1, pageSize || pagination.pageSize, {
+            isActive: isActive !== undefined ? isActive : undefined,
+            vaiTro: vaiTro || undefined,
+            search: searchKeyword || undefined
+        });
+    };
+
+    const handleResetFilters = () => {
+        setFilters({
+            searchKeyword: '',
+            isActive: '',
+            vaiTro: ''
+        });
+        loadUsers(1, pagination.pageSize);
+    };
+
+    const handlePageSizeChange = (newPageSize) => {
+        loadUsers(1, newPageSize, {
+            isActive: filters.isActive !== '' ? filters.isActive : undefined,
+            vaiTro: filters.vaiTro !== '' ? filters.vaiTro : undefined,
+            search: filters.searchKeyword !== '' ? filters.searchKeyword : undefined
+        });
+    };
+
+    const handlePageChangeWithFilters = (page) => {
+        handlePageChange(page, {
+            isActive: filters.isActive !== '' ? filters.isActive : undefined,
+            vaiTro: filters.vaiTro !== '' ? filters.vaiTro : undefined,
+        });
     };
 
     const columns = [
@@ -106,7 +235,7 @@ export default function AdminManager() {
             key: 'username',
             width: '150px',
             render: (value) => (
-                <span 
+                <span
                     className="block max-w-[150px] truncate text-ellipsis overflow-hidden whitespace-nowrap text-sm"
                     title={value}
                 >
@@ -120,7 +249,7 @@ export default function AdminManager() {
             key: 'fullName',
             width: '180px',
             render: (value) => (
-                <span 
+                <span
                     className="block max-w-[180px] truncate text-ellipsis overflow-hidden whitespace-nowrap text-sm"
                     title={value}
                 >
@@ -132,10 +261,10 @@ export default function AdminManager() {
             title: 'Email',
             dataIndex: 'email',
             key: 'email',
-            width: '200px',
+            width: '300px',
             render: (value) => (
-                <span 
-                    className="block max-w-[200px] truncate text-ellipsis overflow-hidden whitespace-nowrap text-sm"
+                <span
+                    className="block max-w-[300px] truncate text-ellipsis overflow-hidden whitespace-nowrap text-sm"
                     title={value}
                 >
                     {value}
@@ -146,21 +275,40 @@ export default function AdminManager() {
             title: 'Vai trò',
             dataIndex: 'role',
             key: 'role',
+            width: '100px',
             render: (role) => (
-                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${ROLE_COLORS[role] || 'bg-gray-100 text-gray-800'
-                    }`}>
-                    {ROLE_LABELS[role] || role}
+                <span className='block max-w-[300px] truncate text-ellipsis overflow-hidden whitespace-nowrap text-sm'>
+                    {role}
                 </span>
             )
         },
         {
-            title: 'Trạng thái',
-            dataIndex: 'status',
-            key: 'status',
-            render: (status, record) => (
-                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${record.active !== false ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                    }`}>
-                    {record.active !== false ? 'Hoạt động' : 'Đã khóa'}
+            title: 'SỐ ĐIỆN THOẠI',
+            dataIndex: 'phone',
+            key: 'phone',
+            width: '150px',
+            render: (value) => (
+                <span
+                    className="block max-w-[150px] truncate text-ellipsis overflow-hidden whitespace-nowrap text-sm text-gray-900"
+                    title={value}
+                >
+                    {value}
+                </span>
+            )
+        },
+        {
+            title: 'TRẠNG THÁI',
+            dataIndex: 'active',
+            key: 'active',
+            width: '150px',
+            render: (value) => (
+                <span
+                    className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${value
+                            ? 'bg-green-100 text-green-800'
+                            : 'bg-red-100 text-red-800'
+                        }`}
+                >
+                    {value ? 'Hoạt động' : 'Đã khóa'}
                 </span>
             )
         }
@@ -175,16 +323,28 @@ export default function AdminManager() {
                         Quản lý người dùng và phân quyền hệ thống
                     </p>
                 </div>
-                <button
-                    onClick={handleCreateUser}
-                    className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                >
-                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                    </svg>
-                    Thêm tài khoản mới
-                </button>
+                <PermissionHidden modulePrefix="ND" action="CREATE">
+                    <button
+                        onClick={handleCreateUser}
+                        className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                    >
+                        <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                        </svg>
+                        Thêm tài khoản mới
+                    </button>
+                </PermissionHidden>
             </div>
+
+            <UserFilter
+                filters={filters}
+                pagination={pagination}
+                onFilterChange={handleFilterChange}
+                onSearch={handleSearch}
+                onReset={handleResetFilters}
+                onPageSizeChange={handlePageSizeChange}
+                onSearchWithFilters={handleSearchWithFilters}
+            />
 
             <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
                 <div className="bg-white overflow-hidden shadow rounded-lg">
@@ -289,9 +449,12 @@ export default function AdminManager() {
                 columns={columns}
                 loading={loading}
                 pagination={pagination}
-                onPageChange={handlePageChange}
+                onPageChange={handlePageChangeWithFilters}
+                onView={handleViewUser}
                 onEdit={handleEditUser}
                 onDelete={handleDeleteUser}
+                canDelete={canDeleteUser}
+                onUpdateStatus={handleUpdateStatus}
                 emptyMessage="Không có tài khoản nào"
             />
 
@@ -301,6 +464,13 @@ export default function AdminManager() {
                 onSubmit={handleUserModalSubmit}
                 user={userModal.user}
                 loading={modalLoading}
+            />
+
+            <UserViewModal
+                isOpen={viewModal.isOpen}
+                onClose={handleViewModalClose}
+                userData={selectedUserDetail}
+                loading={detailLoading}
             />
 
             <ConfirmModal

@@ -1,17 +1,20 @@
 # dependencies
+
 node_modules
-**/node_modules
+\*\*/node_modules
 
 # git
+
 .git
 .gitignore
 
 # ci/cd
+
 Jenkinsfile
 
 # local env, logs, caches
-.env
-*.log
+
+\*.log
 .cache
 tmp
 dist
@@ -19,5 +22,6 @@ build
 coverage
 
 # docker build artifacts
+
 Dockerfile
 docker-compose.yml

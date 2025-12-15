@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from 'react';
+import { useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
     fetchProcedures,
@@ -6,12 +6,13 @@ import {
     createProcedure as createProcedureThunk,
     updateProcedure as updateProcedureThunk,
     deleteProcedure as deleteProcedureThunk,
-    fetchProcedureById
+    fetchProcedureById,
+    updateProcedureStatus
 } from '../features/procedures/proceduresThunks';
 import {
     setFilters,
     resetFilters as resetFiltersAction,
-    setShowRemoved,
+    setShowActive,
     clearCurrentProcedure,
     clearError
 } from '../features/procedures/proceduresSlice';
@@ -24,7 +25,7 @@ import {
     selectError,
     selectPagination,
     selectFilters,
-    selectShowRemoved,
+    selectShowActive,
     selectProceduresWithAreas
 } from '../features/procedures/proceduresSelectors';
 
@@ -39,7 +40,7 @@ export const useProcedure = () => {
     const error = useSelector(selectError);
     const pagination = useSelector(selectPagination);
     const filters = useSelector(selectFilters);
-    const showRemoved = useSelector(selectShowRemoved);
+    const showActive = useSelector(selectShowActive);
     const proceduresWithAreas = useSelector(selectProceduresWithAreas);
 
     const loadProcedures = useCallback((
@@ -47,14 +48,14 @@ export const useProcedure = () => {
         size = 10,
         search = '',
         id_linh_vuc = '',
-        is_removed = false
+        isActive = true
     ) => {
         dispatch(fetchProcedures({
             page,
             size,
             search,
             id_linh_vuc,
-            is_removed
+            isActive
         }));
     }, [dispatch]);
 
@@ -65,72 +66,38 @@ export const useProcedure = () => {
     const createProcedure = useCallback(async (formData) => {
         try {
             const result = await dispatch(createProcedureThunk(formData)).unwrap();
-
-            dispatch(fetchProcedures({
-                page: pagination.current,
-                size: pagination.pageSize,
-                search: filters.searchKeyword,
-                id_linh_vuc: filters.selectedDomain,
-                is_removed: showRemoved
-            }));
-
-            alert('Tạo thủ tục thành công!');
             return { success: true };
         } catch (error) {
-            alert('Có lỗi xảy ra khi tạo thủ tục!');
-            return { success: false, error };
+            return { success: false, error: { message: error } };
         }
-    }, [dispatch, pagination, filters, showRemoved]);
+    }, [dispatch]);
 
     const updateProcedure = useCallback(async (procedureId, formData) => {
         try {
             const result = await dispatch(updateProcedureThunk({ procedureId, formData })).unwrap();
-
-            dispatch(fetchProcedures({
-                page: pagination.current,
-                size: pagination.pageSize,
-                search: filters.searchKeyword,
-                id_linh_vuc: filters.selectedDomain,
-                is_removed: showRemoved
-            }));
-
-            alert('Cập nhật thủ tục thành công!');
             return { success: true };
         } catch (error) {
-            alert('Có lỗi xảy ra khi cập nhật thủ tục!');
-            return { success: false, error };
+            return { success: false, error: { message: error } };
         }
-    }, [dispatch, pagination, filters, showRemoved]);
+    }, [dispatch]);
 
     const deleteProcedure = useCallback(async (procedureId, procedureName) => {
         try {
             const result = await dispatch(deleteProcedureThunk({ procedureId, procedureName })).unwrap();
-
-            dispatch(fetchProcedures({
-                page: pagination.current,
-                size: pagination.pageSize,
-                search: filters.searchKeyword,
-                id_linh_vuc: filters.selectedDomain,
-                is_removed: showRemoved
-            }));
-
-            alert('Đã xóa thủ tục thành công.');
             return { success: true };
         } catch (error) {
             if (error === 'User cancelled') {
                 return { success: false, cancelled: true };
             }
-            alert('Có lỗi xảy ra khi xóa thủ tục!');
-            return { success: false, error };
+            return { success: false, error: { message: error } };
         }
-    }, [dispatch, pagination, filters, showRemoved]);
+    }, [dispatch]);
 
     const getProcedureById = useCallback(async (procedureId) => {
         try {
             const result = await dispatch(fetchProcedureById(procedureId)).unwrap();
             return { success: true, data: result };
         } catch (error) {
-            alert('Có lỗi xảy ra khi lấy thông tin thủ tục!');
             return { success: false, error };
         }
     }, [dispatch]);
@@ -141,9 +108,9 @@ export const useProcedure = () => {
             size: pagination.pageSize,
             search: filters.searchKeyword,
             id_linh_vuc: filters.selectedDomain,
-            is_removed: showRemoved
+            isActive: showActive
         }));
-    }, [dispatch, pagination.pageSize, filters, showRemoved]);
+    }, [dispatch, pagination.pageSize, filters, showActive]);
 
     const changePage = useCallback((page) => {
         dispatch(fetchProcedures({
@@ -151,9 +118,9 @@ export const useProcedure = () => {
             size: pagination.pageSize,
             search: filters.searchKeyword,
             id_linh_vuc: filters.selectedDomain,
-            is_removed: showRemoved
+            isActive: showActive
         }));
-    }, [dispatch, pagination.pageSize, filters, showRemoved]);
+    }, [dispatch, pagination.pageSize, filters, showActive]);
 
     const changePageSize = useCallback((size) => {
         dispatch(fetchProcedures({
@@ -161,9 +128,9 @@ export const useProcedure = () => {
             size,
             search: filters.searchKeyword,
             id_linh_vuc: filters.selectedDomain,
-            is_removed: showRemoved
+            isActive: showActive
         }));
-    }, [dispatch, filters, showRemoved]);
+    }, [dispatch, filters, showActive]);
 
     const updateFilters = useCallback((newFilters) => {
         dispatch(setFilters(newFilters));
@@ -171,17 +138,21 @@ export const useProcedure = () => {
 
     const resetFilters = useCallback(() => {
         dispatch(resetFiltersAction());
+    }, [dispatch]);
+
+    const resetFiltersAndFetch = useCallback(() => {
+        dispatch(resetFiltersAction());
         dispatch(fetchProcedures({
             page: 1,
             size: pagination.pageSize,
             search: '',
             id_linh_vuc: '',
-            is_removed: showRemoved
+            isActive: showActive
         }));
-    }, [dispatch, pagination.pageSize, showRemoved]);
+    }, [dispatch, pagination.pageSize, showActive]);
 
-    const toggleShowRemoved = useCallback((value) => {
-        dispatch(setShowRemoved(value));
+    const toggleShowActive = useCallback((value) => {
+        dispatch(setShowActive(value));
     }, [dispatch]);
 
     const clearCurrent = useCallback(() => {
@@ -192,10 +163,17 @@ export const useProcedure = () => {
         dispatch(clearError());
     }, [dispatch]);
 
-    useEffect(() => {
-        loadProcedures(1, pagination.pageSize, filters.searchKeyword, filters.selectedDomain, showRemoved);
-        loadAreas();
-    }, [showRemoved]); 
+    const handleUpdateStatus = useCallback(
+        async (procedureId, isActive) => {
+            const result = await dispatch(updateProcedureStatus({ procedureId, isActive }));
+            if (updateProcedureStatus.fulfilled.match(result)) {
+                return { success: true };
+            } else {
+                throw new Error(result.payload || 'Không thể cập nhật trạng thái thủ tục');
+            }
+        },
+        [dispatch]
+    );
 
     return {
         procedures,
@@ -206,7 +184,7 @@ export const useProcedure = () => {
         error,
         pagination,
         filters,
-        showRemoved,
+        showActive,
         proceduresWithAreas,
 
         loadProcedures,
@@ -220,8 +198,10 @@ export const useProcedure = () => {
         changePageSize,
         updateFilters,
         resetFilters,
-        toggleShowRemoved,
+        resetFiltersAndFetch,
+        toggleShowActive,
         clearCurrent,
-        clearErrorMessage
+        clearErrorMessage,
+        handleUpdateStatus
     };
 };

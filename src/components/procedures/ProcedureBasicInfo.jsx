@@ -15,23 +15,20 @@ const ProcedureBasicInfo = ({ formData, errors, updateField }) => {
     const containerRef = useRef(null);
 
     useEffect(() => {
-        if (!search) {
-            setResults([]);
-            return;
-        }
-
         const t = setTimeout(async () => {
             setLoading(true);
             try {
-                const resp = await GOVERNMENT_API.getGovernment({ search, isRemoved: false, size: 10 });
-                setResults(resp.content || []);
-                setShowDropdown(true);
+                const resp = await GOVERNMENT_API.getGovermentNoPagination({
+                    search: search,
+                    isActive: true
+                });
+                setResults(resp || []);
             } catch (err) {
                 setResults([]);
             } finally {
                 setLoading(false);
             }
-        }, 300);
+        }, search ? 300 : 0);
 
         return () => clearTimeout(t);
     }, [search]);
@@ -70,7 +67,22 @@ const ProcedureBasicInfo = ({ formData, errors, updateField }) => {
 
     const handleCreateSuccess = (created) => {
         if (!created) return;
-        handleSelect(created);
+        const payload = created.data || created;
+
+        const idCandidate = payload?.id ?? payload?._id ?? payload?.Id ?? payload?.ID;
+        const id = (typeof idCandidate === 'string' || typeof idCandidate === 'number') ? idCandidate : null;
+
+        const nameCandidate = payload?.ten_co_so || payload?.tenCoSo || payload?.name || '';
+        const name = typeof nameCandidate === 'string' ? nameCandidate : '';
+
+        if (!id && !name) return;
+
+        if (id) updateField('idCoSoDichVuCong', id);
+        if (name) {
+            updateField('tenCoSoDichVuCong', name);
+            setSearch(name);
+        }
+        setShowDropdown(false);
     };
 
     const handleKeyDown = (e) => {
@@ -91,7 +103,7 @@ const ProcedureBasicInfo = ({ formData, errors, updateField }) => {
                     <label className="block text-sm font-medium text-gray-700 mb-2 required-label">
                         Mã CSDVC
                     </label>
-                    <div className="flex gap-2">
+                    <div className="flex items-start gap-2">
                         <div className="flex-1">
                             <input
                                 type="text"
@@ -99,25 +111,28 @@ const ProcedureBasicInfo = ({ formData, errors, updateField }) => {
                                 onChange={(e) => {
                                     const v = e.target.value;
                                     setSearch(v);
-                                    if (!v) {
+                                    if (!v && formData.idCoSoDichVuCong) {
                                         updateField('idCoSoDichVuCong', '');
                                         updateField('tenCoSoDichVuCong', '');
-                                        setResults([]);
-                                        setShowDropdown(false);
-                                    } else {
+                                    } else if (v && formData.idCoSoDichVuCong) {
                                         updateField('idCoSoDichVuCong', '');
                                     }
                                 }}
-                                onFocus={() => { if (results.length) setShowDropdown(true); }}
+                                onFocus={() => { 
+                                    setShowDropdown(true);
+                                    if (!search && results.length === 0) {
+                                        setSearch('');
+                                    }
+                                }}
                                 onKeyDown={handleKeyDown}
                                 placeholder="Tìm hoặc chọn cơ sở..."
-                                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.idCoSoDichVuCong ? 'border-red-500' : 'border-gray-300'}`}
+                                className={`w-full px-3 bg-gray-200 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.idCoSoDichVuCong ? 'border-red-500' : 'border-gray-300'}`}
                             />
                             {errors.idCoSoDichVuCong && (
                                 <p className="mt-1 text-sm text-red-600">{errors.idCoSoDichVuCong}</p>
                             )}
 
-                            {showDropdown && (results.length > 0 || loading) && (
+                            {showDropdown && (
                                 <div className="absolute z-40 left-0 right-[52px] mt-1 bg-white border rounded-md shadow-lg max-h-60 overflow-auto">
                                     {loading && (
                                         <div className="p-2 text-sm text-gray-500">Đang tìm...</div>
@@ -133,8 +148,8 @@ const ProcedureBasicInfo = ({ formData, errors, updateField }) => {
                                             onMouseEnter={() => setHighlightedIndex(idx)}
                                             className={`w-full text-left px-3 py-2 hover:bg-gray-100 ${highlightedIndex === idx ? 'bg-blue-100' : ''}`}
                                         >
-                                            <div className="font-medium">{r.ten_co_so}</div>
-                                            <div className="text-xs text-gray-500">{r.dia_chi}</div>
+                                            <div className="font-medium truncate">{r.ten_co_so}</div>
+                                            <div className="text-xs text-gray-500 truncate">{r.dia_chi}</div>
                                         </button>
                                     ))}
                                 </div>
@@ -144,7 +159,7 @@ const ProcedureBasicInfo = ({ formData, errors, updateField }) => {
                         <button
                             type="button"
                             onClick={() => setOpenCreate(true)}
-                            className="flex-shrink-0 h-[42px] px-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors flex items-center justify-center"
+                            className="self-start flex-shrink-0 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors flex items-center justify-center"
                             title="Tạo mới cơ sở dịch vụ công"
                         >
                             <PlusCircle className="w-5 h-5" />
@@ -161,7 +176,7 @@ const ProcedureBasicInfo = ({ formData, errors, updateField }) => {
                         value={formData.maThuTuc}
                         onChange={(e) => updateField('maThuTuc', e.target.value)}
                         placeholder="Nhập mã thủ tục..."
-                        className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.maThuTuc ? 'border-red-500' : 'border-gray-300'
+                        className={`w-full px-3 py-2 bg-gray-200 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.maThuTuc ? 'border-red-500' : 'border-gray-300'
                             }`}
                     />
                     {errors.maThuTuc && (
@@ -180,7 +195,7 @@ const ProcedureBasicInfo = ({ formData, errors, updateField }) => {
                         value={formData.tenThuTuc}
                         onChange={(e) => updateField('tenThuTuc', e.target.value)}
                         placeholder="Nhập tên thủ tục..."
-                        className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.tenThuTuc ? 'border-red-500' : 'border-gray-300'
+                        className={`w-full px-3 bg-gray-200 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.tenThuTuc ? 'border-red-500' : 'border-gray-300'
                             }`}
                     />
                     {errors.tenThuTuc && (
@@ -197,7 +212,7 @@ const ProcedureBasicInfo = ({ formData, errors, updateField }) => {
                         value={formData.doiTuongThucHien}
                         onChange={(e) => updateField('doiTuongThucHien', e.target.value)}
                         placeholder="VD: Cá nhân, Tổ chức..."
-                        className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.doiTuongThucHien ? 'border-red-500' : 'border-gray-300'
+                        className={`w-full px-3 py-2 bg-gray-200 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.doiTuongThucHien ? 'border-red-500' : 'border-gray-300'
                             }`}
                     />
                     {errors.doiTuongThucHien && (

@@ -1,34 +1,21 @@
 import { USER_API } from '../apis/user';
-import { validateCreateUser, validateUpdateUser } from '../validator/userValidator';
 
 export class UserService {
 
     static async createAccount(userData) {
         try {
-            const validation = await validateCreateUser(userData);
-            if (!validation.isValid) {
-                throw new Error(Object.values(validation.errors)[0] || 'Validation failed');
-            }
-
             const result = await USER_API.createAccount(userData);
             return result;
         } catch (error) {
-            console.error('UserService.createAccount error:', error);
             throw this.formatError(error);
         }
     }
 
     static async updateUserByAdmin(userData) {
         try {
-            const validation = await validateUpdateUser(userData);
-            if (!validation.isValid) {
-                throw new Error(Object.values(validation.errors)[0] || 'Validation failed');
-            }
-
             const result = await USER_API.updateUserProfileByAdmin(userData);
             return result;
         } catch (error) {
-            console.error('UserService.updateUserByAdmin error:', error);
             throw this.formatError(error);
         }
     }
@@ -38,7 +25,6 @@ export class UserService {
             const result = await USER_API.getAllUsersWithPagination(params);
             return result;
         } catch (error) {
-            console.error('UserService.getAllUsers error:', error);
             throw this.formatError(error);
         }
     }
@@ -52,7 +38,19 @@ export class UserService {
             const result = await USER_API.deleteUser(userId);
             return result;
         } catch (error) {
-            console.error('UserService.deleteUser error:', error);
+            throw this.formatError(error);
+        }
+    }
+
+    static async updateUserStatus(userId, isActive) {
+        try {
+            if (!userId) {
+                throw new Error('User ID is required');
+            }
+
+            const result = await USER_API.updateStatus(userId, isActive);
+            return result;
+        } catch (error) {
             throw this.formatError(error);
         }
     }
@@ -62,7 +60,19 @@ export class UserService {
             const result = await USER_API.getMyProfile();
             return result;
         } catch (error) {
-            console.error('UserService.getMyProfile error:', error);
+            throw this.formatError(error);
+        }
+    }
+
+    static async getUserById(userId) {
+        try {
+            if (!userId) {
+                throw new Error('User ID is required');
+            }
+
+            const result = await USER_API.getUserById(userId);
+            return result;
+        } catch (error) {
             throw this.formatError(error);
         }
     }

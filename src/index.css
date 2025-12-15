@@ -1,6 +1,75 @@
+.pdf-exporting select {
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    background-image: none !important;
+}
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@import 'react-quill/dist/quill.snow.css';
+
+@layer base {
+    html {
+        font-size: 14px;
+    }
+
+    body {
+        font-size: 12px;
+        line-height: 1.5;
+        overflow-x: hidden; 
+    }
+
+    h1 {
+        font-size: 18px;
+        font-weight: 700;
+    }
+
+    h2 {
+        font-size: 16px;
+        font-weight: 600;
+    }
+
+    h3 {
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+    h4 {
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    label {
+        font-size: 11px;
+    }
+
+    input,
+    textarea,
+    select {
+        font-size: 12px;
+    }
+
+    button {
+        font-size: 12px;
+    }
+}
+
+/* Utility classes for better text handling */
+@layer utilities {
+    .text-wrap {
+        word-wrap: break-word;
+        overflow-wrap: anywhere;
+        white-space: normal;
+    }
+    
+    .prevent-overflow {
+        max-width: 100%;
+        overflow-wrap: anywhere;
+        word-break: break-word;
+    }
+}
 
 ::-webkit-scrollbar {
     width: 4px;
@@ -32,12 +101,12 @@
 }
 
 .sidebar-scroll::-webkit-scrollbar {
-    display: none; 
+    display: none;
 }
 
 .admin-layout-scroll {
-    overflow-x: hidden; 
-    overflow-y: auto; 
+    overflow-x: hidden;
+    overflow-y: auto;
 }
 
 .admin-layout-scroll::-webkit-scrollbar {
@@ -96,3 +165,121 @@
     color: red;
     font-weight: bold;
 }
+
+@layer base {
+    select {
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%236B7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
+        background-position: right 0.5rem center;
+        background-repeat: no-repeat;
+        background-size: 1.5em 1.5em;
+        padding-right: 2.5rem;
+        box-sizing: border-box !important;
+        border-style: solid !important;
+    }
+}
+
+@layer components {
+    select {
+        border-color: #d1d5db;
+    }
+
+    select:focus {
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 2px rgb(191, 219, 254);
+    }
+}
+
+.quill {
+    background-color: white;
+}
+
+.ql-toolbar {
+    border-top-left-radius: 0.375rem;
+    border-top-right-radius: 0.375rem;
+    background-color: #f9fafb;
+    border-color: #d1d5db;
+}
+
+.ql-container {
+    border-bottom-left-radius: 0.375rem;
+    border-bottom-right-radius: 0.375rem;
+    border-color: #d1d5db;
+    font-size: 14px;
+    min-height: 200px;
+}
+
+.ql-editor {
+    min-height: 200px;
+    padding: 12px 15px;
+}
+
+.ql-editor.ql-blank::before {
+    color: #9ca3af;
+    font-style: normal;
+}
+
+.ql-snow .ql-picker {
+    font-size: 14px;
+}
+
+.ql-snow .ql-stroke {
+    stroke: #4b5563;
+}
+
+.ql-snow .ql-fill {
+    fill: #4b5563;
+}
+
+.ql-snow .ql-picker-label {
+    color: #4b5563;
+}
+
+.ql-toolbar.ql-snow .ql-picker-label:hover,
+.ql-toolbar.ql-snow .ql-picker-label.ql-active,
+.ql-toolbar.ql-snow .ql-picker-item:hover,
+.ql-toolbar.ql-snow .ql-picker-item.ql-selected {
+    color: #2563eb;
+}
+
+.ql-toolbar.ql-snow button:hover,
+.ql-toolbar.ql-snow button:focus,
+.ql-toolbar.ql-snow button.ql-active {
+    color: #2563eb;
+}
+
+.ql-toolbar.ql-snow button:hover .ql-stroke,
+.ql-toolbar.ql-snow button:focus .ql-stroke,
+.ql-toolbar.ql-snow button.ql-active .ql-stroke {
+    stroke: #2563eb;
+}
+
+.ql-toolbar.ql-snow button:hover .ql-fill,
+.ql-toolbar.ql-snow button:focus .ql-fill,
+.ql-toolbar.ql-snow button.ql-active .ql-fill {
+    fill: #2563eb;
+}
+
+.news-content.prose a,
+.news-content .quill-content a,
+.quill-content a {
+    color: #1d4ed8 !important;
+    text-decoration: underline !important;
+}
+.news-content.prose a:hover,
+.news-content .quill-content a:hover,
+.quill-content a:hover {
+    color: #1e40af !important; 
+}
+
+/* .tree-connector::before {
+    content: "";
+    position: absolute;
+    left: -24px;
+    top: 1.25rem;
+    width: 24px;
+    height: 1px;
+    background-color: #d1d5db;
+} */

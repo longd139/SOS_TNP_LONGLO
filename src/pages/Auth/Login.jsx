@@ -1,73 +1,162 @@
-import { useState, useEffect } from "react";
-import { ShieldCheck, AlertCircle, Loader2, Lock, User } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { ShieldCheck, Loader2, Lock, User } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
 import { useLogin } from "../../hooks/useLogin";
-import { useOtp } from "../../hooks/useOtp";
 import { useAuthRedirect } from "../../hooks/useAuthRedirect";
-import OtpModal from "../Auth/OtpModal";
+import { restoreUser } from "../../features/auth/authSlice";
+import { fetchMyProfile } from "../../features/userProfile/userProfileThunks";
+import TwoFALoginModal from "../../components/twoFactor/TwoFALoginModal";
 import ROUTE_PATH from "../../constants/routes";
+import { getRedirectPathIfDisabled } from "../../utils/routeRedirectUtils";
+import { validateAuth } from "../../validator/loginValidator";
+import { showToast } from "../../utils/toastNotification";
+import { useAuth } from "../../contexts/AuthContext";
+
+const RECAPTCHA_SITE_KEY = process.env.REACT_APP_SITE_KEY
 
 export default function Login() {
     const [tenDangNhap, setTenDangNhap] = useState("");
     const [matKhau, setMatKhau] = useState("");
-    const [showOtpModal, setShowOtpModal] = useState(false);
-    const [email, setEmail] = useState("");
-    const [twoFA, setTwoFA] = useState(true);
+    const [show2FAModal, setShow2FAModal] = useState(false);
+    const [validationErrors, setValidationErrors] = useState({});
+    const [hasInteracted, setHasInteracted] = useState(false);
+    const [recaptchaToken, setRecaptchaToken] = useState("");
+    const [redirecting, setRedirecting] = useState(false);
+    const recaptchaRef = useRef();
+    // const recaptchaWidgetId = useRef(null);
 
-    const { login, loading, errors, apiError, clearErrors } = useLogin();
-    const { sendOtp, verifyOtp, loading: otpLoading, message, error: otpError } = useOtp();
+    const { loginWithCaptcha, loading, errors, apiError, clearErrors } = useLogin();
+    const dispatch = useDispatch();
     const navigate = useNavigate();
+    const { isAuthenticated } = useAuth();
 
     useAuthRedirect();
 
     useEffect(() => {
-        if (Object.keys(errors).length > 0 || apiError) {
+        if (isAuthenticated && !redirecting) {
+            setRedirecting(true);
+            const redirectPath = getRedirectPathIfDisabled(ROUTE_PATH.DASHBOARD);
+            navigate(redirectPath, { replace: true });
+        }
+    }, [isAuthenticated, redirecting, navigate]);
+
+    useEffect(() => {
+        if (!hasInteracted) return;
+
+        if (apiError || Object.keys(errors).length > 0) {
             clearErrors();
         }
-    }, [tenDangNhap, matKhau, apiError, errors, clearErrors]);
+        if (Object.keys(validationErrors).length > 0) {
+            setValidationErrors({});
+        }
+    }, [tenDangNhap, matKhau, hasInteracted, apiError, errors, validationErrors, clearErrors]);
+
+    useEffect(() => {
+        if (redirecting || isAuthenticated) return;
+
+        const checkRecaptcha = () => {
+            if (window.grecaptcha && window.grecaptcha.render) {
+                renderRecaptcha();
+            } else {
+                setTimeout(checkRecaptcha, 100);
+            }
+        };
+
+        checkRecaptcha();
+        window.addEventListener('load', checkRecaptcha);
+
+        return () => {
+            window.removeEventListener('load', checkRecaptcha);
+        };
+    }, [redirecting, isAuthenticated]);
+
+    const renderRecaptcha = () => {
+        if (!RECAPTCHA_SITE_KEY) {
+            showToast.error('RECAPTCHA_SITE_KEY không được cấu hình đúng.');
+            return;
+        }
+
+        if (window.grecaptcha && window.grecaptcha.render && recaptchaRef.current && !recaptchaRef.current.hasChildNodes()) {
+            try {
+                const widgetId = window.grecaptcha.render(recaptchaRef.current, {
+                    sitekey: RECAPTCHA_SITE_KEY,
+                    callback: onRecaptchaChange,
+                    'expired-callback': onRecaptchaExpired,
+                });
+            } catch (error) {
+                showToast.error('Lỗi khi hiển thị reCAPTCHA.');
+            }
+        }
+    };
+
+    const onRecaptchaChange = (token) => {
+        setRecaptchaToken(token);
+    };
+
+    const onRecaptchaExpired = () => {
+        setRecaptchaToken("");
+    };
+
+    const handleInputChange = (setter) => (e) => {
+        setHasInteracted(true);
+        setter(e.target.value);
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        if (redirecting || isAuthenticated) return;
+        setHasInteracted(true);
 
         const credentials = { tenDangNhap, matKhau };
-        const result = await login(credentials);
-    
-        console.log("Login result:", result);
-        const mail = result?.email || result?.user?.email || "";
 
+        const { valid, errors: validationErrs } = await validateAuth(credentials);
 
-        if (result?.needOtp || !result?.success) {
+        if (!valid) {
+            setValidationErrors(validationErrs);
+            return;
+        }
 
-            if (mail) {
-                try {
-                    const otpRes = await sendOtp({ email: mail, type: "LOGIN" });
-                    if (otpRes.success) setEmail(mail);
-                } catch (err) {
-                    throw err;
-                }
+        if (!recaptchaToken) {
+            showToast.error('Vui lòng xác thực reCAPTCHA');
+            return;
+        }
+
+        setValidationErrors({});
+
+        const result = await loginWithCaptcha({
+            ...credentials,
+            recaptchaToken
+        });
+
+        if (!result?.success) {
+            if (window.grecaptcha) {
+                window.grecaptcha.reset();
             }
-
-            navigate("/OtpModal", {
-                replace: true,
-                state: { tenDangNhap, email: mail },
-            });
+            setRecaptchaToken("");
+        }
+        if (result?.requiresTwoFactorAuth) {
+            setShow2FAModal(true);
             return;
         }
     };
 
-    const handleVerifyOtp = async ({ otp }) => {
-        const res = await verifyOtp({ otp, tenDangNhap });
+    const handle2FASuccess = async (result) => {
+        setShow2FAModal(false);
+        dispatch(restoreUser());
+        await dispatch(fetchMyProfile());
 
-        if (res.success) {
-            localStorage.setItem("accessToken", res.data.accessToken);
-            localStorage.setItem("refreshToken", res.data.refreshToken);
-
-            setShowOtpModal(false);
-            navigate(ROUTE_PATH.DASHBOARD, { replace: true });
-        } else {
-            alert("Mã OTP không đúng hoặc đã hết hạn!");
-        }
+        const redirectPath = getRedirectPathIfDisabled(ROUTE_PATH.DASHBOARD);
+        navigate(redirectPath, { replace: true });
     };
+
+    const handle2FAError = (error) => {
+        showToast.error(error || 'Xác thực 2FA thất bại, vui lòng thử lại.');
+    };
+
+    if (redirecting || isAuthenticated) {
+        return null;
+    }
 
     return (
         <div className="flex items-center justify-center min-h-screen bg-gray-100">
@@ -83,16 +172,9 @@ export default function Login() {
                     Ứng dụng công dân Phường Tăng Nhơn Phú
                 </p>
 
-                {apiError && (
-                    <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg flex items-center gap-2">
-                        <AlertCircle className="w-4 h-4" />
-                        <span className="text-sm">{apiError}</span>
-                    </div>
-                )}
-
                 <form onSubmit={handleSubmit} className="space-y-4 text-left">
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label className="block text-sm font-medium text-gray-700 mb-1 required-label">
                             Tên đăng nhập
                         </label>
                         <div className="relative">
@@ -103,20 +185,20 @@ export default function Login() {
                             <input
                                 type="text"
                                 value={tenDangNhap}
-                                onChange={(e) => setTenDangNhap(e.target.value)}
+                                onChange={handleInputChange(setTenDangNhap)}
                                 placeholder="Nhập tên đăng nhập"
-                                className={`pl-10 w-full border rounded-lg py-2 ${errors.tenDangNhap ? "border-red-400" : "border-gray-300"
+                                className={`pl-10 w-full border rounded-lg py-2 ${validationErrors.tenDangNhap || errors.tenDangNhap ? "border-red-400" : "border-gray-300"
                                     }`}
                                 disabled={loading}
                             />
                         </div>
-                        {errors.tenDangNhap && (
-                            <p className="text-red-500 text-xs mt-1">{errors.tenDangNhap}</p>
+                        {(validationErrors.tenDangNhap || errors.tenDangNhap) && (
+                            <p className="text-red-500 text-xs mt-1">{validationErrors.tenDangNhap || errors.tenDangNhap}</p>
                         )}
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label className="block text-sm font-medium text-gray-700 mb-1 required-label">
                             Mật khẩu
                         </label>
                         <div className="relative">
@@ -127,34 +209,20 @@ export default function Login() {
                             <input
                                 type="password"
                                 value={matKhau}
-                                onChange={(e) => setMatKhau(e.target.value)}
+                                onChange={handleInputChange(setMatKhau)}
                                 placeholder="Nhập mật khẩu"
-                                className={`pl-10 pr-10 w-full border rounded-lg py-2 ${errors.matKhau ? "border-red-400" : "border-gray-300"
+                                className={`pl-10 pr-10 w-full border rounded-lg py-2 ${validationErrors.matKhau || errors.matKhau ? "border-red-400" : "border-gray-300"
                                     }`}
                                 disabled={loading}
                             />
                         </div>
-                        {errors.matKhau && (
-                            <p className="text-red-500 text-xs mt-1">{errors.matKhau}</p>
+                        {(validationErrors.matKhau || errors.matKhau) && (
+                            <p className="text-red-500 text-xs mt-1">{validationErrors.matKhau || errors.matKhau}</p>
                         )}
                     </div>
 
-                    <div className="flex items-center justify-between mt-3 mb-5">
-                        <label htmlFor="twoFA" className="text-sm text-gray-700">
-                            Bật xác thực 2 yếu tố (2FA)
-                        </label>
-                        <input
-                            id="twoFA"
-                            type="checkbox"
-                            checked={twoFA}
-                            onChange={(e) => setTwoFA(e.target.checked)}
-                            className="appearance-none w-11 h-6 bg-gray-300 rounded-full relative cursor-pointer
-                         transition-colors duration-200 checked:bg-blue-600
-                         before:content-[''] before:absolute before:top-[2px] before:left-[2px]
-                         before:w-5 before:h-5 before:bg-white before:rounded-full
-                         before:transition-transform before:duration-200
-                         checked:before:translate-x-5"
-                        />
+                    <div className="flex justify-center">
+                        <div ref={recaptchaRef}></div>
                     </div>
 
                     <button
@@ -169,7 +237,7 @@ export default function Login() {
                     <div className="text-center mt-2">
                         <button
                             type="button"
-                            onClick={() => navigate("/forgot-password")}
+                            onClick={() => navigate(ROUTE_PATH.FORGOT_PASSWORD)}
                             className="text-sm text-blue-600 hover:underline"
                         >
                             Quên mật khẩu?
@@ -178,17 +246,13 @@ export default function Login() {
                 </form>
             </div>
 
-            {showOtpModal && (
-                <OtpModal
-                    email={email}
-                    tenDangNhap={tenDangNhap}
-                    onClose={() => setShowOtpModal(false)}
-                    onVerify={handleVerifyOtp}
-                    loading={otpLoading}
-                    error={otpError}
-                    message={message}
-                />
-            )}
+            <TwoFALoginModal
+                isOpen={show2FAModal}
+                onClose={() => setShow2FAModal(false)}
+                tenDangNhap={tenDangNhap}
+                onSuccess={handle2FASuccess}
+                onError={handle2FAError}
+            />
         </div>
     );
 }

@@ -27,7 +27,7 @@ const initialState = {
         searchKeyword: '',
         selectedDomain: ''
     },
-    showRemoved: false
+    showActive: true
 };
 
 const proceduresSlice = createSlice({
@@ -43,8 +43,8 @@ const proceduresSlice = createSlice({
                 selectedDomain: ''
             };
         },
-        setShowRemoved: (state, action) => {
-            state.showRemoved = action.payload;
+        setShowActive: (state, action) => {
+            state.showActive = action.payload;
         },
         clearCurrentProcedure: (state) => {
             state.currentProcedure = null;
@@ -123,7 +123,6 @@ const proceduresSlice = createSlice({
                 state.error = action.payload || 'Failed to delete procedure';
             })
 
-            // Fetch Procedure By ID
             .addCase(fetchProcedureById.pending, (state) => {
                 state.loading = true;
                 state.error = null;
@@ -142,7 +141,7 @@ const proceduresSlice = createSlice({
 export const {
     setFilters,
     resetFilters,
-    setShowRemoved,
+    setShowActive,
     clearCurrentProcedure,
     clearError
 } = proceduresSlice.actions;

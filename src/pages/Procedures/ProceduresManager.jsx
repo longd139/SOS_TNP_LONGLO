@@ -1,27 +1,40 @@
-import React, { useState } from 'react';
-import dayjs from 'dayjs';
-import 'dayjs/locale/vi';
-import { Search, RotateCcw } from 'lucide-react';
-import BaseTable from '../../components/BaseTable';
-import ProcedureForm from '../../components/procedures/ProcedureForm';
-import ProcedureDetailModal from '../../components/procedures/ProcedureDetailModal';
-import { useProcedure } from '../../hooks/useProcedures';
-import { getProcedureColumns } from '../../components/procedures/columns';
-dayjs.locale('vi');
+import React, { useState, useEffect } from "react";
+import { useDispatch } from "react-redux";
+import dayjs from "dayjs";
+import "dayjs/locale/vi";
+import BaseTable from "../../components/base/BaseTable";
+import ProcedureForm from "../../components/procedures/ProcedureForm";
+import ProcedureDetailModal from "../../components/procedures/ProcedureDetailModal";
+import ProceduresFilter from "../../components/procedures/ProceduresFilter";
+import { useProcedure } from "../../hooks/useProcedures";
+import { usePermission } from "../../hooks/usePermission";
+import { PermissionHidden } from "../../components/PermissionGuard";
+import { getProcedureColumns } from "../../components/procedures/columns";
+import { showToast } from "../../utils/toastNotification";
+import { ConfirmModal } from "../../components/base/BaseModal";
+import { fetchProcedures } from "../../features/procedures/proceduresThunks";
+import { Loader2 } from "lucide-react";
+dayjs.locale("vi");
 
 export default function ProceduresManager() {
+    const dispatch = useDispatch();
+    const { canUpdate, canDelete, canView, canUpdateStatus } = usePermission();
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+    const [selectedProcedure, setSelectedProcedure] = useState(null);
+    const [deleteConfirm, setDeleteConfirm] = useState({
+        isOpen: false,
+        procedure: null,
+    });
 
     const {
         procedures,
         areas,
-        currentProcedure,
         loading,
         pagination,
         filters,
-        showRemoved,
+        showActive,
         searchProcedures,
         changePage,
         changePageSize,
@@ -31,12 +44,28 @@ export default function ProceduresManager() {
         updateProcedure,
         deleteProcedure,
         getProcedureById,
-        toggleShowRemoved,
-        clearCurrent
+        toggleShowActive,
+        handleUpdateStatus: updateStatus,
     } = useProcedure();
 
-
     const columns = getProcedureColumns(pagination);
+
+    useEffect(() => {
+        resetFilters();
+        toggleShowActive(true);
+
+        dispatch(
+            fetchProcedures({
+                page: 1,
+                size: 10,
+                search: '',
+                id_linh_vuc: undefined,
+                isActive: true,
+            })
+        );
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
     const openCreateModal = () => {
         setIsCreateModalOpen(true);
     };
@@ -51,7 +80,7 @@ export default function ProceduresManager() {
 
     const closeEditModal = () => {
         setIsEditModalOpen(false);
-        clearCurrent();
+        setSelectedProcedure(null);
     };
 
     const openDetailModal = () => {
@@ -60,178 +89,237 @@ export default function ProceduresManager() {
 
     const closeDetailModal = () => {
         setIsDetailModalOpen(false);
-        clearCurrent();
+        setSelectedProcedure(null);
     };
 
     const handleSubmitNewProcedure = async (formData) => {
         const result = await createProcedure(formData);
         if (result.success) {
             closeCreateModal();
-            alert('Tạo thủ tục thành công!');
+            showToast.success("Tạo thủ tục thành công!");
+            dispatch(
+                fetchProcedures({
+                    page: pagination.current,
+                    size: pagination.pageSize,
+                    search: filters.searchKeyword,
+                    id_linh_vuc: filters.selectedDomain,
+                    isActive: showActive,
+                })
+            );
+            return { success: true };
         } else {
-            throw new Error(result.error?.message || 'Failed to create procedure');
+            const errorMessage = result.error?.message || result.error || "Có lỗi xảy ra khi tạo thủ tục!";
+            showToast.error(errorMessage);
+            return { success: false, error: errorMessage };
         }
     };
 
     const handleSubmitEditProcedure = async (formData) => {
-        if (!currentProcedure) return;
+        if (!selectedProcedure) return { success: false };
 
-        const result = await updateProcedure(currentProcedure.id, formData);
+        const result = await updateProcedure(selectedProcedure.id, formData);
         if (result.success) {
             closeEditModal();
+            showToast.success("Cập nhật thủ tục thành công!");
+            dispatch(
+                fetchProcedures({
+                    page: pagination.current,
+                    size: pagination.pageSize,
+                    search: filters.searchKeyword,
+                    id_linh_vuc: filters.selectedDomain,
+                    isActive: showActive,
+                })
+            );
+            return { success: true };
         } else {
-            throw new Error(result.error?.message || 'Failed to update procedure');
+            const errorMessage = result.error?.message || result.error || "Có lỗi xảy ra khi cập nhật thủ tục!";
+            showToast.error(errorMessage);
+            return { success: false, error: errorMessage };
         }
     };
 
     const handleEdit = async (procedure) => {
         const result = await getProcedureById(procedure.id);
         if (result.success) {
+            setSelectedProcedure(result.data);
             openEditModal();
+        } else {
+            const errorMessage = result.error?.message || result.error || "Có lỗi xảy ra khi lấy thông tin thủ tục!";
+            showToast.error(errorMessage);
         }
     };
 
+    const handleDelete = (procedure) => {
+        setDeleteConfirm({ isOpen: true, procedure });
+    };
 
-    const handleDelete = async (procedure) => {
-        await deleteProcedure(procedure.id, procedure.ten_thu_tuc || procedure.tenThuTuc);
+    const handleDeleteConfirm = async () => {
+        if (!deleteConfirm.procedure) return;
+
+        const result = await deleteProcedure(
+            deleteConfirm.procedure.id,
+            deleteConfirm.procedure.ten_thu_tuc || deleteConfirm.procedure.tenThuTuc
+        );
+
+        if (result.success) {
+            showToast.success("Đã xóa thủ tục thành công.");
+            dispatch(
+                fetchProcedures({
+                    page: pagination.current,
+                    size: pagination.pageSize,
+                    search: filters.searchKeyword,
+                    id_linh_vuc: filters.selectedDomain,
+                    isActive: showActive,
+                })
+            );
+        } else if (result.cancelled) {
+        } else {
+            const errorMessage = result.error?.message || result.error || "Có lỗi xảy ra khi xóa thủ tục!";
+            showToast.error(errorMessage);
+        }
+
+        setDeleteConfirm({ isOpen: false, procedure: null });
     };
 
     const handleView = async (procedure) => {
         const result = await getProcedureById(procedure.id);
         if (result.success) {
+            setSelectedProcedure(result.data);
             openDetailModal();
+        } else {
+            const errorMessage = result.error?.message || result.error || "Có lỗi xảy ra khi lấy thông tin thủ tục!";
+            showToast.error(errorMessage);
         }
     };
 
-
-    const handleSearchKeywordChange = (value) => {
-        updateFilters({ searchKeyword: value });
+    const handleFilterChange = (key, value) => {
+        updateFilters({ [key]: value });
     };
 
-    const handleDomainChange = (value) => {
-        updateFilters({ selectedDomain: value });
-    };
-
-    const handleSearchKeyPress = (e) => {
-        if (e.key === 'Enter') {
-            searchProcedures();
+    const handleUpdateStatus = async (procedure) => {
+        try {
+            await updateStatus(procedure.id, !procedure.is_active);
+            showToast.success(
+                `Thủ tục đã được ${!procedure.is_active ? "kích hoạt" : "vô hiệu hóa"
+                } thành công!`
+            );
+            dispatch(
+                fetchProcedures({
+                    page: pagination.current,
+                    size: pagination.pageSize,
+                    search: filters.searchKeyword,
+                    id_linh_vuc: filters.selectedDomain,
+                    isActive: showActive,
+                })
+            );
+        } catch (error) {
+            showToast.error(
+                error.message || "Có lỗi xảy ra khi cập nhật trạng thái thủ tục!"
+            );
         }
+    };
+
+    const handleSearchWithFilters = (newFilters) => {
+        updateFilters({
+            searchKeyword: newFilters.searchKeyword,
+            selectedDomain: newFilters.selectedDomain,
+        });
+
+        if (newFilters.showActive !== showActive) {
+            toggleShowActive(newFilters.showActive);
+        }
+
+        if (newFilters.pageSize !== pagination.pageSize) {
+            changePageSize(newFilters.pageSize);
+        }
+
+        const id_linh_vuc = newFilters.selectedDomain === '' ? undefined : newFilters.selectedDomain;
+
+        dispatch(
+            fetchProcedures({
+                page: 1,
+                size: newFilters.pageSize,
+                search: newFilters.searchKeyword,
+                id_linh_vuc: id_linh_vuc,
+                isActive: newFilters.showActive,
+            })
+        );
     };
 
     return (
         <div className="min-h-screen">
-            <div className="mb-3 md:mb-4">
-                <h1 className="text-xl md:text-2xl font-bold text-gray-900 mb-2">Quản lý thủ tục hành chính</h1>
-                <p className="text-sm md:text-base text-gray-600">Quản lý các thủ tục được hiển thị trong ứng dụng</p>
-            </div>
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3 md:p-4 mb-3 md:mb-4">
-                <div className="flex flex-col md:flex-row gap-2 items-end">
-                    <div className="flex-1 w-full md:w-auto">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Tìm kiếm thủ tục
-                        </label>
-                        <input
-                            type="text"
-                            value={filters.searchKeyword}
-                            onChange={(e) => handleSearchKeywordChange(e.target.value)}
-                            placeholder="Nhập từ khóa tìm kiếm..."
-                            className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                            onKeyPress={handleSearchKeyPress}
-                        />
-                    </div>
-
-                    <div className="flex-1 w-full md:w-auto">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Lĩnh vực
-                        </label>
-                        <select
-                            value={filters.selectedDomain}
-                            onChange={(e) => handleDomainChange(e.target.value)}
-                            className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        >
-                            <option value="">Tất cả lĩnh vực</option>
-                            {areas.map((area) => (
-                                <option key={area.id} value={area.id}>
-                                    {area.ten_linh_vuc}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
-
-                    <div className="w-full md:w-48">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Trạng thái
-                        </label>
-                        <select
-                            value={showRemoved ? 'removed' : 'active'}
-                            onChange={(e) => toggleShowRemoved(e.target.value === 'removed')}
-                            className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        >
-                            <option value="active">Hoạt động</option>
-                            <option value="removed">Đã xóa</option>
-                        </select>
-                    </div>
-
-                    <div className="w-full md:w-32">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Hiển thị
-                        </label>
-                        <select
-                            value={pagination.pageSize}
-                            onChange={(e) => changePageSize(Number(e.target.value))}
-                            className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        >
-                            <option value={5}>5</option>
-                            <option value={10}>10</option>
-                            <option value={20}>20</option>
-                            <option value={50}>50</option>
-                        </select>
-                    </div>
-
-                    <div className="flex gap-2 w-full md:w-auto">
-                        <button
-                            onClick={searchProcedures}
-                            className="flex-1 md:flex-none p-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
-                            title="Tìm kiếm"
-                        >
-                            <Search className="w-5 h-5" />
-                        </button>
-                        <button
-                            onClick={resetFilters}
-                            className="flex-1 md:flex-none p-2.5 bg-gray-500 text-white rounded-lg hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors"
-                            title="Đặt lại"
-                        >
-                            <RotateCcw className="w-5 h-5" />
-                        </button>
-                    </div>
+            <div className="mb-4 flex items-center justify-between">
+                <div>
+                    <h1 className="text-xl md:text-2xl font-bold text-gray-900 mb-2">
+                        Quản lý thủ tục hành chính
+                    </h1>
+                    <p className="text-sm md:text-base text-gray-600">
+                        Quản lý các thủ tục được hiển thị trong ứng dụng
+                    </p>
                 </div>
+                <PermissionHidden modulePrefix="TT" action="CREATE">
+                    <button
+                        onClick={openCreateModal}
+                        className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center"
+                    >
+                        <svg
+                            className="w-4 h-4 mr-2"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth="2"
+                                d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                            />
+                        </svg>
+                        Thêm thủ tục mới
+                    </button>
+                </PermissionHidden>
             </div>
 
-            <div className="mb-3 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 bg-white p-3 rounded-lg shadow-sm border border-gray-200">
+            <ProceduresFilter
+                filters={filters}
+                pagination={pagination}
+                showActive={showActive}
+                currentFilters={{
+                    searchKeyword: filters.searchKeyword || '',
+                    selectedDomain: filters.selectedDomain || '',
+                    showActive: showActive,
+                    pageSize: pagination.pageSize || 10
+                }}
+                onFilterChange={handleFilterChange}
+                onSearch={searchProcedures}
+                onReset={resetFilters}
+                onToggleActive={toggleShowActive}
+                onPageSizeChange={changePageSize}
+                onSearchWithFilters={handleSearchWithFilters}
+            />
+
+            <div className="flex flex-col mb-4 sm:flex-row sm:justify-between sm:items-center gap-2 bg-white p-3 rounded-lg shadow-sm border border-gray-200">
                 <div className="flex items-center gap-3">
-                    <div className="text-xs md:text-sm text-gray-600">
+                    <h3 className="font-semibold text-gray-900 mb-0">
                         Danh sách thủ tục ({pagination.total})
-                    </div>
-                    {showRemoved && (
+                    </h3>
+                    {!showActive && (
                         <span className="px-2 md:px-3 py-1 bg-red-100 text-red-800 text-xs font-medium rounded-full">
-                            Đã xóa
+                            Không hoạt động
                         </span>
                     )}
-                    {!showRemoved && (
+                    {showActive && (
                         <span className="px-3 py-1 bg-green-100 text-green-800 text-xs font-medium rounded-full">
                             Đang hoạt động
                         </span>
                     )}
                 </div>
-                <button
-                    onClick={openCreateModal}
-                    className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center"
-                >
-                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                    </svg>
-                    Thêm thủ tục mới
-                </button>
+                {loading && (
+                    <div className="flex items-center gap-2 text-sm text-gray-600">
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        <span>Đang tải...</span>
+                    </div>
+                )}
             </div>
 
             <BaseTable
@@ -241,11 +329,12 @@ export default function ProceduresManager() {
                 pagination={pagination}
                 onPageChange={changePage}
                 onEdit={handleEdit}
-                onDelete={showRemoved ? handleDelete : null}
+                onDelete={!JSON.parse(showActive) ? handleDelete : undefined}
                 onView={handleView}
                 showActions={true}
                 emptyMessage="Không có thủ tục nào được tìm thấy"
                 className="mb-4"
+                onUpdateStatus={handleUpdateStatus}
             />
 
             <ProcedureForm
@@ -261,14 +350,27 @@ export default function ProceduresManager() {
                 onClose={closeEditModal}
                 onSubmit={handleSubmitEditProcedure}
                 areas={areas}
-                initialData={currentProcedure}
+                initialData={selectedProcedure}
                 mode="edit"
             />
 
             <ProcedureDetailModal
                 isOpen={isDetailModalOpen}
                 onClose={closeDetailModal}
-                procedure={currentProcedure}
+                procedure={selectedProcedure}
+            />
+
+            <ConfirmModal
+                isOpen={deleteConfirm.isOpen}
+                onClose={() => setDeleteConfirm({ isOpen: false, procedure: null })}
+                onConfirm={handleDeleteConfirm}
+                title="Xác nhận xóa"
+                message={`Bạn có chắc chắn muốn xóa thủ tục "${deleteConfirm.procedure?.ten_thu_tuc ||
+                    deleteConfirm.procedure?.tenThuTuc
+                    }"?`}
+                confirmText="Xóa"
+                cancelText="Hủy"
+                type="danger"
             />
         </div>
     );

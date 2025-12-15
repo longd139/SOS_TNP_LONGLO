@@ -1,8 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
-import BaseModal, { ModalFooter } from '../BaseModal';
-import { Upload, Eye, Download } from 'lucide-react';
+import BaseModal, { ModalFooter } from '../base/BaseModal';
+import { Upload, Download } from 'lucide-react';
 import { validateTemplateForm } from '../../validator/templateValidator';
+import { showToast } from '../../utils/toastNotification';
+import { downloadUtils } from '../../utils/downLoadUtils';
 
 const TemplateFormModal = ({
     isOpen,
@@ -13,6 +15,7 @@ const TemplateFormModal = ({
 }) => {
     const [formData, setFormData] = useState({
         tenMauDon: '',
+        maMauDon: '',
         moTa: '',
         file: null,
         isRemoved: false
@@ -20,21 +23,23 @@ const TemplateFormModal = ({
     const [errors, setErrors] = useState({});
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [fileName, setFileName] = useState('');
-
-    const baseUrl = process.env.REACT_APP_API_URL;
+    const [uploadProgress, setUploadProgress] = useState(null);
+    const fileInputRef = useRef(null);
 
     useEffect(() => {
         if (initialData && mode === 'edit') {
             setFormData({
-                tenMauDon: initialData.ten_mau_don || '',
-                moTa: initialData.mo_ta || '',
+                tenMauDon: initialData?.ten_mau_don ?? initialData?.tenMauDon ?? '',
+                maMauDon: initialData?.ma_mau_don ?? initialData?.maMauDon ?? '',
+                moTa: initialData?.mo_ta ?? initialData?.moTa ?? '',
                 file: null,
-                isRemoved: initialData.is_removed || false
+                isRemoved: initialData?.is_removed ?? initialData?.is_delete ?? initialData?.isRemoved ?? false
             });
             setFileName('');
         } else {
             setFormData({
                 tenMauDon: '',
+                maMauDon: '',
                 moTa: '',
                 file: null,
                 isRemoved: false
@@ -47,6 +52,7 @@ const TemplateFormModal = ({
     const resetForm = () => {
         setFormData({
             tenMauDon: '',
+            maMauDon: '',
             moTa: '',
             file: null,
             isRemoved: false
@@ -64,34 +70,45 @@ const TemplateFormModal = ({
 
     const handleSubmit = async () => {
         const isValid = await validateForm();
-        
+
         if (!isValid) {
-            alert('Vui lòng kiểm tra lại các trường bắt buộc!');
+            showToast.error('Vui lòng kiểm tra lại các trường bắt buộc!');
             return;
         }
 
         setIsSubmitting(true);
-
         try {
             const formDataToSubmit = new FormData();
             formDataToSubmit.append('tenMauDon', formData.tenMauDon.trim());
 
+            formDataToSubmit.append('maMauDon', formData.maMauDon.trim().toUpperCase());
+
             if (formData.moTa.trim()) {
                 formDataToSubmit.append('moTa', formData.moTa.trim());
-            }
-
-            if (mode === 'edit') {
-                formDataToSubmit.append('isRemoved', formData.isRemoved);
             }
 
             if (formData.file) {
                 formDataToSubmit.append('file', formData.file);
             }
 
-            await onSubmit(formDataToSubmit);
+            const options = {
+                onUploadProgress: (e) => {
+                    if (e.lengthComputable) {
+                        const pct = Math.round((e.loaded * 100) / e.total);
+                        setUploadProgress(pct);
+                    } else {
+                        setUploadProgress(null);
+                    }
+                }
+            };
+
+            await onSubmit(formDataToSubmit, options);
+            setUploadProgress(null);
             resetForm();
         } catch (error) {
-            alert('Có lỗi xảy ra khi lưu biểu mẫu!');
+            if (error.response?.data?.message) {
+                showToast.error(error.response.data.message);
+            }
         } finally {
             setIsSubmitting(false);
         }
@@ -116,8 +133,13 @@ const TemplateFormModal = ({
     const handleFileChange = (e) => {
         const file = e.target.files[0];
         if (file) {
-            if (file.type !== 'application/pdf') {
-                alert('Chỉ chấp nhận file PDF!');
+            const allowedTypes = [
+                'application/pdf',
+                'application/msword',
+                'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+            ];
+            if (!allowedTypes.includes(file.type)) {
+                showToast.error('Chỉ chấp nhận file PDF, DOC, DOCX!');
                 e.target.value = '';
                 return;
             }
@@ -129,6 +151,9 @@ const TemplateFormModal = ({
     const handleRemoveFile = () => {
         setFileName('');
         updateField('file', null);
+        if (fileInputRef.current) {
+            fileInputRef.current.value = '';
+        }
     };
 
     const modalTitle = mode === 'create' ? 'Thêm biểu mẫu mới' : 'Chỉnh sửa biểu mẫu';
@@ -139,7 +164,9 @@ const TemplateFormModal = ({
             isOpen={isOpen}
             onClose={handleClose}
             title={modalTitle}
-            size="lg"
+            subtitle='Tải lên file PDF biểu mẫu (tối đa 10MB)'
+            size="3xl"
+            className="max-w-5xl"
             footer={
                 <ModalFooter
                     onCancel={handleClose}
@@ -151,21 +178,40 @@ const TemplateFormModal = ({
             }
         >
             <div className="space-y-4">
-                <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Tên biểu mẫu <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                        type="text"
-                        value={formData.tenMauDon}
-                        onChange={(e) => updateField('tenMauDon', e.target.value)}
-                        placeholder="Nhập tên biểu mẫu..."
-                        className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.tenMauDon ? 'border-red-500' : 'border-gray-300'
-                            }`}
-                    />
-                    {errors.tenMauDon && (
-                        <p className="mt-1 text-sm text-red-600">{errors.tenMauDon}</p>
-                    )}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2 required-label">
+                            Tên biểu mẫu
+                        </label>
+                        <input
+                            type="text"
+                            value={formData.tenMauDon}
+                            onChange={(e) => updateField('tenMauDon', e.target.value)}
+                            placeholder="Nhập tên biểu mẫu..."
+                            className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.tenMauDon ? 'border-red-500' : 'border-gray-300'
+                                }`}
+                        />
+                        {errors.tenMauDon && (
+                            <p className="mt-1 text-sm text-red-600">{errors.tenMauDon}</p>
+                        )}
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2 required-label">
+                            Mã biểu mẫu
+                        </label>
+                        <input
+                            type="text"
+                            value={formData.maMauDon}
+                            onChange={(e) => updateField('maMauDon', e.target.value)}
+                            placeholder="Nhập mã biểu mẫu"
+                            className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.maMauDon ? 'border-red-500' : 'border-gray-300'
+                                }`}
+                        />
+                        {errors.maMauDon && (
+                            <p className="mt-1 text-sm text-red-600">{errors.maMauDon}</p>
+                        )}
+                    </div>
                 </div>
 
                 <div>
@@ -179,14 +225,17 @@ const TemplateFormModal = ({
                         rows="3"
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
+                     {errors.moTa && (
+                            <p className="mt-1 text-sm text-red-600">{errors.moTa}</p>
+                        )}
                 </div>
 
                 <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                        File PDF {mode === 'create' && <span className="text-red-500">*</span>}
+                    <label className="block text-sm font-medium text-gray-700 mb-2 required-label">
+                        File
                     </label>
 
-                    {mode === 'edit' && initialData?.url_file_pdf && !fileName && (
+                    {mode === 'edit' && (initialData?.urlFilePdf ?? initialData?.url_file_pdf) && !fileName && (
                         <div className="mb-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
                             <div className="flex items-center gap-2">
                                 <div className="flex-shrink-0">
@@ -195,31 +244,24 @@ const TemplateFormModal = ({
                                     </svg>
                                 </div>
                                 <div className="flex-1 min-w-0 max-w-[50%]">
-                                    <p className="text-sm font-medium text-gray-900 truncate" title={initialData.url_file_pdf.split('/').pop()}>
-                                        {initialData.url_file_pdf.split('/').pop()}
+                                    <p className="text-sm font-medium text-gray-900 truncate" title={(initialData?.urlFilePdf ?? initialData?.url_file_pdf).split('/').pop()}>
+                                        {(initialData?.urlFilePdf ?? initialData?.url_file_pdf).split('/').pop()}
                                     </p>
                                     <p className="text-xs text-gray-500">
-                                        {initialData.kich_thuoc_file_mb} MB
+                                        {initialData?.kichThuocFileMb ?? initialData?.kich_thuoc_file_mb} MB
                                     </p>
                                 </div>
                                 <div className="flex items-center gap-1 flex-shrink-0 ml-auto">
-                                    <a
-                                        href={`${baseUrl}${initialData.url_file_pdf}`}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="p-1.5 text-blue-600 hover:text-blue-700 hover:bg-blue-100 rounded transition-colors"
-                                        title="Xem file PDF"
-                                    >
-                                        <Eye className="w-4 h-4" />
-                                    </a>
-                                    <a
-                                        href={`${baseUrl}${initialData.url_file_pdf}`}
-                                        download
-                                        className="p-1.5 text-blue-600 hover:text-blue-700 hover:bg-blue-100 rounded transition-colors"
-                                        title="Tải xuống file PDF"
-                                    >
-                                        <Download className="w-4 h-4" />
-                                    </a>
+                                    <div>
+                                        <button
+                                            type="button"
+                                            onClick={() => downloadUtils.handleDownloadPdf(initialData)}
+                                            className="p-1.5 text-blue-600 hover:text-blue-700 hover:bg-blue-100 rounded transition-colors"
+                                            title="Tải xuống file"
+                                        >
+                                            <Download className="w-4 h-4" />
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -257,18 +299,20 @@ const TemplateFormModal = ({
                         <Upload className="w-12 h-12 mx-auto text-gray-400 mb-3" />
                         <div className="mb-2">
                             <label className="cursor-pointer text-blue-600 hover:text-blue-700 font-medium">
-                                {fileName ? 'Chọn file khác' : (mode === 'edit' ? 'Thay đổi file PDF' : 'Chọn file PDF')}
+                                {fileName ? 'Chọn file khác' : (mode === 'edit' ? 'Thay đổi file' : 'Chọn file')}
                                 <input
+                                    ref={fileInputRef}
                                     type="file"
-                                    accept=".pdf"
+                                    accept=".pdf,.doc,.docx"
                                     onChange={handleFileChange}
+                                    onClick={(e) => { e.target.value = null; }}
                                     className="hidden"
                                 />
                             </label>
                         </div>
                         {!fileName && mode === 'create' && (
                             <p className="text-xs text-gray-500 mt-2">
-                                Chỉ chấp nhận file PDF, tối đa 1 file
+                                Chỉ chấp nhận file PDF, DOC, DOCX, tối đa 1 file
                             </p>
                         )}
                         {!fileName && mode === 'edit' && (
@@ -282,24 +326,13 @@ const TemplateFormModal = ({
                     )}
                 </div>
 
-                {mode === 'edit' && (
-                    <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
-                        <label className="flex items-center gap-3 cursor-pointer">
-                            <div className="relative inline-block w-12 h-6">
-                                <input
-                                    type="checkbox"
-                                    checked={formData.isRemoved}
-                                    onChange={(e) => updateField('isRemoved', e.target.checked)}
-                                    className="sr-only peer"
-                                />
-                                <div className="w-12 h-6 bg-gray-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-yellow-300 rounded-full peer peer-checked:after:translate-x-6 peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-500"></div>
-                            </div>
-                            <div className="flex-1">
-                                <span className="text-sm font-medium text-gray-900">
-                                    Đánh dấu xóa biểu mẫu
-                                </span>
-                            </div>
-                        </label>
+                {isSubmitting && uploadProgress !== null && (
+                    <div className="w-full bg-gray-100 rounded-full h-3 overflow-hidden">
+                        <div
+                            className="h-3 bg-blue-600"
+                            style={{ width: `${uploadProgress}%`, transition: 'width 200ms linear' }}
+                        />
+                        <div className="text-xs text-gray-600 mt-1">Đang tải lên: {uploadProgress}%</div>
                     </div>
                 )}
             </div>

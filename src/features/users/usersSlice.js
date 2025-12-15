@@ -1,10 +1,12 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { fetchUsers, createUser, updateUser, deleteUser } from './usersThunks';
+import { fetchUsers, createUser, updateUser, deleteUser, getUserById } from './usersThunks';
 
 const initialState = {
     users: [],
     currentUser: null,
+    selectedUserDetail: null,
     loading: false,
+    detailLoading: false,
     error: null,
     pagination: {
         current: 1,
@@ -26,6 +28,9 @@ const usersSlice = createSlice({
         },
         setCurrentUser: (state, action) => {
             state.currentUser = action.payload;
+        },
+        clearSelectedUserDetail: (state) => {
+            state.selectedUserDetail = null;
         }
     },
     extraReducers: (builder) => {
@@ -50,7 +55,6 @@ const usersSlice = createSlice({
             })
             .addCase(createUser.fulfilled, (state, action) => {
                 state.loading = false;
-                // User will be added to list on next fetch
             })
             .addCase(createUser.rejected, (state, action) => {
                 state.loading = false;
@@ -63,14 +67,12 @@ const usersSlice = createSlice({
             })
             .addCase(updateUser.fulfilled, (state, action) => {
                 state.loading = false;
-                // User will be updated on next fetch
             })
             .addCase(updateUser.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload;
             })
 
-            // Delete user
             .addCase(deleteUser.pending, (state) => {
                 state.loading = true;
                 state.error = null;
@@ -83,9 +85,22 @@ const usersSlice = createSlice({
             .addCase(deleteUser.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload;
+            })
+
+            .addCase(getUserById.pending, (state) => {
+                state.detailLoading = true;
+                state.error = null;
+            })
+            .addCase(getUserById.fulfilled, (state, action) => {
+                state.detailLoading = false;
+                state.selectedUserDetail = action.payload;
+            })
+            .addCase(getUserById.rejected, (state, action) => {
+                state.detailLoading = false;
+                state.error = action.payload;
             });
     }
 });
 
-export const { clearCurrentUser, clearError, setCurrentUser } = usersSlice.actions;
+export const { clearCurrentUser, clearError, setCurrentUser, clearSelectedUserDetail } = usersSlice.actions;
 export default usersSlice.reducer;
