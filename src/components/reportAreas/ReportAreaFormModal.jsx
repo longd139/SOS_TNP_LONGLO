@@ -6,6 +6,7 @@ import { showToast } from "../../utils/toastNotification";
 import { USER_API } from "../../apis/user";
 import { X } from "lucide-react";
 import { handleSearchDropdownKeyDown } from "../../utils/keyboardNavigation";
+import { all } from "axios";
 
 let _persistedReportAreaForm = null;
 let _persistedReportAreaId = null;
@@ -89,22 +90,41 @@ const ReportAreaFormModal = ({
       async () => {
         setLoading(true);
         try {
-          const result = await USER_API.getAllUsersWithPagination({
-            page: 1,
-            size: 100,
-            isActive: true,
-            search: searchUser || "",
-          });
-          const allUsers = result.content || [];
+          let allUsers = [];
+          if (searchUser.trim() === "") {
+            allUsers = await USER_API.getAllUsersWithPagination({
+              page: 1,
+              size: 20,
+              isActive: true,
+              search: "",
+            });
+          } else {
+            allUsers = await USER_API.searchUsers({
+              query: searchUser.trim(),
+              isActive: true,
+              page: 1,
+              size: 20,
+            });
+            allUsers = allUsers.content || [];
+          }
+
           const filtered = allUsers.filter(
             (user) =>
               !formData.nguoiQuanLyIds.includes(user.id) &&
               user.fullName &&
               user.fullName.trim() !== ""
           );
-          setUsers(
-            allUsers.filter((u) => u.fullName && u.fullName.trim() !== "")
-          );
+
+          setUsers((prev) => {
+            const newUsers = [...prev];
+            allUsers.forEach((user) => {
+              if (!newUsers.find((u) => u.id === user.id)) {
+                newUsers.push(user);
+              }
+            });
+            return newUsers;
+          });
+
           setSearchResults(filtered);
         } catch (error) {
           setSearchResults([]);
@@ -267,8 +287,7 @@ const ReportAreaFormModal = ({
       : mode === "edit"
       ? "Chỉnh sửa lĩnh vực"
       : "Chi tiết lĩnh vực";
-  const submitText =
-    mode === "create" ? "Tạo lĩnh vực" : "Cập nhật";
+  const submitText = mode === "create" ? "Tạo lĩnh vực" : "Cập nhật";
 
   return (
     <BaseModal

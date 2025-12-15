@@ -61,20 +61,18 @@ const getAllUsersWithPagination = async ({
 
         const response = await apiClient.get("/api/users", { params });
         if (response.data.success) {
-            const mappedData = response.data.data.map(user => {
-                return {
-                    id: user.id,
-                    username: user.ten_dang_nhap,
-                    fullName: user.ho_va_ten,
-                    email: user.email,
-                    phone: user.so_dien_thoai,
-                    role: user.vai_tro,
-                    twoFactorAuth: user.xac_thuc_hai_yeu_to,
-                    active: user.is_active,
-                    createdAt: user.thoi_gian_tao,
-                    updatedAt: user.thoi_gian_cap_nhat
-                };
-            });
+            const mappedData = response.data.data.map(user => ({
+                id: user.id,
+                username: user.ten_dang_nhap || user.username,
+                fullName: user.ho_va_ten || user.ho_ten || user.fullName || user.ten,
+                email: user.email || user.email_dang_nhap,
+                phone: user.so_dien_thoai || user.sdt,
+                role: user.vai_tro || user.role,
+                twoFactorAuth: user.xac_thuc_hai_yeu_to,
+                active: user.is_active,
+                createdAt: user.thoi_gian_tao,
+                updatedAt: user.thoi_gian_cap_nhat
+            }));
 
             const pagination = response.data.pagintation || response.data.pagination;
             return {
@@ -93,6 +91,29 @@ const getAllUsersWithPagination = async ({
             throw new Error(error.response.data.message);
         }
         throw error;
+    }
+}
+
+const searchUsers = async (keyword) => {
+    try {
+        const params = { search: keyword};
+        const response = await apiClient.get("/api/users/search", { params });
+
+        if (response.data.success) {
+            return response.data.data.map(user => ({
+                id: user.id,
+                username: user.ten_dang_nhap || user.username,
+                fullName: user.ho_va_ten || user.ho_ten || user.fullName || user.ten,
+                email: user.email || user.email_dang_nhap,
+                phone: user.so_dien_thoai || user.sdt,
+                role: user.vai_tro || user.role,
+                active: user.is_active,
+            }));
+        } else {
+            return [];
+        }
+    } catch (error) {
+        return [];
     }
 }
 
@@ -211,5 +232,6 @@ export const USER_API = {
     updateUserProfileByAdmin,
     deleteUser,
     updateStatus,
-    getUserById
+    getUserById,
+    searchUsers 
 }
