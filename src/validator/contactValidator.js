@@ -16,6 +16,8 @@ export const contactSchema = yup.object().shape({
         .max(255, "Địa chỉ không được vượt quá 255 ký tự"),
     soDienThoai: yup
         .string()
+        .required("Số điện thoại không được để trống")
+        .test('trim', 'Số điện thoại không được để trống', value => value && value.trim().length > 0)
         .matches(
             /^(0\d{9,10}|\+84\d{9,10})$/,
             "Số điện thoại không hợp lệ"
