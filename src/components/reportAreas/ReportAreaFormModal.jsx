@@ -92,20 +92,25 @@ const ReportAreaFormModal = ({
         try {
           let allUsers = [];
           if (searchUser.trim() === "") {
-            allUsers = await USER_API.getAllUsersWithPagination({
+            const response = await USER_API.getAllUsersWithPagination({
               page: 1,
-              size: 20,
+              size: 100,
               isActive: true,
               search: "",
             });
+
+            if (Array.isArray(response)) {
+                allUsers = response;
+            } else {
+                allUsers = response.content || response.data || [];
+            }
+
           } else {
-            allUsers = await USER_API.searchUsers({
-              query: searchUser.trim(),
-              isActive: true,
-              page: 1,
-              size: 20,
-            });
-            allUsers = allUsers.content || [];
+            allUsers = await USER_API.searchUsers(searchUser.trim());
+          }
+
+          if (!Array.isArray(allUsers)) {
+            allUsers = allUsers.content || allUsers.data || [];
           }
 
           const filtered = allUsers.filter(
@@ -370,30 +375,6 @@ const ReportAreaFormModal = ({
                 setShowDropdown(true);
                 if (searchResults.length === 0 && !loading) {
                   setLoading(true);
-                  try {
-                    const result = await USER_API.getAllUsersWithPagination({
-                      page: 1,
-                      size: 100,
-                      isActive: true,
-                      search: "",
-                    });
-                    const allUsers = result.content || [];
-                    const filtered = allUsers.filter(
-                      (user) =>
-                        !formData.nguoiQuanLyIds.includes(user.id) &&
-                        user.fullName &&
-                        user.fullName.trim() !== ""
-                    );
-                    setUsers(
-                      allUsers.filter(
-                        (u) => u.fullName && u.fullName.trim() !== ""
-                      )
-                    );
-                    setSearchResults(filtered);
-                  } catch (error) {
-                  } finally {
-                    setLoading(false);
-                  }
                 }
               }}
               onKeyDown={handleKeyDown}
