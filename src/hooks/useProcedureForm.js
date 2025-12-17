@@ -219,12 +219,17 @@ export const useProcedureForm = ({ initialData, mode, isOpen, onSubmit }) => {
         updateField('truongHopThuTuc', newTruongHop);
     };
 
-    const updateThanhPhanHoSo = (caseIndex, componentIndex, field, value) => {
+    const updateThanhPhanHoSo = (caseIndex, componentIndex, fieldOrUpdates, value) => {
         const newTruongHop = [...formData.truongHopThuTuc];
-        newTruongHop[caseIndex].thanh_phan_ho_so[componentIndex] = {
-            ...newTruongHop[caseIndex].thanh_phan_ho_so[componentIndex],
-            [field]: value
-        };
+        const targetComponent = newTruongHop?.[caseIndex]?.thanh_phan_ho_so?.[componentIndex];
+        if (!targetComponent) {
+            return;
+        }
+
+        newTruongHop[caseIndex].thanh_phan_ho_so[componentIndex] =
+            typeof fieldOrUpdates === 'object'
+                ? { ...targetComponent, ...fieldOrUpdates }
+                : { ...targetComponent, [fieldOrUpdates]: value };
         updateField('truongHopThuTuc', newTruongHop);
     };
 
