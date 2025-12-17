@@ -4,7 +4,10 @@ import { X, Edit2 } from "lucide-react";
 import BaseModal, { ModalFooter } from "../base/BaseModal";
 import PortalModal from "../base/PortalModal";
 import { validateSchema } from "../../utils/validationUtils";
-import { truongHopThuTucSchema, thanhPhanHoSoSchema } from "../../validator/formalityValidator";
+import {
+  truongHopThuTucSchema,
+  thanhPhanHoSoSchema,
+} from "../../validator/formalityValidator";
 
 const ProcedureCasesSection = ({
   cases = [],
@@ -12,12 +15,14 @@ const ProcedureCasesSection = ({
   removeCase,
   updateCase,
   addCaseComponent,
-  removeCaseComponent
+  removeCaseComponent,
+  updateCaseComponent,
 }) => {
   const [expandedCases, setExpandedCases] = useState({});
   const [isAddCaseModalOpen, setIsAddCaseModalOpen] = useState(false);
   const [isAddComponentModalOpen, setIsAddComponentModalOpen] = useState(false);
   const [editingCaseIndex, setEditingCaseIndex] = useState(null);
+  const [editingComponentIndex, setEditingComponentIndex] = useState(null);
   const [activeCaseIndex, setActiveCaseIndex] = useState(null);
   const [selectedCaseIndex, setSelectedCaseIndex] = useState(
     cases && cases.length > 0 ? 0 : null
@@ -25,7 +30,7 @@ const ProcedureCasesSection = ({
 
   const [caseForm, setCaseForm] = useState({
     ten_truong_hop: "",
-    mo_ta: ""
+    mo_ta: "",
   });
   const [caseErrors, setCaseErrors] = useState({});
 
@@ -34,7 +39,7 @@ const ProcedureCasesSection = ({
     mo_ta_chi_tiet: "",
     so_luong_ban_chinh: "",
     so_luong_ban_sao: "",
-    ghi_chu: ""
+    ghi_chu: "",
   });
   const [componentErrors, setComponentErrors] = useState({});
   const validateCase = async (data) => {
@@ -58,10 +63,10 @@ const ProcedureCasesSection = ({
       mo_ta_chi_tiet: "",
       so_luong_ban_chinh: "",
       so_luong_ban_sao: "",
-      ghi_chu: ""
+      ghi_chu: "",
     });
     setComponentErrors({});
-    setActiveCaseIndex(null);
+    setEditingComponentIndex(null);
   };
   const handleCaseSubmit = async () => {
     try {
@@ -78,12 +83,13 @@ const ProcedureCasesSection = ({
       if (isEdit) {
         updateCase(editingCaseIndex, {
           ten_truong_hop: caseForm.ten_truong_hop,
-          mo_ta: caseForm.mo_ta
+          mo_ta: caseForm.mo_ta,
         });
-        setExpandedCases(prev => ({ ...prev, [editingCaseIndex]: true }));
+        setExpandedCases((prev) => ({ ...prev, [editingCaseIndex]: true }));
       } else {
         const newIndex = cases.length;
-        const maxThuTu = cases.length > 0 ? Math.max(...cases.map(c => c.thu_tu || 0)) : 0;
+        const maxThuTu =
+          cases.length > 0 ? Math.max(...cases.map((c) => c.thu_tu || 0)) : 0;
 
         addCase({
           ten_truong_hop: caseForm.ten_truong_hop,
@@ -92,7 +98,7 @@ const ProcedureCasesSection = ({
           thanh_phan_ho_so: [],
         });
 
-        setExpandedCases(prev => ({ ...prev, [newIndex]: true }));
+        setExpandedCases((prev) => ({ ...prev, [newIndex]: true }));
         setTimeout(() => {
           const el = document.querySelector(`[data-case-index="${newIndex}"]`);
           el?.scrollIntoView({ behavior: "smooth", block: "center" });
@@ -106,23 +112,55 @@ const ProcedureCasesSection = ({
     }
   };
 
+  const handleEditComponentClick = async (
+    caseIndex,
+    componentIndex,
+    component
+  ) => {
+    console.log("Đã click nút sửa!", {
+        caseIndex,
+        componentIndex,
+        component,
+      });
+    setActiveCaseIndex(caseIndex);
+    setEditingComponentIndex(componentIndex);
+    setComponentForm({
+      ten_thanh_phan: component.ten_thanh_phan || "",
+      mo_ta_chi_tiet: component.mo_ta_chi_tiet || "",
+      so_luong_ban_chinh: component.so_luong_ban_chinh || "",
+      so_luong_ban_sao: component.so_luong_ban_sao || "",
+      ghi_chu: component.ghi_chu || "",
+    });
+    setIsAddComponentModalOpen(true);
+  };
+
   const handleComponentSubmit = async () => {
     try {
       let caseIndex = activeCaseIndex;
+
       if (caseIndex === null || caseIndex === undefined) {
         caseIndex = selectedCaseIndex !== null ? selectedCaseIndex : 0;
       }
 
-      if (caseIndex === null || caseIndex === undefined || !cases || caseIndex >= cases.length) {
+      if (
+        caseIndex === null ||
+        caseIndex === undefined ||
+        !cases ||
+        caseIndex >= cases.length
+      ) {
         return;
       }
-
+      
       const dataForValidation = {
         ten_thanh_phan: componentForm.ten_thanh_phan?.trim() || "",
         mo_ta_chi_tiet: componentForm.mo_ta_chi_tiet?.trim() || "",
-        so_luong_ban_chinh: componentForm.so_luong_ban_chinh ? Number(componentForm.so_luong_ban_chinh) : null,
-        so_luong_ban_sao: componentForm.so_luong_ban_sao ? Number(componentForm.so_luong_ban_sao) : null,
-        ghi_chu: componentForm.ghi_chu?.trim() || ""
+        so_luong_ban_chinh: componentForm.so_luong_ban_chinh
+          ? Number(componentForm.so_luong_ban_chinh)
+          : null,
+        so_luong_ban_sao: componentForm.so_luong_ban_sao
+          ? Number(componentForm.so_luong_ban_sao)
+          : null,
+        ghi_chu: componentForm.ghi_chu?.trim() || "",
       };
 
       if (!dataForValidation.ten_thanh_phan) {
@@ -137,8 +175,20 @@ const ProcedureCasesSection = ({
       }
 
       setComponentErrors({});
-      addCaseComponent(caseIndex, dataForValidation);
-      setExpandedCases(prev => ({ ...prev, [caseIndex]: true }));
+
+      if (
+        editingComponentIndex !== null &&
+        editingComponentIndex !== undefined
+      ) {
+        updateCaseComponent(
+          caseIndex,
+          editingComponentIndex,
+          dataForValidation
+        );
+      } else {
+        addCaseComponent(caseIndex, dataForValidation);
+      }
+      setExpandedCases((prev) => ({ ...prev, [caseIndex]: true }));
       setIsAddComponentModalOpen(false);
       resetComponentForm();
 
@@ -146,7 +196,6 @@ const ProcedureCasesSection = ({
         const el = document.querySelector(`[data-case-index="${caseIndex}"]`);
         el?.scrollIntoView({ behavior: "smooth", block: "center" });
       }, 50);
-
     } catch (error) {
       setComponentErrors({ general: "Có lỗi xảy ra. Vui lòng thử lại." });
     }
@@ -189,7 +238,11 @@ const ProcedureCasesSection = ({
           setIsAddCaseModalOpen(false);
           resetCaseForm();
         }}
-        title={editingCaseIndex !== null ? "Chỉnh sửa trường hợp" : "Thêm trường hợp mới"}
+        title={
+          editingCaseIndex !== null
+            ? "Chỉnh sửa trường hợp"
+            : "Thêm trường hợp mới"
+        }
         size="md"
         footer={
           <ModalFooter
@@ -213,9 +266,12 @@ const ProcedureCasesSection = ({
               type="text"
               value={caseForm.ten_truong_hop}
               onChange={(e) => {
-                setCaseForm(prev => ({...prev, ten_truong_hop: e.target.value}));
+                setCaseForm((prev) => ({
+                  ...prev,
+                  ten_truong_hop: e.target.value,
+                }));
                 if (caseErrors.ten_truong_hop) {
-                  setCaseErrors(prev => ({...prev, ten_truong_hop: null}));
+                  setCaseErrors((prev) => ({ ...prev, ten_truong_hop: null }));
                 }
               }}
               placeholder="Nhập tên trường hợp..."
@@ -227,7 +283,9 @@ const ProcedureCasesSection = ({
               }`}
             />
             {caseErrors.ten_truong_hop && (
-              <p className="text-xs text-red-600 mt-1">{caseErrors.ten_truong_hop}</p>
+              <p className="text-xs text-red-600 mt-1">
+                {caseErrors.ten_truong_hop}
+              </p>
             )}
           </div>
 
@@ -237,7 +295,9 @@ const ProcedureCasesSection = ({
             </label>
             <textarea
               value={caseForm.mo_ta}
-              onChange={(e) => setCaseForm(prev => ({...prev, mo_ta: e.target.value}))}
+              onChange={(e) =>
+                setCaseForm((prev) => ({ ...prev, mo_ta: e.target.value }))
+              }
               placeholder="Nhập mô tả trường hợp..."
               rows="4"
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
@@ -251,9 +311,14 @@ const ProcedureCasesSection = ({
           setIsAddComponentModalOpen(false);
           resetComponentForm();
         }}
-        title="Thêm thành phần hồ sơ"
+        title={
+          editingComponentIndex !== null
+            ? "Chỉnh sửa thành phần hồ sơ"
+            : "Thêm thành phần hồ sơ mới"
+        }
         size="lg"
         className="max-w-xl"
+        style={{ zIndex: 99999, position: 'relative' }} 
         contentClassName="bg-white overflow-hidden"
         footer={
           <ModalFooter
@@ -263,7 +328,7 @@ const ProcedureCasesSection = ({
             }}
             onSubmit={handleComponentSubmit}
             cancelText="Hủy"
-            submitText="Lưu"
+            submitText={editingComponentIndex !== null ? "Cập nhật" : "Lưu"}
             submitType="primary"
           />
         }
@@ -277,9 +342,15 @@ const ProcedureCasesSection = ({
               type="text"
               value={componentForm.ten_thanh_phan}
               onChange={(e) => {
-                setComponentForm(prev => ({...prev, ten_thanh_phan: e.target.value}));
+                setComponentForm((prev) => ({
+                  ...prev,
+                  ten_thanh_phan: e.target.value,
+                }));
                 if (componentErrors.ten_thanh_phan) {
-                  setComponentErrors(prev => ({...prev, ten_thanh_phan: null}));
+                  setComponentErrors((prev) => ({
+                    ...prev,
+                    ten_thanh_phan: null,
+                  }));
                 }
               }}
               placeholder="Nhập tên thành phần..."
@@ -291,7 +362,9 @@ const ProcedureCasesSection = ({
               }`}
             />
             {componentErrors.ten_thanh_phan && (
-              <p className="text-xs text-red-600 mt-1">{componentErrors.ten_thanh_phan}</p>
+              <p className="text-xs text-red-600 mt-1">
+                {componentErrors.ten_thanh_phan}
+              </p>
             )}
           </div>
 
@@ -301,7 +374,12 @@ const ProcedureCasesSection = ({
             </label>
             <textarea
               value={componentForm.mo_ta_chi_tiet}
-              onChange={(e) => setComponentForm(prev => ({...prev, mo_ta_chi_tiet: e.target.value}))}
+              onChange={(e) =>
+                setComponentForm((prev) => ({
+                  ...prev,
+                  mo_ta_chi_tiet: e.target.value,
+                }))
+              }
               placeholder="Nhập mô tả chi tiết..."
               rows="3"
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
@@ -318,16 +396,24 @@ const ProcedureCasesSection = ({
                 min="0"
                 value={componentForm.so_luong_ban_chinh}
                 onChange={(e) => {
-                  setComponentForm(prev => ({...prev, so_luong_ban_chinh: e.target.value}));
+                  setComponentForm((prev) => ({
+                    ...prev,
+                    so_luong_ban_chinh: e.target.value,
+                  }));
                   if (componentErrors.so_luong_ban_chinh) {
-                    setComponentErrors(prev => ({...prev, so_luong_ban_chinh: null}));
+                    setComponentErrors((prev) => ({
+                      ...prev,
+                      so_luong_ban_chinh: null,
+                    }));
                   }
                 }}
                 placeholder="0"
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
               />
               {componentErrors.so_luong_ban_chinh && (
-                <p className="text-xs text-red-600 mt-1">{componentErrors.so_luong_ban_chinh}</p>
+                <p className="text-xs text-red-600 mt-1">
+                  {componentErrors.so_luong_ban_chinh}
+                </p>
               )}
             </div>
 
@@ -340,16 +426,24 @@ const ProcedureCasesSection = ({
                 min="0"
                 value={componentForm.so_luong_ban_sao}
                 onChange={(e) => {
-                  setComponentForm(prev => ({...prev, so_luong_ban_sao: e.target.value}));
+                  setComponentForm((prev) => ({
+                    ...prev,
+                    so_luong_ban_sao: e.target.value,
+                  }));
                   if (componentErrors.so_luong_ban_sao) {
-                    setComponentErrors(prev => ({...prev, so_luong_ban_sao: null}));
+                    setComponentErrors((prev) => ({
+                      ...prev,
+                      so_luong_ban_sao: null,
+                    }));
                   }
                 }}
                 placeholder="0"
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
               />
               {componentErrors.so_luong_ban_sao && (
-                <p className="text-xs text-red-600 mt-1">{componentErrors.so_luong_ban_sao}</p>
+                <p className="text-xs text-red-600 mt-1">
+                  {componentErrors.so_luong_ban_sao}
+                </p>
               )}
             </div>
 
@@ -360,7 +454,12 @@ const ProcedureCasesSection = ({
               <input
                 type="text"
                 value={componentForm.ghi_chu}
-                onChange={(e) => setComponentForm(prev => ({...prev, ghi_chu: e.target.value}))}
+                onChange={(e) =>
+                  setComponentForm((prev) => ({
+                    ...prev,
+                    ghi_chu: e.target.value,
+                  }))
+                }
                 placeholder="Ghi chú..."
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
               />
@@ -400,7 +499,7 @@ const ProcedureCasesSection = ({
                           setEditingCaseIndex(caseIndex);
                           setCaseForm({
                             ten_truong_hop: caseItem.ten_truong_hop || "",
-                            mo_ta: caseItem.mo_ta || ""
+                            mo_ta: caseItem.mo_ta || "",
                           });
                           setIsAddCaseModalOpen(true);
                         }}
@@ -475,32 +574,54 @@ const ProcedureCasesSection = ({
                             key={idx}
                             className="bg-gray-50 p-3 rounded border border-gray-200 hover:bg-gray-100 transition-colors"
                           >
-                            <div className="flex justify-between items-start mb-2">
+                            <div className="flex items-center justify-between w-full">
                               <h6 className="text-sm font-medium text-gray-900">
                                 {component.ten_thanh_phan ||
                                   `Thành phần ${idx + 1}`}
                               </h6>
-                              <button
-                                type="button"
-                                onClick={() => removeCaseComponent(selectedCaseIndex, idx)}
-                                className="text-red-600 hover:bg-red-50 p-1 rounded transition-colors"
-                                title="Xóa thành phần này"
-                              >
-                                <X className="w-3 h-3" />
-                              </button>
+                              <div className="flex items-center gap-2">
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    handleEditComponentClick(
+                                      selectedCaseIndex,
+                                      idx,
+                                      component
+                                    )
+                                  }
+                                  className="text-black p-1 rounded transition-colors"
+                                  title="Sửa thành phần này"
+                                >
+                                  <Edit2 className="w-4 h-4" />
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    removeCaseComponent(selectedCaseIndex, idx)
+                                  }
+                                  className="text-red-600 hover:bg-red-50 p-1 rounded transition-colors"
+                                  title="Xóa thành phần này"
+                                >
+                                  <X className="w-4 h-4" />
+                                </button>
+                              </div>
                             </div>
-                            
+
                             {component.mo_ta_chi_tiet && (
                               <p className="text-xs text-gray-600 mb-2">
                                 {component.mo_ta_chi_tiet}
                               </p>
                             )}
-                            
+
                             <div className="flex gap-4 text-xs text-gray-500">
-                              <span>Bản chính: {component.so_luong_ban_chinh || 0}</span>
-                              <span>Bản sao: {component.so_luong_ban_sao || 0}</span>
+                              <span>
+                                Bản chính: {component.so_luong_ban_chinh || 0}
+                              </span>
+                              <span>
+                                Bản sao: {component.so_luong_ban_sao || 0}
+                              </span>
                             </div>
-                            
+
                             {component.ghi_chu && (
                               <p className="text-xs text-gray-500 mt-1 italic">
                                 Ghi chú: {component.ghi_chu}
@@ -516,12 +637,13 @@ const ProcedureCasesSection = ({
                     <button
                       type="button"
                       onClick={() => {
-                        const caseIndexToUse = selectedCaseIndex !== null ? selectedCaseIndex : 0;
-                        
+                        const caseIndexToUse =
+                          selectedCaseIndex !== null ? selectedCaseIndex : 0;
+
                         if (cases?.length === 0 || !cases) {
                           return;
                         }
-                        
+
                         setActiveCaseIndex(caseIndexToUse);
                         resetComponentForm();
                         setIsAddComponentModalOpen(true);
