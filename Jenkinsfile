@@ -112,6 +112,7 @@ pipeline {
             --name ${CONTAINER_NAME} \
             --restart unless-stopped \
             -p ${HOST_PORT}:${CONTAINER_PORT} \
+            --network proxy \
             ${IMAGE_NAME}:${IMAGE_TAG}
         '''
       }
