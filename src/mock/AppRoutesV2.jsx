@@ -30,6 +30,8 @@ function RoleHome() {
   const { currentUser } = useMock();
   return <Navigate to={ROLE_HOME[currentUser?.role] || '/submit'} replace />;
 }
+// Bản đồ số
+import DigitalMap from '../pages-v2/map/DigitalMap';
 
 export default function AppRoutesV2() {
   return (
@@ -46,6 +48,7 @@ export default function AppRoutesV2() {
         <Route path="/admin/complaints/:id" element={<ComplaintDetail />} />
         <Route path="/admin/extensions" element={<ExtensionList />} />
         <Route path="/admin/extensions/:id" element={<ExtensionDetail />} />
+        <Route path="/admin/digital-map" element={<DigitalMap />} />
         <Route path="/placeholder" element={<PlaceholderPage />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
