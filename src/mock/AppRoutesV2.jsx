@@ -1,43 +1,46 @@
 // ============================================================
-// APP ROUTES V2 — Prototype routes
+// APP ROUTES V2 — Role-based routing, all share AdminLayoutV2
 // ============================================================
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { AdminLayoutV2, CitizenLayout } from './layouts/Layouts';
+import { AdminLayoutV2 } from './layouts/Layouts';
+import { useMock } from './MockContext';
 
-// Citizen pages
 import SubmitComplaint from '../pages-v2/citizen/SubmitComplaint';
 import MyComplaints from '../pages-v2/citizen/MyComplaints';
 import CitizenComplaintDetail from '../pages-v2/citizen/CitizenComplaintDetail';
-
-// Admin pages
 import ComplaintList from '../pages-v2/admin/ComplaintList';
 import ComplaintDetail from '../pages-v2/admin/ComplaintDetail';
 import ExtensionList from '../pages-v2/admin/ExtensionList';
 import ExtensionDetail from '../pages-v2/admin/ExtensionDetail';
-
-// Dashboard pages
 import DashboardOverview from '../pages-v2/dashboard/DashboardOverview';
 import DashboardNeighborhood from '../pages-v2/dashboard/DashboardNeighborhood';
 import DashboardLargeScreen from '../pages-v2/dashboard/DashboardLargeScreen';
-
-// Placeholder
 import PlaceholderPage from '../pages-v2/PlaceholderPage';
 
+const ROLE_HOME = {
+  CITIZEN: '/submit',
+  RECEPTION_OFFICER: '/admin/complaints',
+  PROCESSING_OFFICER: '/admin/complaints',
+  APPROVER: '/dashboard',
+  LEADER: '/dashboard',
+  ADMIN: '/dashboard',
+};
+
+function RoleHome() {
+  const { currentUser } = useMock();
+  return <Navigate to={ROLE_HOME[currentUser?.role] || '/submit'} replace />;
+}
 // Bản đồ số
 import DigitalMap from '../pages-v2/map/DigitalMap';
 
 export default function AppRoutesV2() {
   return (
     <Routes>
-      {/* Citizen routes */}
-      <Route element={<CitizenLayout />}>
-        <Route path="/" element={<SubmitComplaint />} />
+      <Route path="/" element={<RoleHome />} />
+      <Route element={<AdminLayoutV2 />}>
+        <Route path="/submit" element={<SubmitComplaint />} />
         <Route path="/my-complaints" element={<MyComplaints />} />
         <Route path="/complaint/:id" element={<CitizenComplaintDetail />} />
-      </Route>
-
-      {/* Admin routes */}
-      <Route element={<AdminLayoutV2 />}>
         <Route path="/dashboard" element={<DashboardOverview />} />
         <Route path="/dashboard/neighborhood" element={<DashboardNeighborhood />} />
         <Route path="/dashboard/large-screen" element={<DashboardLargeScreen />} />
@@ -48,8 +51,6 @@ export default function AppRoutesV2() {
         <Route path="/admin/digital-map" element={<DigitalMap />} />
         <Route path="/placeholder" element={<PlaceholderPage />} />
       </Route>
-
-      {/* Catch-all */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );

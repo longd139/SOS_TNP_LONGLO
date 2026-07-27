@@ -1,17 +1,19 @@
 // ============================================================
-// SIDEBAR V2 — Menu cho admin portal của prototype
+// SIDEBAR V2 — Menu hiển thị theo role (không ẩn, chỉ disable)
 // ============================================================
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, MessageSquare, Clock, MapPin, FolderOpen, Building2, Users, Settings, ChevronLeft, Map } from 'lucide-react';
+import { LayoutDashboard, MessageSquare, Clock, MapPin, FolderOpen, Building2, Users, Settings, ChevronLeft, FileText } from 'lucide-react';
+import { useMock } from '../MockContext';
 
-const MENU_ITEMS = [
-  { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, path: '/dashboard' },
-  { id: 'complaints', label: 'Quản lý phản ánh', icon: MessageSquare, path: '/admin/complaints' },
-  { id: 'extensions', label: 'Quản lý gia hạn', icon: Clock, path: '/admin/extensions' },
-  { id: 'digital-map', label: 'Bản đồ số', icon: Map, path: '/admin/digital-map' },
-  { id: 'neighborhood-dashboard', label: 'Dashboard khu phố', icon: MapPin, path: '/dashboard/neighborhood' },
-  { id: 'large-screen', label: 'Màn hình lớn', icon: LayoutDashboard, path: '/dashboard/large-screen' },
+const ALL_MENUS = [
+  { id: 'dashboard', label: 'Tổng quan', icon: LayoutDashboard, path: '/dashboard', roles: ['APPROVER','LEADER','ADMIN'] },
+  { id: 'complaints', label: 'Quản lý phản ánh', icon: MessageSquare, path: '/admin/complaints', roles: ['RECEPTION_OFFICER','PROCESSING_OFFICER','APPROVER','LEADER','ADMIN'] },
+  { id: 'extensions', label: 'Quản lý gia hạn', icon: Clock, path: '/admin/extensions', roles: ['PROCESSING_OFFICER','APPROVER','LEADER','ADMIN'] },
+  { id: 'neighborhood-dashboard', label: 'Dashboard khu phố', icon: MapPin, path: '/dashboard/neighborhood', roles: ['APPROVER','LEADER','ADMIN'] },
+  { id: 'large-screen', label: 'Màn hình lớn', icon: LayoutDashboard, path: '/dashboard/large-screen', roles: ['APPROVER','LEADER','ADMIN'] },
+  { id: 'submit', label: 'Gửi phản ánh', icon: FileText, path: '/submit', roles: ['CITIZEN','RECEPTION_OFFICER','ADMIN'] },
+  { id: 'my-complaints', label: 'Phản ánh của tôi', icon: MessageSquare, path: '/my-complaints', roles: ['CITIZEN'] },
   { type: 'divider' },
   { id: 'categories', label: 'Loại phản ánh', icon: FolderOpen, path: '/placeholder', disabled: true },
   { id: 'neighborhoods', label: 'Khu phố', icon: Building2, path: '/placeholder', disabled: true },
@@ -22,6 +24,8 @@ const MENU_ITEMS = [
 
 export default function SidebarV2({ collapsed, onToggle }) {
   const location = useLocation();
+  const { currentUser } = useMock();
+  const role = currentUser?.role || 'CITIZEN';
 
   return (
     <aside className={`bg-white border-r border-gray-200 h-screen overflow-y-auto transition-all duration-300 flex-shrink-0 ${collapsed ? 'w-20' : 'w-64'}`}>
@@ -41,17 +45,20 @@ export default function SidebarV2({ collapsed, onToggle }) {
 
       <nav className={`py-4 transition-all duration-300 ${collapsed ? 'px-2' : 'px-3'}`}>
         <ul className="space-y-1">
-          {MENU_ITEMS.map((item) => {
+          {ALL_MENUS.map((item) => {
             if (item.type === 'divider') return <li key="div" className="border-t border-gray-200 my-2" />;
             const isActive = location.pathname === item.path || location.pathname.startsWith(item.path + '/');
             const Icon = item.icon;
+            const hasAccess = !item.roles || item.roles.includes(role);
+            const isLocked = !item.disabled && !hasAccess;
 
             return (
               <li key={item.id}>
-                {item.disabled ? (
-                  <div className={`flex items-center text-sm rounded-lg transition-all duration-200 cursor-not-allowed opacity-50 bg-gray-50 text-gray-400 ${collapsed ? 'px-3 py-3 justify-center' : 'px-4 py-3'}`} title={`${item.label} (placeholder)`}>
+                {item.disabled || isLocked ? (
+                  <div className={`flex items-center text-sm rounded-lg transition-all duration-200 cursor-not-allowed opacity-50 bg-gray-50 text-gray-400 ${collapsed ? 'px-3 py-3 justify-center' : 'px-4 py-3'}`}
+                    title={isLocked ? `${item.label} (yêu cầu quyền truy cập)` : `${item.label} (đang phát triển)`}>
                     <Icon className={`w-5 h-5 flex-shrink-0 text-gray-400 ${collapsed ? '' : 'mr-3'}`} />
-                    {!collapsed && <span className="font-medium flex-1">{item.label}</span>}
+                    {!collapsed && <><span className="font-medium flex-1">{item.label}</span><span className="text-[10px]">🔒</span></>}
                   </div>
                 ) : (
                   <Link to={item.path} className={`flex items-center text-sm rounded-lg transition-all duration-200 ${collapsed ? 'px-3 py-3 justify-center' : 'px-4 py-3'} ${isActive ? 'bg-blue-50 text-blue-600' : 'text-gray-700 hover:bg-gray-50'}`} title={collapsed ? item.label : ''}>
@@ -66,7 +73,7 @@ export default function SidebarV2({ collapsed, onToggle }) {
       </nav>
 
       <div className={`border-t border-gray-200 p-3 ${collapsed ? 'text-center' : ''}`}>
-        <p className="text-xs text-gray-400">Mock v2.0 — {new Date().getFullYear()}</p>
+        <p className="text-xs text-gray-400">{role === 'CITIZEN' ? 'Người dân' : role === 'RECEPTION_OFFICER' ? 'Cán bộ tiếp nhận' : role === 'PROCESSING_OFFICER' ? 'Cán bộ xử lý' : role === 'APPROVER' || role === 'LEADER' ? 'Lãnh đạo' : 'Admin'} — v2.0</p>
       </div>
     </aside>
   );

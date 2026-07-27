@@ -3,17 +3,19 @@
 // ============================================================
 import React, { useState } from 'react';
 import { Menu, Bell, Search, User, ChevronDown, ShieldCheck } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useMock } from '../MockContext';
 
 const ROLES = [
   { role: 'CITIZEN', label: '👤 Người dân' },
   { role: 'RECEPTION_OFFICER', label: '📋 Cán bộ tiếp nhận' },
   { role: 'PROCESSING_OFFICER', label: '🔧 Cán bộ xử lý' },
-  { role: 'APPROVER', label: '✅ Lãnh đạo' },
-  { role: 'ADMIN', label: '⚙️ Quản trị viên' },
+  { role: 'APPROVER', label: '✅ Lãnh đạo', home: '/dashboard' },
+  { role: 'ADMIN', label: '⚙️ Quản trị viên', home: '/dashboard' },
 ];
 
 export default function HeaderV2({ onMobileMenuToggle, isMobileMenuOpen }) {
+  const navigate = useNavigate();
   const { currentUser, roleLabel, switchRole, getFilteredComplaints, setFilters, filters } = useMock();
   const [showRoleSwitcher, setShowRoleSwitcher] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
@@ -71,7 +73,7 @@ export default function HeaderV2({ onMobileMenuToggle, isMobileMenuOpen }) {
                   {ROLES.map(r => (
                     <button
                       key={r.role}
-                      onClick={() => { switchRole(r.role); setShowRoleSwitcher(false); }}
+                      onClick={() => { switchRole(r.role); navigate(r.home); setShowRoleSwitcher(false); }}
                       className={`w-full text-left px-3 py-2 text-sm hover:bg-gray-50 flex items-center gap-2 ${currentUser?.role === r.role ? 'bg-blue-50 text-blue-700 font-medium' : 'text-gray-700'}`}
                     >
                       <span>{r.label}</span>

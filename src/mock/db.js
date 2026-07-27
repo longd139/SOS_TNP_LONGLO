@@ -17,22 +17,22 @@ const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
 // 1. USERS
 // ============================================================
 export const users = [
-  { id: "USR-001", fullName: "Nguyễn Văn An",    phone: "0901234567", email: "an.nguyen@example.com",     role: "CITIZEN",              departmentId: null,         status: "ACTIVE", avatarUrl: "/mock/avatars/01.png" },
-  { id: "USR-002", fullName: "Trần Thị Bình",     phone: "0901234568", email: "binh.tran@example.com",    role: "CITIZEN",              departmentId: null,         status: "ACTIVE", avatarUrl: "/mock/avatars/02.png" },
-  { id: "USR-003", fullName: "Lê Văn Cường",      phone: "0901234569", email: "cuong.le@example.com",     role: "CITIZEN",              departmentId: null,         status: "ACTIVE", avatarUrl: "/mock/avatars/03.png" },
-  { id: "USR-004", fullName: "Phạm Thị Dung",      phone: "0901234570", email: "dung.pham@example.com",    role: "CITIZEN",              departmentId: null,         status: "ACTIVE", avatarUrl: "/mock/avatars/04.png" },
-  { id: "USR-005", fullName: "Hoàng Văn Em",       phone: "0901234571", email: "em.hoang@example.com",     role: "CITIZEN",              departmentId: null,         status: "ACTIVE", avatarUrl: "/mock/avatars/05.png" },
-  { id: "USR-010", fullName: "Vũ Thị Hoa",         phone: "0987654321", email: "hoa.vu@ubnd.gov.vn",       role: "RECEPTION_OFFICER",    departmentId: "DEP-RECEPTION", status: "ACTIVE", avatarUrl: "/mock/avatars/10.png" },
-  { id: "USR-011", fullName: "Mai Văn Khánh",      phone: "0987654322", email: "khanh.mai@ubnd.gov.vn",    role: "RECEPTION_OFFICER",    departmentId: "DEP-RECEPTION", status: "ACTIVE", avatarUrl: "/mock/avatars/11.png" },
-  { id: "USR-020", fullName: "Đặng Minh Luân",     phone: "0987654330", email: "luan.dang@ubnd.gov.vn",    role: "PROCESSING_OFFICER",   departmentId: "DEP-URBAN",   status: "ACTIVE", avatarUrl: "/mock/avatars/20.png" },
-  { id: "USR-021", fullName: "Bùi Thanh Mai",      phone: "0987654331", email: "mai.bui@ubnd.gov.vn",      role: "PROCESSING_OFFICER",   departmentId: "DEP-URBAN",   status: "ACTIVE", avatarUrl: "/mock/avatars/21.png" },
-  { id: "USR-022", fullName: "Ngô Quốc Nam",       phone: "0987654332", email: "nam.ngo@ubnd.gov.vn",      role: "PROCESSING_OFFICER",   departmentId: "DEP-ENV",     status: "ACTIVE", avatarUrl: "/mock/avatars/22.png" },
-  { id: "USR-023", fullName: "Lý Thị Oanh",        phone: "0987654333", email: "oanh.ly@ubnd.gov.vn",      role: "PROCESSING_OFFICER",   departmentId: "DEP-ENV",     status: "ACTIVE", avatarUrl: "/mock/avatars/23.png" },
-  { id: "USR-024", fullName: "Trịnh Văn Phong",    phone: "0987654334", email: "phong.trinh@ubnd.gov.vn",  role: "PROCESSING_OFFICER",   departmentId: "DEP-INFRA",   status: "ACTIVE", avatarUrl: "/mock/avatars/24.png" },
-  { id: "USR-025", fullName: "Hồ Thị Quyên",       phone: "0987654335", email: "quyen.ho@ubnd.gov.vn",     role: "PROCESSING_OFFICER",   departmentId: "DEP-INFRA",   status: "ACTIVE", avatarUrl: "/mock/avatars/25.png" },
-  { id: "USR-030", fullName: "Đỗ Văn Sơn",         phone: "0987654340", email: "son.do@ubnd.gov.vn",       role: "APPROVER",             departmentId: "DEP-LEADERSHIP", status: "ACTIVE", avatarUrl: "/mock/avatars/30.png" },
-  { id: "USR-031", fullName: "Phan Thị Thảo",      phone: "0987654341", email: "thao.phan@ubnd.gov.vn",    role: "LEADER",               departmentId: "DEP-LEADERSHIP", status: "ACTIVE", avatarUrl: "/mock/avatars/31.png" },
-  { id: "USR-032", fullName: "Võ Minh Tuấn",       phone: "0987654342", email: "tuan.vo@ubnd.gov.vn",      role: "ADMIN",                departmentId: "DEP-LEADERSHIP", status: "ACTIVE", avatarUrl: "/mock/avatars/32.png" },
+  { id: "USR-001", fullName: "Nguyễn Văn An",    phone: "0901234567", role: "CITIZEN",              departmentId: null,         status: "ACTIVE", avatarUrl: "/mock/avatars/01.png" },
+  { id: "USR-002", fullName: "Trần Thị Bình",     phone: "0901234568", role: "CITIZEN",              departmentId: null,         status: "ACTIVE", avatarUrl: "/mock/avatars/02.png" },
+  { id: "USR-003", fullName: "Lê Văn Cường",      phone: "0901234569", role: "CITIZEN",              departmentId: null,         status: "ACTIVE", avatarUrl: "/mock/avatars/03.png" },
+  { id: "USR-004", fullName: "Phạm Thị Dung",      phone: "0901234570", role: "CITIZEN",              departmentId: null,         status: "ACTIVE", avatarUrl: "/mock/avatars/04.png" },
+  { id: "USR-005", fullName: "Hoàng Văn Em",       phone: "0901234571", role: "CITIZEN",              departmentId: null,         status: "ACTIVE", avatarUrl: "/mock/avatars/05.png" },
+  { id: "USR-010", fullName: "Vũ Thị Hoa",         phone: "0987654321", role: "RECEPTION_OFFICER",    departmentId: "DEP-RECEPTION", status: "ACTIVE", avatarUrl: "/mock/avatars/10.png" },
+  { id: "USR-011", fullName: "Mai Văn Khánh",      phone: "0987654322", role: "RECEPTION_OFFICER",    departmentId: "DEP-RECEPTION", status: "ACTIVE", avatarUrl: "/mock/avatars/11.png" },
+  { id: "USR-020", fullName: "Đặng Minh Luân",     phone: "0987654330", role: "PROCESSING_OFFICER",   departmentId: "DEP-URBAN",   status: "ACTIVE", avatarUrl: "/mock/avatars/20.png" },
+  { id: "USR-021", fullName: "Bùi Thanh Mai",      phone: "0987654331", role: "PROCESSING_OFFICER",   departmentId: "DEP-URBAN",   status: "ACTIVE", avatarUrl: "/mock/avatars/21.png" },
+  { id: "USR-022", fullName: "Ngô Quốc Nam",       phone: "0987654332", role: "PROCESSING_OFFICER",   departmentId: "DEP-ENV",     status: "ACTIVE", avatarUrl: "/mock/avatars/22.png" },
+  { id: "USR-023", fullName: "Lý Thị Oanh",        phone: "0987654333", role: "PROCESSING_OFFICER",   departmentId: "DEP-ENV",     status: "ACTIVE", avatarUrl: "/mock/avatars/23.png" },
+  { id: "USR-024", fullName: "Trịnh Văn Phong",    phone: "0987654334", role: "PROCESSING_OFFICER",   departmentId: "DEP-INFRA",   status: "ACTIVE", avatarUrl: "/mock/avatars/24.png" },
+  { id: "USR-025", fullName: "Hồ Thị Quyên",       phone: "0987654335", role: "PROCESSING_OFFICER",   departmentId: "DEP-INFRA",   status: "ACTIVE", avatarUrl: "/mock/avatars/25.png" },
+  { id: "USR-030", fullName: "Đỗ Văn Sơn",         phone: "0987654340", role: "APPROVER",             departmentId: "DEP-LEADERSHIP", status: "ACTIVE", avatarUrl: "/mock/avatars/30.png" },
+  { id: "USR-031", fullName: "Phan Thị Thảo",      phone: "0987654341", role: "LEADER",               departmentId: "DEP-LEADERSHIP", status: "ACTIVE", avatarUrl: "/mock/avatars/31.png" },
+  { id: "USR-032", fullName: "Võ Minh Tuấn",       phone: "0987654342", role: "ADMIN",                departmentId: "DEP-LEADERSHIP", status: "ACTIVE", avatarUrl: "/mock/avatars/32.png" },
 ];
 
 // ============================================================
@@ -98,7 +98,7 @@ const C = (overrides = {}) => {
 
   return {
     id,
-    code: `PA-${new Date(createdAt).getFullYear()}${String(new Date(createdAt).getMonth()+1).padStart(2,'0')}${String(new Date(createdAt).getDate()).padStart(2,'0')}-${String(cid).padStart(4,'0')}`,
+    code: `PA-${String(cid).padStart(4,'0')}`,
     citizenId: pick(users.filter(u => u.role === 'CITIZEN')).id,
     title: overrides.title || "Phản ánh mẫu",
     description: overrides.description || "Mô tả chi tiết phản ánh",
@@ -116,7 +116,7 @@ const C = (overrides = {}) => {
     originalDeadline,
     currentDeadline: overrides.currentDeadline || originalDeadline,
     completedAt: overrides.completedAt || null,
-    slaStatus: overrides.slaStatus || computeSlaStatus(status, originalDeadline, overrides.completedAt),
+    slaStatus: overrides.slaStatus || computeSlaStatus(status, originalDeadline, overrides.completedAt, slaHours),
     assignedDepartmentId: overrides.assignedDepartmentId || null,
     assignedOfficerId: overrides.assignedOfficerId || null,
     extensionCount: overrides.extensionCount || 0,
@@ -128,7 +128,7 @@ const C = (overrides = {}) => {
   };
 };
 
-function computeSlaStatus(status, deadline, completedAt) {
+function computeSlaStatus(status, deadline, completedAt, slaHours = 120) {
   if (status === 'COMPLETED' && completedAt && deadline) {
     return new Date(completedAt) <= new Date(deadline) ? 'COMPLETED_ON_TIME' : 'COMPLETED_LATE';
   }
@@ -137,8 +137,9 @@ function computeSlaStatus(status, deadline, completedAt) {
   const nowDate = new Date();
   if (nowDate > dl) return 'OVERDUE';
   const hoursLeft = (dl - nowDate) / 3600000;
-  if (hoursLeft < 6) return 'NEAR_DUE';
-  if (hoursLeft < 24) return 'NEAR_DUE';
+  // ponytail: urgent (≤24h SLA) warns at 6h, normal warns at 24h
+  const warnThreshold = slaHours <= 24 ? 6 : 24;
+  if (hoursLeft < warnThreshold) return 'NEAR_DUE';
   return 'ON_TIME';
 }
 
@@ -474,35 +475,38 @@ export function getSlaLabel(slaStatus) {
 
 export function getSlaColor(slaStatus) {
   const map = {
-    'ON_TIME': 'bg-green-100 text-green-800', 'NEAR_DUE': 'bg-yellow-100 text-yellow-800',
-    'OVERDUE': 'bg-red-100 text-red-800', 'COMPLETED_ON_TIME': 'bg-green-100 text-green-800',
-    'COMPLETED_LATE': 'bg-red-200 text-red-900', 'PENDING_EXTENSION': 'bg-orange-100 text-orange-800',
-    'NOT_APPLICABLE': 'bg-gray-100 text-gray-600',
+    'ON_TIME':            { bg: '#D1FAE5', color: '#065F46' },
+    'NEAR_DUE':           { bg: '#FEF3C7', color: '#92400E' },
+    'OVERDUE':            { bg: '#FEE2E2', color: '#991B1B' },
+    'COMPLETED_ON_TIME':  { bg: '#D1FAE5', color: '#065F46' },
+    'COMPLETED_LATE':     { bg: '#FEE2E2', color: '#991B1B' },
+    'PENDING_EXTENSION':  { bg: '#FFEDD5', color: '#9A3412' },
+    'NOT_APPLICABLE':     { bg: '#F3F4F6', color: '#6B7280' },
   };
-  return map[slaStatus] || 'bg-gray-100 text-gray-600';
+  return map[slaStatus] || { bg: '#F3F4F6', color: '#6B7280' };
 }
 
 export function getStatusLabel(status) {
   const map = {
-    'NEW': 'Mới gửi', 'PENDING_RECEPTION': 'Chờ tiếp nhận', 'RECEIVED': 'Đã tiếp nhận',
-    'ASSIGNED': 'Đã phân công', 'IN_PROGRESS': 'Đang xử lý',
-    'EXTENSION_PENDING': 'Chờ duyệt gia hạn', 'COMPLETED': 'Hoàn thành', 'REJECTED': 'Từ chối',
+    'NEW': 'Đã gửi', 'PENDING_RECEPTION': 'Đã gửi', 'RECEIVED': 'Đang xử lý',
+    'ASSIGNED': 'Đang xử lý', 'IN_PROGRESS': 'Đang xử lý',
+    'EXTENSION_PENDING': 'Đang xử lý', 'COMPLETED': 'Đã giải quyết', 'REJECTED': 'Từ chối',
   };
   return map[status] || status;
 }
 
 export function getStatusColor(status) {
   const map = {
-    'NEW': 'bg-gray-100 text-gray-600',
-    'PENDING_RECEPTION': 'bg-blue-100 text-blue-800',
-    'RECEIVED': 'bg-blue-100 text-blue-800',
-    'ASSIGNED': 'bg-purple-100 text-purple-800',
-    'IN_PROGRESS': 'bg-orange-100 text-orange-800',
-    'EXTENSION_PENDING': 'bg-yellow-100 text-yellow-800',
-    'COMPLETED': 'bg-green-100 text-green-800',
-    'REJECTED': 'bg-red-100 text-red-800',
+    'NEW':                 { bg: '#FEF3C7', color: '#92400E' },
+    'PENDING_RECEPTION':   { bg: '#FEF3C7', color: '#92400E' },
+    'RECEIVED':            { bg: '#DBEAFE', color: '#1E40AF' },
+    'ASSIGNED':            { bg: '#DBEAFE', color: '#1E40AF' },
+    'IN_PROGRESS':         { bg: '#DBEAFE', color: '#1E40AF' },
+    'EXTENSION_PENDING':   { bg: '#FEF3C7', color: '#92400E' },
+    'COMPLETED':           { bg: '#D1FAE5', color: '#065F46' },
+    'REJECTED':            { bg: '#FEE2E2', color: '#991B1B' },
   };
-  return map[status] || 'bg-gray-100 text-gray-600';
+  return map[status] || { bg: '#F3F4F6', color: '#6B7280' };
 }
 
 export function getUrgencyLabel(urgency) {
