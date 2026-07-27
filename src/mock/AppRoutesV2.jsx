@@ -16,6 +16,7 @@ import DashboardOverview from '../pages-v2/dashboard/DashboardOverview';
 import DashboardNeighborhood from '../pages-v2/dashboard/DashboardNeighborhood';
 import DashboardLargeScreen from '../pages-v2/dashboard/DashboardLargeScreen';
 import PlaceholderPage from '../pages-v2/PlaceholderPage';
+import DigitalMap from '../pages-v2/map/DigitalMap';
 
 const ROLE_HOME = {
   CITIZEN: '/submit',
@@ -31,7 +32,6 @@ function RoleHome() {
   return <Navigate to={ROLE_HOME[currentUser?.role] || '/submit'} replace />;
 }
 // Bản đồ số
-import DigitalMap from '../pages-v2/map/DigitalMap';
 
 export default function AppRoutesV2() {
   return (

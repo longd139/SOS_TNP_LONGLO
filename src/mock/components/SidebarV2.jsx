@@ -3,7 +3,7 @@
 // ============================================================
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, MessageSquare, Clock, MapPin, FolderOpen, Building2, Users, Settings, ChevronLeft, FileText } from 'lucide-react';
+import { LayoutDashboard, MessageSquare, Clock, MapPin, FolderOpen, Building2, Users, Settings, ChevronLeft, FileText, Map } from 'lucide-react';
 import { useMock } from '../MockContext';
 
 const ALL_MENUS = [
@@ -12,6 +12,7 @@ const ALL_MENUS = [
   { id: 'extensions', label: 'Quản lý gia hạn', icon: Clock, path: '/admin/extensions', roles: ['PROCESSING_OFFICER','APPROVER','LEADER','ADMIN'] },
   { id: 'neighborhood-dashboard', label: 'Dashboard khu phố', icon: MapPin, path: '/dashboard/neighborhood', roles: ['APPROVER','LEADER','ADMIN'] },
   { id: 'large-screen', label: 'Màn hình lớn', icon: LayoutDashboard, path: '/dashboard/large-screen', roles: ['APPROVER','LEADER','ADMIN'] },
+  { id: 'digital-map', label: 'Bản đồ số', icon: Map, path: '/admin/digital-map', roles: ['APPROVER','LEADER','ADMIN'] },
   { id: 'submit', label: 'Gửi phản ánh', icon: FileText, path: '/submit', roles: ['CITIZEN','RECEPTION_OFFICER','ADMIN'] },
   { id: 'my-complaints', label: 'Phản ánh của tôi', icon: MessageSquare, path: '/my-complaints', roles: ['CITIZEN'] },
   { type: 'divider' },
