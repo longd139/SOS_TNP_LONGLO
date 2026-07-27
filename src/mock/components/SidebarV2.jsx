@@ -3,12 +3,13 @@
 // ============================================================
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, MessageSquare, Clock, MapPin, FolderOpen, Building2, Users, Settings, ChevronLeft } from 'lucide-react';
+import { LayoutDashboard, MessageSquare, Clock, MapPin, FolderOpen, Building2, Users, Settings, ChevronLeft, Map } from 'lucide-react';
 
 const MENU_ITEMS = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, path: '/dashboard' },
   { id: 'complaints', label: 'Quản lý phản ánh', icon: MessageSquare, path: '/admin/complaints' },
   { id: 'extensions', label: 'Quản lý gia hạn', icon: Clock, path: '/admin/extensions' },
+  { id: 'digital-map', label: 'Bản đồ số', icon: Map, path: '/admin/digital-map' },
   { id: 'neighborhood-dashboard', label: 'Dashboard khu phố', icon: MapPin, path: '/dashboard/neighborhood' },
   { id: 'large-screen', label: 'Màn hình lớn', icon: LayoutDashboard, path: '/dashboard/large-screen' },
   { type: 'divider' },

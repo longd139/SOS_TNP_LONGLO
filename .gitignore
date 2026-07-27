@@ -22,3 +22,5 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .env
+# Downloaded GIS planning data (regenerated via npm run download-planning)
+/public/data/*.geojson
