@@ -193,10 +193,10 @@ export default function MyComplaints() {
                     <td colSpan={9} className="px-6 py-16 text-center text-gray-500">
                       <FileText className="w-16 h-16 mx-auto mb-4 text-gray-300" />
                       <p className="text-lg font-medium text-gray-500">
-                        {hasActiveFilter ? 'Không tìm thấy phản ánh phu hop' : 'Bạn chưa gửi phản ánh nao'}
+                        {hasActiveFilter ? 'Không tìm thấy phản ánh phù hợp' : 'Bạn chưa gửi phản ánh nào'}
                       </p>
                       {!hasActiveFilter && allComplaints.length === 0 && (
-                        <p className="text-sm text-gray-400 mt-1">Nhan "Gửi phản ánh" để bắt đầu phản ánh moi.</p>
+                        <p className="text-sm text-gray-400 mt-1">Nhấn "Gửi phản ánh" để bắt đầu phản ánh mới.</p>
                       )}
                     </td>
                   </tr>
@@ -247,7 +247,7 @@ export default function MyComplaints() {
             <div className="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
               <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
                 <p className="text-sm text-gray-700">
-                  Hiển thị <span className="font-medium">{((safePage - 1) * PAGE_SIZE) + 1}</span> den{' '}
+                  Hiển thị <span className="font-medium">{((safePage - 1) * PAGE_SIZE) + 1}</span> đến{' '}
                   <span className="font-medium">{Math.min(safePage * PAGE_SIZE, filtered.length)}</span> trong{' '}
                   <span className="font-medium">{filtered.length}</span> kết quả
                 </p>
@@ -295,10 +295,10 @@ export default function MyComplaints() {
           <div className="bg-white rounded-xl p-6 shadow-sm text-center text-gray-500">
             <FileText className="w-16 h-16 mx-auto mb-4 text-gray-300" />
             <p className="text-base font-medium">
-              {hasActiveFilter ? 'Không tìm thấy phản ánh' : 'Bạn chưa gửi phản ánh nao'}
+              {hasActiveFilter ? 'Không tìm thấy phản ánh' : 'Bạn chưa gửi phản ánh nào'}
             </p>
             {!hasActiveFilter && allComplaints.length === 0 && (
-              <p className="text-sm mt-1">Nhan "Gửi phản ánh" để bắt đầu phản ánh moi.</p>
+              <p className="text-sm mt-1">Nhấn "Gửi phản ánh" để bắt đầu phản ánh mới.</p>
             )}
           </div>
         ) : paginated.map(c => {
@@ -326,13 +326,13 @@ export default function MyComplaints() {
                 )}
               </div>
               {c.slaStatus !== 'NOT_APPLICABLE' && c.currentDeadline && ['ON_TIME','NEAR_DUE','OVERDUE'].includes(c.slaStatus) && (
-                <div className="text-xs text-gray-500 mb-2">Han: {formatDateOnly(c.currentDeadline)} ({getTimeRemaining(c.currentDeadline)})</div>
+                <div className="text-xs text-gray-500 mb-2">Hạn: {formatDateOnly(c.currentDeadline)} ({getTimeRemaining(c.currentDeadline)})</div>
               )}
               <button
                 onClick={() => navigate(`/complaint/${c.id}`)}
                 className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 text-sm font-medium w-full"
               >
-                Xem chi tiet
+                Xem chi tiết
               </button>
             </div>
           );
@@ -345,7 +345,7 @@ export default function MyComplaints() {
               disabled={safePage <= 1}
               className="px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
             >
-              Truoc
+              Trước
             </button>
             <span className="text-sm text-gray-500">Trang {safePage} / {totalPages}</span>
             <button

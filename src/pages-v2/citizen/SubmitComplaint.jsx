@@ -1,5 +1,5 @@
 // ============================================================
-// Gửi phản ánh, kien nghi -- SubmitComplaint (Citizen)
+// Gửi phản ánh, kiến nghị -- SubmitComplaint (Citizen)
 // PAGE C-01
 // ============================================================
 import React, { useState, useRef } from 'react';
@@ -157,7 +157,7 @@ export default function SubmitComplaint() {
     const files = Array.from(e.target.files || []);
     const remaining = 5 - images.length;
     if (files.length > remaining) {
-      setErrors(prev => ({ ...prev, images: `Tối đa 5 ảnh (con ${remaining} anh co the them)` }));
+      setErrors(prev => ({ ...prev, images: `Tối đa 5 ảnh (còn ${remaining} ảnh có thể thêm)` }));
       e.target.value = '';
       return;
     }
@@ -262,7 +262,7 @@ export default function SubmitComplaint() {
           )}
         </div>
 
-        {/* ---- 2. Tieu de ---- */}
+        {/* ---- 2. Tiêu đề ---- */}
         <div>
           <label className={labelClass}>
             Tiêu đề phản ánh <span className={requiredClass}>*</span>
@@ -272,7 +272,7 @@ export default function SubmitComplaint() {
             value={title}
             onChange={e => { setTitle(e.target.value); clearField('title'); }}
             maxLength={150}
-            placeholder="Nhap tieu de ngan gon ve van de cua ban"
+            placeholder="Nhập tiêu đề ngắn gọn về vấn đề của bạn"
             className={errors.title ? inputErrorClass : inputClass}
           />
           <div className="flex justify-between mt-1">
@@ -295,7 +295,7 @@ export default function SubmitComplaint() {
             onChange={e => { setDescription(e.target.value); clearField('description'); }}
             maxLength={2000}
             rows={5}
-            placeholder="Mo ta chi tiet van de ban dang gap phai (thoi gian, dia diem, tinh trang...)"
+            placeholder="Mô tả chi tiết vấn đề bạn đang gặp phải (thời gian, địa điểm, tình trạng...)"
             className={`${errors.description ? inputErrorClass : inputClass} resize-y`}
           />
           <div className="flex justify-between mt-1">
@@ -314,14 +314,14 @@ export default function SubmitComplaint() {
           )}
         </div>
 
-        {/* ---- 4. Muc do ---- */}
+        {/* ---- 4. Mức độ ---- */}
         <div>
           <label className={labelClass}>
-            Muc do <span className={requiredClass}>*</span>
+            Mức độ <span className={requiredClass}>*</span>
           </label>
           <div className="flex flex-col sm:flex-row gap-3">
             <label
-              title="Thoi gian xu ly du kien: 3-5 ngay"
+              title="Thời gian xử lý dự kiến: 3-5 ngày"
               className={`flex-1 cursor-pointer rounded-lg border-2 p-3 ${
                 urgency === 'NORMAL'
                   ? 'border-blue-500 bg-blue-50'
@@ -337,10 +337,10 @@ export default function SubmitComplaint() {
                 className="sr-only"
               />
               <div className="font-medium text-sm text-gray-900">Thông thường</div>
-              <div className="text-xs mt-0.5 text-gray-500">Thoi gian xu ly du kien: 3-5 ngay</div>
+              <div className="text-xs mt-0.5 text-gray-500">Thời gian xử lý dự kiến: 3-5 ngày</div>
             </label>
             <label
-              title="Can xu ly trong vong 24 gio"
+              title="Cần xử lý trong vòng 24 giờ"
               className={`flex-1 cursor-pointer rounded-lg border-2 p-3 ${
                 urgency === 'URGENT'
                   ? 'border-red-500 bg-red-50'
@@ -356,7 +356,7 @@ export default function SubmitComplaint() {
                 className="sr-only"
               />
               <div className="font-medium text-sm text-gray-900">Khẩn cấp</div>
-              <div className="text-xs mt-0.5 text-gray-500">Thoi gian xu ly du kien: 24 gio</div>
+              <div className="text-xs mt-0.5 text-gray-500">Thời gian xử lý dự kiến: 24 giờ</div>
             </label>
           </div>
         </div>
@@ -375,7 +375,7 @@ export default function SubmitComplaint() {
                 onChange={e => { setNeighborhoodSearch(e.target.value); setNeighborhoodId(''); setShowNeighborhoodDropdown(true); }}
                 onFocus={() => setShowNeighborhoodDropdown(true)}
                 onBlur={() => setTimeout(() => setShowNeighborhoodDropdown(false), 200)}
-                placeholder="Tim kiem khu pho..."
+                placeholder="Tìm kiếm khu phố..."
                 className={`${errors.neighborhoodId ? inputErrorClass : inputClass} pl-9 pr-10`}
               />
               <ChevronDown className={`absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4 transition-transform ${showNeighborhoodDropdown ? 'rotate-180' : ''}`} />
@@ -383,7 +383,7 @@ export default function SubmitComplaint() {
             {showNeighborhoodDropdown && (
               <div className="absolute z-10 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg max-h-48 overflow-y-auto">
                 {filteredNeighborhoods.length === 0 ? (
-                  <div className="px-3 py-2 text-sm text-gray-400">Khong tim thay khu pho</div>
+                  <div className="px-3 py-2 text-sm text-gray-400">Không tìm thấy khu phố</div>
                 ) : (
                   filteredNeighborhoods.map(n => (
                     <button
@@ -414,27 +414,27 @@ export default function SubmitComplaint() {
             type="text"
             value={address}
             onChange={e => setAddress(e.target.value)}
-            placeholder="So nha, ten duong, moc tham chieu..."
+            placeholder="Số nhà, tên đường, mốc tham chiếu..."
             className={inputClass}
           />
         </div>
 
-        {/* ---- 7. Vi tri (mock map) ---- */}
+        {/* ---- 7. Vị trí (mock map) ---- */}
         <div>
           <label className={labelClass}>
-            Vi tri <MapPin className="w-4 h-4 inline ml-1 text-blue-600" />
+            Vị trí <MapPin className="w-4 h-4 inline ml-1 text-blue-600" />
           </label>
           <div className="bg-gray-100 rounded-lg h-48 flex flex-col items-center justify-center border border-gray-200">
             {(latitude && longitude) ? (
               <div className="text-center">
                 <MapPin className="w-6 h-6 text-blue-600 mx-auto mb-1" />
                 <p className="text-sm font-mono text-gray-700">{latitude}, {longitude}</p>
-                <p className="text-xs text-gray-400 mt-0.5">Vi tri da chon</p>
+                <p className="text-xs text-gray-400 mt-0.5">Vị trí đã chọn</p>
               </div>
             ) : (
               <div className="text-center text-gray-400">
                 <MapPin className="w-6 h-6 mx-auto mb-1 opacity-50" />
-                <p className="text-xs">Chua co vi tri</p>
+                <p className="text-xs">Chưa có vị trí</p>
               </div>
             )}
           </div>
@@ -448,12 +448,12 @@ export default function SubmitComplaint() {
           </button>
         </div>
 
-        {/* ---- 8. Hinh anh dinh kem ---- */}
+        {/* ---- 8. Hình ảnh đính kèm ---- */}
         <div>
           <label className={labelClass}>
-            Hinh anh dinh kem <Camera className="w-4 h-4 inline ml-1 text-blue-600" />
+            Hình ảnh đính kèm <Camera className="w-4 h-4 inline ml-1 text-blue-600" />
           </label>
-          <p className="text-xs text-gray-400 mb-2">Tối đa 5 ảnh. Ho tro JPG, PNG.</p>
+          <p className="text-xs text-gray-400 mb-2">Tối đa 5 ảnh. Hỗ trợ JPG, PNG.</p>
 
           {images.length > 0 && (
             <div className="flex flex-wrap gap-2 mb-2">
@@ -491,9 +491,9 @@ export default function SubmitComplaint() {
           >
             <Upload className="w-5 h-5 mx-auto text-gray-400 mb-1" />
             <p className="text-sm text-gray-500">
-              {images.length >= 5 ? 'Da dat toi da 5 anh' : 'Keo tha hoac nhan de tai anh len'}
+              {images.length >= 5 ? 'Đã đạt tối đa 5 ảnh' : 'Kéo thả hoặc nhấn để tải ảnh lên'}
             </p>
-            <p className="text-xs text-gray-400 mt-0.5">JPG, PNG (toi da 5 anh)</p>
+            <p className="text-xs text-gray-400 mt-0.5">JPG, PNG (tối đa 5 ảnh)</p>
           </div>
           {errors.images && (
             <p className={errorClass}><AlertCircle className="w-3 h-3" />{errors.images}</p>
@@ -505,7 +505,7 @@ export default function SubmitComplaint() {
           <h3 className="text-sm font-semibold text-gray-700 mb-3">Thông tin liên hệ</h3>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div>
-              <label className="block text-xs text-gray-500 mb-1">Ho va ten</label>
+              <label className="block text-xs text-gray-500 mb-1">Họ và tên</label>
               <input
                 type="text"
                 value={contactName}
@@ -537,7 +537,7 @@ export default function SubmitComplaint() {
           </div>
         </div>
 
-        {/* ---- 10. Xac nhan ---- */}
+        {/* ---- 10. Xác nhận ---- */}
         <div>
           <label className="flex items-start gap-3 cursor-pointer">
             <input
@@ -547,7 +547,7 @@ export default function SubmitComplaint() {
               className="mt-0.5 w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
             />
             <span className="text-sm text-gray-600 leading-snug">
-              Toi xac nhan thong tin phan anh la dung su that va chiu trach nhiem ve noi dung da cung cap.
+              Tôi xác nhận thông tin phản ánh là đúng sự thật và chịu trách nhiệm về nội dung đã cung cấp.
             </span>
           </label>
           {errors.confirmed && (

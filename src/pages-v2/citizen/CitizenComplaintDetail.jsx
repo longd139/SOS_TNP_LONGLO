@@ -26,8 +26,8 @@ export default function CitizenComplaintDetail() {
   if (!complaint) {
     return (
       <div className="bg-white rounded-xl shadow-sm p-16 text-center">
-        <p className="text-lg font-medium text-gray-500">Khong tim thay phan anh</p>
-        <button onClick={() => navigate(-1)} className="mt-4 text-sm text-blue-600 hover:underline">Quay lai</button>
+        <p className="text-lg font-medium text-gray-500">Không tìm thấy phản ánh</p>
+        <button onClick={() => navigate(-1)} className="mt-4 text-sm text-blue-600 hover:underline">Quay lại</button>
       </div>
     );
   }
@@ -58,22 +58,22 @@ export default function CitizenComplaintDetail() {
           className="inline-flex items-center gap-1.5 text-sm text-gray-600 hover:text-gray-900 mb-3"
         >
           <ArrowLeft className="w-4 h-4" />
-          Quay lai
+          Quay lại
         </button>
-        <h1 className="text-2xl font-bold text-gray-900">Chi tiet phan anh</h1>
+        <h1 className="text-2xl font-bold text-gray-900">Chi tiết phản ánh</h1>
         <p className="text-gray-600 mt-1">{complaint.title}</p>
       </div>
 
       {/* ---- Status overview ---- */}
       <div className={CARD}>
-        <h3 className={SECTION_TITLE}>Trang thai</h3>
+        <h3 className={SECTION_TITLE}>Trạng thái</h3>
         <div className="space-y-3">
           <div className="flex items-center gap-2 text-sm text-gray-600">
-            <span className="font-medium">Ma phan anh:</span>
+            <span className="font-medium">Mã phản ánh:</span>
             <span>{complaint.code}</span>
           </div>
           <div className="flex flex-wrap items-center gap-2">
-            <span className="text-sm font-medium text-gray-600">Trang thai:</span>
+            <span className="text-sm font-medium text-gray-600">Trạng thái:</span>
             <StatusBadge status={complaint.status} />
             <UrgencyBadge urgency={urgency} />
             <SlaBadge slaStatus={complaint.slaStatus} />
@@ -82,7 +82,7 @@ export default function CitizenComplaintDetail() {
             <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4 text-sm text-gray-600">
               <div className="flex items-center gap-1.5">
                 <Clock className="w-4 h-4" />
-                <span>Han xu ly: {formatDate(complaint.currentDeadline)}</span>
+                <span>Hạn xử lý: {formatDate(complaint.currentDeadline)}</span>
               </div>
               {timeRemaining && (
                 <span className={`font-medium ${timeRemainingColor}`}>
@@ -96,22 +96,22 @@ export default function CitizenComplaintDetail() {
 
       {/* ---- Content ---- */}
       <div className={CARD}>
-        <h3 className={SECTION_TITLE}>Noi dung phan anh</h3>
+        <h3 className={SECTION_TITLE}>Nội dung phản ánh</h3>
         <div className="space-y-3">
           {/* Description */}
           <div>
             <p className="text-sm text-gray-700 whitespace-pre-wrap break-words">
-              {complaint.description || 'Khong co mo ta'}
+              {complaint.description || 'Không có mô tả'}
             </p>
           </div>
 
           {/* Info grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm pt-2 border-t border-gray-100">
-            <div><span className="text-gray-500">Loai phan anh:</span> <span className="text-gray-700 font-medium">{cat?.name || '—'}</span></div>
-            <div><span className="text-gray-500">Khu pho:</span> <span className="text-gray-700 font-medium">{nb?.name || '—'}</span></div>
+            <div><span className="text-gray-500">Loại phản ánh:</span> <span className="text-gray-700 font-medium">{cat?.name || '—'}</span></div>
+            <div><span className="text-gray-500">Khu phố:</span> <span className="text-gray-700 font-medium">{nb?.name || '—'}</span></div>
             {complaint.address && (
               <div className="sm:col-span-2">
-                <span className="text-gray-500">Dia chi:</span> <span className="text-gray-700">{complaint.address}</span>
+                <span className="text-gray-500">Địa chỉ:</span> <span className="text-gray-700">{complaint.address}</span>
               </div>
             )}
           </div>
@@ -122,7 +122,7 @@ export default function CitizenComplaintDetail() {
               <div className="text-center text-gray-500">
                 <MapPin className="w-6 h-6 mx-auto mb-1" />
                 <p className="text-xs font-mono">{complaint.latitude.toFixed(6)}, {complaint.longitude.toFixed(6)}</p>
-                <p className="text-xs mt-0.5">Vi tri ban do</p>
+                <p className="text-xs mt-0.5">Vị trí bản đồ</p>
               </div>
             </div>
           )}
@@ -130,7 +130,7 @@ export default function CitizenComplaintDetail() {
           {/* Images */}
           {attachments.length > 0 && (
             <div className="pt-2 border-t border-gray-100">
-              <p className="text-sm font-medium text-gray-600 mb-2">Hinh anh dinh kem ({attachments.length})</p>
+              <p className="text-sm font-medium text-gray-600 mb-2">Hình ảnh đính kèm ({attachments.length})</p>
               <div className="flex flex-wrap gap-2">
                 {attachments.map(att => (
                   <img
@@ -149,25 +149,25 @@ export default function CitizenComplaintDetail() {
       {/* ---- Processing info (public only) ---- */}
       {(dept || complaint.receivedAt || complaint.currentDeadline) && (
         <div className={CARD}>
-          <h3 className={SECTION_TITLE}>Thong tin xu ly</h3>
+          <h3 className={SECTION_TITLE}>Thông tin xử lý</h3>
           <div className="space-y-2 text-sm">
             {dept && (
               <div className="flex items-center gap-1.5">
-                <span className="text-gray-500">Don vi xu ly:</span>
+                <span className="text-gray-500">Đơn vị xử lý:</span>
                 <span className="text-gray-700 font-medium">{dept.name}</span>
               </div>
             )}
             {complaint.receivedAt && (
               <div className="flex items-center gap-1.5">
                 <Calendar className="w-4 h-4 text-gray-400" />
-                <span className="text-gray-500">Ngay tiep nhan:</span>
+                <span className="text-gray-500">Ngày tiếp nhận:</span>
                 <span className="text-gray-700">{formatDate(complaint.receivedAt)}</span>
               </div>
             )}
             {complaint.currentDeadline && (
               <div className="flex items-center gap-1.5">
                 <Clock className="w-4 h-4 text-gray-400" />
-                <span className="text-gray-500">Du kien hoan thanh:</span>
+                <span className="text-gray-500">Dự kiến hoàn thành:</span>
                 <span className="text-gray-700">{formatDate(complaint.currentDeadline)}</span>
               </div>
             )}
@@ -178,7 +178,7 @@ export default function CitizenComplaintDetail() {
       {/* ---- Public timeline ---- */}
       {publicHistory.length > 0 && (
         <div className={CARD}>
-          <h3 className={SECTION_TITLE}>Tien trinh xu ly</h3>
+          <h3 className={SECTION_TITLE}>Tiến trình xử lý</h3>
           <div className="relative pl-6">
             <div className="absolute left-[11px] top-0 bottom-0 w-0.5 bg-gray-200" />
             {publicHistory.map((entry, idx) => {
@@ -223,21 +223,21 @@ export default function CitizenComplaintDetail() {
       {/* ---- Completion result ---- */}
       {isCompleted && (
         <div className={CARD}>
-          <h3 className={SECTION_TITLE}>Ket qua xu ly</h3>
+          <h3 className={SECTION_TITLE}>Kết quả xử lý</h3>
           <div className="flex items-center gap-2 mb-3">
             <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
             <p className="text-sm text-gray-700">
-              Phan anh da duoc xu ly va hoan thanh
-              {complaint.slaStatus === 'COMPLETED_LATE' ? ' (tre han).' : ' dung han.'}
+              Phản ánh đã được xử lý và hoàn thành
+              {complaint.slaStatus === 'COMPLETED_LATE' ? ' (trễ hạn).' : ' đúng hạn.'}
             </p>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-sm text-gray-600">Ket luan SLA:</span>
+            <span className="text-sm text-gray-600">Kết luận SLA:</span>
             <SlaBadge slaStatus={complaint.slaStatus} />
           </div>
           {complaint.completedAt && (
             <p className="text-xs text-gray-500 mt-3">
-              Hoan thanh: {formatDate(complaint.completedAt)}
+              Hoàn thành: {formatDate(complaint.completedAt)}
             </p>
           )}
         </div>

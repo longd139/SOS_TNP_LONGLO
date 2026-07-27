@@ -1,5 +1,5 @@
 // ============================================================
-// DASHBOARD NEIGHBORHOOD — So sanh cac khu pho (PAGE D-02)
+// DASHBOARD NEIGHBORHOOD — So sánh các khu phố (PAGE D-02)
 // ============================================================
 import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -132,11 +132,11 @@ function DashboardNeighborhood() {
     ['neighborhoodName', 'Khu phố'],
     ['total', 'Tổng'],
     ['urgent', 'Khẩn cấp'],
-    ['inProgress', 'Đang xử l\xFD'],
-    ['completed', 'Ho\xE0n th\xE0nh'],
-    ['overdue', 'Qu\xE1 hạn'],
-    ['onTimeRate', 'Tỷ lệ đ\xFAng hạn'],
-    ['avgDays', 'TB xử l\xFD'],
+    ['inProgress', 'Đang xử lý'],
+    ['completed', 'Hoàn thành'],
+    ['overdue', 'Quá hạn'],
+    ['onTimeRate', 'Tỷ lệ đúng hạn'],
+    ['avgDays', 'TB xử lý'],
   ];
 
   // ---- map heat colors (based on volume + overdue) ----
@@ -157,12 +157,12 @@ function DashboardNeighborhood() {
           <MapPin size={24} className="text-blue-600" />
           Dashboard theo khu phố
         </h1>
-        <p className="text-gray-600 mt-1">So s\xE1nh hiệu suất xử l\xFD phản \xE1nh giữa c\xE1c khu phố</p>
+        <p className="text-gray-600 mt-1">So sánh hiệu suất xử lý phản ánh giữa các khu phố</p>
       </div>
 
       {/* ---- Neighborhood filter chips ---- */}
       <div className="bg-white rounded-xl p-3 md:p-4 shadow-sm mb-4">
-        <p className="text-xs text-gray-500 mb-2">Chọn khu phố để so s\xE1nh (bỏ trống = tất cả)</p>
+        <p className="text-xs text-gray-500 mb-2">Chọn khu phố để so sánh (bỏ trống = tất cả)</p>
         <div className="flex flex-wrap gap-2">
           {stats.map(s => (
             <button
@@ -182,17 +182,17 @@ function DashboardNeighborhood() {
 
       {/* ---- KPI Row ---- */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4 mb-4">
-        <StatCard title="Tổng phản \xE1nh" value={kpi.total} icon={<MessageSquare size={20} />} color="blue" />
-        <StatCard title="Đang xử l\xFD" value={kpi.inProgress} icon={<Clock size={20} />} color="orange" />
-        <StatCard title="Ho\xE0n th\xE0nh" value={kpi.completed} icon={<CheckCircle size={20} />} color="green" />
-        <StatCard title="Qu\xE1 hạn" value={kpi.overdue} icon={<AlertTriangle size={20} />} color="red" />
-        <StatCard title="Tỷ lệ đ\xFAng hạn" value={`${kpi.onTimeRate}%`} icon={<BarChart3 size={20} />} color="violet" />
+        <StatCard title="Tổng phản ánh" value={kpi.total} icon={<MessageSquare size={20} />} color="blue" />
+        <StatCard title="Đang xử lý" value={kpi.inProgress} icon={<Clock size={20} />} color="orange" />
+        <StatCard title="Hoàn thành" value={kpi.completed} icon={<CheckCircle size={20} />} color="green" />
+        <StatCard title="Quá hạn" value={kpi.overdue} icon={<AlertTriangle size={20} />} color="red" />
+        <StatCard title="Tỷ lệ đúng hạn" value={`${kpi.onTimeRate}%`} icon={<BarChart3 size={20} />} color="violet" />
       </div>
 
       {/* ---- Comparison Table (BaseTable style) ---- */}
       <div className="bg-white rounded-xl p-3 md:p-4 shadow-sm mb-4">
         <h3 className="text-base md:text-lg font-semibold text-gray-800 mb-3 md:mb-4 ml-3 mt-2">
-          Bảng so s\xE1nh khu phố
+          Bảng so sánh khu phố
         </h3>
         <div className="bg-white rounded-lg shadow-sm border border-gray-200">
           <table className="min-w-full divide-y divide-gray-200">
@@ -232,7 +232,7 @@ function DashboardNeighborhood() {
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-center">{makeBadge(s.overdue, '#FEE2E2', '#991B1B')}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-center">{badgeOnTimeRate(onTimeRate)}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-center text-gray-500">
-                        {s.avgDays != null ? `${s.avgDays} ng\xE0y` : '—'}
+                        {s.avgDays != null ? `${s.avgDays} ngày` : '—'}
                       </td>
                     </tr>
                     {/* Expanded drill-down row */}
@@ -301,7 +301,7 @@ function DashboardNeighborhood() {
               {sorted.length === 0 && (
                 <tr>
                   <td colSpan={8} className="px-6 py-8 text-center text-sm text-gray-400">
-                    Kh\xF4ng c\xF3 dữ liệu khu phố n\xE0o
+                    Không có dữ liệu khu phố nào
                   </td>
                 </tr>
               )}
@@ -315,7 +315,7 @@ function DashboardNeighborhood() {
         <h3 className="text-base md:text-lg font-semibold text-gray-800 mb-3 md:mb-4 ml-3 mt-2">
           Bản đồ khu phố
         </h3>
-        <p className="text-[10px] text-gray-400 ml-3 -mt-2 mb-4">(theo số lượng phản \xE1nh)</p>
+        <p className="text-[10px] text-gray-400 ml-3 -mt-2 mb-4">(theo số lượng phản ánh)</p>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
           {stats.map(s => {
             const h = heatColor(s);
@@ -331,7 +331,7 @@ function DashboardNeighborhood() {
                   className="inline-block px-2 py-0.5 rounded text-[10px] font-medium"
                   style={{ backgroundColor: h.bg, color: h.text }}
                 >
-                  {s.overdue > 0 ? `${s.overdue} qu\xE1 hạn` : `${s.completed} ho\xE0n th\xE0nh`}
+                  {s.overdue > 0 ? `${s.overdue} quá hạn` : `${s.completed} hoàn thành`}
                 </span>
               </div>
             );

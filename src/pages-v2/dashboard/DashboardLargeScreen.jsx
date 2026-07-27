@@ -16,7 +16,7 @@ import {
 import { neighborhoods, departments } from '../../mock/db';
 
 // ============================================================
-// SVG donut — Trang thai
+// SVG donut — Trạng thái
 // ============================================================
 function StatusDonut({ inProgress, overdue, completed, others }) {
   const total = inProgress + overdue + completed + others || 1;
@@ -66,7 +66,7 @@ function StatusDonut({ inProgress, overdue, completed, others }) {
 }
 
 // ============================================================
-// Horizontal bar chart — Phan anh theo trang thai
+// Horizontal bar chart — Phản ánh theo trạng thái
 // ============================================================
 function StatusBarChart({ data }) {
   const max = Math.max(...data.map((d) => d.count), 1);
