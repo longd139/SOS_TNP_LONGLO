@@ -17,6 +17,8 @@ import DashboardNeighborhood from '../pages-v2/dashboard/DashboardNeighborhood';
 import DashboardLargeScreen from '../pages-v2/dashboard/DashboardLargeScreen';
 import PlaceholderPage from '../pages-v2/PlaceholderPage';
 import DigitalMap from '../pages-v2/map/DigitalMap';
+import InternalDocs from '../pages-v2/admin/InternalDocs';
+import PublicDocs from '../pages-v2/admin/PublicDocs';
 
 const ROLE_HOME = {
   CITIZEN: '/submit',
@@ -49,6 +51,8 @@ export default function AppRoutesV2() {
         <Route path="/admin/extensions" element={<ExtensionList />} />
         <Route path="/admin/extensions/:id" element={<ExtensionDetail />} />
         <Route path="/admin/digital-map" element={<DigitalMap />} />
+        <Route path="/admin/documents/internal" element={<InternalDocs />} />
+        <Route path="/admin/documents/public" element={<PublicDocs />} />
         <Route path="/placeholder" element={<PlaceholderPage />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />

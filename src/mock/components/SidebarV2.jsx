@@ -1,15 +1,32 @@
 // ============================================================
 // SIDEBAR V2 — Menu hiển thị theo role (không ẩn, chỉ disable)
 // ============================================================
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, MessageSquare, Clock, MapPin, FolderOpen, Building2, Users, Settings, ChevronLeft, FileText, Map } from 'lucide-react';
+import { LayoutDashboard, MessageSquare, Clock, MapPin, FolderOpen, Building2, Users, Settings, ChevronLeft, FileText, Map, ChevronDown, ChevronRight } from 'lucide-react';
 import { useMock } from '../MockContext';
 
 const ALL_MENUS = [
   { id: 'dashboard', label: 'Tổng quan', icon: LayoutDashboard, path: '/dashboard', roles: ['APPROVER','LEADER','ADMIN'] },
   { id: 'complaints', label: 'Quản lý phản ánh', icon: MessageSquare, path: '/admin/complaints', roles: ['RECEPTION_OFFICER','PROCESSING_OFFICER','APPROVER','LEADER','ADMIN'] },
   { id: 'extensions', label: 'Quản lý gia hạn', icon: Clock, path: '/admin/extensions', roles: ['PROCESSING_OFFICER','APPROVER','LEADER','ADMIN'] },
+  { 
+    id: 'documents', 
+    label: 'Quản lý Tài liệu', 
+    icon: FileText, 
+    roles: ['PROCESSING_OFFICER','APPROVER','LEADER','ADMIN'],
+    submenu: [
+      { id: 'doc-internal', label: 'Tài liệu nội bộ', path: '/admin/documents/internal' },
+      { 
+        id: 'doc-public', 
+        label: 'Tài liệu công khai', 
+        submenu: [
+          { id: 'doc-public-history', label: 'Văn hóa lịch sử', path: '/admin/documents/public?category=history' },
+          { id: 'doc-public-legal', label: 'Quy phạm pháp luật', path: '/admin/documents/public?category=legal' }
+        ]
+      },
+    ]
+  },
   { id: 'neighborhood-dashboard', label: 'Dashboard khu phố', icon: MapPin, path: '/dashboard/neighborhood', roles: ['APPROVER','LEADER','ADMIN'] },
   { id: 'large-screen', label: 'Màn hình lớn', icon: LayoutDashboard, path: '/dashboard/large-screen', roles: ['APPROVER','LEADER','ADMIN'] },
   { id: 'digital-map', label: 'Bản đồ số', icon: Map, path: '/admin/digital-map', roles: ['APPROVER','LEADER','ADMIN'] },
@@ -27,6 +44,11 @@ export default function SidebarV2({ collapsed, onToggle }) {
   const location = useLocation();
   const { currentUser } = useMock();
   const role = currentUser?.role || 'CITIZEN';
+  const [openMenus, setOpenMenus] = useState({ documents: true });
+
+  const toggleSubmenu = (id) => {
+    setOpenMenus(prev => ({ ...prev, [id]: !prev[id] }));
+  };
 
   return (
     <aside className={`bg-white border-r border-gray-200 h-screen overflow-y-auto transition-all duration-300 flex-shrink-0 ${collapsed ? 'w-20' : 'w-64'}`}>
@@ -48,11 +70,80 @@ export default function SidebarV2({ collapsed, onToggle }) {
         <ul className="space-y-1">
           {ALL_MENUS.map((item) => {
             if (item.type === 'divider') return <li key="div" className="border-t border-gray-200 my-2" />;
-            const isActive = location.pathname === item.path || location.pathname.startsWith(item.path + '/');
             const Icon = item.icon;
             const hasAccess = !item.roles || item.roles.includes(role);
             const isLocked = !item.disabled && !hasAccess;
 
+            if (item.submenu) {
+              const isSubOpen = openMenus[item.id];
+              const isActiveSub = item.submenu.some(sub => location.pathname === sub.path || location.pathname.startsWith(sub.path + '/'));
+              
+              return (
+                <li key={item.id} className="mb-1">
+                  {item.disabled || isLocked ? (
+                    <div className={`flex items-center text-sm rounded-lg transition-all duration-200 cursor-not-allowed opacity-50 bg-gray-50 text-gray-400 ${collapsed ? 'px-3 py-3 justify-center' : 'px-4 py-3'}`}
+                      title={isLocked ? `${item.label} (yêu cầu quyền truy cập)` : `${item.label} (đang phát triển)`}>
+                      <Icon className={`w-5 h-5 flex-shrink-0 text-gray-400 ${collapsed ? '' : 'mr-3'}`} />
+                      {!collapsed && <><span className="font-medium flex-1">{item.label}</span><span className="text-[10px]">🔒</span></>}
+                    </div>
+                  ) : (
+                    <>
+                      <div onClick={() => toggleSubmenu(item.id)} className={`flex items-center text-sm rounded-lg transition-all duration-200 cursor-pointer ${collapsed ? 'px-3 py-3 justify-center' : 'px-4 py-3'} ${isActiveSub ? 'bg-blue-50 text-blue-600' : 'text-gray-700 hover:bg-gray-50'}`} title={collapsed ? item.label : ''}>
+                        <Icon className={`w-5 h-5 flex-shrink-0 ${isActiveSub ? 'text-blue-600' : 'text-gray-500'} ${collapsed ? '' : 'mr-3'}`} />
+                        {!collapsed && (
+                          <>
+                            <span className="font-medium flex-1">{item.label}</span>
+                            {isSubOpen ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
+                          </>
+                        )}
+                      </div>
+                      {!collapsed && isSubOpen && (
+                        <ul className="mt-1 ml-9 space-y-1">
+                          {item.submenu.map(sub => {
+                            if (sub.submenu) {
+                              const isLevel3Open = openMenus[sub.id];
+                              const isLevel3Active = sub.submenu.some(sub3 => location.pathname === sub3.path.split('?')[0]);
+                              return (
+                                <li key={sub.id} className="mb-1">
+                                  <div onClick={() => toggleSubmenu(sub.id)} className={`flex items-center text-sm rounded-lg cursor-pointer px-3 py-2 transition-all duration-200 ${isLevel3Active ? 'text-blue-600 font-medium' : 'text-gray-600 hover:bg-gray-50'}`}>
+                                    <span className="flex-1">{sub.label}</span>
+                                    {isLevel3Open ? <ChevronDown className="w-3 h-3" /> : <ChevronRight className="w-3 h-3" />}
+                                  </div>
+                                  {isLevel3Open && (
+                                    <ul className="mt-1 ml-2 space-y-1 border-l border-gray-200 pl-2">
+                                      {sub.submenu.map(sub3 => {
+                                        const isSub3Active = location.pathname + location.search === sub3.path;
+                                        return (
+                                          <li key={sub3.id}>
+                                            <Link to={sub3.path} className={`block text-xs rounded-lg px-3 py-2 transition-all duration-200 ${isSub3Active ? 'bg-blue-50 text-blue-600 font-medium' : 'text-gray-500 hover:text-blue-600'}`}>
+                                              {sub3.label}
+                                            </Link>
+                                          </li>
+                                        )
+                                      })}
+                                    </ul>
+                                  )}
+                                </li>
+                              )
+                            }
+                            const isSubActive = location.pathname === sub.path;
+                            return (
+                              <li key={sub.id}>
+                                <Link to={sub.path} className={`block text-sm rounded-lg px-3 py-2 transition-all duration-200 ${isSubActive ? 'bg-blue-50 text-blue-600 font-medium' : 'text-gray-600 hover:bg-gray-50 hover:text-blue-600'}`}>
+                                  {sub.label}
+                                </Link>
+                              </li>
+                            );
+                          })}
+                        </ul>
+                      )}
+                    </>
+                  )}
+                </li>
+              );
+            }
+
+            const isActive = location.pathname === item.path || location.pathname.startsWith(item.path + '/');
             return (
               <li key={item.id}>
                 {item.disabled || isLocked ? (
