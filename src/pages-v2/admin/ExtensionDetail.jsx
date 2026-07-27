@@ -1,19 +1,32 @@
 // ============================================================
-// EXTENSION DETAIL — Duyệt / từ chối yêu cầu gia hạn
+// EXTENSION DETAIL — PAGE E-03: Duyệt / từ chối yêu cầu gia hạn
 // ============================================================
 import React, { useState, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
-  ArrowLeft, Clock, User, Building2, FileText, Calendar, AlertTriangle,
-  CheckCircle, XCircle, MessageSquare, Image, Send, ChevronDown, ChevronUp,
+  ArrowLeft, Clock, User, Building2, FileText, Calendar,
+  CheckCircle, XCircle, MessageSquare, Image, Send,
 } from 'lucide-react';
 import { useMock } from '../../mock/MockContext';
 import {
   getComplaintById, getUserById, getCategoryById, getDepartmentById,
-  getNeighborhoodById, getStatusLabel, getUrgencyLabel, getTimeRemaining,
+  getNeighborhoodById, getStatusLabel, getTimeRemaining,
   getActionTypeLabel, getHistoryByComplaint,
 } from '../../mock/db';
 import { StatusBadge, SlaBadge, UrgencyBadge } from '../../mock/components/Badges';
+
+// ---- Extension-specific constants ----
+const EXT_STATUS_COLORS = {
+  PENDING:  { bg: '#FEF3C7', color: '#92400E' },
+  APPROVED: { bg: '#D1FAE5', color: '#065F46' },
+  REJECTED: { bg: '#FEE2E2', color: '#991B1B' },
+};
+
+const EXT_STATUS_LABELS = {
+  PENDING: 'Chờ phê duyệt',
+  APPROVED: 'Đã phê duyệt',
+  REJECTED: 'Đã từ chối',
+};
 
 const EXT_REASON_LABELS = {
   WAITING_FOR_COORDINATION: 'Chờ phối hợp liên ngành',
@@ -21,16 +34,29 @@ const EXT_REASON_LABELS = {
   COMPLEX_CASE: 'Vụ việc phức tạp',
   WAITING_FOR_SUPPLIES: 'Chờ vật tư, thiết bị',
   WEATHER_CONDITIONS: 'Điều kiện thời tiết',
+  WAITING_FOR_CITIZEN_INFO: 'Chờ người dân bổ sung thông tin',
   OTHER: 'Lý do khác',
 };
 
-// ponytail: badge colors match db.js getStatusColor
-const EXT_STATUS = {
-  PENDING: { label: 'Chờ phê duyệt', color: 'bg-yellow-100 text-yellow-800' },
-  APPROVED: { label: 'Đã phê duyệt', color: 'bg-green-100 text-green-800' },
-  REJECTED: { label: 'Đã từ chối', color: 'bg-red-100 text-red-800' },
-};
+// ---- Shared badge base (StatusBadge/SlaBadge/UrgencyBadge imported from Badges.jsx) ----
+function Badge({ label, bg, color, icon: Icon }) {
+  return (
+    <span
+      className="inline-flex items-center gap-1 px-3 py-1 text-xs font-medium rounded-full"
+      style={{ backgroundColor: bg, color }}
+    >
+      {Icon && <Icon className="w-3 h-3" />}
+      {label || '—'}
+    </span>
+  );
+}
 
+function ExtStatusBadge({ status }) {
+  const c = EXT_STATUS_COLORS[status] || { bg: '#F3F4F6', color: '#6B7280' };
+  return <Badge label={EXT_STATUS_LABELS[status] || status} bg={c.bg} color={c.color} />;
+}
+
+// ---- Helpers ----
 function formatDate(dateStr) {
   if (!dateStr) return '—';
   const d = new Date(dateStr);
@@ -38,83 +64,32 @@ function formatDate(dateStr) {
     ' ' + d.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
 }
 
-function formatDateShort(dateStr) {
-  if (!dateStr) return '—';
-  const d = new Date(dateStr);
-  return d.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
-}
+// ---- Form classes (exact spec) ----
+const inputCls = "w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent";
+const textareaCls = "w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none";
 
-// ---- Collapsible section wrapper (matching ComplaintDetail) ----
-function Section({ title, icon: Icon, defaultOpen = true, children, action }) {
-  const [open, setOpen] = useState(defaultOpen);
+// ---- Field ----
+function Field({ label, required, children }) {
   return (
-    <div className="bg-white rounded-xl shadow-sm overflow-hidden">
-      <button
-        onClick={() => setOpen(!open)}
-        className="w-full flex items-center justify-between px-5 py-3.5 hover:bg-gray-50 transition-colors"
-      >
-        <div className="flex items-center gap-2.5">
-          {Icon && <Icon className="w-4 h-4 text-gray-400" />}
-          <h4 className="text-sm font-semibold text-gray-900">{title}</h4>
-        </div>
-        <div className="flex items-center gap-2">
-          {action}
-          {open ? <ChevronUp className="w-4 h-4 text-gray-400" /> : <ChevronDown className="w-4 h-4 text-gray-400" />}
-        </div>
-      </button>
-      {open && <div className="px-5 pb-5 space-y-3">{children}</div>}
+    <div>
+      <label className="block text-sm font-medium text-gray-700 mb-1">
+        {label}{required && <span className="text-red-500 ml-0.5">*</span>}
+      </label>
+      {children}
     </div>
   );
 }
 
-// ---- Modal wrapper (matching ComplaintDetail) ----
-function Modal({ title, icon: Icon, onClose, children }) {
+// ---- Modal ----
+function Modal({ title, onClose, children }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onClick={onClose}>
       <div
         className="bg-white rounded-xl shadow-xl w-full max-w-lg mx-4 p-6 space-y-4 max-h-[90vh] overflow-y-auto"
         onClick={e => e.stopPropagation()}
       >
-        <div className="flex items-center gap-2">
-          {Icon && <Icon className="w-5 h-5 text-blue-600" />}
-          <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
-        </div>
+        <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
         {children}
-      </div>
-    </div>
-  );
-}
-
-// ---- Timeline entry (matching ComplaintDetail) ----
-function TimelineEntry({ entry, isLast, isLatest }) {
-  const actor = getUserById(entry.performedBy);
-  const dotClass = isLatest
-    ? 'bg-white border-2 border-blue-600'
-    : 'bg-white border-2 border-gray-400';
-
-  return (
-    <div className="flex gap-3">
-      <div className="flex flex-col items-center pt-0.5">
-        <div className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${dotClass}`} />
-        {!isLast && <div className="w-0.5 flex-1 min-h-[1.5rem] bg-gray-300" />}
-      </div>
-      <div className="pb-3 flex-1 min-w-0">
-        <div className="flex items-center gap-2 text-sm flex-wrap">
-          <span className="font-medium text-gray-800">{getActionTypeLabel(entry.actionType)}</span>
-          <span className="text-xs text-gray-400">{formatDate(entry.performedAt)}</span>
-        </div>
-        <p className="text-xs text-gray-500 mt-0.5">
-          {actor?.fullName || entry.performedBy}
-        </p>
-        {entry.internalNote && (
-          <p className="text-xs text-gray-600 mt-0.5 bg-gray-50 rounded-md px-2 py-1">{entry.internalNote}</p>
-        )}
-        {entry.publicNote && (
-          <p className="text-xs text-green-600 mt-0.5 italic">
-            <MessageSquare className="w-3 h-3 inline mr-1" />
-            {entry.publicNote}
-          </p>
-        )}
       </div>
     </div>
   );
@@ -137,8 +112,10 @@ export default function ExtensionDetail() {
   const neighborhood = complaint ? getNeighborhoodById(complaint.neighborhoodId) : null;
   const timeline = complaint ? getHistoryByComplaint(complaint.id) : [];
 
-  const canAct = (currentRole === 'APPROVER' || currentRole === 'LEADER') && ext?.status === 'PENDING';
+  const canAct = (currentRole === 'APPROVER' || currentRole === 'LEADER' || currentRole === 'ADMIN') && ext?.status === 'PENDING';
   const isFinal = ext?.status === 'APPROVED' || ext?.status === 'REJECTED';
+  const urgency = complaint?.confirmedUrgency || complaint?.citizenUrgency;
+  const isOverdue = complaint?.currentDeadline && new Date(complaint.currentDeadline) < new Date();
 
   // ---- modals ----
   const [showApprove, setShowApprove] = useState(false);
@@ -153,7 +130,6 @@ export default function ExtensionDetail() {
   // reject form
   const [rejectReason, setRejectReason] = useState('');
   const [nextSteps, setNextSteps] = useState('');
-  const [rejectNote, setRejectNote] = useState('');
 
   const openApprove = () => {
     const dl = ext?.requestedDeadline ? new Date(ext.requestedDeadline) : null;
@@ -167,9 +143,7 @@ export default function ExtensionDetail() {
   const openReject = () => {
     setRejectReason('');
     setNextSteps('');
-    setRejectNote('');
-    setShowReject(false);
-    setTimeout(() => setShowReject(true), 0);
+    setShowReject(true);
   };
 
   // ---- submit handlers ----
@@ -190,6 +164,7 @@ export default function ExtensionDetail() {
     updateComplaint(complaint.id, {
       currentDeadline: finalDeadline,
       slaStatus: 'ON_TIME',
+      extensionCount: (complaint.extensionCount || 0) + 1,
       ...(applyImmediately ? { status: 'IN_PROGRESS' } : {}),
     });
 
@@ -251,7 +226,7 @@ export default function ExtensionDetail() {
       performedAt: now,
       oldValue: { requestedDeadline: ext.requestedDeadline },
       newValue: { currentDeadline: ext.oldDeadline },
-      internalNote: [rejectReason, nextSteps, rejectNote].filter(Boolean).join(' | ') || 'Đã từ chối gia hạn',
+      internalNote: [rejectReason, nextSteps].filter(Boolean).join(' | ') || 'Đã từ chối gia hạn',
       publicNote: null,
       isPublic: false,
     });
@@ -273,7 +248,6 @@ export default function ExtensionDetail() {
   if (!ext) {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-gray-500">
-        <AlertTriangle className="w-12 h-12 mb-3 text-gray-300" />
         <p className="text-lg font-medium">Không tìm thấy yêu cầu gia hạn</p>
         <button onClick={() => navigate('/admin/extensions')} className="mt-4 text-blue-600 hover:underline text-sm">
           Quay lại danh sách
@@ -282,305 +256,334 @@ export default function ExtensionDetail() {
     );
   }
 
-  const urgency = complaint?.confirmedUrgency || complaint?.citizenUrgency;
-  const isOverdue = complaint?.currentDeadline && new Date(complaint.currentDeadline) < new Date();
+  const daysRequested = Math.ceil((new Date(ext.requestedDeadline) - new Date(ext.oldDeadline)) / 86400000);
 
   return (
-    <div className="space-y-3 md:space-y-4 min-h-full">
-      {/* ======== HEADER ======== */}
-      <div className="flex items-start gap-3 flex-wrap">
+    <div className="space-y-6 min-h-full">
+      {/* ======== 1. PAGE HEADER: Back button + extension request info ======== */}
+      <div className="flex items-start gap-3">
         <button
           onClick={() => navigate('/admin/extensions')}
-          className="p-2 rounded-lg hover:bg-gray-100 text-gray-600 hover:text-gray-700 transition-colors flex-shrink-0 mt-0.5"
-          title="Quay lại"
+          className="border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50 text-sm font-medium inline-flex items-center gap-2 flex-shrink-0"
         >
-          <ArrowLeft className="w-5 h-5" />
+          <ArrowLeft className="w-4 h-4" />
+          Quay lại
         </button>
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 text-sm text-gray-500 mb-0.5">
-            <span className="font-mono font-medium text-blue-600">{ext.id}</span>
-            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${EXT_STATUS[ext.status]?.color || 'bg-gray-100 text-gray-600'}`}>
-              {EXT_STATUS[ext.status]?.label || ext.status}
-            </span>
-            {complaint && (
-              <>
-                <span className="text-gray-300">|</span>
-                <span className="font-mono text-gray-500">{complaint.code}</span>
-                <StatusBadge status={complaint.status} />
-                <UrgencyBadge urgency={urgency} />
-                <SlaBadge slaStatus={complaint.slaStatus} />
-              </>
-            )}
-          </div>
-          <h1 className="text-2xl font-bold text-gray-900 leading-snug">
-            Yêu cầu gia hạn — {complaint?.title || '—'}
+          <h1 className="text-2xl font-bold text-gray-900">
+            Yêu cầu gia hạn — {ext.id}
           </h1>
-          {requester && (
-            <p className="text-sm text-gray-600 mt-1">
-              Người đề nghị: {requester.fullName} — {formatDate(ext.requestedAt)}
-            </p>
-          )}
+          <p className="text-gray-600 mt-1">
+            {requester?.fullName || '—'} đề nghị gia hạn xử lý phản ánh {complaint?.code || '—'}
+          </p>
+          <div className="flex items-center gap-2 mt-2 flex-wrap">
+            <ExtStatusBadge status={ext.status} />
+            <span className="text-xs text-gray-400">{formatDate(ext.requestedAt)}</span>
+          </div>
         </div>
       </div>
 
-      {/* ======== TWO-COLUMN LAYOUT ======== */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        {/* ---- LEFT COLUMN (2/3) ---- */}
-        <div className="lg:col-span-2 space-y-4">
-
-          {/* Section 1: Thông tin phản ánh */}
-          {complaint && (
-            <Section title="Thông tin phản ánh" icon={FileText}>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
-                <div className="flex items-center gap-2">
-                  <FileText className="w-4 h-4 text-gray-400 flex-shrink-0" />
-                  <span className="text-gray-500">Mã PA:</span>
-                  <span className="font-mono font-medium text-gray-900">{complaint.code}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-gray-500">Danh mục:</span>
-                  <span className="text-gray-900">{category?.name || '—'}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Building2 className="w-4 h-4 text-gray-400 flex-shrink-0" />
-                  <span className="text-gray-500">Khu phố:</span>
-                  <span className="text-gray-900">{neighborhood?.name || '—'}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <AlertTriangle className="w-4 h-4 text-gray-400 flex-shrink-0" />
-                  <span className="text-gray-500">Mức độ:</span>
-                  <UrgencyBadge urgency={urgency} />
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-gray-500">Trạng thái:</span>
-                  <StatusBadge status={complaint.status} />
-                </div>
-                <div className="flex items-center gap-2">
-                  <Clock className="w-4 h-4 text-gray-400 flex-shrink-0" />
-                  <span className="text-gray-500">Hạn hiện tại:</span>
-                  <span className={`font-mono ${isOverdue ? 'text-red-600 font-medium' : 'text-gray-900'}`}>
-                    {formatDate(complaint.currentDeadline)}
-                  </span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-gray-500">Thời hạn:</span>
-                  <span className={isOverdue ? 'text-red-600 font-medium' : 'text-green-600 font-medium'}>
-                    {getTimeRemaining(complaint.currentDeadline)}
-                  </span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <SlaBadge slaStatus={complaint.slaStatus} />
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-gray-500">Số lần gia hạn:</span>
-                  <span className="font-medium text-gray-900">{complaint.extensionCount || 0}</span>
-                </div>
-              </div>
-              <p className="text-sm font-medium text-gray-900 pt-1">{complaint.title}</p>
-            </Section>
-          )}
-
-          {/* Section 2: Timeline */}
-          <Section title="Lịch sử liên quan" icon={Clock} defaultOpen>
-            {timeline.length === 0 ? (
-              <p className="text-sm text-gray-500">Chưa có lịch sử xử lý</p>
-            ) : (
-              <div className="space-y-0">
-                {timeline.slice(0, 15).map((entry, idx) => (
-                  <TimelineEntry
-                    key={entry.id}
-                    entry={entry}
-                    isLast={idx === Math.min(timeline.length, 15) - 1}
-                    isLatest={idx === 0}
-                  />
-                ))}
-                {timeline.length > 15 && (
-                  <p className="text-xs text-gray-400 text-center py-1">
-                    + {timeline.length - 15} mục khác
-                  </p>
-                )}
-              </div>
-            )}
-          </Section>
-        </div>
-
-        {/* ---- RIGHT COLUMN (1/3) ---- */}
-        <div className="space-y-4">
-
-          {/* Section 3: Chi tiết yêu cầu */}
-          <Section title="Chi tiết yêu cầu" icon={FileText}>
-            {/* Requester info */}
-            <div className="space-y-2 text-sm">
-              <div className="flex items-center gap-2">
-                <User className="w-4 h-4 text-gray-400 flex-shrink-0" />
-                <span className="text-gray-500">Người đề nghị:</span>
-                <span className="font-medium text-gray-900">{requester?.fullName || '—'}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Building2 className="w-4 h-4 text-gray-400 flex-shrink-0" />
-                <span className="text-gray-500">Đơn vị:</span>
-                <span className="text-gray-900">{dept?.name || '—'}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Calendar className="w-4 h-4 text-gray-400 flex-shrink-0" />
-                <span className="text-gray-500">Ngày đề nghị:</span>
-                <span className="text-gray-900">{formatDate(ext.requestedAt)}</span>
-              </div>
-            </div>
-
-            {/* Deadline diff */}
-            <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
-              <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Thời hạn</h3>
-              <div className="flex items-center gap-3 flex-wrap">
-                <div className="flex flex-col">
-                  <span className="text-xs text-gray-400">Hạn cũ</span>
-                  <span className="font-mono text-sm text-gray-500 line-through">{formatDate(ext.oldDeadline)}</span>
-                </div>
-                <ArrowLeft className="w-5 h-5 text-gray-300 rotate-180" />
-                <div className="flex flex-col">
-                  <span className="text-xs text-gray-400">Hạn đề nghị</span>
-                  <span className="font-mono text-sm font-semibold text-blue-700">{formatDate(ext.requestedDeadline)}</span>
-                </div>
-                {ext.approvedDeadline && (
-                  <>
-                    <span className="text-xs text-green-600 font-medium mx-1">→ Đã duyệt:</span>
-                    <span className="font-mono text-sm font-semibold text-green-700">{formatDate(ext.approvedDeadline)}</span>
-                  </>
-                )}
-              </div>
-              <div className="mt-2 text-xs text-gray-500">
-                Gia hạn thêm{' '}
-                <span className="font-medium text-gray-700">
-                  {Math.ceil((new Date(ext.requestedDeadline) - new Date(ext.oldDeadline)) / 86400000)} ngày
-                </span>
-              </div>
-            </div>
-
-            {/* Reason */}
+      {/* ======== 2. COMPLAINT SUMMARY CARD ======== */}
+      {complaint && (
+        <div className="bg-white rounded-xl p-3 md:p-4 shadow-sm">
+          <h3 className="text-base md:text-lg font-semibold text-gray-800 mb-3 md:mb-4 ml-3 mt-2">
+            Thông tin phản ánh
+          </h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 text-sm px-3">
             <div>
-              <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Lý do gia hạn</h3>
-              <div className="flex items-center gap-2 mb-2">
-                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-700">
-                  {EXT_REASON_LABELS[ext.reasonType] || ext.reasonType}
-                </span>
-              </div>
-              <p className="text-sm text-gray-700 bg-gray-50 rounded-lg p-3 border border-gray-100">{ext.reason}</p>
+              <span className="text-gray-500">Mã PA:</span>{' '}
+              <span className="font-mono font-medium text-gray-900">{complaint.code}</span>
             </div>
+            <div>
+              <span className="text-gray-500">Tiêu đề:</span>{' '}
+              <span className="text-gray-900">{complaint.title}</span>
+            </div>
+            <div>
+              <span className="text-gray-500">Khu phố:</span>{' '}
+              <span className="text-gray-900">{neighborhood?.name || '—'}</span>
+            </div>
+            <div>
+              <span className="text-gray-500">Danh mục:</span>{' '}
+              <span className="text-gray-900">{category?.name || '—'}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-gray-500">Mức độ:</span>
+              <UrgencyBadge urgency={urgency} />
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-gray-500">Trạng thái:</span>
+              <StatusBadge status={complaint.status} />
+            </div>
+            <div>
+              <span className="text-gray-500">Hạn hiện tại:</span>{' '}
+              <span className={`font-mono ${isOverdue ? 'text-red-600 font-medium' : 'text-gray-900'}`}>
+                {formatDate(complaint.currentDeadline)}
+              </span>
+            </div>
+            <div>
+              <span className="text-gray-500">Thời hạn:</span>{' '}
+              <span className={isOverdue ? 'text-red-600 font-medium' : 'text-green-600 font-medium'}>
+                {getTimeRemaining(complaint.currentDeadline)}
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-gray-500">SLA:</span>
+              <SlaBadge slaStatus={complaint.slaStatus} />
+            </div>
+            <div>
+              <span className="text-gray-500">Số lần gia hạn:</span>{' '}
+              <span className="font-medium text-gray-900">{complaint.extensionCount || 0}</span>
+            </div>
+          </div>
+        </div>
+      )}
 
-            {/* Processing plan */}
-            {ext.processingPlan && (
+      {/* ======== 3. REQUEST DETAIL CARD ======== */}
+      <div className="bg-white rounded-xl p-3 md:p-4 shadow-sm">
+        <h3 className="text-base md:text-lg font-semibold text-gray-800 mb-3 md:mb-4 ml-3 mt-2">
+          Chi tiết yêu cầu gia hạn
+        </h3>
+
+        <div className="space-y-4 px-3">
+          {/* Requester info row */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 text-sm">
+            <div className="flex items-center gap-2">
+              <User className="w-4 h-4 text-gray-400 flex-shrink-0" />
+              <span className="text-gray-500">Người đề nghị:</span>
+              <span className="font-medium text-gray-900">{requester?.fullName || '—'}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Building2 className="w-4 h-4 text-gray-400 flex-shrink-0" />
+              <span className="text-gray-500">Đơn vị:</span>
+              <span className="text-gray-900">{dept?.name || '—'}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Calendar className="w-4 h-4 text-gray-400 flex-shrink-0" />
+              <span className="text-gray-500">Ngày đề nghị:</span>
+              <span className="text-gray-900">{formatDate(ext.requestedAt)}</span>
+            </div>
+          </div>
+
+          {/* Deadline change */}
+          <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+            <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Thay đổi thời hạn</h4>
+            <div className="flex items-center gap-4 flex-wrap text-sm">
               <div>
-                <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Kế hoạch xử lý</h3>
-                <p className="text-sm text-gray-700 bg-blue-50 rounded-lg p-3 border border-blue-100">{ext.processingPlan}</p>
+                <span className="text-xs text-gray-400 block">Hạn cũ</span>
+                <span className="font-mono text-gray-500 line-through">{formatDate(ext.oldDeadline)}</span>
               </div>
-            )}
-
-            {/* Evidence thumbnails */}
-            {mockEvidence.length > 0 && (
+              <span className="text-gray-300">&rarr;</span>
               <div>
-                <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Hình ảnh minh chứng</h3>
-                <div className="flex gap-3 flex-wrap">
-                  {mockEvidence.map(ev => (
-                    <div key={ev.id} className="border border-gray-200 rounded-lg overflow-hidden bg-gray-50 w-32">
-                      <div className="h-20 bg-gray-200 flex items-center justify-center">
-                        <Image className="w-8 h-8 text-gray-400" />
-                      </div>
-                      <p className="text-xs text-gray-500 text-center py-1.5 truncate px-1">{ev.label}</p>
+                <span className="text-xs text-gray-400 block">Hạn đề nghị</span>
+                <span className="font-mono font-semibold text-blue-700">{formatDate(ext.requestedDeadline)}</span>
+              </div>
+              {ext.approvedDeadline && (
+                <>
+                  <span className="text-gray-300">&rarr;</span>
+                  <div>
+                    <span className="text-xs text-gray-400 block">Hạn được duyệt</span>
+                    <span className="font-mono font-semibold text-green-700">{formatDate(ext.approvedDeadline)}</span>
+                  </div>
+                </>
+              )}
+            </div>
+            <p className="text-xs text-gray-500 mt-2">
+              Gia hạn thêm <span className="font-medium text-gray-700">{daysRequested} ngày</span>
+            </p>
+          </div>
+
+          {/* Reason */}
+          <div>
+            <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Lý do gia hạn</h4>
+            <div className="flex items-center gap-2 mb-2">
+              <Badge
+                label={EXT_REASON_LABELS[ext.reasonType] || ext.reasonType}
+                bg="#EDE9FE" color="#5B21B6"
+              />
+            </div>
+            <p className="text-sm text-gray-700 bg-gray-50 rounded-lg p-3 border border-gray-100">{ext.reason}</p>
+          </div>
+
+          {/* Processing plan */}
+          {ext.processingPlan && (
+            <div>
+              <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Kế hoạch xử lý</h4>
+              <p className="text-sm text-gray-700 bg-blue-50 rounded-lg p-3 border border-blue-100">{ext.processingPlan}</p>
+            </div>
+          )}
+
+          {/* Evidence */}
+          {mockEvidence.length > 0 && (
+            <div>
+              <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Hình ảnh minh chứng</h4>
+              <div className="flex gap-3 flex-wrap">
+                {mockEvidence.map(ev => (
+                  <div key={ev.id} className="border border-gray-200 rounded-lg overflow-hidden bg-gray-50 w-32">
+                    <div className="h-20 bg-gray-200 flex items-center justify-center">
+                      <Image className="w-8 h-8 text-gray-400" />
                     </div>
-                  ))}
-                </div>
+                    <p className="text-xs text-gray-500 text-center py-1.5 truncate px-1">{ev.label}</p>
+                  </div>
+                ))}
               </div>
-            )}
+            </div>
+          )}
 
-            {/* Reviewer info (if final) */}
-            {isFinal && reviewer && (
-              <div className="border-t border-gray-200 pt-4 mt-2 space-y-2">
-                <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Thông tin phê duyệt</h3>
-                <div className="space-y-2 text-sm">
-                  <div className="flex items-center gap-2">
-                    {ext.status === 'APPROVED' ? (
-                      <CheckCircle className="w-4 h-4 text-green-500" />
-                    ) : (
-                      <XCircle className="w-4 h-4 text-red-500" />
-                    )}
-                    <span className="text-gray-500">Người duyệt:</span>
-                    <span className="font-medium text-gray-900">{reviewer.fullName}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Calendar className="w-4 h-4 text-gray-400" />
-                    <span className="text-gray-500">Ngày duyệt:</span>
-                    <span className="text-gray-900">{formatDate(ext.reviewedAt)}</span>
-                  </div>
-                </div>
-                {ext.reviewNote && (
-                  <p className="text-sm text-gray-700 mt-1 bg-gray-50 rounded-lg p-3 border border-gray-100">{ext.reviewNote}</p>
+          {/* Reviewer info (if reviewed) */}
+          {isFinal && reviewer && (
+            <div className="border-t border-gray-200 pt-4 space-y-2 text-sm">
+              <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Thông tin phê duyệt</h4>
+              <div className="flex items-center gap-2">
+                {ext.status === 'APPROVED' ? (
+                  <CheckCircle className="w-4 h-4 text-green-500" />
+                ) : (
+                  <XCircle className="w-4 h-4 text-red-500" />
                 )}
+                <span className="text-gray-600">Người duyệt:</span>
+                <span className="font-medium text-gray-900">{reviewer.fullName}</span>
               </div>
-            )}
-          </Section>
-
-          {/* Section 4: Thao tác */}
-          {canAct && (
-            <Section title="Thao tác" icon={CheckCircle} defaultOpen>
-              <div className="flex flex-col gap-2">
-                <button
-                  onClick={openApprove}
-                  className="flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 transition-colors shadow-sm"
-                >
-                  <CheckCircle className="w-4 h-4" />
-                  Phê duyệt gia hạn
-                </button>
-                <button
-                  onClick={openReject}
-                  className="flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors shadow-sm"
-                >
-                  <XCircle className="w-4 h-4" />
-                  Từ chối gia hạn
-                </button>
+              <div className="flex items-center gap-2">
+                <Calendar className="w-4 h-4 text-gray-400" />
+                <span className="text-gray-600">Ngày duyệt:</span>
+                <span className="text-gray-900">{formatDate(ext.reviewedAt)}</span>
               </div>
-            </Section>
+              {ext.reviewNote && (
+                <p className="text-sm text-gray-700 bg-gray-50 rounded-lg p-3 border border-gray-100">{ext.reviewNote}</p>
+              )}
+            </div>
           )}
         </div>
       </div>
 
-      {/* ======== MODALS ======== */}
+      {/* ======== 4. RELATED TIMELINE ======== */}
+      <div className="bg-white rounded-xl p-3 md:p-4 shadow-sm">
+        <h3 className="text-base md:text-lg font-semibold text-gray-800 mb-3 md:mb-4 ml-3 mt-2">
+          Lịch sử liên quan ({timeline.length})
+        </h3>
+        {timeline.length === 0 ? (
+          <p className="text-sm text-gray-500 px-3">Chưa có lịch sử xử lý</p>
+        ) : (
+          <div className="divide-y divide-gray-100">
+            {timeline.slice(0, 15).map((entry, idx) => {
+              const actor = getUserById(entry.performedBy);
+              return (
+                <div key={entry.id} className="px-3 py-3 flex items-start gap-3">
+                  <span
+                    className={`w-2 h-2 mt-1.5 rounded-full flex-shrink-0 ${idx === 0 ? 'bg-blue-600' : 'bg-gray-300'}`}
+                  />
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap mb-1">
+                      <Badge
+                        label={getActionTypeLabel(entry.actionType)}
+                        bg={idx === 0 ? '#DBEAFE' : '#F3F4F6'}
+                        color={idx === 0 ? '#1E40AF' : '#6B7280'}
+                      />
+                      <span className="text-xs text-gray-400">{formatDate(entry.performedAt)}</span>
+                      {entry.isPublic !== undefined && (
+                        <span className={`text-xs px-1.5 py-0.5 rounded-full ${entry.isPublic ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
+                          {entry.isPublic ? 'Công khai' : 'Nội bộ'}
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-xs text-gray-500">
+                      {actor?.fullName || entry.performedBy}{' '}
+                      <span className="text-gray-400">
+                        ({actor?.role === 'CITIZEN' ? 'Người dân' : actor?.role === 'RECEPTION_OFFICER' ? 'Cán bộ tiếp nhận' : actor?.role === 'PROCESSING_OFFICER' ? 'Cán bộ xử lý' : actor?.role || '—'})
+                      </span>
+                    </p>
+                    {entry.oldValue && entry.newValue && (
+                      <p className="text-xs text-gray-500 mt-0.5">
+                        <span className="text-gray-400 line-through">
+                          {typeof entry.oldValue === 'object'
+                            ? (entry.oldValue.status ? getStatusLabel(entry.oldValue.status) : JSON.stringify(entry.oldValue))
+                            : entry.oldValue}
+                        </span>
+                        <span className="mx-1 text-gray-300">&rarr;</span>
+                        <span className="font-medium text-gray-700">
+                          {typeof entry.newValue === 'object'
+                            ? (entry.newValue.status ? getStatusLabel(entry.newValue.status) : JSON.stringify(entry.newValue))
+                            : entry.newValue}
+                        </span>
+                      </p>
+                    )}
+                    {entry.internalNote && (
+                      <p className="text-xs text-gray-600 mt-0.5 bg-white rounded-md px-2 py-1 border border-gray-100">{entry.internalNote}</p>
+                    )}
+                    {entry.publicNote && (
+                      <p className="text-xs text-green-600 mt-0.5 italic">
+                        <MessageSquare className="w-3 h-3 inline mr-1" />
+                        {entry.publicNote}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+        {timeline.length > 15 && (
+          <p className="text-xs text-gray-400 text-center py-2">+ {timeline.length - 15} mục khác</p>
+        )}
+      </div>
 
-      {/* a) Approval modal */}
+      {/* ======== 5. ACTION BUTTONS (APPROVER/LEADER only, only if PENDING) ======== */}
+      {canAct && (
+        <div className="bg-white rounded-xl p-3 md:p-4 shadow-sm">
+          <h3 className="text-base md:text-lg font-semibold text-gray-800 mb-3 md:mb-4 ml-3 mt-2">
+            Thao tác
+          </h3>
+          <div className="flex flex-wrap gap-3 px-3">
+            <button
+              onClick={openApprove}
+              className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 text-sm font-medium inline-flex items-center gap-2"
+            >
+              <CheckCircle className="w-4 h-4" />
+              Phê duyệt
+            </button>
+            <button
+              onClick={openReject}
+              className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 text-sm font-medium inline-flex items-center gap-2"
+            >
+              <XCircle className="w-4 h-4" />
+              Từ chối
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* ======== 6. APPROVAL MODAL ======== */}
       {showApprove && (
-        <Modal title="Phê duyệt gia hạn" icon={CheckCircle} onClose={() => setShowApprove(false)}>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Hạn được duyệt <span className="text-gray-400 font-normal">(mặc định: hạn đề nghị)</span>
-            </label>
+        <Modal title="Phê duyệt gia hạn" onClose={() => setShowApprove(false)}>
+          <Field label="Hạn được duyệt">
+            <span className="text-xs text-gray-400 ml-1 font-normal">(mặc định: hạn đề nghị)</span>
             <input
               type="datetime-local"
               value={approvedDeadline}
               onChange={e => setApprovedDeadline(e.target.value)}
-              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className={inputCls}
+              style={{ marginTop: '0.25rem' }}
             />
-          </div>
+          </Field>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Ghi chú nội bộ</label>
+          <Field label="Ghi chú nội bộ">
             <textarea
               value={approveNote}
               onChange={e => setApproveNote(e.target.value)}
               rows={3}
-              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+              className={textareaCls}
               placeholder="Ghi chú cho cán bộ xử lý..."
             />
-          </div>
+          </Field>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Ghi chú công khai cho người dân</label>
+          <Field label="Ghi chú công khai cho người dân">
             <textarea
               value={publicNote}
               onChange={e => setPublicNote(e.target.value)}
               rows={2}
-              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+              className={textareaCls}
               placeholder="Thông báo đến người dân (hiển thị công khai)..."
             />
-          </div>
+          </Field>
 
           <label className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
             <input
@@ -593,15 +596,12 @@ export default function ExtensionDetail() {
           </label>
 
           <div className="flex gap-3 pt-2">
-            <button
-              onClick={() => setShowApprove(false)}
-              className="flex-1 px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-            >
+            <button onClick={() => setShowApprove(false)} className="border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50 text-sm font-medium flex-1">
               Hủy
             </button>
             <button
               onClick={handleApprove}
-              className="flex-1 px-4 py-2.5 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center gap-2"
+              className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 text-sm font-medium inline-flex items-center justify-center gap-2 flex-1"
             >
               <Send className="w-4 h-4" />
               Xác nhận phê duyệt
@@ -610,56 +610,37 @@ export default function ExtensionDetail() {
         </Modal>
       )}
 
-      {/* b) Rejection modal */}
+      {/* ======== 7. REJECTION MODAL ======== */}
       {showReject && (
-        <Modal title="Từ chối gia hạn" icon={XCircle} onClose={() => setShowReject(false)}>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Lý do từ chối <span className="text-red-500">*</span>
-            </label>
+        <Modal title="Từ chối gia hạn" onClose={() => setShowReject(false)}>
+          <Field label="Lý do từ chối" required>
             <textarea
               value={rejectReason}
               onChange={e => setRejectReason(e.target.value)}
               rows={3}
-              required
-              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+              className={textareaCls}
               placeholder="Nêu rõ lý do từ chối gia hạn..."
             />
-          </div>
+          </Field>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Hướng dẫn tiếp theo</label>
+          <Field label="Hướng dẫn tiếp theo">
             <textarea
               value={nextSteps}
               onChange={e => setNextSteps(e.target.value)}
               rows={2}
-              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+              className={textareaCls}
               placeholder="Hướng dẫn cán bộ các bước cần làm..."
             />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Ghi chú cho cán bộ đề nghị</label>
-            <textarea
-              value={rejectNote}
-              onChange={e => setRejectNote(e.target.value)}
-              rows={2}
-              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-              placeholder="Ghi chú thêm cho cán bộ..."
-            />
-          </div>
+          </Field>
 
           <div className="flex gap-3 pt-2">
-            <button
-              onClick={() => setShowReject(false)}
-              className="flex-1 px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-            >
+            <button onClick={() => setShowReject(false)} className="border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50 text-sm font-medium flex-1">
               Hủy
             </button>
             <button
               onClick={handleReject}
               disabled={!rejectReason.trim()}
-              className="flex-1 px-4 py-2.5 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 text-sm font-medium inline-flex items-center justify-center gap-2 flex-1 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Send className="w-4 h-4" />
               Xác nhận từ chối

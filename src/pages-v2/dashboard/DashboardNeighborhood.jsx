@@ -1,12 +1,12 @@
 // ============================================================
-// DASHBOARD NEIGHBORHOOD — So sánh các khu phố
+// DASHBOARD NEIGHBORHOOD — So sanh cac khu pho (PAGE D-02)
 // ============================================================
 import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { MapPin, BarChart3, TrendingUp, AlertTriangle, ArrowRight } from 'lucide-react';
+import { MapPin, MessageSquare, Clock, CheckCircle, AlertTriangle, BarChart3, ChevronDown, ChevronUp } from 'lucide-react';
+import StatCard from '../../components/dashboard/StatCard';
 import { useMock } from '../../mock/MockContext';
-import { getNeighborhoodById } from '../../mock/db';
-import { StatusBadge, SlaBadge } from '../../mock/components/Badges';
+import { getCategoryById, categories } from '../../mock/db';
 
 function DashboardNeighborhood() {
   const navigate = useNavigate();
@@ -17,6 +17,7 @@ function DashboardNeighborhood() {
   const [selectedIds, setSelectedIds] = useState([]);
   const [sortKey, setSortKey] = useState('total');
   const [sortDir, setSortDir] = useState('desc');
+  const [expandedId, setExpandedId] = useState(null);
 
   // ---- enrich with avg processing days ----
   const stats = useMemo(() => baseStats.map(s => {
@@ -46,14 +47,17 @@ function DashboardNeighborhood() {
   // ---- sort ----
   const sorted = useMemo(() => {
     return [...filtered].sort((a, b) => {
-      const resolve = (x) => {
-        if (sortKey === 'onTimeRate') return x.total > 0 ? Math.round((x.onTime / x.total) * 100) : 0;
-        if (sortKey === 'neighborhoodName') return x.neighborhoodName;
-        const v = x[sortKey];
-        return v == null ? 0 : v;
-      };
-      const av = resolve(a);
-      const bv = resolve(b);
+      let av, bv;
+      if (sortKey === 'onTimeRate') {
+        av = a.total > 0 ? Math.round((a.onTime / a.total) * 100) : 0;
+        bv = b.total > 0 ? Math.round((b.onTime / b.total) * 100) : 0;
+      } else if (sortKey === 'neighborhoodName') {
+        av = a.neighborhoodName;
+        bv = b.neighborhoodName;
+      } else {
+        av = a[sortKey] ?? 0;
+        bv = b[sortKey] ?? 0;
+      }
       const cmp = av < bv ? -1 : av > bv ? 1 : 0;
       return sortDir === 'asc' ? cmp : -cmp;
     });
@@ -80,46 +84,85 @@ function DashboardNeighborhood() {
     sortKey === key ? (sortDir === 'asc' ? ' ↑' : ' ↓') : '';
 
   const handleNeighborhoodClick = (neighborhoodId) => {
+    setExpandedId(prev => prev === neighborhoodId ? null : neighborhoodId);
+  };
+
+  const handleViewAll = (e, neighborhoodId) => {
+    e.stopPropagation();
     setFilters({ neighborhoodId });
     navigate('/admin/complaints');
   };
 
-  // ---- volume color for map cards ----
-  const maxTotal = Math.max(...stats.map(s => s.total), 1);
-  const volumeColor = (total) => {
-    const pct = total / maxTotal;
-    if (pct < 0.33) return 'text-green-600 bg-green-50';
-    if (pct < 0.66) return 'text-yellow-600 bg-yellow-50';
-    return 'text-red-600 bg-red-50';
+  // ---- drill-down data for expanded row ----
+  const drillData = useMemo(() => {
+    if (!expandedId) return null;
+    const nc = complaints.filter(c => c.neighborhoodId === expandedId);
+    const categoryBreakdown = categories.filter(c => c.status === 'ACTIVE').map(c => ({
+      label: c.name,
+      count: nc.filter(x => x.categoryId === c.id).length,
+    })).filter(d => d.count > 0).sort((a, b) => b.count - a.count);
+    const overdueList = nc
+      .filter(c => c.status !== 'COMPLETED' && c.status !== 'REJECTED')
+      .filter(c => c.slaStatus === 'OVERDUE' || c.slaStatus === 'NEAR_DUE')
+      .sort((a, b) => new Date(a.currentDeadline || a.originalDeadline) - new Date(b.currentDeadline || b.originalDeadline))
+      .slice(0, 5);
+    return { categoryBreakdown, overdueList };
+  }, [expandedId, complaints]);
+
+  // ---- badge helpers (exact badgeUtils.jsx palette) ----
+  const makeBadge = (value, bg, color) => value > 0
+    ? <span className="inline-flex items-center gap-1 px-3 py-1 text-xs font-medium rounded-full" style={{ backgroundColor: bg, color }}>{value}</span>
+    : <span className="text-gray-300">—</span>;
+
+  const badgeOnTimeRate = (rate) => {
+    const s = rate >= 80
+      ? { bg: '#D1FAE5', color: '#065F46' }
+      : rate >= 50
+        ? { bg: '#FEF3C7', color: '#92400E' }
+        : { bg: '#FEE2E2', color: '#991B1B' };
+    return (
+      <span className="inline-flex items-center gap-1 px-3 py-1 text-xs font-medium rounded-full" style={{ backgroundColor: s.bg, color: s.color }}>
+        {rate}%
+      </span>
+    );
   };
 
-  // ---- bar chart data (sorted by total desc) ----
-  const barMax = Math.max(...stats.map(s => s.total), 1);
-  const barData = [...stats].sort((a, b) => b.total - a.total);
-
-  // ---- table columns config ----
+  // ---- table columns ----
   const columns = [
     ['neighborhoodName', 'Khu phố'],
     ['total', 'Tổng'],
     ['urgent', 'Khẩn cấp'],
-    ['inProgress', 'Đang xử lý'],
-    ['completed', 'Hoàn thành'],
-    ['overdue', 'Quá hạn'],
-    ['onTimeRate', 'Tỷ lệ đúng hạn'],
-    ['avgDays', 'TB xử lý (ngày)'],
+    ['inProgress', 'Đang xử l\xFD'],
+    ['completed', 'Ho\xE0n th\xE0nh'],
+    ['overdue', 'Qu\xE1 hạn'],
+    ['onTimeRate', 'Tỷ lệ đ\xFAng hạn'],
+    ['avgDays', 'TB xử l\xFD'],
   ];
 
+  // ---- map heat colors (based on volume + overdue) ----
+  const maxTotal = Math.max(...stats.map(s => s.total), 1);
+  const maxOverdue = Math.max(...stats.map(s => s.overdue), 1);
+  const heatColor = (s) => {
+    const score = (s.overdue / (maxOverdue || 1)) * 0.6 + (s.total / maxTotal) * 0.4;
+    if (score < 0.33) return { bg: '#ECFDF5', text: '#065F46', ring: 'border-emerald-200' };
+    if (score < 0.66) return { bg: '#FFFBEB', text: '#92400E', ring: 'border-amber-200' };
+    return { bg: '#FEF2F2', text: '#991B1B', ring: 'border-red-200' };
+  };
+
   return (
-    <div className="space-y-3 md:space-y-4 min-h-full">
-      {/* ---- Title ---- */}
-      <div className="flex items-center gap-2">
-        <MapPin size={22} className="text-blue-600" />
-        <h2 className="text-2xl font-bold text-gray-900">Dashboard theo khu phố</h2>
+    <div className="min-h-full">
+      {/* ---- Page title ---- */}
+      <div className="mb-4">
+        <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+          <MapPin size={24} className="text-blue-600" />
+          Dashboard theo khu phố
+        </h1>
+        <p className="text-gray-600 mt-1">So s\xE1nh hiệu suất xử l\xFD phản \xE1nh giữa c\xE1c khu phố</p>
       </div>
 
       {/* ---- Neighborhood filter chips ---- */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
-        <p className="text-xs text-gray-500 mb-2">Chọn khu phố để so sánh (bỏ trống = tất cả)</p>
+      <div className="bg-white rounded-xl p-3 md:p-4 shadow-sm mb-4">
+        <p className="text-xs text-gray-500 mb-2">Chọn khu phố để so s\xE1nh (bỏ trống = tất cả)</p>
         <div className="flex flex-wrap gap-2">
           {stats.map(s => (
             <button
@@ -127,7 +170,7 @@ function DashboardNeighborhood() {
               onClick={() => toggleNeighborhood(s.neighborhoodId)}
               className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
                 selectedIds.includes(s.neighborhoodId)
-                  ? 'bg-blue-600 text-white'
+                  ? 'bg-blue-600 text-white border-blue-600'
                   : 'bg-white text-gray-600 border-gray-200 hover:border-blue-300'
               }`}
             >
@@ -138,42 +181,27 @@ function DashboardNeighborhood() {
       </div>
 
       {/* ---- KPI Row ---- */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
-        {[
-          { label: 'Tổng', value: kpi.total, color: 'text-blue-600', bg: 'bg-blue-50', icon: '📋' },
-          { label: 'Đang xử lý', value: kpi.inProgress, color: 'text-orange-600', bg: 'bg-orange-50', icon: '⏳' },
-          { label: 'Hoàn thành', value: kpi.completed, color: 'text-green-600', bg: 'bg-green-50', icon: '✅' },
-          { label: 'Quá hạn', value: kpi.overdue, color: 'text-red-600', bg: 'bg-red-50', icon: '⚠️' },
-          { label: 'Tỷ lệ đúng hạn', value: `${kpi.onTimeRate}%`, color: 'text-violet-600', bg: 'bg-violet-50', icon: '📊' },
-        ].map(k => (
-          <div key={k.label} className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
-            <div className="flex items-center justify-between">
-              <div className="flex-1">
-                <p className="text-sm font-medium text-gray-600 mb-1">{k.label}</p>
-                <p className={`text-3xl font-bold ${k.color}`}>{k.value}</p>
-              </div>
-              <div className={`w-10 h-10 ${k.bg} rounded-lg flex items-center justify-center text-lg`}>
-                {k.icon}
-              </div>
-            </div>
-          </div>
-        ))}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4 mb-4">
+        <StatCard title="Tổng phản \xE1nh" value={kpi.total} icon={<MessageSquare size={20} />} color="blue" />
+        <StatCard title="Đang xử l\xFD" value={kpi.inProgress} icon={<Clock size={20} />} color="orange" />
+        <StatCard title="Ho\xE0n th\xE0nh" value={kpi.completed} icon={<CheckCircle size={20} />} color="green" />
+        <StatCard title="Qu\xE1 hạn" value={kpi.overdue} icon={<AlertTriangle size={20} />} color="red" />
+        <StatCard title="Tỷ lệ đ\xFAng hạn" value={`${kpi.onTimeRate}%`} icon={<BarChart3 size={20} />} color="violet" />
       </div>
 
-      {/* ---- Comparison Table ---- */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-        <div className="flex items-center gap-2 p-4 border-b border-gray-100">
-          <BarChart3 size={18} className="text-blue-500" />
-          <h3 className="text-sm font-semibold text-gray-700">Bảng so sánh khu phố</h3>
-        </div>
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="bg-gray-50 text-left text-xs text-gray-500 uppercase tracking-wider">
+      {/* ---- Comparison Table (BaseTable style) ---- */}
+      <div className="bg-white rounded-xl p-3 md:p-4 shadow-sm mb-4">
+        <h3 className="text-base md:text-lg font-semibold text-gray-800 mb-3 md:mb-4 ml-3 mt-2">
+          Bảng so s\xE1nh khu phố
+        </h3>
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
                 {columns.map(([key, label]) => (
                   <th
                     key={key}
-                    className={`px-3 py-2.5 cursor-pointer hover:text-gray-700 select-none ${key === 'neighborhoodName' ? 'text-left' : 'text-center'}`}
+                    className={`px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap cursor-pointer hover:text-gray-700 select-none ${key === 'neighborhoodName' ? 'text-left' : 'text-center'}`}
                     onClick={() => handleSort(key)}
                   >
                     {label}{sortArrow(key)}
@@ -181,112 +209,133 @@ function DashboardNeighborhood() {
                 ))}
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-200">
+            <tbody className="bg-white divide-y divide-gray-200">
               {sorted.map(s => {
-                const overdueRate = s.total > 0 ? (s.overdue / s.total) * 100 : 0;
                 const onTimeRate = s.total > 0 ? Math.round((s.onTime / s.total) * 100) : 0;
+                const isExpanded = expandedId === s.neighborhoodId;
                 return (
-                  <tr
-                    key={s.neighborhoodId}
-                    className={`cursor-pointer transition-colors ${
-                      overdueRate > 30
-                        ? 'bg-red-50 hover:bg-red-100'
-                        : 'hover:bg-gray-50'
-                    }`}
-                    onClick={() => handleNeighborhoodClick(s.neighborhoodId)}
-                  >
-                    <td className="px-3 py-2.5 font-medium text-gray-800">{s.neighborhoodName}</td>
-                    <td className="px-3 py-2.5 text-center font-semibold text-gray-700">{s.total}</td>
-                    <td className="px-3 py-2.5 text-center">
-                      {s.urgent > 0
-                        ? <span className="px-2 py-0.5 text-xs rounded-full bg-red-100 text-red-600 font-medium">{s.urgent}</span>
-                        : <span className="text-gray-300">—</span>}
-                    </td>
-                    <td className="px-3 py-2.5 text-center text-orange-600 font-medium">{s.inProgress || '—'}</td>
-                    <td className="px-3 py-2.5 text-center text-green-600 font-medium">{s.completed || '—'}</td>
-                    <td className="px-3 py-2.5 text-center">
-                      <span className={s.overdue > 0 ? 'text-red-600 font-medium' : 'text-gray-400'}>{s.overdue || '—'}</span>
-                    </td>
-                    <td className="px-3 py-2.5 text-center">
-                      <span className={`font-medium ${
-                        onTimeRate >= 80 ? 'text-green-600' : onTimeRate >= 50 ? 'text-amber-600' : 'text-red-600'
-                      }`}>
-                        {onTimeRate}%
-                      </span>
-                    </td>
-                    <td className="px-3 py-2.5 text-center text-gray-500">
-                      {s.avgDays != null ? `${s.avgDays} ngày` : '—'}
-                    </td>
-                  </tr>
+                  <React.Fragment key={s.neighborhoodId}>
+                    <tr
+                      className={`cursor-pointer hover:bg-gray-50 ${isExpanded ? 'bg-blue-50' : ''}`}
+                      onClick={() => handleNeighborhoodClick(s.neighborhoodId)}
+                    >
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                        <span className="inline-flex items-center gap-1">
+                          {isExpanded ? <ChevronUp className="w-4 h-4 text-blue-600" /> : <ChevronDown className="w-4 h-4 text-gray-400" />}
+                          {s.neighborhoodName}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-center font-semibold text-gray-700">{s.total}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-center">{makeBadge(s.urgent, '#FEE2E2', '#991B1B')}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-center">{makeBadge(s.inProgress, '#DBEAFE', '#1E40AF')}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-center">{makeBadge(s.completed, '#D1FAE5', '#065F46')}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-center">{makeBadge(s.overdue, '#FEE2E2', '#991B1B')}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-center">{badgeOnTimeRate(onTimeRate)}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-center text-gray-500">
+                        {s.avgDays != null ? `${s.avgDays} ng\xE0y` : '—'}
+                      </td>
+                    </tr>
+                    {/* Expanded drill-down row */}
+                    {isExpanded && drillData && (
+                      <tr key={`${s.neighborhoodId}-expanded`}>
+                        <td colSpan={8} className="px-6 py-4 bg-gray-50">
+                          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                            {/* Category breakdown */}
+                            <div>
+                              <h4 className="text-xs font-semibold text-gray-500 uppercase mb-2">Phân bố theo loại</h4>
+                              {drillData.categoryBreakdown.length === 0 ? (
+                                <p className="text-xs text-gray-400">Không có dữ liệu</p>
+                              ) : (
+                                <div className="space-y-1">
+                                  {drillData.categoryBreakdown.map(d => {
+                                    const maxC = Math.max(...drillData.categoryBreakdown.map(x => x.count), 1);
+                                    return (
+                                      <div key={d.label} className="flex items-center gap-2 text-xs">
+                                        <span className="w-32 text-gray-600 truncate">{d.label}</span>
+                                        <div className="flex-1 bg-gray-200 rounded-full h-4 overflow-hidden">
+                                          <div className="h-full bg-blue-500 rounded-full" style={{ width: `${(d.count / maxC) * 100}%`, minWidth: d.count > 0 ? '8px' : 0 }} />
+                                        </div>
+                                        <span className="w-6 text-right text-gray-700 font-medium">{d.count}</span>
+                                      </div>
+                                    );
+                                  })}
+                                </div>
+                              )}
+                            </div>
+                            {/* Overdue list */}
+                            <div>
+                              <h4 className="text-xs font-semibold text-gray-500 uppercase mb-2">Phản ánh quá hạn / sắp hết hạn</h4>
+                              {drillData.overdueList.length === 0 ? (
+                                <p className="text-xs text-gray-400">Không có phản ánh quá hạn</p>
+                              ) : (
+                                <div className="space-y-1.5">
+                                  {drillData.overdueList.map(c => (
+                                    <div key={c.id} className="flex items-center justify-between text-xs bg-white rounded-lg px-3 py-2 border border-gray-100">
+                                      <div className="flex-1 min-w-0">
+                                        <p className="text-gray-700 truncate font-medium">{c.title}</p>
+                                        <p className="text-gray-400">{c.code}</p>
+                                      </div>
+                                      <span className={`ml-2 px-2 py-0.5 rounded-full text-xs font-medium ${c.slaStatus === 'OVERDUE' ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700'}`}>
+                                        {c.slaStatus === 'OVERDUE' ? 'Quá hạn' : 'Sắp hết hạn'}
+                                      </span>
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                          <div className="mt-3 text-right">
+                            <button
+                              onClick={(e) => handleViewAll(e, s.neighborhoodId)}
+                              className="text-xs font-medium text-blue-600 hover:text-blue-800"
+                            >
+                              Xem tất cả phản ánh của {s.neighborhoodName} →
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+                  </React.Fragment>
                 );
               })}
+              {sorted.length === 0 && (
+                <tr>
+                  <td colSpan={8} className="px-6 py-8 text-center text-sm text-gray-400">
+                    Kh\xF4ng c\xF3 dữ liệu khu phố n\xE0o
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>
       </div>
 
-      {/* ---- Bar Chart: side-by-side bars ---- */}
-      {/* ponytail: CSS grouped bars; swap for recharts when >5 metrics */}
-      <div className="bg-white rounded-xl p-3 md:p-4 shadow-sm">
-        <div className="flex items-center gap-2 mb-4">
-          <TrendingUp size={18} className="text-blue-500" />
-          <h3 className="text-sm font-semibold text-gray-700">Biểu đồ so sánh: Tổng vs Hoàn thành vs Quá hạn</h3>
-        </div>
-        <div className="space-y-2">
-          {barData.map(s => (
-            <div key={s.neighborhoodId} className="flex items-center gap-2 text-xs">
-              <span className="w-24 truncate text-gray-600">{s.neighborhoodName}</span>
-              <div className="flex-1 flex items-end gap-0.5 h-6">
-                <div
-                  className="h-5 bg-blue-400 rounded-sm"
-                  style={{ width: `${(s.total / barMax) * 100}%`, minWidth: s.total > 0 ? '3px' : 0 }}
-                  title={`Tổng: ${s.total}`}
-                />
-                <div
-                  className="h-5 bg-green-400 rounded-sm"
-                  style={{ width: `${(s.completed / barMax) * 100}%`, minWidth: s.completed > 0 ? '3px' : 0 }}
-                  title={`Hoàn thành: ${s.completed}`}
-                />
-                <div
-                  className="h-5 bg-red-400 rounded-sm"
-                  style={{ width: `${(s.overdue / barMax) * 100}%`, minWidth: s.overdue > 0 ? '3px' : 0 }}
-                  title={`Quá hạn: ${s.overdue}`}
-                />
-              </div>
-            </div>
-          ))}
-        </div>
-        <div className="flex items-center gap-4 mt-3 pt-3 border-t border-gray-100 text-xs text-gray-500">
-          <span className="flex items-center gap-1"><span className="w-3 h-3 bg-blue-400 rounded-sm inline-block" /> Tổng</span>
-          <span className="flex items-center gap-1"><span className="w-3 h-3 bg-green-400 rounded-sm inline-block" /> Hoàn thành</span>
-          <span className="flex items-center gap-1"><span className="w-3 h-3 bg-red-400 rounded-sm inline-block" /> Quá hạn</span>
-        </div>
-      </div>
-
       {/* ---- Mock Map: Neighborhood cards grid ---- */}
       <div className="bg-white rounded-xl p-3 md:p-4 shadow-sm">
-        <div className="flex items-center gap-2 mb-4">
-          <MapPin size={18} className="text-blue-500" />
-          <h3 className="text-sm font-semibold text-gray-700">Bản đồ khu phố</h3>
-          <span className="text-[10px] text-gray-400 ml-2">(theo số lượng phản ánh)</span>
-        </div>
+        <h3 className="text-base md:text-lg font-semibold text-gray-800 mb-3 md:mb-4 ml-3 mt-2">
+          Bản đồ khu phố
+        </h3>
+        <p className="text-[10px] text-gray-400 ml-3 -mt-2 mb-4">(theo số lượng phản \xE1nh)</p>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
-          {stats.map(s => (
-            <div
-              key={s.neighborhoodId}
-              onClick={() => handleNeighborhoodClick(s.neighborhoodId)}
-              className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 cursor-pointer hover:shadow-md transition-all"
-            >
-              <div className="flex items-start justify-between">
+          {stats.map(s => {
+            const h = heatColor(s);
+            return (
+              <div
+                key={s.neighborhoodId}
+                onClick={() => handleNeighborhoodClick(s.neighborhoodId)}
+                className={`bg-white rounded-xl p-4 shadow-sm border cursor-pointer hover:shadow-md ${h.ring}`}
+              >
                 <p className="text-sm font-semibold text-gray-800 mb-1">{s.neighborhoodName}</p>
-                <ArrowRight size={14} className="text-gray-300 mt-0.5" />
+                <p className="text-2xl font-bold mb-1" style={{ color: h.text }}>{s.total}</p>
+                <span
+                  className="inline-block px-2 py-0.5 rounded text-[10px] font-medium"
+                  style={{ backgroundColor: h.bg, color: h.text }}
+                >
+                  {s.overdue > 0 ? `${s.overdue} qu\xE1 hạn` : `${s.completed} ho\xE0n th\xE0nh`}
+                </span>
               </div>
-              <p className={`text-2xl font-bold mb-1 ${volumeColor(s.total).split(' ').slice(0, 1).join(' ')}`}>{s.total}</p>
-              <span className={`inline-block px-2 py-0.5 rounded text-[10px] font-medium ${volumeColor(s.total)}`}>
-                {s.overdue > 0 ? `${s.overdue} quá hạn` : 'phản ánh'}
-              </span>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </div>
