@@ -6,11 +6,11 @@ import { PlusOutlined, EditOutlined, DeleteOutlined, GlobalOutlined, UploadOutli
 const { Title } = Typography;
 const { Option } = Select;
 
-const publicDocsMock = [
+export const publicDocsMock = [
   {
     id: 'PD001',
     docNumber: '104/2022/NĐ-CP',
-    title: 'Nghị định quy định chi tiết một số điều của Luật Cư trú',
+    title: 'Nghị định quy định chi tiết một số điều của Luật Cư trú & Thủ tục đăng ký cư trú',
     category: 'Văn bản quy phạm pháp luật',
     issueDate: '2022-12-21',
     isPublished: true,
@@ -18,6 +18,33 @@ const publicDocsMock = [
   },
   {
     id: 'PD002',
+    docNumber: '15/2026/QĐ-UBND',
+    title: 'Quyết định Hướng dẫn chi tiết Đăng ký Khai sinh & Hộ tịch điện tử Phường Tăng Nhơn Phú',
+    category: 'Văn bản quy phạm pháp luật',
+    issueDate: '2026-01-10',
+    isPublished: true,
+    fileName: 'QD_Khai_sinh_TNP_2026.pdf'
+  },
+  {
+    id: 'PD003',
+    docNumber: '123/2015/NĐ-CP',
+    title: 'Nghị định quy định chi tiết thi hành Luật Hộ tịch & Đăng ký kết hôn',
+    category: 'Văn bản quy phạm pháp luật',
+    issueDate: '2015-11-15',
+    isPublished: true,
+    fileName: 'Nghi_dinh_123_Ho_tich.pdf'
+  },
+  {
+    id: 'PD004',
+    docNumber: '45/2026/QĐ-UBND',
+    title: 'Quy định quản lý kiến trúc & Thủ tục Cấp giấy phép xây dựng nhà ở Phường Tăng Nhơn Phú',
+    category: 'Văn bản quy phạm pháp luật',
+    issueDate: '2026-03-05',
+    isPublished: true,
+    fileName: 'QD_Cap_phep_xay_dung_TNP.pdf'
+  },
+  {
+    id: 'PD005',
     docNumber: 'N/A',
     title: 'Lịch sử hình thành và phát triển Phường Tăng Nhơn Phú',
     category: 'Văn hóa lịch sử',

@@ -5,7 +5,7 @@ import { PlusOutlined, UploadOutlined, EditOutlined, DeleteOutlined, RobotOutlin
 const { Title, Text } = Typography;
 const { Option } = Select;
 
-const internalDocsMock = [
+export const internalDocsMock = [
   {
     id: 'ID001',
     docNumber: '15/KH-UBND',

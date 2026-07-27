@@ -3,11 +3,12 @@
 // ============================================================
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, MessageSquare, Clock, MapPin, FolderOpen, Building2, Users, Settings, ChevronLeft, FileText, Map, ChevronDown, ChevronRight } from 'lucide-react';
+import { LayoutDashboard, MessageSquare, Clock, MapPin, FolderOpen, Building2, Users, Settings, ChevronLeft, FileText, Map, ChevronDown, ChevronRight, Bot } from 'lucide-react';
 import { useMock } from '../MockContext';
 
 const ALL_MENUS = [
   { id: 'dashboard', label: 'Tổng quan', icon: LayoutDashboard, path: '/dashboard', roles: ['APPROVER','LEADER','ADMIN'] },
+  { id: 'officer-chatbot', label: 'Trợ lý AI Cán bộ', icon: Bot, path: '/admin/chatbot', roles: ['RECEPTION_OFFICER','PROCESSING_OFFICER','APPROVER','LEADER','ADMIN'] },
   { id: 'complaints', label: 'Quản lý phản ánh', icon: MessageSquare, path: '/admin/complaints', roles: ['RECEPTION_OFFICER','PROCESSING_OFFICER','APPROVER','LEADER','ADMIN'] },
   { id: 'extensions', label: 'Quản lý gia hạn', icon: Clock, path: '/admin/extensions', roles: ['PROCESSING_OFFICER','APPROVER','LEADER','ADMIN'] },
   { 
@@ -73,6 +74,8 @@ export default function SidebarV2({ collapsed, onToggle }) {
             const Icon = item.icon;
             const hasAccess = !item.roles || item.roles.includes(role);
             const isLocked = !item.disabled && !hasAccess;
+
+            let displayLabel = item.label;
 
             if (item.submenu) {
               const isSubOpen = openMenus[item.id];
@@ -148,14 +151,14 @@ export default function SidebarV2({ collapsed, onToggle }) {
               <li key={item.id}>
                 {item.disabled || isLocked ? (
                   <div className={`flex items-center text-sm rounded-lg transition-all duration-200 cursor-not-allowed opacity-50 bg-gray-50 text-gray-400 ${collapsed ? 'px-3 py-3 justify-center' : 'px-4 py-3'}`}
-                    title={isLocked ? `${item.label} (yêu cầu quyền truy cập)` : `${item.label} (đang phát triển)`}>
+                    title={isLocked ? `${displayLabel} (yêu cầu quyền truy cập)` : `${displayLabel} (đang phát triển)`}>
                     <Icon className={`w-5 h-5 flex-shrink-0 text-gray-400 ${collapsed ? '' : 'mr-3'}`} />
-                    {!collapsed && <><span className="font-medium flex-1">{item.label}</span><span className="text-[10px]">🔒</span></>}
+                    {!collapsed && <><span className="font-medium flex-1">{displayLabel}</span><span className="text-[10px]">🔒</span></>}
                   </div>
                 ) : (
-                  <Link to={item.path} className={`flex items-center text-sm rounded-lg transition-all duration-200 ${collapsed ? 'px-3 py-3 justify-center' : 'px-4 py-3'} ${isActive ? 'bg-blue-50 text-blue-600' : 'text-gray-700 hover:bg-gray-50'}`} title={collapsed ? item.label : ''}>
+                  <Link to={item.path} className={`flex items-center text-sm rounded-lg transition-all duration-200 ${collapsed ? 'px-3 py-3 justify-center' : 'px-4 py-3'} ${isActive ? 'bg-blue-50 text-blue-600' : 'text-gray-700 hover:bg-gray-50'}`} title={collapsed ? displayLabel : ''}>
                     <Icon className={`w-5 h-5 flex-shrink-0 ${isActive ? 'text-blue-600' : 'text-gray-500'} ${collapsed ? '' : 'mr-3'}`} />
-                    {!collapsed && <span className="font-medium flex-1">{item.label}</span>}
+                    {!collapsed && <span className="font-medium flex-1">{displayLabel}</span>}
                   </Link>
                 )}
               </li>

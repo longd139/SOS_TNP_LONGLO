@@ -19,6 +19,8 @@ import PlaceholderPage from '../pages-v2/PlaceholderPage';
 import DigitalMap from '../pages-v2/map/DigitalMap';
 import InternalDocs from '../pages-v2/admin/InternalDocs';
 import PublicDocs from '../pages-v2/admin/PublicDocs';
+import CitizenChatbot from '../pages-v2/citizen/CitizenChatbot';
+
 
 const ROLE_HOME = {
   CITIZEN: '/submit',
@@ -43,6 +45,8 @@ export default function AppRoutesV2() {
         <Route path="/submit" element={<SubmitComplaint />} />
         <Route path="/my-complaints" element={<MyComplaints />} />
         <Route path="/complaint/:id" element={<CitizenComplaintDetail />} />
+        <Route path="/admin/chatbot" element={<CitizenChatbot />} />
+        <Route path="/chatbot" element={<CitizenChatbot />} />
         <Route path="/dashboard" element={<DashboardOverview />} />
         <Route path="/dashboard/neighborhood" element={<DashboardNeighborhood />} />
         <Route path="/dashboard/large-screen" element={<DashboardLargeScreen />} />
