@@ -1,0 +1,501 @@
+// ============================================================
+// LIBRARY DATA — Mock data cho Thư Viện Số
+// 12 tài liệu địa phương + 12 bộ luật quốc gia
+// ============================================================
+
+export const libraryCategories = [
+  { id: 'tu-sach', name: 'Tủ sách', color: '#2563EB', bgColor: '#EFF6FF', icon: 'bookshelf' },
+  { id: 'tai-lieu', name: 'Tài liệu', color: '#059669', bgColor: '#ECFDF5', icon: 'file' },
+  { id: 'van-ban', name: 'Văn bản', color: '#EA580C', bgColor: '#FFF7ED', icon: 'scroll' },
+  { id: 'ban-do', name: 'Bản đồ', color: '#7C3AED', bgColor: '#F5F3FF', icon: 'map' },
+];
+
+export const libraryDocuments = [
+  // ============================================
+  // TỦ SÁCH (tu-sach) — 3 items
+  // ============================================
+  {
+    id: 'sach-01',
+    category: 'tu-sach',
+    title: 'Lịch sử Đảng bộ Phường Tăng Nhơn Phú (1975-2025)',
+    author: 'Đảng ủy Phường Tăng Nhơn Phú',
+    cover: 'https://images.unsplash.com/photo-1589829085413-56de8ae18c73?w=600&h=400&fit=crop',
+    description: 'Cuốn sách ghi lại chặng đường 50 năm xây dựng và phát triển của Đảng bộ phường Tăng Nhơn Phú, từ ngày thống nhất đất nước đến nay. Tài liệu quý giá cho các nhà nghiên cứu và người dân muốn tìm hiểu về lịch sử địa phương.',
+    downloads: 3842,
+    featured: true,
+    docType: 'Sách',
+    tags: ['lịch sử', 'đảng bộ', 'địa phương', 'tăng nhơn phú'],
+    sections: [
+      { heading: 'Chương 1: Bối cảnh lịch sử và sự ra đời của Đảng bộ Phường', content: 'Trước năm 1975, vùng đất Tăng Nhơn Phú là một xã thuộc quận Thủ Đức cũ. Sau ngày thống nhất đất nước, Đảng bộ xã Tăng Nhơn Phú được thành lập vào tháng 5 năm 1975. Đây là cột mốc quan trọng đánh dấu sự khởi đầu của công cuộc xây dựng và phát triển địa phương dưới sự lãnh đạo của Đảng. Trong giai đoạn đầu, Đảng bộ tập trung vào việc ổn định tình hình chính trị - xã hội, khôi phục sản xuất nông nghiệp và xây dựng hệ thống chính quyền cơ sở.' },
+      { heading: 'Chương 2: Giai đoạn đổi mới (1986-2000)', content: 'Cùng với công cuộc đổi mới của đất nước, Đảng bộ phường Tăng Nhơn Phú đã lãnh đạo nhân dân thực hiện nhiều chủ trương quan trọng. Kinh tế địa phương chuyển dịch mạnh mẽ từ nông nghiệp sang công nghiệp - dịch vụ. Nhiều khu công nghiệp, cụm dân cư mới được hình thành. Đời sống nhân dân từng bước được cải thiện. Hệ thống giao thông, điện, nước được đầu tư xây dựng.' },
+      { heading: 'Chương 3: Phát triển và hội nhập (2000-2025)', content: 'Bước vào thế kỷ 21, Tăng Nhơn Phú có những bước phát triển vượt bậc. Từ một xã nông nghiệp, đến nay đã trở thành một phường đô thị phát triển với hệ thống hạ tầng đồng bộ. Công tác xây dựng Đảng được chú trọng, nhiều chi bộ đạt trong sạch vững mạnh. Các phong trào thi đua yêu nước được đẩy mạnh, góp phần xây dựng địa phương ngày càng văn minh, giàu đẹp.' },
+      { heading: 'Chương 4: Định hướng phát triển đến năm 2030', content: 'Đảng bộ phường Tăng Nhơn Phú đặt mục tiêu đến năm 2030 trở thành phường đô thị văn minh, hiện đại. Tập trung vào các nhiệm vụ trọng tâm: phát triển hạ tầng đồng bộ, nâng cao chất lượng cuộc sống người dân, đẩy mạnh chuyển đổi số trong quản lý nhà nước, xây dựng chính quyền điện tử, và phát triển các mô hình kinh tế mới phù hợp với xu thế đô thị hóa.' },
+    ],
+  },
+  {
+    id: 'sach-02',
+    category: 'tu-sach',
+    title: 'Kỷ yếu 25 năm thành lập Phường Tăng Nhơn Phú',
+    author: 'UBND Phường Tăng Nhơn Phú',
+    cover: 'https://images.unsplash.com/photo-1532629345422-7515f3d16bb6?w=600&h=400&fit=crop',
+    description: 'Kỷ yếu tổng hợp những thành tựu nổi bật của phường Tăng Nhơn Phú sau 25 năm thành lập. Bao gồm các bài viết của lãnh đạo, hình ảnh tư liệu và những câu chuyện về sự phát triển của địa phương.',
+    downloads: 2156,
+    featured: true,
+    docType: 'Sách',
+    tags: ['kỷ yếu', 'thành tựu', 'phát triển', 'tăng nhơn phú'],
+    sections: [
+      { heading: 'Lời giới thiệu', content: 'Kỷ yếu này được biên soạn nhằm ghi lại những dấu ấn quan trọng trong quá trình hình thành và phát triển của phường Tăng Nhơn Phú. Đây là món quà tinh thần gửi đến các thế hệ cán bộ, đảng viên và nhân dân đã đóng góp cho sự phát triển của địa phương.' },
+      { heading: 'Phần 1: Dấu ấn 25 năm', content: 'Trải qua 25 năm xây dựng và phát triển, phường Tăng Nhơn Phú đã đạt được nhiều thành tựu quan trọng trên các lĩnh vực: kinh tế, văn hóa - xã hội, quốc phòng - an ninh, xây dựng Đảng và hệ thống chính trị. Từ một địa phương thuần nông, đến nay cơ cấu kinh tế đã chuyển dịch mạnh mẽ sang thương mại - dịch vụ - công nghiệp.' },
+    ],
+  },
+  {
+    id: 'sach-03',
+    category: 'tu-sach',
+    title: 'Truyền thống đấu tranh cách mạng của nhân dân Tăng Nhơn Phú',
+    author: 'Hội Cựu Chiến binh Phường Tăng Nhơn Phú',
+    cover: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&h=400&fit=crop',
+    description: 'Tài liệu ghi lại truyền thống đấu tranh cách mạng hào hùng của nhân dân Tăng Nhơn Phú qua các thời kỳ kháng chiến chống Pháp và chống Mỹ cứu nước.',
+    downloads: 1890,
+    featured: false,
+    docType: 'Sách',
+    tags: ['cách mạng', 'lịch sử', 'truyền thống', 'kháng chiến'],
+  },
+
+  // ============================================
+  // TÀI LIỆU (tai-lieu) — 3 items
+  // ============================================
+  {
+    id: 'tl-01',
+    category: 'tai-lieu',
+    title: 'Báo cáo tình hình kinh tế - xã hội Quý I/2026',
+    author: 'UBND Phường Tăng Nhơn Phú',
+    cover: 'https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=600&h=400&fit=crop',
+    description: 'Báo cáo tổng hợp tình hình phát triển kinh tế - xã hội của phường trong quý I năm 2026, bao gồm các chỉ tiêu về thu ngân sách, đầu tư công, an sinh xã hội và các nhiệm vụ trọng tâm.',
+    downloads: 1523,
+    featured: true,
+    docType: 'Báo cáo',
+    tags: ['báo cáo', 'kinh tế', 'xã hội', '2026'],
+    sections: [
+      { heading: 'I. Tình hình kinh tế', content: 'Trong quý I/2026, tình hình kinh tế trên địa bàn phường tiếp tục duy trì đà tăng trưởng ổn định. Tổng thu ngân sách đạt 105% kế hoạch quý. Hoạt động thương mại - dịch vụ sôi động với 45 hộ kinh doanh mới đăng ký. Sản xuất công nghiệp - tiểu thủ công nghiệp duy trì ổn định.' },
+      { heading: 'II. Văn hóa - Xã hội', content: 'Công tác an sinh xã hội được đảm bảo. Đã tổ chức thăm hỏi, tặng quà cho 120 hộ gia đình chính sách, hộ nghèo nhân dịp Tết Nguyên đán. Công tác giáo dục được duy trì tốt, tỷ lệ học sinh đến trường đạt 100%. Hoạt động văn hóa, thể thao được tổ chức sôi nổi.' },
+      { heading: 'III. Nhiệm vụ trọng tâm Quý II/2026', content: 'Tập trung đẩy nhanh tiến độ các công trình xây dựng cơ bản. Tăng cường công tác quản lý đô thị, trật tự xây dựng. Triển khai kế hoạch chuyển đổi số giai đoạn 2. Tổ chức các hoạt động kỷ niệm các ngày lễ lớn.' },
+    ],
+  },
+  {
+    id: 'tl-02',
+    category: 'tai-lieu',
+    title: 'Hướng dẫn thủ tục hành chính tại UBND Phường',
+    author: 'Bộ phận Tiếp nhận và Trả kết quả',
+    cover: 'https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=600&h=400&fit=crop',
+    description: 'Tài liệu hướng dẫn chi tiết các thủ tục hành chính thường gặp tại UBND phường, bao gồm: đăng ký hộ khẩu, khai sinh, kết hôn, chứng thực và các thủ tục khác.',
+    downloads: 4231,
+    featured: true,
+    docType: 'Hướng dẫn',
+    tags: ['thủ tục hành chính', 'hướng dẫn', 'dịch vụ công'],
+  },
+  {
+    id: 'tl-03',
+    category: 'tai-lieu',
+    title: 'Đề án Chuyển đổi số Phường Tăng Nhơn Phú giai đoạn 2025-2030',
+    author: 'UBND Phường Tăng Nhơn Phú',
+    cover: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=600&h=400&fit=crop',
+    description: 'Đề án tổng thể về chuyển đổi số của phường, bao gồm các mục tiêu, giải pháp và lộ trình triển khai ứng dụng công nghệ thông tin trong quản lý nhà nước và phục vụ người dân.',
+    downloads: 892,
+    featured: false,
+    docType: 'Đề án',
+    tags: ['chuyển đổi số', 'công nghệ', 'đề án', '2025-2030'],
+  },
+
+  // ============================================
+  // VĂN BẢN (van-ban) — 3 items
+  // ============================================
+  {
+    id: 'vb-01',
+    category: 'van-ban',
+    title: 'Quyết định số 123/QĐ-UBND về việc ban hành Quy chế quản lý đô thị',
+    author: 'UBND Phường Tăng Nhơn Phú',
+    cover: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=600&h=400&fit=crop',
+    description: 'Quyết định ban hành Quy chế quản lý đô thị trên địa bàn phường, quy định về trật tự xây dựng, vệ sinh môi trường, quản lý vỉa hè, lòng đường và các vấn đề liên quan.',
+    downloads: 654,
+    featured: false,
+    docType: 'Quyết định',
+    issuingAgency: 'UBND Phường Tăng Nhơn Phú',
+    issuedDate: '15/06/2025',
+    effectiveDate: '01/07/2025',
+    status: 'Đang hiệu lực',
+    code: 'Số 123/QĐ-UBND',
+    tags: ['quyết định', 'quản lý đô thị', 'quy chế', 'xây dựng'],
+    sections: [
+      { heading: 'Điều 1: Phạm vi điều chỉnh', content: 'Quy chế này quy định về quản lý trật tự đô thị, trật tự xây dựng, vệ sinh môi trường, quản lý vỉa hè, lòng đường và các hoạt động khác liên quan đến cảnh quan đô thị trên địa bàn phường Tăng Nhơn Phú.' },
+      { heading: 'Điều 2: Đối tượng áp dụng', content: 'Quy chế này áp dụng đối với tất cả các tổ chức, hộ gia đình và cá nhân sinh sống, hoạt động trên địa bàn phường Tăng Nhơn Phú.' },
+      { heading: 'Điều 3: Nguyên tắc quản lý', content: 'Việc quản lý đô thị phải tuân thủ quy hoạch được duyệt, đảm bảo mỹ quan đô thị, an toàn giao thông, vệ sinh môi trường và quyền lợi hợp pháp của người dân.' },
+    ],
+  },
+  {
+    id: 'vb-02',
+    category: 'van-ban',
+    title: 'Nghị quyết số 45/NQ-HĐND về kế hoạch phát triển kinh tế - xã hội năm 2026',
+    author: 'HĐND Phường Tăng Nhơn Phú',
+    cover: 'https://images.unsplash.com/photo-1551836022-d5d88e9218df?w=600&h=400&fit=crop',
+    description: 'Nghị quyết thông qua kế hoạch phát triển kinh tế - xã hội năm 2026 với các chỉ tiêu chủ yếu và giải pháp thực hiện.',
+    downloads: 478,
+    featured: false,
+    docType: 'Nghị quyết',
+    issuingAgency: 'HĐND Phường Tăng Nhơn Phú',
+    issuedDate: '28/12/2025',
+    effectiveDate: '01/01/2026',
+    status: 'Đang hiệu lực',
+    code: 'Số 45/NQ-HĐND',
+    tags: ['nghị quyết', 'kế hoạch', 'phát triển', '2026'],
+  },
+  {
+    id: 'vb-03',
+    category: 'van-ban',
+    title: 'Chỉ thị số 08/CT-UBND về tăng cường công tác phòng cháy chữa cháy',
+    author: 'UBND Phường Tăng Nhơn Phú',
+    cover: 'https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=600&h=400&fit=crop',
+    description: 'Chỉ thị về việc tăng cường công tác phòng cháy chữa cháy trên địa bàn phường, đặc biệt trong mùa khô và dịp lễ Tết.',
+    downloads: 1023,
+    featured: false,
+    docType: 'Chỉ thị',
+    issuingAgency: 'UBND Phường Tăng Nhơn Phú',
+    issuedDate: '10/03/2026',
+    effectiveDate: '10/03/2026',
+    status: 'Đang hiệu lực',
+    code: 'Số 08/CT-UBND',
+    tags: ['chỉ thị', 'phòng cháy', 'chữa cháy', 'an toàn'],
+  },
+
+  // ============================================
+  // BẢN ĐỒ (ban-do) — 3 items
+  // ============================================
+  {
+    id: 'bd-01',
+    category: 'ban-do',
+    title: 'Bản đồ quy hoạch sử dụng đất Phường Tăng Nhơn Phú đến năm 2030',
+    author: 'Phòng Tài nguyên và Môi trường',
+    cover: 'https://images.unsplash.com/photo-1524661135-423995f22d0b?w=600&h=400&fit=crop',
+    description: 'Bản đồ quy hoạch sử dụng đất chi tiết của phường Tăng Nhơn Phú, thể hiện các khu vực chức năng: đất ở, đất công nghiệp, đất công cộng, đất giao thông và các khu vực khác.',
+    downloads: 2341,
+    featured: true,
+    docType: 'Bản đồ quy hoạch',
+    tags: ['bản đồ', 'quy hoạch', 'đất đai', '2030'],
+  },
+  {
+    id: 'bd-02',
+    category: 'ban-do',
+    title: 'Bản đồ hành chính Phường Tăng Nhơn Phú',
+    author: 'UBND Phường Tăng Nhơn Phú',
+    cover: 'https://images.unsplash.com/photo-1569336415962-a4bd9f69c07b?w=600&h=400&fit=crop',
+    description: 'Bản đồ hành chính thể hiện ranh giới 12 khu phố, hệ thống giao thông chính và các công trình công cộng trên địa bàn phường.',
+    downloads: 1876,
+    featured: false,
+    docType: 'Bản đồ hành chính',
+    tags: ['bản đồ', 'hành chính', 'khu phố', 'giao thông'],
+  },
+  {
+    id: 'bd-03',
+    category: 'ban-do',
+    title: 'Sơ đồ mạng lưới thoát nước Phường Tăng Nhơn Phú',
+    author: 'Phòng Quản lý Đô thị',
+    cover: 'https://images.unsplash.com/photo-1577434470439-7b1e44e5e630?w=600&h=400&fit=crop',
+    description: 'Sơ đồ hệ thống thoát nước mưa và nước thải trên địa bàn phường, bao gồm vị trí các cống chính, hố ga, trạm bơm và hướng thoát nước.',
+    downloads: 567,
+    featured: false,
+    docType: 'Sơ đồ kỹ thuật',
+    tags: ['bản đồ', 'thoát nước', 'hạ tầng', 'kỹ thuật'],
+  },
+];
+
+// ============================================
+// LUẬT QUỐC GIA — 12 items
+// ============================================
+export const lawsData = [
+  {
+    id: 'law-hp-2013',
+    type: 'Hiến pháp',
+    code: 'Hiến pháp 2013',
+    title: 'Hiến Pháp Nước Cộng Hòa Xã Hội Chủ Nghĩa Việt Nam',
+    issuingAgency: 'Quốc hội',
+    issuedDate: '28/11/2013',
+    effectiveDate: '01/01/2014',
+    status: 'Đang hiệu lực',
+    cover: 'https://images.unsplash.com/photo-1589391886645-d51941baf7fb?w=600&h=400&fit=crop',
+    summary: 'Hiến pháp là đạo luật cơ bản, có hiệu lực pháp lý cao nhất của nước CHXHCN Việt Nam. Hiến pháp 2013 gồm 11 chương, 120 điều, quy định về chế độ chính trị, quyền con người, quyền và nghĩa vụ cơ bản của công dân, kinh tế, văn hóa, giáo dục, bảo vệ tổ quốc và tổ chức bộ máy nhà nước.',
+    downloads: 256800,
+    tags: ['hiến pháp', 'luật cơ bản', 'nhà nước'],
+    chapters: [
+      { title: 'Chương I: Chế độ chính trị', articles: ['Điều 1', 'Điều 2', 'Điều 3', 'Điều 4', 'Điều 5', 'Điều 6', 'Điều 7', 'Điều 8', 'Điều 9', 'Điều 10', 'Điều 11', 'Điều 12', 'Điều 13'] },
+      { title: 'Chương II: Quyền con người, quyền và nghĩa vụ cơ bản của công dân', articles: ['Điều 14 - Điều 49'] },
+      { title: 'Chương III: Kinh tế, xã hội, văn hóa, giáo dục, khoa học, công nghệ và môi trường', articles: ['Điều 50 - Điều 63'] },
+      { title: 'Chương IV: Bảo vệ Tổ quốc', articles: ['Điều 64 - Điều 68'] },
+      { title: 'Chương V: Quốc hội', articles: ['Điều 69 - Điều 85'] },
+      { title: 'Chương VI: Chủ tịch nước', articles: ['Điều 86 - Điều 93'] },
+      { title: 'Chương VII: Chính phủ', articles: ['Điều 94 - Điều 101'] },
+      { title: 'Chương VIII: Tòa án nhân dân, Viện Kiểm sát nhân dân', articles: ['Điều 102 - Điều 109'] },
+      { title: 'Chương IX: Chính quyền địa phương', articles: ['Điều 110 - Điều 116'] },
+      { title: 'Chương X: Hội đồng bầu cử quốc gia, Kiểm toán nhà nước', articles: ['Điều 117 - Điều 118'] },
+      { title: 'Chương XI: Hiệu lực và sửa đổi Hiến pháp', articles: ['Điều 119 - Điều 120'] },
+    ],
+  },
+  {
+    id: 'law-ds-2015',
+    type: 'Bộ luật',
+    code: 'Số 91/2015/QH13',
+    title: 'Bộ Luật Dân Sự',
+    issuingAgency: 'Quốc hội',
+    issuedDate: '24/11/2015',
+    effectiveDate: '01/01/2017',
+    status: 'Đang hiệu lực',
+    cover: 'https://images.unsplash.com/photo-1589994965851-a8f479c573a9?w=600&h=400&fit=crop',
+    summary: 'Bộ luật Dân sự quy định địa vị pháp lý, chuẩn mực pháp lý về cách ứng xử của cá nhân, pháp nhân trong quan hệ dân sự. Bộ luật gồm 6 phần, 27 chương, 689 điều.',
+    downloads: 189200,
+    tags: ['dân sự', 'quyền', 'nghĩa vụ', 'hợp đồng'],
+    chapters: [
+      { title: 'Phần 1: Quy định chung', articles: ['Chương I - X'] },
+      { title: 'Phần 2: Quyền sở hữu và quyền khác đối với tài sản', articles: ['Chương XI - XV'] },
+      { title: 'Phần 3: Nghĩa vụ và hợp đồng', articles: ['Chương XVI - XXI'] },
+      { title: 'Phần 4: Thừa kế', articles: ['Chương XXII - XXIV'] },
+      { title: 'Phần 5: Pháp luật áp dụng đối với quan hệ dân sự có yếu tố nước ngoài', articles: ['Chương XXV - XXVII'] },
+      { title: 'Phần 6: Điều khoản thi hành', articles: [] },
+    ],
+  },
+  {
+    id: 'law-hs-2015',
+    type: 'Bộ luật',
+    code: 'Số 100/2015/QH13',
+    title: 'Bộ Luật Hình Sự',
+    issuingAgency: 'Quốc hội',
+    issuedDate: '27/11/2015',
+    effectiveDate: '01/01/2018',
+    status: 'Đang hiệu lực',
+    cover: 'https://images.unsplash.com/photo-1453873531674-2151bcd01707?w=600&h=400&fit=crop',
+    summary: 'Bộ luật Hình sự quy định về tội phạm và hình phạt, là cơ sở pháp lý để bảo vệ chế độ, quyền con người, quyền công dân và lợi ích của Nhà nước. Bộ luật gồm 3 phần, 26 chương, 426 điều.',
+    downloads: 145300,
+    tags: ['hình sự', 'tội phạm', 'hình phạt'],
+    chapters: [
+      { title: 'Phần 1: Những quy định chung', articles: ['Chương I - XII'] },
+      { title: 'Phần 2: Các tội phạm', articles: ['Chương XIII - XXIV'] },
+      { title: 'Phần 3: Điều khoản thi hành', articles: [] },
+    ],
+  },
+  {
+    id: 'law-datdai-2024',
+    type: 'Luật',
+    code: 'Số 31/2024/QH15',
+    title: 'Luật Đất Đai',
+    issuingAgency: 'Quốc hội',
+    issuedDate: '18/01/2024',
+    effectiveDate: '01/08/2024',
+    status: 'Đang hiệu lực',
+    cover: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=600&h=400&fit=crop',
+    summary: 'Luật Đất đai 2024 quy định về chế độ sở hữu đất đai, quyền và nghĩa vụ của người sử dụng đất, quản lý và sử dụng đất đai. Luật có nhiều điểm mới về bồi thường, hỗ trợ tái định cư, giá đất và cấp giấy chứng nhận.',
+    downloads: 98700,
+    tags: ['đất đai', 'sở hữu', 'quyền sử dụng', 'bồi thường'],
+    chapters: [
+      { title: 'Chương I: Quy định chung', articles: ['Điều 1 - Điều 12'] },
+      { title: 'Chương II: Quyền và trách nhiệm của Nhà nước đối với đất đai', articles: ['Điều 13 - Điều 24'] },
+      { title: 'Chương III: Quyền và nghĩa vụ của người sử dụng đất', articles: ['Điều 25 - Điều 48'] },
+      { title: 'Chương IV: Địa giới hành chính, điều tra, đánh giá đất đai', articles: ['Điều 49 - Điều 60'] },
+      { title: 'Chương V: Quy hoạch, kế hoạch sử dụng đất', articles: ['Điều 61 - Điều 80'] },
+      { title: 'Chương VI: Thu hồi đất, trưng dụng đất', articles: ['Điều 81 - Điều 110'] },
+      { title: 'Chương VII: Giao đất, cho thuê đất, chuyển mục đích sử dụng đất', articles: ['Điều 111 - Điều 130'] },
+      { title: 'Chương VIII: Đăng ký đất đai, cấp giấy chứng nhận', articles: ['Điều 131 - Điều 155'] },
+      { title: 'Chương IX: Tài chính đất đai, giá đất', articles: ['Điều 156 - Điều 175'] },
+      { title: 'Chương X: Hệ thống thông tin đất đai', articles: ['Điều 176 - Điều 190'] },
+      { title: 'Chương XI: Điều khoản thi hành', articles: ['Điều 191 - Điều 200'] },
+    ],
+  },
+  {
+    id: 'law-ld-2019',
+    type: 'Bộ luật',
+    code: 'Số 45/2019/QH14',
+    title: 'Bộ Luật Lao Động',
+    issuingAgency: 'Quốc hội',
+    issuedDate: '20/11/2019',
+    effectiveDate: '01/01/2021',
+    status: 'Đang hiệu lực',
+    cover: 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=600&h=400&fit=crop',
+    summary: 'Bộ luật Lao động quy định về quyền và nghĩa vụ của người lao động, người sử dụng lao động, các tiêu chuẩn lao động và các nguyên tắc quản lý lao động. Bộ luật gồm 17 chương, 220 điều.',
+    downloads: 123400,
+    tags: ['lao động', 'việc làm', 'hợp đồng', 'bảo hiểm'],
+    chapters: [
+      { title: 'Chương I: Những quy định chung', articles: [] },
+      { title: 'Chương II: Việc làm', articles: [] },
+      { title: 'Chương III: Hợp đồng lao động', articles: [] },
+      { title: 'Chương IV: Đối thoại, thương lượng tập thể', articles: [] },
+      { title: 'Chương V: Tiền lương', articles: [] },
+      { title: 'Chương VI: Thời giờ làm việc, thời giờ nghỉ ngơi', articles: [] },
+      { title: 'Chương VII: Kỷ luật lao động', articles: [] },
+      { title: 'Chương VIII: An toàn, vệ sinh lao động', articles: [] },
+    ],
+  },
+  {
+    id: 'law-hn-2014',
+    type: 'Luật',
+    code: 'Số 52/2014/QH13',
+    title: 'Luật Hôn Nhân Và Gia Đình',
+    issuingAgency: 'Quốc hội',
+    issuedDate: '19/06/2014',
+    effectiveDate: '01/01/2015',
+    status: 'Đang hiệu lực',
+    cover: 'https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?w=600&h=400&fit=crop',
+    summary: 'Luật Hôn nhân và Gia đình quy định về chế độ hôn nhân và gia đình, các nguyên tắc cơ bản, điều kiện kết hôn, quyền và nghĩa vụ của vợ chồng, cha mẹ và con cái.',
+    downloads: 87600,
+    tags: ['hôn nhân', 'gia đình', 'kết hôn', 'ly hôn'],
+    chapters: [
+      { title: 'Chương I: Những quy định chung', articles: [] },
+      { title: 'Chương II: Kết hôn', articles: [] },
+      { title: 'Chương III: Quan hệ giữa vợ và chồng', articles: [] },
+      { title: 'Chương IV: Chấm dứt hôn nhân', articles: [] },
+      { title: 'Chương V: Quan hệ giữa cha mẹ và con', articles: [] },
+    ],
+  },
+  {
+    id: 'law-bvmt-2020',
+    type: 'Luật',
+    code: 'Số 72/2020/QH14',
+    title: 'Luật Bảo Vệ Môi Trường',
+    issuingAgency: 'Quốc hội',
+    issuedDate: '17/11/2020',
+    effectiveDate: '01/01/2022',
+    status: 'Đang hiệu lực',
+    cover: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=600&h=400&fit=crop',
+    summary: 'Luật Bảo vệ Môi trường 2020 quy định về hoạt động bảo vệ môi trường, quyền và nghĩa vụ của tổ chức, cá nhân trong bảo vệ môi trường. Luật có nhiều điểm mới về phân loại rác thải, trách nhiệm mở rộng của nhà sản xuất và đánh giá tác động môi trường.',
+    downloads: 65400,
+    tags: ['môi trường', 'bảo vệ', 'rác thải', 'ô nhiễm'],
+    chapters: [
+      { title: 'Chương I: Những quy định chung', articles: [] },
+      { title: 'Chương II: Bảo vệ môi trường trong hoạt động sản xuất, kinh doanh', articles: [] },
+      { title: 'Chương III: Bảo vệ môi trường đô thị và nông thôn', articles: [] },
+      { title: 'Chương IV: Quản lý chất thải', articles: [] },
+      { title: 'Chương V: Ứng phó biến đổi khí hậu', articles: [] },
+    ],
+  },
+  {
+    id: 'law-xd-2014',
+    type: 'Luật',
+    code: 'Số 50/2014/QH13',
+    title: 'Luật Xây Dựng',
+    issuingAgency: 'Quốc hội',
+    issuedDate: '18/06/2014',
+    effectiveDate: '01/01/2015',
+    status: 'Đang hiệu lực',
+    cover: 'https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=600&h=400&fit=crop',
+    summary: 'Luật Xây dựng quy định về quyền và nghĩa vụ của tổ chức, cá nhân trong hoạt động đầu tư xây dựng; quy hoạch xây dựng; cấp phép xây dựng; quản lý chất lượng công trình và các vấn đề liên quan.',
+    downloads: 54300,
+    tags: ['xây dựng', 'cấp phép', 'quy hoạch', 'công trình'],
+    chapters: [
+      { title: 'Chương I: Những quy định chung', articles: [] },
+      { title: 'Chương II: Quy hoạch xây dựng', articles: [] },
+      { title: 'Chương III: Dự án đầu tư xây dựng', articles: [] },
+      { title: 'Chương IV: Khảo sát, thiết kế xây dựng', articles: [] },
+      { title: 'Chương V: Cấp phép xây dựng', articles: [] },
+    ],
+  },
+  {
+    id: 'law-nd-158',
+    type: 'Nghị định',
+    code: 'Số 158/2016/NĐ-CP',
+    title: 'Nghị Định Quy Định Chi Tiết Thi Hành Luật Khoáng Sản',
+    issuingAgency: 'Chính phủ',
+    issuedDate: '29/11/2016',
+    effectiveDate: '15/01/2017',
+    status: 'Đang hiệu lực',
+    cover: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=600&h=400&fit=crop',
+    summary: 'Nghị định quy định chi tiết thi hành một số điều của Luật Khoáng sản, bao gồm các quy định về thăm dò, khai thác và chế biến khoáng sản.',
+    downloads: 21300,
+    tags: ['nghị định', 'khoáng sản', 'khai thác', 'tài nguyên'],
+    chapters: [],
+  },
+  {
+    id: 'law-nd-100',
+    type: 'Nghị định',
+    code: 'Số 100/2019/NĐ-CP',
+    title: 'Nghị Định Quy Định Xử Phạt Vi Phạm Hành Chính Trong Lĩnh Vực Giao Thông Đường Bộ',
+    issuingAgency: 'Chính phủ',
+    issuedDate: '30/12/2019',
+    effectiveDate: '01/01/2020',
+    status: 'Đang hiệu lực',
+    cover: 'https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?w=600&h=400&fit=crop',
+    summary: 'Nghị định quy định về hành vi vi phạm hành chính, hình thức xử phạt, mức xử phạt và các biện pháp khắc phục hậu quả trong lĩnh vực giao thông đường bộ.',
+    downloads: 156700,
+    tags: ['nghị định', 'giao thông', 'xử phạt', 'đường bộ'],
+    chapters: [],
+  },
+  {
+    id: 'law-cu-2020',
+    type: 'Luật',
+    code: 'Số 68/2020/QH14',
+    title: 'Luật Cư Trú',
+    issuingAgency: 'Quốc hội',
+    issuedDate: '13/11/2020',
+    effectiveDate: '01/07/2021',
+    status: 'Đang hiệu lực',
+    cover: 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=600&h=400&fit=crop',
+    summary: 'Luật Cư trú 2020 quy định về việc thực hiện quyền tự do cư trú của công dân Việt Nam, thay thế hình thức quản lý bằng sổ hộ khẩu, sổ tạm trú bằng quản lý qua cơ sở dữ liệu quốc gia về dân cư.',
+    downloads: 112400,
+    tags: ['cư trú', 'hộ khẩu', 'dân cư', 'đăng ký'],
+    chapters: [
+      { title: 'Chương I: Những quy định chung', articles: [] },
+      { title: 'Chương II: Quyền và nghĩa vụ về cư trú', articles: [] },
+      { title: 'Chương III: Đăng ký cư trú', articles: [] },
+      { title: 'Chương IV: Quản lý cư trú', articles: [] },
+      { title: 'Chương V: Điều khoản thi hành', articles: [] },
+    ],
+  },
+  {
+    id: 'law-tctc-2024',
+    type: 'Luật',
+    code: 'Số 35/2024/QH15',
+    title: 'Luật Tổ Chức Tòa Án Nhân Dân',
+    issuingAgency: 'Quốc hội',
+    issuedDate: '24/06/2024',
+    effectiveDate: '01/01/2025',
+    status: 'Đang hiệu lực',
+    cover: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=600&h=400&fit=crop',
+    summary: 'Luật quy định về tổ chức, nhiệm vụ, quyền hạn của Tòa án nhân dân các cấp; quy định về thẩm phán, hội thẩm và các chức danh khác trong Tòa án.',
+    downloads: 43200,
+    tags: ['tòa án', 'tư pháp', 'xét xử', 'thẩm phán'],
+    chapters: [],
+  },
+];
+
+// ============================================
+// SEARCH HINTS — Gợi ý tìm kiếm
+// ============================================
+export const searchHints = [
+  'Thủ tục đăng ký khai sinh',
+  'Quy định về đất đai',
+  'Quy hoạch đô thị',
+  'Phòng cháy chữa cháy',
+  'Luật lao động',
+  'Bảo hiểm xã hội',
+  'Xây dựng nhà ở',
+  'Bảo vệ môi trường',
+];
+
+// ============================================
+// HELPERS
+// ============================================
+export function getCategoryById(id) {
+  return libraryCategories.find(c => c.id === id);
+}
+
+export function getDocumentById(id) {
+  return libraryDocuments.find(d => d.id === id);
+}
+
+export function getLawById(id) {
+  return lawsData.find(l => l.id === id);
+}
+
+export function getFeaturedDocuments() {
+  return libraryDocuments.filter(d => d.featured);
+}
+
+export function getRelatedDocuments(doc) {
+  return libraryDocuments
+    .filter(d => d.id !== doc.id && (d.category === doc.category || d.tags.some(t => doc.tags.includes(t))))
+    .slice(0, 4);
+}

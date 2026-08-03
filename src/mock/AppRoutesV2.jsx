@@ -19,6 +19,8 @@ import PlaceholderPage from '../pages-v2/PlaceholderPage';
 import DigitalMap from '../pages-v2/map/DigitalMap';
 import InternalDocs from '../pages-v2/admin/InternalDocs';
 import PublicDocs from '../pages-v2/admin/PublicDocs';
+import DigitalLibraryPage from '../pages-v2/citizen/DigitalLibraryPage';
+import LibraryManagement from '../pages-v2/admin/LibraryManagement';
 
 const ROLE_HOME = {
   CITIZEN: '/submit',
@@ -53,6 +55,8 @@ export default function AppRoutesV2() {
         <Route path="/admin/digital-map" element={<DigitalMap />} />
         <Route path="/admin/documents/internal" element={<InternalDocs />} />
         <Route path="/admin/documents/public" element={<PublicDocs />} />
+        <Route path="/cong-dong/thu-vien-so" element={<DigitalLibraryPage />} />
+        <Route path="/admin/library" element={<LibraryManagement />} />
         <Route path="/placeholder" element={<PlaceholderPage />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />

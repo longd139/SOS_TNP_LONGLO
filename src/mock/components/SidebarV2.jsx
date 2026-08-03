@@ -17,14 +17,15 @@ const ALL_MENUS = [
     roles: ['PROCESSING_OFFICER','APPROVER','LEADER','ADMIN'],
     submenu: [
       { id: 'doc-internal', label: 'Tài liệu nội bộ', path: '/admin/documents/internal' },
-      { 
-        id: 'doc-public', 
-        label: 'Tài liệu công khai', 
+      {
+        id: 'doc-public',
+        label: 'Tài liệu công khai',
         submenu: [
           { id: 'doc-public-history', label: 'Văn hóa lịch sử', path: '/admin/documents/public?category=history' },
           { id: 'doc-public-legal', label: 'Quy phạm pháp luật', path: '/admin/documents/public?category=legal' }
         ]
       },
+      { id: 'doc-library', label: 'Thư Viện Số', path: '/admin/library' },
     ]
   },
   { id: 'neighborhood-dashboard', label: 'Dashboard khu phố', icon: MapPin, path: '/dashboard/neighborhood', roles: ['APPROVER','LEADER','ADMIN'] },
