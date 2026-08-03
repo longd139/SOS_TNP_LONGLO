@@ -5,6 +5,7 @@ import { CitizenNotFound, ComplaintDetailPage, ContactPage, NewsDetailPage, News
 import CitizenHomePage from './citizen/pages/CitizenHomePage';
 import CitizenLoginPage from './citizen/pages/CitizenLoginPage';
 import { CitizenGuidePage, PublicServicesPage, ReceptionSchedulePage } from './citizen/pages/CitizenServicePages';
+import DigitalLibraryPage from './citizen/pages/DigitalLibraryPage';
 
 export default function CitizenApp() {
   return (
@@ -25,6 +26,7 @@ export default function CitizenApp() {
           <Route path="/cong-dong/dich-vu-cong" element={<PublicServicesPage />} />
           <Route path="/cong-dong/lich-tiep-dan" element={<ReceptionSchedulePage />} />
           <Route path="/cong-dong/huong-dan" element={<CitizenGuidePage />} />
+          <Route path="/cong-dong/thu-vien-so" element={<DigitalLibraryPage />} />
           <Route path="*" element={<CitizenNotFound />} />
         </Route>
       </Routes>

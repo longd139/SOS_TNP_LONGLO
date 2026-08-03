@@ -15,4 +15,6 @@ export {
   complaintStatuses,
   contactInfo,
   departments,
+  libraryCategories,
+  libraryDocuments,
 } from './citizenData';
