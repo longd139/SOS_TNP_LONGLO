@@ -1,0 +1,28 @@
+const ROUTE_PATH = {
+    LOGIN: '/',
+    DASHBOARD: '/dashboard',
+    REPORT: '/reports',
+    REPORT_DETAIL: '/reports/:id',
+    REPORT_UPDATE: '/reports/update',
+    REPORT_STATISTICS: '/reports/statistics',
+    REPORT_USERS: '/reports/users',
+    REPORT_EXPORT: '/reports/export',
+    NEWS: '/news',
+    PROCEDURES: '/procedures',
+    TEMPLATES: '/templates',
+    CONTACT: '/contact',
+    SCHEDULES: '/schedules',
+    STATISTICS: '/statistics',
+    ACCOUNTS: '/accounts',
+    NOT_FOUND: '*',
+    REPORT_AREAS: '/report-areas',
+    AREAS: '/areas',
+    FORGOT_PASSWORD: '/forgot-password',
+    GOVERNMENT: '/government',
+    PERMISSIONS: '/permissions',
+    ROLE_CREATE: '/permissions/create',
+    ROLE_EDIT: '/permissions/:roleId/edit',
+    AUDIT_LOG: '/audit-log', 
+    CATEGORY_NEWS: '/category-news' 
+}
+export default ROUTE_PATH;

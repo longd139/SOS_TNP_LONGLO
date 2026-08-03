@@ -1,0 +1,18 @@
+// Nguồn dữ liệu giả duy nhất của Citizen Web. Khi có backend, thay module này bằng lớp gọi API.
+export {
+  citizenMockDb,
+  citizenNavItems,
+  heroBanners,
+  homeFeatures,
+  importantNotices,
+  emergencyContact,
+  publicServices,
+  citizenReceptionSchedule,
+  procedureCategories,
+  procedures,
+  newsCategories,
+  news,
+  complaintStatuses,
+  contactInfo,
+  departments,
+} from './citizenData';
