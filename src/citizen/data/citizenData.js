@@ -16,6 +16,7 @@ export const heroBanners = [
     description: 'Tra cứu thủ tục, gửi phản ánh, theo dõi tiến độ và cập nhật thông tin địa phương trên một nền tảng dễ sử dụng.',
     metric: '4.286',
     metricLabel: 'hồ sơ đã được tiếp nhận trực tuyến',
+    image: 'https://images.unsplash.com/photo-1554774853-aae0a22c8aa4?auto=format&fit=crop&w=1600&q=85',
   },
   {
     id: 'phan-anh',
@@ -24,6 +25,7 @@ export const heroBanners = [
     description: 'Chia sẻ vấn đề tại khu phố, nhận mã phản ánh và theo dõi từng bước xử lý từ cơ quan chức năng.',
     metric: '96%',
     metricLabel: 'phản ánh được xử lý đúng hạn',
+    image: 'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=1600&q=85',
   },
   {
     id: 'thu-tuc',
@@ -32,6 +34,7 @@ export const heroBanners = [
     description: 'Tìm hướng dẫn rõ ràng, chuẩn bị đủ hồ sơ và biết trước thời hạn giải quyết trước khi nộp.',
     metric: '24/7',
     metricLabel: 'tra cứu thông tin mọi lúc',
+    image: 'https://images.unsplash.com/photo-1556761175-b413da4baf72?auto=format&fit=crop&w=1600&q=85',
   },
 ];
 

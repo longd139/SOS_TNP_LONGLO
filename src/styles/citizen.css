@@ -491,3 +491,183 @@
   .lib-detail-hero-card { flex-direction: column; padding: 24px; }
   .lib-detail-hero-img { width: 160px; height: 220px; }
 }
+
+/* Hệ thống trình bày Citizen 2026: giữ nguyên bảng màu xanh hiện hữu. */
+.citizen-app {
+  --citizen-radius: 14px;
+  background: #fff;
+}
+
+.citizen-container { width: min(1240px, calc(100% - 48px)); }
+.citizen-topbar { font-size: 11px; letter-spacing: .01em; }
+.citizen-header { box-shadow: 0 1px 0 rgba(21, 101, 192, .08); }
+.citizen-header-inner { min-height: 72px; gap: 24px; }
+.citizen-brand-mark { width: 42px; height: 42px; border-radius: 11px; }
+.citizen-brand strong { font-size: 15px; }
+.citizen-nav { gap: 1px; }
+.citizen-nav a { padding: 9px 10px; border-radius: 7px; font-size: 13px; }
+.citizen-nav a:hover, .citizen-nav a.active { background: transparent; box-shadow: inset 0 -2px 0 var(--citizen-blue); }
+.citizen-officer-link { min-height: 40px; padding: 9px 12px; border-radius: 8px; }
+
+.citizen-hero { background: var(--citizen-blue-dark); }
+.citizen-hero::before {
+  position: absolute;
+  inset: 0;
+  content: '';
+  pointer-events: none;
+  background: linear-gradient(90deg, rgba(21, 101, 192, .16), transparent 60%);
+}
+.citizen-hero::after { display: none; }
+.citizen-hero-grid { min-height: 500px; grid-template-columns: minmax(0, .9fr) minmax(400px, 1.1fr); gap: 56px; padding: 52px 0 48px; }
+.citizen-hero-copy { max-width: 570px; animation: citizen-banner-copy-in 300ms cubic-bezier(.16, 1, .3, 1) both; }
+.citizen-eyebrow { margin-bottom: 11px; color: var(--citizen-blue-dark); font-size: 11px; letter-spacing: .1em; }
+.citizen-eyebrow-light { color: var(--citizen-blue-soft); }
+.citizen-hero h1 { max-width: 560px; font-size: clamp(38px, 4.2vw, 58px); line-height: 1.13; letter-spacing: -.045em; }
+.citizen-hero-copy > p:not(.citizen-eyebrow) { max-width: 510px; margin: 18px 0 24px; color: #eaf4ff; font-size: 16px; line-height: 1.72; }
+.citizen-hero-actions { gap: 10px; }
+.citizen-button { min-height: 44px; border-radius: 8px; padding: 10px 15px; font-size: 13px; }
+.citizen-button:hover { transform: translateY(-1px); }
+.citizen-button:active { transform: translateY(1px); }
+.citizen-trust-note { margin-top: 19px; color: #eaf4ff; }
+.citizen-hero-visual { min-height: 356px; display: block; overflow: visible; background: transparent; }
+.hero-banner-visual-content { height: 356px; animation: citizen-banner-image-in 320ms cubic-bezier(.16, 1, .3, 1) both; }
+.hero-service-image { display: block; width: 100%; height: 356px; object-fit: cover; object-position: 68% center; border-radius: 14px; box-shadow: 0 18px 42px rgba(5, 45, 92, .25); }
+.hero-metric-card { position: absolute; bottom: 20px; left: -26px; display: grid; gap: 3px; min-width: 194px; padding: 15px 17px; border-left: 3px solid var(--citizen-blue); border-radius: 8px; color: var(--citizen-ink); background: #fff; box-shadow: 0 12px 30px rgba(5, 45, 92, .2); animation: citizen-banner-card-in 340ms 40ms cubic-bezier(.16, 1, .3, 1) both; }
+.hero-metric-card span { color: var(--citizen-muted); font-size: 11px; line-height: 1.4; }
+.hero-metric-card strong { color: var(--citizen-blue-dark); font-size: 28px; letter-spacing: -.04em; line-height: 1.1; }
+.hero-controls { right: 14px; bottom: 14px; padding: 5px; border-radius: 8px; background: rgba(17, 24, 39, .65); backdrop-filter: blur(6px); }
+.hero-controls button { width: 29px; height: 29px; border-radius: 6px; }
+.hero-indicators { gap: 6px; padding-bottom: 19px; }
+.hero-indicators button { width: 22px; }
+.hero-indicators button.active { width: 38px; }
+
+@keyframes citizen-banner-copy-in {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes citizen-banner-image-in {
+  from { opacity: 0; transform: translateX(22px) scale(.985); }
+  to { opacity: 1; transform: translateX(0) scale(1); }
+}
+@keyframes citizen-banner-card-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.citizen-quick-search { padding: 0; background: var(--citizen-soft); }
+.citizen-quick-search .citizen-container { min-height: 104px; padding: 22px 0; border: 0; border-radius: 0; box-shadow: none; background: transparent; }
+.quick-search-label span { color: var(--citizen-ink); font-size: 15px; }
+.quick-search-label small { color: var(--citizen-muted); }
+.citizen-search { min-height: 52px; border: 1px solid var(--citizen-line); border-radius: 9px; background: #fff; }
+.citizen-search:focus-within { border-color: var(--citizen-blue); box-shadow: 0 0 0 3px rgba(37, 99, 235, .12); }
+
+.citizen-section { padding: 76px 0; }
+.citizen-section-soft { background: var(--citizen-soft); }
+.citizen-section-heading { display: block; margin-bottom: 30px; }
+.citizen-section-heading > div { max-width: 690px; }
+.citizen-section-heading h2 { font-size: clamp(27px, 3vw, 38px); letter-spacing: -.035em; line-height: 1.2; }
+.citizen-section-heading > div > p:last-child { max-width: 650px; margin-top: 10px; }
+.citizen-section-heading > .citizen-text-link { display: inline-flex; margin-top: 13px; }
+.citizen-text-link { color: var(--citizen-blue-dark); font-size: 13px; font-weight: 700; }
+
+.citizen-mobile-feature-grid { grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 12px; }
+.citizen-mobile-feature { min-height: 180px; grid-column: span 2; padding: 21px; border-radius: 12px; background: #fff; }
+.citizen-mobile-feature:first-child { grid-column: span 2; background: var(--citizen-blue-soft); }
+.citizen-mobile-feature:nth-child(4), .citizen-mobile-feature:nth-child(5) { grid-column: span 3; }
+.citizen-mobile-feature:nth-child(6) { grid-column: span 3; }
+.citizen-mobile-feature:hover { transform: translateY(-2px); }
+.citizen-mobile-feature strong { margin-top: 15px; font-size: 15px; }
+.citizen-mobile-feature small { margin-top: 4px; }
+.citizen-mobile-feature-icon { width: 45px; height: 45px; border-radius: 10px; }
+
+.citizen-notice-layout { grid-template-columns: minmax(0, 1.35fr) minmax(280px, .65fr); gap: 44px; }
+.citizen-notice-list { gap: 9px; }
+.citizen-notice-card { min-height: 86px; padding: 16px 18px 16px 19px; border: 1px solid var(--citizen-line); border-left: 3px solid var(--citizen-blue); border-radius: 8px; box-shadow: none; }
+.citizen-notice-card:hover { border-color: var(--citizen-blue); }
+.citizen-emergency-card { min-height: 100%; padding: 30px; border-radius: 12px; box-shadow: none; background: var(--citizen-blue-dark); }
+.citizen-emergency-card h2 { line-height: 1.25; }
+.citizen-emergency-card .citizen-button { border-radius: 8px; }
+
+.procedure-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.citizen-card, .citizen-news-card, .citizen-feature-card, .citizen-service-card, .contact-info-card { border-radius: 12px; }
+.citizen-card { min-height: 320px; padding: 22px; }
+.citizen-card:hover, .citizen-news-card:hover { transform: translateY(-2px); }
+.procedure-card-icon { width: 44px; height: 44px; border-radius: 10px; }
+.citizen-card h3 { font-size: 17px; }
+.citizen-card-link { font-size: 13px; }
+.news-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+.news-grid > :first-child { grid-column: span 2; }
+.citizen-news-card:not(.citizen-news-card-featured) { display: flex; flex-direction: column; }
+.citizen-news-card:not(.citizen-news-card-featured) img { height: auto; min-height: 0; aspect-ratio: 16 / 10; object-fit: cover; }
+.citizen-news-card-featured img { height: 260px; }
+.citizen-news-content { padding: 18px; }
+.citizen-news-content h3 { font-size: 17px; }
+.citizen-process-section { background: #fff; }
+.process-steps { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 24px; }
+.process-step { padding-right: 6px; }
+.process-step-icon { width: 48px; height: 48px; border-radius: 10px; }
+.process-step-number { width: 25px; height: 25px; border-radius: 50%; }
+.process-connector { top: 36px; left: calc(100% - 6px); width: 24px; }
+
+.citizen-page-hero { padding: 55px 0 50px; background: var(--citizen-blue-soft); }
+.citizen-page-hero h1 { max-width: 850px; font-size: clamp(32px, 4vw, 50px); letter-spacing: -.04em; }
+.citizen-page-hero-description { max-width: 680px; font-size: 16px; }
+.procedure-filter, .complaint-form, .tracking-result, .detail-summary { border-radius: 12px; }
+.procedure-filter { top: 90px; padding: 16px; }
+.detail-facts, .detail-facts > div { border-radius: 0; }
+.detail-facts { border-radius: 10px; }
+.complaint-form, .tracking-result { box-shadow: 0 12px 28px rgba(21, 101, 192, .07); }
+.citizen-footer-support { padding: 44px 0; }
+.citizen-footer-grid { padding: 48px 0; }
+
+@media (max-width: 1100px) {
+  .citizen-header-inner { min-height: 68px; }
+  .citizen-nav { top: 68px; }
+  .citizen-hero-grid { grid-template-columns: 1fr 1fr; gap: 34px; min-height: 470px; }
+  .hero-metric-card { left: -12px; }
+  .citizen-mobile-feature-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .citizen-mobile-feature, .citizen-mobile-feature:first-child, .citizen-mobile-feature:nth-child(4), .citizen-mobile-feature:nth-child(5), .citizen-mobile-feature:nth-child(6) { grid-column: auto; }
+}
+@media (max-width: 780px) {
+  .citizen-container { width: min(100% - 32px, 760px); }
+  .citizen-hero-grid { grid-template-columns: 1fr; gap: 30px; padding: 42px 0 28px; }
+  .citizen-hero-copy { max-width: 630px; }
+  .citizen-hero h1 { max-width: 620px; }
+  .citizen-hero-visual, .hero-banner-visual-content { min-height: 290px; height: 300px; }
+  .hero-service-image { height: 300px; object-position: 66% center; }
+  .citizen-hero-copy > p:not(.citizen-eyebrow) { max-width: 620px; }
+  .hero-metric-card { left: 16px; bottom: 16px; }
+  .citizen-notice-layout { grid-template-columns: 1fr; }
+  .news-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .news-grid > :first-child { grid-column: span 2; }
+  .process-steps { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 34px; }
+  .process-connector { display: none; }
+}
+@media (max-width: 580px) {
+  .citizen-container { width: min(100% - 28px, 520px); }
+  .citizen-topbar-inner { min-height: 34px; }
+  .citizen-topbar-inner > span { display: none; }
+  .citizen-topbar-inner { justify-content: flex-end; }
+  .citizen-section { padding: 52px 0; }
+  .citizen-hero-grid { padding-top: 36px; }
+  .citizen-hero h1 { font-size: 36px; }
+  .citizen-hero-actions .citizen-button { width: 100%; }
+  .citizen-hero-visual, .hero-banner-visual-content { min-height: 246px; height: 252px; }
+  .hero-service-image { height: 252px; }
+  .hero-metric-card { min-width: 168px; padding: 12px 14px; }
+  .hero-metric-card strong { font-size: 24px; }
+  .hero-controls { right: 10px; bottom: 10px; }
+  .citizen-quick-search .citizen-container { padding: 20px 0; }
+  .citizen-mobile-feature-grid, .procedure-grid, .process-steps, .news-grid { grid-template-columns: 1fr; }
+  .citizen-mobile-feature { min-height: 148px; }
+  .news-grid > :first-child { grid-column: auto; }
+  .citizen-news-card:not(.citizen-news-card-featured) img { aspect-ratio: 16 / 9; }
+  .citizen-news-content { padding: 14px; }
+  .citizen-news-content p { display: none; }
+  .citizen-emergency-card { padding: 24px; }
+  .citizen-page-hero { padding: 42px 0; }
+  .citizen-page-hero h1 { font-size: 32px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .citizen-hero-copy, .hero-banner-visual-content, .hero-metric-card { animation: none; }
+}

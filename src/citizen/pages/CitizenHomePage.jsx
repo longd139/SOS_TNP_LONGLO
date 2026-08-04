@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ArrowRight, BriefcaseBusiness, CalendarDays, CheckCircle2, ChevronLeft, ChevronRight, FileImage, FileText, MessageSquare, Newspaper, Phone } from 'lucide-react';
+import { ArrowRight, BriefcaseBusiness, CalendarDays, ChevronLeft, ChevronRight, FileImage, FileText, MessageSquare, Newspaper, Phone } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { emergencyContact, heroBanners, homeFeatures, importantNotices, procedures, news, contactInfo } from '../data/citizenMockDb';
 import { NewsCard, ProcedureCard, ProcessSteps, QuickSearch, SectionHeading, TrustNote } from '../components/CitizenPrimitives';
@@ -12,6 +12,13 @@ export default function CitizenHomePage() {
   useEffect(() => {
     const timer = window.setInterval(() => setActiveIndex((current) => (current + 1) % heroBanners.length), 6500);
     return () => window.clearInterval(timer);
+  }, []);
+
+  useEffect(() => {
+    heroBanners.forEach((banner) => {
+      const image = new Image();
+      image.src = banner.image;
+    });
   }, []);
 
   const moveBanner = (direction) => setActiveIndex((current) => (current + direction + heroBanners.length) % heroBanners.length);
@@ -27,8 +34,10 @@ export default function CitizenHomePage() {
           <TrustNote />
         </div>
         <div className="citizen-hero-visual">
-          <div className="hero-visual-main"><span className="hero-visual-label">Phường Tăng Nhơn Phú</span><strong>{activeBanner.metric}</strong><span>{activeBanner.metricLabel}</span><div className="hero-mini-chart"><i /><i /><i /><i /><i /><i /><i /></div></div>
-          <div className="hero-float-card"><CheckCircle2 size={20} /><div><strong>Minh bạch từng bước</strong><span>Thông tin được cập nhật rõ ràng</span></div></div>
+          <div className="hero-banner-visual-content" key={activeBanner.id}>
+            <img src={activeBanner.image} alt="Hình ảnh minh họa cho dịch vụ công trực tuyến" className="hero-service-image" />
+            <div className="hero-metric-card"><span>{activeBanner.metricLabel}</span><strong>{activeBanner.metric}</strong></div>
+          </div>
           <div className="hero-controls"><button onClick={() => moveBanner(-1)} aria-label="Banner trước"><ChevronLeft size={18} /></button><span>{activeIndex + 1} / {heroBanners.length}</span><button onClick={() => moveBanner(1)} aria-label="Banner tiếp theo"><ChevronRight size={18} /></button></div>
         </div>
       </div>
