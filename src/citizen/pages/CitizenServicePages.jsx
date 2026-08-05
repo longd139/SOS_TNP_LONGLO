@@ -22,11 +22,61 @@ export function PublicServicesPage() {
 
 export function ReceptionSchedulePage() {
   return <>
-    <PageHero eyebrow="Lịch tiếp công dân" title="Lịch làm việc và tiếp nhận ý kiến" description="Người dân có thể đến đúng khung giờ để được hướng dẫn, trao đổi và gửi ý kiến trực tiếp." />
-    <section className="citizen-section"><div className="citizen-container citizen-schedule-layout"><div>
-      <SectionHeading eyebrow="Lịch trong tuần" title="Thời gian tiếp công dân" description="Vui lòng mang theo giấy tờ liên quan để việc trao đổi được thuận tiện." />
-      <div className="citizen-schedule-list">{citizenReceptionSchedule.map((schedule) => <article className="citizen-schedule-row" key={schedule.day}><div className="citizen-schedule-day"><CalendarDays size={21} /><strong>{schedule.day}</strong><span>{schedule.time}</span></div><div><strong>{schedule.host}</strong><p><MapPin size={15} /> {schedule.place}</p></div></article>)}</div>
-    </div><aside className="citizen-schedule-aside"><Phone size={28} /><h2>Đặt lịch trao đổi</h2><p>Nếu nội dung cần trao đổi nhiều, hãy liên hệ trước để được sắp xếp thời gian phù hợp.</p><a className="citizen-button citizen-button-primary" href="tel:(028)38961234">Gọi Bộ phận Một cửa</a></aside></div></section>
+    <section className="schedule-page">
+      <div className="schedule-hero">
+        <div className="citizen-container">
+          <h1>Lịch <em>tiếp công dân</em></h1>
+          <p>Người dân có thể đến đúng khung giờ để được hướng dẫn, trao đổi và gửi ý kiến trực tiếp.</p>
+        </div>
+      </div>
+
+      <div className="citizen-container">
+        <div className="sch-layout">
+          <div className="sch-main">
+            <h2>Lịch trong tuần</h2>
+            <div className="sch-list">
+              {citizenReceptionSchedule.map((schedule) => (
+                <div key={schedule.day} className="sch-item">
+                  <div className="sch-day">
+                    <CalendarDays size={20} />
+                    <div>
+                      <strong>{schedule.day}</strong>
+                      <span>{schedule.time}</span>
+                    </div>
+                  </div>
+                  <div className="sch-info">
+                    <strong>{schedule.host}</strong>
+                    <p>📍 {schedule.place}</p>
+                  </div>
+                  <div className="sch-status">
+                    <span className="sch-status-dot" />
+                    <span>Đang áp dụng</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <aside className="sch-sidebar">
+            <div className="sch-card">
+              <div className="sch-card-head">
+                <Phone size={20} />
+                <h3>Đặt lịch trao đổi</h3>
+              </div>
+              <p>Nếu nội dung cần trao đổi nhiều, hãy liên hệ trước để được sắp xếp thời gian phù hợp.</p>
+              <a className="citizen-button citizen-button-primary full-width" href="tel:(028)38961234">Gọi Bộ phận Một cửa</a>
+            </div>
+            <div className="sch-card sch-note">
+              <div className="sch-card-head">
+                <FileText size={20} />
+                <h3>Lưu ý</h3>
+              </div>
+              <p>Vui lòng mang theo CCCD và các giấy tờ liên quan để việc trao đổi được thuận tiện.</p>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </section>
   </>;
 }
 

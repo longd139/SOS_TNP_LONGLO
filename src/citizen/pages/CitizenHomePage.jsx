@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { ArrowRight, BriefcaseBusiness, CalendarDays, CheckCircle2, ChevronLeft, ChevronRight, FileImage, FileText, MessageSquare, Newspaper, Phone } from 'lucide-react';
+import { ArrowRight, BookOpen, BriefcaseBusiness, CalendarDays, FileImage, FileText, MessageSquare, Newspaper, Phone } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { emergencyContact, heroBanners, homeFeatures, importantNotices, procedures, news, contactInfo } from '../data/citizenMockDb';
-import { NewsCard, ProcedureCard, ProcessSteps, QuickSearch, SectionHeading, TrustNote } from '../components/CitizenPrimitives';
+import { ProcedureCard, ProcessSteps, QuickSearch, TrustNote } from '../components/CitizenPrimitives';
 
 export default function CitizenHomePage() {
   const [activeIndex, setActiveIndex] = useState(0);
@@ -14,34 +14,178 @@ export default function CitizenHomePage() {
     return () => window.clearInterval(timer);
   }, []);
 
-  const moveBanner = (direction) => setActiveIndex((current) => (current + direction + heroBanners.length) % heroBanners.length);
-
   return <>
-    <section className={`citizen-hero citizen-hero-${activeBanner.id}`} aria-roledescription="carousel" aria-label="Thông tin nổi bật">
+    <section className={`citizen-hero citizen-hero-${activeBanner.id}`} style={{ background: `linear-gradient(170deg, rgba(10,22,48,.90) 0%, rgba(15,40,70,.72) 38%, rgba(10,30,56,.90) 100%), url(${process.env.PUBLIC_URL}/1.jpg) center/cover no-repeat` }} aria-roledescription="carousel" aria-label="Thông tin nổi bật">
       <div className="citizen-container citizen-hero-grid">
         <div className="citizen-hero-copy" key={activeBanner.id}>
-          <p className="citizen-eyebrow citizen-eyebrow-light">{activeBanner.eyebrow}</p>
-          <h1>{activeBanner.title}</h1>
-          <p>{activeBanner.description}</p>
+          <div className="hero-accent-line" />
+          <p className="citizen-eyebrow citizen-eyebrow-light">
+            <span className="hero-eyebrow-dot" /> {activeBanner.eyebrow}
+          </p>
+          <h1>
+            {activeBanner.id === 'ket-noi' && <><em>Kết nối</em> người dân<br />với chính quyền <em>địa phương</em></>}
+            {activeBanner.id === 'phan-anh' && <>Mỗi phản ánh đều được<br /><em>tiếp nhận minh bạch</em></>}
+            {activeBanner.id === 'thu-tuc' && <>Chủ động thực hiện<br /><em>thủ tục hành chính</em></>}
+          </h1>
+          <p className="hero-desc">{activeBanner.description}</p>
           <div className="citizen-hero-actions"><Link to="/cong-dong/gui-phan-anh" className="citizen-button citizen-button-white">Gửi phản ánh <ArrowRight size={17} /></Link><Link to="/cong-dong/thu-tuc" className="citizen-button citizen-button-ghost">Xem thủ tục hành chính</Link></div>
           <TrustNote />
         </div>
-        <div className="citizen-hero-visual">
-          <div className="hero-visual-main"><span className="hero-visual-label">Phường Tăng Nhơn Phú</span><strong>{activeBanner.metric}</strong><span>{activeBanner.metricLabel}</span><div className="hero-mini-chart"><i /><i /><i /><i /><i /><i /><i /></div></div>
-          <div className="hero-float-card"><CheckCircle2 size={20} /><div><strong>Minh bạch từng bước</strong><span>Thông tin được cập nhật rõ ràng</span></div></div>
-          <div className="hero-controls"><button onClick={() => moveBanner(-1)} aria-label="Banner trước"><ChevronLeft size={18} /></button><span>{activeIndex + 1} / {heroBanners.length}</span><button onClick={() => moveBanner(1)} aria-label="Banner tiếp theo"><ChevronRight size={18} /></button></div>
-        </div>
       </div>
-      <div className="citizen-container hero-indicators">{heroBanners.map((banner, index) => <button key={banner.id} className={index === activeIndex ? 'active' : ''} onClick={() => setActiveIndex(index)} aria-label={`Xem banner ${index + 1}`} />)}</div>
+      <div className="citizen-container hero-indicators">
+        {heroBanners.map((banner, index) => <button key={banner.id} className={index === activeIndex ? 'active' : ''} onClick={() => setActiveIndex(index)} aria-label={`Xem banner ${index + 1}`} />)}
+      </div>
     </section>
     <section className="citizen-quick-search"><div className="citizen-container"><div className="quick-search-label"><span>Tìm kiếm nhanh</span><small>Tra cứu thông tin bạn cần chỉ trong vài giây</small></div><QuickSearch onSubmit={(value) => value && navigate(`/cong-dong/thu-tuc?search=${encodeURIComponent(value)}`)} /></div></section>
-    <section className="citizen-section citizen-container"><SectionHeading eyebrow="Bạn cần làm gì?" title="Chức năng chính" description="Các tiện ích quen thuộc từ ứng dụng được mở rộng để dễ sử dụng trên web." /><div className="citizen-mobile-feature-grid">{homeFeatures.map((feature) => <MobileFeature key={feature.label} feature={feature} />)}</div></section>
-    <section className="citizen-section citizen-section-soft"><div className="citizen-container citizen-notice-layout"><div><SectionHeading eyebrow="Thông báo quan trọng" title="Đừng bỏ lỡ thông tin mới" action={<Link to="/cong-dong/tin-tuc" className="citizen-text-link">Xem tất cả <ArrowRight size={16} /></Link>} /><div className="citizen-notice-list">{importantNotices.map((notice) => <Link key={notice.id} to={`/cong-dong/tin-tuc/${notice.id}`} className="citizen-notice-card"><div><span className={`citizen-notice-tag ${notice.type === 'Quan trọng' ? 'is-important' : ''}`}>{notice.type}</span>{notice.isNew && <span className="citizen-notice-tag is-new">Mới</span>}</div><strong>{notice.title}</strong><time>{notice.date}</time></Link>)}</div></div><aside className="citizen-emergency-card"><Phone size={28} /><h2>{emergencyContact.title}</h2><p>{emergencyContact.subtitle}</p><div><a href={`tel:${contactInfo.phone}`} className="citizen-button citizen-button-danger">{emergencyContact.phoneLabel}</a><Link to="/cong-dong/gui-phan-anh" className="citizen-button citizen-button-white">{emergencyContact.messageLabel}</Link></div></aside></div></section>
-    <section className="citizen-section citizen-section-soft"><div className="citizen-container"><SectionHeading eyebrow="Thủ tục nổi bật" title="Bắt đầu hồ sơ của bạn" action={<Link to="/cong-dong/thu-tuc" className="citizen-text-link">Xem tất cả <ArrowRight size={16} /></Link>} /><div className="procedure-grid">{procedures.filter((item) => item.featured).slice(0, 3).map((item) => <ProcedureCard key={item.id} procedure={item} />)}</div></div></section>
-    <section className="citizen-section citizen-container"><SectionHeading eyebrow="Tin tức và thông báo" title="Thông tin mới nhất" action={<Link to="/cong-dong/tin-tuc" className="citizen-text-link">Xem tất cả <ArrowRight size={16} /></Link>} /><div className="news-grid">{news.slice(0, 3).map((item, index) => <NewsCard key={item.id} item={item} featured={index === 0} />)}</div></section>
-    <section className="citizen-section citizen-process-section"><div className="citizen-container"><SectionHeading eyebrow="Quy trình xử lý" title="Mỗi phản ánh đều được lắng nghe" description="Từ lúc gửi thông tin đến khi hoàn tất, bạn luôn biết phản ánh của mình đang ở đâu." /><ProcessSteps /></div></section>
+
+    {/* ═══ TIN TỨC NỔI BẬT ═══ */}
+    <section className="citizen-section citizen-container">
+      <div className="lib-section-head">
+        <div>
+          <span className="lib-section-tag">Tin tức & Sự kiện</span>
+          <h2 className="lib-section-title">Thông tin mới nhất từ địa phương</h2>
+          <p className="lib-section-desc">Cập nhật các hoạt động, thông báo và sự kiện đang diễn ra trên địa bàn phường.</p>
+        </div>
+        <Link to="/cong-dong/tin-tuc" className="citizen-text-link">Xem tất cả <ArrowRight size={16} /></Link>
+      </div>
+      <div className="home-news-grid">
+        {news.slice(0, 6).map((item) => (
+          <Link key={item.id} to={`/cong-dong/tin-tuc/${item.id}`} className="home-news-card">
+            <div className="hn-card-img">
+              <img src={item.image} alt="" loading="lazy" />
+              <span className="hn-card-badge">{item.category}</span>
+            </div>
+            <div className="hn-card-body">
+              <div className="hn-card-meta">
+                <span>{item.category}</span>
+                <time>{item.date}</time>
+              </div>
+              <h3>{item.title}</h3>
+              <p>{item.excerpt}</p>
+            </div>
+          </Link>
+        ))}
+      </div>
+    </section>
+
+    <section className="citizen-section citizen-container">
+      <div className="lib-section-head">
+        <div>
+          <span className="lib-section-tag">Chức năng chính</span>
+          <h2 className="lib-section-title">Bạn cần làm gì hôm nay?</h2>
+          <p className="lib-section-desc">Chọn một chức năng bên dưới để bắt đầu — mọi thứ đều được thiết kế đơn giản, dễ hiểu.</p>
+        </div>
+      </div>
+      <div className="citizen-mobile-feature-grid-v2">{homeFeatures.map((feature, index) => <MobileFeature key={feature.label} feature={feature} index={index} />)}</div>
+    </section>
+
+    <section className="citizen-section citizen-section-soft">
+      <div className="citizen-container">
+        <div className="lib-section-head">
+          <div>
+            <span className="lib-section-tag" style={{ background: '#FFEBEE', color: '#E53935' }}>Quan trọng</span>
+            <h2 className="lib-section-title">Thông báo & Khẩn cấp</h2>
+            <p className="lib-section-desc">Những thông tin cần thiết được cập nhật thường xuyên từ chính quyền địa phương.</p>
+          </div>
+          <Link to="/cong-dong/tin-tuc" className="citizen-text-link">Xem tất cả <ArrowRight size={16} /></Link>
+        </div>
+        <div className="citizen-notice-layout">
+          <div className="citizen-notice-list">
+            {importantNotices.map((notice, i) => (
+              <Link key={notice.id} to={`/cong-dong/tin-tuc/${notice.id}`} className="notice-card-v2">
+                <div className="notice-card-left">
+                  <span className={`notice-icon-badge ${notice.type === 'Quan trọng' ? 'is-urgent' : ''}`}>
+                    {notice.type === 'Quan trọng' ? '!' : 'i'}
+                  </span>
+                </div>
+                <div className="notice-card-body">
+                  <div className="notice-card-top">
+                    <span className={`notice-type-tag ${notice.type === 'Quan trọng' ? 'is-urgent' : ''}`}>{notice.type}</span>
+                    {notice.isNew && <span className="notice-type-tag is-new">Mới</span>}
+                    <time>{notice.date}</time>
+                  </div>
+                  <strong>{notice.title}</strong>
+                </div>
+                <ArrowRight size={16} className="notice-card-arrow" />
+              </Link>
+            ))}
+          </div>
+          <aside className="citizen-emergency-card">
+            <div className="emergency-top">
+              <div className="emergency-icon-ring">
+                <Phone size={24} />
+              </div>
+              <div>
+                <p className="emergency-label">Hỗ trợ 24/7</p>
+                <h2>{emergencyContact.title}</h2>
+              </div>
+            </div>
+            <p className="emergency-desc">{emergencyContact.subtitle}</p>
+            <div className="emergency-actions">
+              <a href={`tel:${contactInfo.phone}`} className="citizen-button citizen-button-danger">
+                <Phone size={15} /> Gọi ngay: {contactInfo.phone}
+              </a>
+              <Link to="/cong-dong/gui-phan-anh" className="citizen-button citizen-button-white">
+                Gửi phản ánh <ArrowRight size={15} />
+              </Link>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section className="citizen-section citizen-section-soft">
+      <div className="citizen-container">
+        <div className="lib-section-head">
+          <div>
+            <span className="lib-section-tag">Thủ tục hành chính</span>
+            <h2 className="lib-section-title">Bắt đầu hồ sơ của bạn</h2>
+            <p className="lib-section-desc">Chọn thủ tục bên dưới để xem hướng dẫn chi tiết và chuẩn bị đầy đủ giấy tờ cần thiết.</p>
+          </div>
+          <Link to="/cong-dong/thu-tuc" className="citizen-text-link">Xem tất cả <ArrowRight size={16} /></Link>
+        </div>
+        <div className="procedure-grid">{procedures.filter((item) => item.featured).slice(0, 3).map((item) => <ProcedureCard key={item.id} procedure={item} />)}</div>
+      </div>
+    </section>
+
+    <section className="citizen-section citizen-process-section">
+      <div className="citizen-container">
+        <div className="lib-section-head">
+          <div>
+            <span className="lib-section-tag">Quy trình</span>
+            <h2 className="lib-section-title">Mỗi phản ánh đều được lắng nghe</h2>
+            <p className="lib-section-desc">Từ lúc gửi thông tin đến khi hoàn tất, bạn luôn biết phản ánh của mình đang ở đâu.</p>
+          </div>
+        </div>
+        <ProcessSteps />
+      </div>
+    </section>
   </>;
 }
 
-const mobileIcons = { FileText, Newspaper, MessageSquare, Phone, BriefcaseBusiness, CalendarDays };
-function MobileFeature({ feature }) { const Icon = mobileIcons[feature.icon] || FileImage; return <Link to={feature.to} className="citizen-mobile-feature"><span className="citizen-mobile-feature-icon"><Icon size={26} /></span><strong>{feature.label}</strong><small>{feature.description}</small></Link>; }
+const mobileIcons = { FileText, Newspaper, MessageSquare, Phone, BriefcaseBusiness, CalendarDays, BookOpen };
+function MobileFeature({ feature, index }) {
+  const Icon = mobileIcons[feature.icon] || FileImage;
+  const tones = {
+    blue:   { bg: '#EFF6FF', iconBg: '#2563EB', accent: '#1E40AF' },
+    green:  { bg: '#F0FDF4', iconBg: '#16A34A', accent: '#15803D' },
+    orange: { bg: '#FFF7ED', iconBg: '#EA580C', accent: '#C2410C' },
+    purple: { bg: '#FAFAFE', iconBg: '#7C3AED', accent: '#5B21B6' },
+  };
+  const t = tones[feature.tone] || tones.blue;
+  const isFirst = index === 0;
+  const isLast = index === 6;
+  const isHero = isFirst || isLast;
+  return (
+    <Link to={feature.to} className={`citizen-mobile-feature-v2 ${isHero ? 'feature-hero' : ''}`}
+      style={isHero ? {} : { '--feat-bg': t.bg, '--feat-icon': t.iconBg, '--feat-accent': t.accent }}>
+      <span className="feature-number-badge">{String(index + 1).padStart(2, '0')}</span>
+      <span className="citizen-mobile-feature-icon-v2" style={{ color: '#fff', background: isHero && isLast ? '#16A34A' : t.iconBg }}>
+        <Icon size={isHero ? 18 : 16} />
+      </span>
+      <strong>{feature.label}</strong>
+      <small>{feature.description}</small>
+      <span className="feature-action">Truy cập ngay →</span>
+    </Link>
+  );
+}

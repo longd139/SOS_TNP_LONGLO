@@ -19,14 +19,6 @@ function useScrollReveal() {
 /* ─── Icon map cho danh mục ─── */
 const categoryIcons = { BookOpen, FileText, ScrollText, Map };
 
-/* ─── Helper: tông màu cho badge ─── */
-const toneColors = {
-  blue:   { bg: '#E3F2FD', text: '#1565C0' },
-  green:  { bg: '#E8F5E9', text: '#2E7D32' },
-  orange: { bg: '#FFF3E0', text: '#E65100' },
-  purple: { bg: '#F3E5F5', text: '#6A1B9A' },
-};
-
 /* ============================================================
    DIGITAL LIBRARY PAGE — Trang chủ Thư viện số cho người dân
    ============================================================ */
@@ -92,7 +84,7 @@ export default function DigitalLibraryPage() {
       <>
         {/* Hero card */}
         <section className="lib-detail-hero-v2">
-          <div className="lib-detail-hero-bg" style={{ backgroundImage: `url(${selectedDoc.cover || 'https://picsum.photos/seed/default/1200/500'})` }} />
+          <div className="lib-detail-hero-bg" style={{ backgroundImage: `url(${selectedDoc.cover || 'https://images.unsplash.com/photo-1557683316-973673baf926?auto=format&fit=crop&w=1200&q=80'})` }} />
           <div className="citizen-container lib-detail-hero-inner">
             <button className="back-link" onClick={() => setSelectedDoc(null)} style={{ color: '#fff' }}>← Quay lại Thư viện số</button>
             <div className="lib-detail-hero-card">
@@ -287,7 +279,7 @@ export default function DigitalLibraryPage() {
                     key={law.id}
                     className="lib-result-row lib-result-law"
                     onClick={() => {
-                      setSelectedDoc({ ...law, category: 'van-ban', docType: law.type, author: law.issuingAgency, cover: 'https://picsum.photos/seed/law-justice/600/400', description: law.summary, downloads: law.downloads, sections: (law.chapters || []).map(c => ({ heading: c.title, content: c.articles ? c.articles.join('. ') : '' })), issuingAgency: law.issuingAgency, issuedDate: law.issuedDate, effectiveDate: law.effectiveDate, status: law.status, tags: law.tags });
+                      setSelectedDoc({ ...law, category: 'van-ban', docType: law.type, author: law.issuingAgency, cover: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&w=600&q=80', description: law.summary, downloads: law.downloads, sections: (law.chapters || []).map(c => ({ heading: c.title, content: c.articles ? c.articles.join('. ') : '' })), issuingAgency: law.issuingAgency, issuedDate: law.issuedDate, effectiveDate: law.effectiveDate, status: law.status, tags: law.tags });
                       window.scrollTo(0, 0);
                     }}
                     style={{ fontFamily: 'inherit' }}
@@ -471,7 +463,7 @@ function DocCardV2({ doc, onClick }) {
           src={doc.cover}
           alt=""
           loading="lazy"
-          onError={(e) => { e.target.src = `data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="260" fill="%23E2E8F0"><rect width="400" height="260"/><text x="200" y="140" text-anchor="middle" fill="%2394A3B8" font-size="16" font-family="Arial">${encodeURIComponent(doc.title.slice(0, 20))}</text></svg>`; }}
+          onError={(e) => { e.target.src = `data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="260" fill="%23DBEAFE"><rect width="400" height="260"/><text x="200" y="140" text-anchor="middle" fill="%232563EB" font-size="16" font-family="Arial">${encodeURIComponent(doc.title.slice(0, 20))}</text></svg>`; }}
         />
         <div className="lib-doc-overlay-v2">
           <Eye size={22} />
@@ -495,21 +487,6 @@ function DocCardV2({ doc, onClick }) {
           <span className="lib-doc-read">Đọc ngay <ArrowRight size={14} /></span>
         </div>
       </div>
-    </button>
-  );
-}
-
-function LawCardMini({ law, onClick }) {
-  return (
-    <button className="lib-law-mini" onClick={onClick} style={{ fontFamily: 'inherit', textAlign: 'left' }}>
-      <span className="lib-law-type-badge">{law.type}</span>
-      <h4>{law.title}</h4>
-      <p>{law.summary.slice(0, 100)}...</p>
-      <div className="lib-law-mini-meta">
-        <span><strong>{law.code}</strong></span>
-        <span className="lib-law-status">{law.status}</span>
-      </div>
-      <span className="lib-law-mini-cta">Xem chi tiết <ArrowRight size={13} /></span>
     </button>
   );
 }
