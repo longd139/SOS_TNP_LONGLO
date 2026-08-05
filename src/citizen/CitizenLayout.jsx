@@ -3,6 +3,7 @@ import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { ArrowUpRight, Menu, Phone, X } from 'lucide-react';
 import { citizenNavItems, contactInfo } from './data/citizenMockDb';
 import AIChatWidget from './components/AIChatWidget';
+import DigitalMapFab from './components/DigitalMapFab';
 import '../styles/citizen.css';
 
 export default function CitizenLayout() {
@@ -80,6 +81,7 @@ export default function CitizenLayout() {
           </div>
         </div>
       </footer>
+      <DigitalMapFab />
       <AIChatWidget />
     </div>
   );

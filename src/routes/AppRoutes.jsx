@@ -26,6 +26,7 @@ import PermissionsManagement from "../pages/Permissions/PermissionsManagement";
 import RoleFormPage from "../pages/Permissions/RoleFormPage";
 import AuditLogManagement from "../pages/AuditLog/AuditLogManagement";
 import CategoryNewsManagement from "../pages/CategoryNews/CategoryNewsManagement";
+import DigitalMap from "../pages/DigitalMap/DigitalMap";
 
 function AppRoutes() {
     return (
@@ -64,6 +65,7 @@ function AppRoutes() {
                 <Route path={ROUTE_PATH.ROLE_EDIT} element={<RoleFormPage />} />
                 <Route path={ROUTE_PATH.AUDIT_LOG} element={<AuditLogManagement />} />
                 <Route path={ROUTE_PATH.CATEGORY_NEWS} element={<CategoryNewsManagement />} />
+                <Route path={ROUTE_PATH.DIGITAL_MAP} element={<DigitalMap />} />
 
                 <Route path="/reports/:id" element={<ReportList />} />
             </Route>

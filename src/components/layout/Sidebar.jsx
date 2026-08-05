@@ -1,4 +1,4 @@
-import { BarChart3, Calendar, FileText, FolderOpen, LayoutDashboard, MessageSquare, Newspaper, Phone, UserCog, Menu, ChevronLeft, X, ClipboardList, Shield, FileCheck } from 'lucide-react';
+import { BarChart3, Calendar, FileText, FolderOpen, LayoutDashboard, MessageSquare, Newspaper, Phone, UserCog, Menu, ChevronLeft, X, ClipboardList, Shield, FileCheck, Map } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import React from 'react';
 import PropTypes from 'prop-types';
@@ -126,6 +126,14 @@ const menuItems = [
         path: ROUTE_PATH.AUDIT_LOG,
         hasSubmenu: false,
         modulePrefix: 'ADL'
+    },
+    {
+        id: 'digital-map',
+        label: 'Bản đồ số',
+        icon: Map,
+        path: ROUTE_PATH.DIGITAL_MAP,
+        hasSubmenu: false,
+        requiresPermission: false
     }
 ];
 
