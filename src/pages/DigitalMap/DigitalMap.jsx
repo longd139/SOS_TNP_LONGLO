@@ -6,7 +6,7 @@
 import React, { useState, useMemo, useCallback } from 'react';
 import { MapContainer, TileLayer, Marker, Polygon, Popup, useMap, useMapEvents } from 'react-leaflet';
 import {
-  Layers, SlidersHorizontal, X, Loader2, Search, AlertCircle, MapPin, Key, Database,
+  Layers, SlidersHorizontal, X, Loader2, AlertCircle, MapPin, Key, Database,
   Plus, Edit2, Trash2, GraduationCap, HeartPulse, Landmark, Trees, Building2, Shield, UserCheck,
 } from 'lucide-react';
 import 'leaflet/dist/leaflet.css';
@@ -32,7 +32,6 @@ L.Icon.Default.mergeOptions({
 const PLANNING_TILE_URL =
   'https://api-gisxaydung.tphcm.gov.vn/arcm/rest/services/HCM/SuDungDat_QHPK_HCM/MapServer/tile/{z}/{y}/{x}?blankTile=false';
 
-const IDENTIFY_PATH = '/arcm/rest/services/HCM/SuDungDat_QHPK_HCM/MapServer/identify';
 const FEATURE_SERVER_PATH = '/arcgis/rest/services/HCM/ThuaDat/FeatureServer/0/query';
 
 const CENTER = [10.8449, 106.7907];
@@ -189,25 +188,6 @@ const MOCK_PARCELS = [
 // ============================================================
 const API_PROXY = process.env.NODE_ENV === 'development' ? '/api-gis' : 'https://api-gisxaydung.tphcm.gov.vn';
 
-async function queryIdentify(lat, lng, mapBounds) {
-  const params = new URLSearchParams({
-    f: 'json',
-    geometry: JSON.stringify({ x: lng, y: lat, spatialReference: { wkid: 4326 } }),
-    geometryType: 'esriGeometryPoint', sr: '4326', tolerance: '3', layers: 'visible:0,2,3',
-    mapExtent: JSON.stringify({
-      xmin: mapBounds._southWest.lng, ymin: mapBounds._southWest.lat,
-      xmax: mapBounds._northEast.lng, ymax: mapBounds._northEast.lat,
-      spatialReference: { wkid: 4326 },
-    }),
-    imageDisplay: '1200,800,96', returnGeometry: 'true',
-  });
-  const url = `${API_PROXY}${IDENTIFY_PATH}?${params}`;
-  const res = await fetch(url);
-  const raw = await res.text();
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
-  if (!raw || raw.trim() === '') throw new Error('API trả về rỗng');
-  try { return JSON.parse(raw); } catch (e) { throw new Error(`Không parse được JSON`); }
-}
 
 async function queryFeatureServer(lat, lng, token) {
   const params = new URLSearchParams({

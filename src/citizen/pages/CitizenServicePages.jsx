@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowRight, CalendarDays, CheckCircle2, Clock3, FileText, MapPin, Phone, ShieldCheck } from 'lucide-react';
+import { ArrowRight, CalendarDays, CheckCircle2, Clock3, FileText, Phone, ShieldCheck } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { citizenReceptionSchedule, publicServices } from '../data/citizenMockDb';
 import { PageHero, SectionHeading } from '../components/CitizenPrimitives';

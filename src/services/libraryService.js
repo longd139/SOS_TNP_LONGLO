@@ -8,7 +8,7 @@
  * Cấu trúc response mô phỏng đúng format backend sẽ trả về.
  */
 
-import { apiClient } from '../utils/apiClient';
+import { apiClient } from '../utils/apiClient'; // eslint-disable-line no-unused-vars
 
 /* ─── CONFIG ─── */
 const MOCK_MODE = true; // ← Đổi thành false khi có backend thật
@@ -350,4 +350,5 @@ export async function getLibraryStats() {
   };
 }
 
-export default { searchLaws, getLawById, getFeaturedLaws, getLibraryStats };
+const libraryService = { searchLaws, getLawById, getFeaturedLaws, getLibraryStats };
+export default libraryService;
