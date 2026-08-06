@@ -6,7 +6,8 @@ import { AdminLayoutV2 } from './layouts/Layouts';
 import { useMock } from './MockContext';
 import CitizenLayout from '../citizen/CitizenLayout';
 import CitizenHomePage from '../citizen/pages/CitizenHomePage';
-import { ProcedureListPage, ProcedureDetailPage, NewsListPage, NewsDetailPage, SubmitComplaintPage, TrackComplaintPage, ComplaintPage, ComplaintDetailPage, ContactPage, CitizenNotFound } from '../citizen/CitizenPages';
+import { ProcedureListPage, ProcedureDetailPage, NewsListPage, NewsDetailPage, SubmitComplaintPage, TrackComplaintPage, ComplaintDetailPage, ContactPage, CitizenNotFound } from '../citizen/CitizenPages';
+import SatisfactionPage from '../citizen/pages/SatisfactionPage';
 import CitizenLoginPage from '../citizen/pages/CitizenLoginPage';
 import { CitizenGuidePage, PublicServicesPage, ReceptionSchedulePage } from '../citizen/pages/CitizenServicePages';
 import DigitalLibraryPage from '../citizen/pages/DigitalLibraryPage';
@@ -24,6 +25,7 @@ import DigitalMap from '../pages/DigitalMap/DigitalMap';
 import HistoryDocs from '../pages-v2/admin/HistoryDocs';
 import LegalDocs from '../pages-v2/admin/LegalDocs';
 import AppDownloadStatistics from '../pages/Statistic/AppDownloadStatistics';
+import SatisfactionDashboard from '../pages-v2/admin/SatisfactionDashboard';
 
 const ROLE_HOME = {
   CITIZEN: '/submit',
@@ -52,9 +54,8 @@ export default function AppRoutesV2() {
         <Route path="/cong-dong/tin-tuc/:id" element={<NewsDetailPage />} />
         <Route path="/cong-dong/gui-phan-anh" element={<SubmitComplaintPage />} />
         <Route path="/cong-dong/tra-cuu" element={<TrackComplaintPage />} />
-        <Route path="/cong-dong/phan-anh" element={<ComplaintPage />} />
-        <Route path="/cong-dong/phan-anh/:code" element={<ComplaintDetailPage />} />
         <Route path="/cong-dong/tra-cuu/:code" element={<ComplaintDetailPage />} />
+        <Route path="/cong-dong/danh-gia/:code" element={<SatisfactionPage />} />
         <Route path="/cong-dong/lien-he" element={<ContactPage />} />
         <Route path="/cong-dong/dich-vu-cong" element={<PublicServicesPage />} />
         <Route path="/cong-dong/lich-tiep-dan" element={<ReceptionSchedulePage />} />
@@ -76,6 +77,7 @@ export default function AppRoutesV2() {
         <Route path="/admin/extensions/:id" element={<ExtensionDetail />} />
         <Route path="/admin/digital-map" element={<DigitalMap />} />
         <Route path="/admin/app-statistics" element={<AppDownloadStatistics />} />
+        <Route path="/admin/satisfaction" element={<SatisfactionDashboard />} />
         <Route path="/admin/documents/history" element={<HistoryDocs />} />
         <Route path="/admin/documents/legal" element={<LegalDocs />} />
         <Route path="/placeholder" element={<PlaceholderPage />} />
