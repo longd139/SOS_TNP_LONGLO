@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { Button, Container, Nav, Navbar } from 'react-bootstrap';
-import { ArrowUpRight, BoxArrowUpRight, Envelope, GeoAlt, List, Telephone, X } from 'react-bootstrap-icons';
+import { BoxArrowUpRight, Envelope, GeoAlt, List, Telephone, X } from 'react-bootstrap-icons';
 import { citizenNavItems, contactInfo } from './data/citizenMockDb';
 import AIChatWidget from './components/AIChatWidget';
 import DigitalMapFab from './components/DigitalMapFab';
@@ -89,7 +89,7 @@ export default function CitizenLayout() {
               <h3>Liên kết nhanh</h3>
               <Link to="/cong-dong/thu-tuc">Thủ tục hành chính</Link>
               <Link to="/cong-dong/tin-tuc">Tin tức</Link>
-              <Link to="/cong-dong/phan-anh">Phản ánh</Link>
+              <Link to="/cong-dong/gui-phan-anh">Phản ánh</Link>
               <Link to="/cong-dong/thu-vien-so">Thư viện số</Link>
               <Link to="/cong-dong/lien-he">Liên hệ</Link>
             </div>
