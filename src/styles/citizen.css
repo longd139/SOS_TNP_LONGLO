@@ -2660,6 +2660,59 @@
   }
 }
 
+/* Align the quick search and procedure/news search bars to the same control grid. */
+.citizen-app :where(.lib-search-bar, .ph6-search-bar) {
+  min-height: var(--citizen-search-height);
+  padding: 5px 6px 5px 16px;
+  border: 1.5px solid #E2E8F0;
+  border-radius: var(--citizen-search-radius);
+  background: #fff;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, .05);
+}
+.citizen-app :where(.lib-search-bar, .ph6-search-bar):focus-within {
+  border-color: var(--citizen-blue);
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, .10);
+}
+.citizen-app :where(.lib-search-bar-icon, .ph6-search-bar > svg) {
+  width: 20px;
+  height: 20px;
+  flex: 0 0 auto;
+  color: #94A3B8;
+}
+.citizen-app :where(.lib-search-bar-input, .ph6-search-bar input) {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: var(--citizen-search-input-height);
+  padding: 0 12px;
+  font-size: 14px;
+}
+.citizen-app .ph6-sort-inline {
+  flex: 0 0 auto;
+  height: var(--citizen-search-input-height);
+  min-height: var(--citizen-search-input-height);
+  padding: 0 12px;
+  border: 1px solid #D7E0EA;
+  border-radius: 10px;
+  background: #F8FAFC;
+  font-size: 13px;
+}
+.citizen-app .lib-search-bar-btn {
+  min-width: 120px;
+  height: var(--citizen-search-button-height);
+  min-height: var(--citizen-search-button-height);
+  border-radius: 10px;
+}
+
+@media (max-width: 600px) {
+  .citizen-app :where(.lib-search-bar, .ph6-search-bar) { padding: 6px; }
+  .citizen-app .ph6-search-bar { flex-wrap: wrap; }
+  .citizen-app .ph6-search-bar input { flex: 1 1 calc(100% - 34px); }
+  .citizen-app .ph6-sort-inline { flex: 1 1 100%; width: 100%; }
+  .citizen-app .lib-search-bar { flex-wrap: wrap; }
+  .citizen-app .lib-search-bar-input { flex: 1 1 calc(100% - 34px); }
+  .citizen-app .lib-search-bar-btn { width: 100%; }
+}
+
 /* Complaint process: one clear visual path on desktop, a guided timeline on mobile. */
 .process-pipeline { width: 100%; padding: 8px 0 4px; }
 .process-pipeline-track {
