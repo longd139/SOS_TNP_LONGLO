@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { MessageSquare, Star, TrendingUp } from 'lucide-react';
 import { complaintStatuses } from '../../citizen/data/citizenMockDb';
-import { readCitizenRatings, satisfactionLabel, satisfactionSeedRatings } from '../../citizen/data/satisfactionData';
+import { adminSatisfactionMockDb, readCitizenRatings, satisfactionLabel } from '../../citizen/data/satisfactionData';
 
 const stars = [5, 4, 3, 2, 1];
 const scoreColor = (score) => score <= 2 ? 'text-red-600' : score === 3 ? 'text-amber-600' : 'text-emerald-600';
@@ -11,7 +11,7 @@ export default function SatisfactionDashboard() {
   const [dateFilter, setDateFilter] = useState('all');
   const ratings = useMemo(() => {
     const submitted = readCitizenRatings();
-    const byCode = new Map(satisfactionSeedRatings.map((item) => [item.code, item]));
+    const byCode = new Map(adminSatisfactionMockDb.map((item) => [item.code, item]));
     submitted.forEach((item) => byCode.set(item.code, item));
     return Array.from(byCode.values());
   }, []);
