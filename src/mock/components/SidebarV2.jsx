@@ -24,8 +24,6 @@ const ALL_MENUS = [
   { id: 'digital-map', label: 'Bản đồ số', icon: Map, path: '/admin/digital-map', roles: ['APPROVER','LEADER','ADMIN'] },
   { id: 'app-statistics', label: 'Thống kê lượt tải App', icon: Smartphone, path: '/admin/app-statistics', roles: ['APPROVER','LEADER','ADMIN'] },
   { id: 'satisfaction', label: 'Đánh giá hài lòng', icon: Star, path: '/admin/satisfaction', roles: ['APPROVER','LEADER','ADMIN'] },
-  { id: 'submit', label: 'Gửi phản ánh', icon: FileText, path: '/submit', roles: ['CITIZEN','RECEPTION_OFFICER','ADMIN'] },
-  { id: 'my-complaints', label: 'Phản ánh của tôi', icon: MessageSquare, path: '/my-complaints', roles: ['CITIZEN'] },
   { type: 'divider' },
   { id: 'categories', label: 'Loại phản ánh', icon: FolderOpen, path: '/placeholder', disabled: true },
   { id: 'neighborhoods', label: 'Khu phố', icon: Building2, path: '/placeholder', disabled: true },
