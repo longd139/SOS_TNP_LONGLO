@@ -5,11 +5,10 @@ import { useState, useMemo } from "react";
 import BaseTable from "../../components/base/BaseTable";
 import { useMock } from "../../mock/MockContext";
 import {
-  getCategoryById, getNeighborhoodById, getDepartmentById,
-  getUserById, getTimeRemaining, getSlaLabel, getSlaColor,
+  getCategoryById, getNeighborhoodById, getUserById, getTimeRemaining,
   categories, neighborhoods, departments, users,
 } from "../../mock/db";
-import { StatusBadge, SlaBadge, UrgencyBadge } from "../../mock/components/Badges";
+import { StatusBadge, UrgencyBadge } from "../../mock/components/Badges";
 import dayjs from "dayjs";
 
 // ---- Quick tabs (giống pattern MyComplaints) ----
@@ -30,32 +29,6 @@ const renderCategoryBadge = (catId) => {
   if (!cat) return <span className="text-sm text-gray-400">-</span>;
   return <span className="text-sm text-gray-900">{cat.name}</span>;
 };
-const renderContactInfo = (c, maxWidth = 180) => {
-  const user = getUserById(c.citizenId);
-  const name = user?.fullName || "Ẩn danh";
-  const phone = user?.phone || null;
-  const isAnonymous = name === "Ẩn danh";
-  const fullText = phone ? `${name}\n${phone}` : name;
-
-  return (
-    <div className="text-sm overflow-wrap-anywhere max-w-full" style={{ maxWidth: `${maxWidth}px` }} title={fullText}>
-      {isAnonymous ? (
-        <span className="inline-flex items-center text-gray-600 bg-gray-100 px-2.5 py-1 rounded-md text-xs break-words">{name}</span>
-      ) : (
-        <div className="space-y-1">
-          <div className="text-gray-900 break-words">{name}</div>
-          {phone && <div className="text-gray-600 break-words">{phone}</div>}
-        </div>
-      )}
-    </div>
-  );
-};
-const renderSlaBadge = (c) => {
-  const label = getSlaLabel(c.slaStatus);
-  const s = getSlaColor(c.slaStatus);
-  return <span className="inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium rounded-full" style={{ backgroundColor: s.bg, color: s.color }}>{label}</span>;
-};
-
 // ---- COMPLAINT DETAIL MODAL (bản sao ReportDetailModal gốc) ----
 function ComplaintDetailModal({ isOpen, onClose, complaint, mode, onModeChange, onStatusUpdated }) {
   const mock = useMock();

@@ -3,7 +3,6 @@
 // ============================================================
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { AdminLayoutV2 } from './layouts/Layouts';
-import { useMock } from './MockContext';
 import CitizenLayout from '../citizen/CitizenLayout';
 import CitizenHomePage from '../citizen/pages/CitizenHomePage';
 import { ProcedureListPage, ProcedureDetailPage, NewsListPage, NewsDetailPage, SubmitComplaintPage, TrackComplaintPage, ComplaintDetailPage, ContactPage, CitizenNotFound } from '../citizen/CitizenPages';
@@ -27,17 +26,7 @@ import LegalDocs from '../pages-v2/admin/LegalDocs';
 import AppDownloadStatistics from '../pages/Statistic/AppDownloadStatistics';
 import SatisfactionDashboard from '../pages-v2/admin/SatisfactionDashboard';
 
-const ROLE_HOME = {
-  CITIZEN: '/submit',
-  RECEPTION_OFFICER: '/admin/complaints',
-  PROCESSING_OFFICER: '/admin/complaints',
-  APPROVER: '/dashboard',
-  LEADER: '/dashboard',
-  ADMIN: '/dashboard',
-};
-
 function RoleHome() {
-  const { currentUser } = useMock();
   return <Navigate to="/cong-dong" replace />;
 }
 

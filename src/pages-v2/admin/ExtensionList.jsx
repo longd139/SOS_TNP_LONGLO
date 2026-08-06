@@ -4,7 +4,7 @@
 // ============================================================
 import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { Clock, Filter, Search, ChevronDown, ChevronUp, X, ArrowRight } from "lucide-react";
+import { Filter, Search, ChevronDown, ChevronUp, X, ArrowRight } from "lucide-react";
 import { useMock } from "../../mock/MockContext";
 import { getComplaintById, getDepartmentById, getUserById, neighborhoods, categories, departments } from "../../mock/db";
 import dayjs from "dayjs";

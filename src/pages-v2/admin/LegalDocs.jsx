@@ -1,15 +1,15 @@
 import React, { useState, useMemo } from 'react';
-import { Table, Button, Typography, Tag, Card, Modal, Form, Input, Select, Upload, message, Tooltip, Descriptions, Progress, Divider, Space, Avatar, Badge, Dropdown, DatePicker } from 'antd';
+import { Table, Button, Typography, Tag, Card, Modal, Form, Input, Select, Upload, message, Progress, Divider, Space, Avatar, Dropdown, DatePicker } from 'antd';
 import { 
   PlusOutlined, UploadOutlined, EditOutlined, DeleteOutlined, 
   RobotOutlined, FilePdfOutlined, CheckCircleOutlined, 
   ClockCircleOutlined, FileWordOutlined, FileTextOutlined,
   SyncOutlined, SearchOutlined, EyeOutlined, DownloadOutlined,
-  LockOutlined, CheckOutlined, CloseOutlined, CloseCircleOutlined, EllipsisOutlined, GlobalOutlined
+  CloseOutlined, CloseCircleOutlined, EllipsisOutlined, GlobalOutlined
 } from '@ant-design/icons';
 import { useMock } from '../../mock/MockContext';
 
-const { Title, Text, Paragraph } = Typography;
+const { Title } = Typography;
 const { Option } = Select;
 
 const legalDocsMock = [
@@ -47,7 +47,7 @@ const LegalDocs = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isDrawerVisible, setIsDrawerVisible] = useState(false);
   const [selectedDoc, setSelectedDoc] = useState(null);
-  const [isSyncingAI, setIsSyncingAI] = useState(false);
+  const [, setIsSyncingAI] = useState(false);
   const [data, setData] = useState(() => {
     const saved = localStorage.getItem('legalDocsData_v2');
     return saved ? JSON.parse(saved) : legalDocsMock;

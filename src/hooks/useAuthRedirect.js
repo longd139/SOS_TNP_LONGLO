@@ -30,5 +30,5 @@ export const useAuthRedirect = () => {
 
         checkAuth();
         hasChecked.current = true;
-    }, []);
+    }, [isAuthenticated, navigate]);
 };

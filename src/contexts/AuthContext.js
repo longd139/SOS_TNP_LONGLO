@@ -26,7 +26,7 @@ export const AuthProvider = ({ children }) => {
         dispatch(clearProfile());
     }, [dispatch]);
 
-    const userPermissions = authState.user?.permissions || [];
+    const userPermissions = useMemo(() => authState.user?.permissions || [], [authState.user?.permissions]);
 
     const checkPermissionMemo = useCallback((permission) =>
         hasPermission(userPermissions, permission), [userPermissions]);

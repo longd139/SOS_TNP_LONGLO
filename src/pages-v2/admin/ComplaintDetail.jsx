@@ -4,7 +4,7 @@
 import React, { useState, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
-  ArrowLeft, User, Phone, Mail, MapPin, Calendar, Clock,
+  ArrowLeft, User, Phone, MapPin, Calendar, Clock,
   MessageSquare, Image, FileText, Edit, UserPlus,
   CheckCircle, XCircle, AlertTriangle, ChevronDown, ChevronUp,
   Send, Paperclip, Eye, EyeOff, Building2, BarChart3,

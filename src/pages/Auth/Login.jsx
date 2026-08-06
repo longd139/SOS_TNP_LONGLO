@@ -69,6 +69,8 @@ export default function Login() {
         return () => {
             window.removeEventListener('load', checkRecaptcha);
         };
+    // renderRecaptcha is intentionally defined below to keep the form handlers together.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [redirecting, isAuthenticated]);
 
     const renderRecaptcha = () => {
@@ -79,7 +81,7 @@ export default function Login() {
 
         if (window.grecaptcha && window.grecaptcha.render && recaptchaRef.current && !recaptchaRef.current.hasChildNodes()) {
             try {
-                const widgetId = window.grecaptcha.render(recaptchaRef.current, {
+                window.grecaptcha.render(recaptchaRef.current, {
                     sitekey: RECAPTCHA_SITE_KEY,
                     callback: onRecaptchaChange,
                     'expired-callback': onRecaptchaExpired,
