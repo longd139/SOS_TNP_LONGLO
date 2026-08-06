@@ -9,6 +9,7 @@ import CitizenHomePage from '../citizen/pages/CitizenHomePage';
 import { ProcedureListPage, ProcedureDetailPage, NewsListPage, NewsDetailPage, SubmitComplaintPage, TrackComplaintPage, ComplaintPage, ComplaintDetailPage, ContactPage, CitizenNotFound } from '../citizen/CitizenPages';
 import CitizenLoginPage from '../citizen/pages/CitizenLoginPage';
 import { CitizenGuidePage, PublicServicesPage, ReceptionSchedulePage } from '../citizen/pages/CitizenServicePages';
+import RegisterLeaderMeeting from '../pages-v2/citizen/RegisterLeaderMeeting';
 import DigitalLibraryPage from '../citizen/pages/DigitalLibraryPage';
 import AuthLayout from '../layouts/AuthLayout';
 import Login from '../pages/Auth/Login';
@@ -24,6 +25,8 @@ import DigitalMap from '../pages/DigitalMap/DigitalMap';
 import HistoryDocs from '../pages-v2/admin/HistoryDocs';
 import LegalDocs from '../pages-v2/admin/LegalDocs';
 import AppDownloadStatistics from '../pages/Statistic/AppDownloadStatistics';
+import AddSchedule from '../pages-v2/admin/AddSchedule';
+import ApproveSchedule from '../pages-v2/admin/ApproveSchedule';
 
 const ROLE_HOME = {
   CITIZEN: '/submit',
@@ -43,6 +46,7 @@ export default function AppRoutesV2() {
   return (
     <Routes>
       <Route path="/" element={<RoleHome />} />
+      <Route path="/register-meeting" element={<RegisterLeaderMeeting />} />
       <Route element={<CitizenLayout />}>
         <Route path="/cong-dong" element={<CitizenHomePage />} />
         <Route path="/cong-dong/dang-nhap" element={<CitizenLoginPage />} />
@@ -78,6 +82,8 @@ export default function AppRoutesV2() {
         <Route path="/admin/app-statistics" element={<AppDownloadStatistics />} />
         <Route path="/admin/documents/history" element={<HistoryDocs />} />
         <Route path="/admin/documents/legal" element={<LegalDocs />} />
+        <Route path="/admin/schedules/approve" element={<ApproveSchedule />} />
+        <Route path="/admin/schedules/add" element={<AddSchedule />} />
         <Route path="/placeholder" element={<PlaceholderPage />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
