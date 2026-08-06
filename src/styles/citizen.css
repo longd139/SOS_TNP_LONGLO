@@ -2555,6 +2555,111 @@
   }
 }
 
+/* Shared search control standard for every citizen page. */
+:root {
+  --citizen-search-height: 54px;
+  --citizen-search-input-height: 42px;
+  --citizen-search-button-height: 44px;
+  --citizen-search-radius: 14px;
+}
+.citizen-app :where(
+  .citizen-search,
+  .lib-search-bar,
+  .tracking-search-bar,
+  .department-search,
+  .dept-search,
+  .proc-search-lg,
+  .news-hero-search,
+  .ph4-search,
+  .ph5-search,
+  .ct3-search,
+  .cn-search,
+  .ph6-search-bar
+) {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: var(--citizen-search-height);
+  border-radius: var(--citizen-search-radius);
+}
+.citizen-app :where(
+  .citizen-search input,
+  .lib-search-bar-input,
+  .tracking-search-bar input,
+  .department-search input,
+  .dept-search input,
+  .proc-search-lg input,
+  .news-hero-search input,
+  .ph4-search input,
+  .ph5-search input,
+  .ct3-search input,
+  .cn-search input,
+  .ph6-search-bar input
+) {
+  min-width: 0;
+  min-height: var(--citizen-search-input-height);
+  height: var(--citizen-search-input-height);
+  padding-block: 0;
+  line-height: 1.4;
+}
+.citizen-app :where(
+  .citizen-search .citizen-button,
+  .lib-search-bar-btn,
+  .lib-search-law-btn,
+  .tracking-search-bar button,
+  .ph5-search button
+) {
+  min-height: var(--citizen-search-button-height);
+  height: var(--citizen-search-button-height);
+  border-radius: 10px;
+  padding-inline: 20px;
+  white-space: nowrap;
+}
+.citizen-app :where(
+  .citizen-search:focus-within,
+  .lib-search-bar:focus-within,
+  .tracking-search-bar:focus-within,
+  .department-search:focus-within,
+  .dept-search:focus-within,
+  .proc-search-lg:focus-within,
+  .news-hero-search:focus-within,
+  .ph4-search:focus-within,
+  .ph5-search:focus-within,
+  .ct3-search:focus-within,
+  .cn-search:focus-within,
+  .ph6-search-bar:focus-within
+) {
+  outline: 3px solid rgba(37, 99, 235, .12);
+  outline-offset: 0;
+}
+
+@media (max-width: 600px) {
+  .citizen-app :where(
+    .citizen-search,
+    .lib-search-bar,
+    .tracking-search-bar,
+    .ph5-search
+  ) {
+    min-height: var(--citizen-search-height);
+    padding: 6px;
+    gap: 8px;
+  }
+  .citizen-app :where(
+    .citizen-search input,
+    .lib-search-bar-input,
+    .tracking-search-bar input
+  ) {
+    flex: 1 1 100%;
+    width: 100%;
+  }
+  .citizen-app :where(
+    .citizen-search .citizen-button,
+    .lib-search-bar-btn,
+    .tracking-search-bar button
+  ) {
+    width: 100%;
+  }
+}
+
 /* Complaint process: one clear visual path on desktop, a guided timeline on mobile. */
 .process-pipeline { width: 100%; padding: 8px 0 4px; }
 .process-pipeline-track {
