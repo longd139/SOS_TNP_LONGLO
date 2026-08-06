@@ -2747,6 +2747,29 @@
   .citizen-brand { gap: 13px; }
 }
 
+/* Content-fit controls: inline buttons grow from their label instead of empty width. */
+.citizen-app :where(
+  .citizen-button,
+  .lib-search-bar-btn,
+  .lib-search-law-btn,
+  .tracking-search-bar button,
+  .ph5-search button
+) {
+  min-width: 0;
+}
+.citizen-app .form-submit { min-width: 0; }
+
+@media (min-width: 681px) {
+  .citizen-app :where(
+    .citizen-button,
+    .lib-search-bar-btn,
+    .lib-search-law-btn,
+    .tracking-search-bar button,
+    .ph5-search button
+  ) { width: fit-content; }
+  .citizen-app :where(.emergency-actions .citizen-button, .citizen-schedule-aside .citizen-button) { width: 100%; }
+}
+
 @media (max-width: 600px) {
   .citizen-app :where(.lib-search-bar, .ph6-search-bar) { padding: 6px; }
   .citizen-app .ph6-search-bar { flex-wrap: wrap; }
