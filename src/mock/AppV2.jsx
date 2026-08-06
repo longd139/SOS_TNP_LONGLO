@@ -4,18 +4,22 @@
 // ============================================================
 import React from 'react';
 import { BrowserRouter } from 'react-router-dom';
+import { Provider } from 'react-redux';
+import { store } from '../app/store';
 import { MockProvider } from './MockContext';
 import AppRoutesV2 from './AppRoutesV2';
 import { AuthProvider } from '../contexts/AuthContext';
 
 export default function AppV2() {
   return (
-    <AuthProvider>
-      <MockProvider>
-        <BrowserRouter>
-          <AppRoutesV2 />
-        </BrowserRouter>
-      </MockProvider>
-    </AuthProvider>
+    <Provider store={store}>
+      <AuthProvider>
+        <MockProvider>
+          <BrowserRouter>
+            <AppRoutesV2 />
+          </BrowserRouter>
+        </MockProvider>
+      </AuthProvider>
+    </Provider>
   );
 }
