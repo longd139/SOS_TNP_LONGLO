@@ -5,7 +5,8 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import { AdminLayoutV2 } from './layouts/Layouts';
 import { useMock } from './MockContext';
 import CitizenLayout from '../citizen/CitizenLayout';
-import { CitizenHome, ProcedureListPage, ProcedureDetailPage, NewsListPage, NewsDetailPage, SubmitComplaintPage, TrackComplaintPage, ContactPage, CitizenNotFound } from '../citizen/CitizenPages';
+import CitizenHomePage from '../citizen/pages/CitizenHomePage';
+import { ProcedureListPage, ProcedureDetailPage, NewsListPage, NewsDetailPage, SubmitComplaintPage, TrackComplaintPage, ContactPage, CitizenNotFound } from '../citizen/CitizenPages';
 import AuthLayout from '../layouts/AuthLayout';
 import Login from '../pages/Auth/Login';
 
@@ -40,7 +41,7 @@ export default function AppRoutesV2() {
     <Routes>
       <Route path="/" element={<RoleHome />} />
       <Route element={<CitizenLayout />}>
-        <Route path="/cong-dong" element={<CitizenHome />} />
+        <Route path="/cong-dong" element={<CitizenHomePage />} />
         <Route path="/cong-dong/thu-tuc" element={<ProcedureListPage />} />
         <Route path="/cong-dong/thu-tuc/:id" element={<ProcedureDetailPage />} />
         <Route path="/cong-dong/tin-tuc" element={<NewsListPage />} />
