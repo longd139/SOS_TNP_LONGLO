@@ -5,7 +5,8 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import { AdminLayoutV2 } from './layouts/Layouts';
 import { useMock } from './MockContext';
 import CitizenLayout from '../citizen/CitizenLayout';
-import { CitizenHome, ProcedureListPage, ProcedureDetailPage, NewsListPage, NewsDetailPage, SubmitComplaintPage, TrackComplaintPage, ContactPage, CitizenNotFound } from '../citizen/CitizenPages';
+import { ProcedureListPage, ProcedureDetailPage, NewsListPage, NewsDetailPage, ComplaintPage, ComplaintDetailPage, ContactPage, CitizenNotFound } from '../citizen/CitizenPages';
+import CitizenHome from '../citizen/pages/CitizenHomePage';
 import AuthLayout from '../layouts/AuthLayout';
 import Login from '../pages/Auth/Login';
 
@@ -42,8 +43,8 @@ export default function AppRoutesV2() {
         <Route path="/cong-dong/thu-tuc/:id" element={<ProcedureDetailPage />} />
         <Route path="/cong-dong/tin-tuc" element={<NewsListPage />} />
         <Route path="/cong-dong/tin-tuc/:id" element={<NewsDetailPage />} />
-        <Route path="/cong-dong/gui-phan-anh" element={<SubmitComplaintPage />} />
-        <Route path="/cong-dong/tra-cuu" element={<TrackComplaintPage />} />
+        <Route path="/cong-dong/phan-anh" element={<ComplaintPage />} />
+        <Route path="/cong-dong/phan-anh/:code" element={<ComplaintDetailPage />} />
         <Route path="/cong-dong/lien-he" element={<ContactPage />} />
         <Route path="/cong-dong/*" element={<CitizenNotFound />} />
       </Route>

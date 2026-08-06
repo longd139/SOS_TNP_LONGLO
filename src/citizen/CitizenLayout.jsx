@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom';
-import { ArrowUpRight, Menu, Phone, X } from 'lucide-react';
+import { Button, Container, Nav, Navbar } from 'react-bootstrap';
+import { ArrowUpRight, BoxArrowUpRight, Envelope, GeoAlt, List, Telephone, X } from 'react-bootstrap-icons';
 import { citizenNavItems, contactInfo } from './data/citizenMockDb';
 import AIChatWidget from './components/AIChatWidget';
 import '../styles/citizen.css';
@@ -9,36 +10,68 @@ export default function CitizenLayout() {
   const [menuOpen, setMenuOpen] = useState(false);
   const navigate = useNavigate();
   const closeMenu = () => setMenuOpen(false);
+
   return (
     <div className="citizen-app">
-      <div className="citizen-topbar"><div className="citizen-container citizen-topbar-inner"><span>Ủy ban nhân dân phường Tăng Nhơn Phú</span><a href={`tel:${contactInfo.phone}`}><Phone size={14} /> {contactInfo.phone}</a></div></div>
-      <header className="citizen-header">
-        <div className="citizen-container citizen-header-inner">
-          <Link to="/cong-dong" className="citizen-brand" onClick={closeMenu}>
-            <img src={`${process.env.PUBLIC_URL}/5.jpg`} alt="Logo" className="citizen-brand-logo" />
-            <span><strong>Cổng thông tin công dân</strong><small>Phường Tăng Nhơn Phú</small></span>
-          </Link>
-          <button className="citizen-menu-toggle" onClick={() => setMenuOpen(!menuOpen)} aria-label="Mở menu">{menuOpen ? <X /> : <Menu />}</button>
-          <nav className={menuOpen ? 'citizen-nav citizen-nav-open' : 'citizen-nav'}>{citizenNavItems.map((item) => <NavLink key={item.to} to={item.to} end={item.to === '/cong-dong'} onClick={closeMenu} className={({ isActive }) => isActive ? 'active' : ''}>{item.label}</NavLink>)}<button className="citizen-officer-link" onClick={() => navigate('/cong-dong/dang-nhap')}>Đăng nhập người dân <ArrowUpRight size={16} /></button></nav>
-        </div>
-      </header>
-      <main><Outlet /></main>
-      <footer className="citizen-footer">
-        <div className="citizen-container">
-          <div className="footer-cta">
-            <div className="footer-cta-text">
-              <p className="footer-cta-eyebrow">Cần hỗ trợ?</p>
-              <h2>Chúng tôi luôn sẵn sàng lắng nghe</h2>
-              <span>Liên hệ Bộ phận Một cửa nếu bạn cần hướng dẫn thêm về dịch vụ công.</span>
-            </div>
-            <div className="footer-cta-actions">
-              <a href={`tel:${contactInfo.phone}`} className="citizen-button citizen-button-white">
-                <Phone size={18} /> {contactInfo.phone}
-              </a>
-              <Link to="/cong-dong/lien-he" className="citizen-button citizen-button-ghost">Thông tin liên hệ</Link>
-            </div>
-          </div>
+      {/* Topbar */}
+      <div className="citizen-topbar">
+        <Container className="citizen-topbar-inner">
+          <span>Ủy ban nhân dân phường Tăng Nhơn Phú</span>
+          <a href={`tel:${contactInfo.phone}`} className="text-white fw-semibold d-inline-flex align-items-center gap-2 text-decoration-none">
+            <Telephone size={14} /> {contactInfo.phone}
+          </a>
+        </Container>
+      </div>
 
+      {/* Navbar */}
+      <Navbar expand="lg" className="citizen-header" sticky="top">
+        <Container className="citizen-header-inner">
+          <Navbar.Brand as={Link} to="/cong-dong" className="citizen-brand" onClick={closeMenu}>
+            <img src={`${process.env.PUBLIC_URL}/5.jpg`} alt="Logo" className="citizen-brand-logo" />
+            <span>
+              <strong>Cổng thông tin công dân</strong>
+              <small>Phường Tăng Nhơn Phú</small>
+            </span>
+          </Navbar.Brand>
+
+          <Navbar.Toggle aria-controls="citizen-navbar" onClick={() => setMenuOpen(!menuOpen)}>
+            {menuOpen ? <X size={20} /> : <List size={20} />}
+          </Navbar.Toggle>
+
+          <Navbar.Collapse id="citizen-navbar">
+            <Nav className="ms-auto citizen-nav align-items-lg-center gap-1">
+              {citizenNavItems.map((item) => (
+                <Nav.Link
+                  as={NavLink}
+                  key={item.to}
+                  to={item.to}
+                  end={item.to === '/cong-dong'}
+                  onClick={closeMenu}
+                  className="citizen-nav-link"
+                >
+                  {item.label}
+                </Nav.Link>
+              ))}
+              <Button
+                variant="outline-primary"
+                size="sm"
+                className="citizen-officer-link ms-lg-2"
+                onClick={() => { closeMenu(); navigate('/cong-dong/dang-nhap'); }}
+              >
+                Đăng nhập người dân <BoxArrowUpRight size={16} />
+              </Button>
+            </Nav>
+          </Navbar.Collapse>
+        </Container>
+      </Navbar>
+
+      {/* Main Content */}
+      <main><Outlet /></main>
+
+      {/* Footer */}
+      <footer className="citizen-footer">
+        <div className="citizen-footer-pattern" />
+        <div className="citizen-container">
           <div className="footer-main">
             <div className="footer-brand">
               <Link to="/cong-dong" className="footer-logo">
@@ -54,22 +87,22 @@ export default function CitizenLayout() {
             <div className="footer-links">
               <h3>Liên kết nhanh</h3>
               <Link to="/cong-dong/thu-tuc">Thủ tục hành chính</Link>
-              <Link to="/cong-dong/dich-vu-cong">Dịch vụ công</Link>
-              <Link to="/cong-dong/lich-tiep-dan">Lịch tiếp dân</Link>
-              <Link to="/cong-dong/gui-phan-anh">Gửi phản ánh</Link>
+              <Link to="/cong-dong/tin-tuc">Tin tức</Link>
+              <Link to="/cong-dong/phan-anh">Phản ánh</Link>
               <Link to="/cong-dong/thu-vien-so">Thư viện số</Link>
+              <Link to="/cong-dong/lien-he">Liên hệ</Link>
             </div>
 
             <div className="footer-contact">
               <h3>Liên hệ</h3>
               <a href={`tel:${contactInfo.phone}`} className="footer-contact-item">
-                <Phone size={14} /> {contactInfo.phone}
+                <Telephone size={14} /> {contactInfo.phone}
               </a>
               <a href={`mailto:${contactInfo.email}`} className="footer-contact-item">
-                <span>✉</span> {contactInfo.email}
+                <Envelope size={14} /> {contactInfo.email}
               </a>
               <span className="footer-contact-item">
-                <span>🕐</span> {contactInfo.hours}
+                <GeoAlt size={14} /> {contactInfo.hours}
               </span>
             </div>
           </div>
@@ -80,6 +113,7 @@ export default function CitizenLayout() {
           </div>
         </div>
       </footer>
+
       <AIChatWidget />
     </div>
   );

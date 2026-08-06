@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowRight, BookOpen, Download, Eye, FileText, Map, Scale, ScrollText, Search, ShieldCheck, Upload } from 'lucide-react';
+import { ArrowRight, Bank, Book, Download, Eye, FileEarmarkText, FileText, Map, Search, ShieldCheck, Upload } from 'react-bootstrap-icons';
 import { Link } from 'react-router-dom';
 import { libraryCategories, libraryDocuments } from '../data/citizenMockDb';
 import { SectionHeading, LoadingState } from '../components/CitizenPrimitives';
@@ -17,7 +17,7 @@ function useScrollReveal() {
 }
 
 /* ─── Icon map cho danh mục ─── */
-const categoryIcons = { BookOpen, FileText, ScrollText, Map };
+const categoryIcons = { BookOpen: Book, FileText, ScrollText: FileEarmarkText, Map };
 
 /* ============================================================
    DIGITAL LIBRARY PAGE — Trang chủ Thư viện số cho người dân
@@ -195,7 +195,7 @@ export default function DigitalLibraryPage() {
           </p>
           <div className="hero-pillars">
             <div className="hero-pillar">
-              <div className="hero-pillar-icon hero-pillar-library"><BookOpen size={22} /></div>
+              <div className="hero-pillar-icon hero-pillar-library"><Book size={22} /></div>
               <div><strong>{(libraryDocuments.reduce((s, d) => s + d.downloads, 0) / 1000).toFixed(1)}k+</strong><span>Lượt tải tài liệu</span></div>
             </div>
             <div className="hero-pillar-divider" />
@@ -263,7 +263,7 @@ export default function DigitalLibraryPage() {
                     </div>
                     <div className="lib-result-info">
                       <span className="lib-result-type" style={{ color: 'var(--citizen-blue)' }}>
-                        <BookOpen size={13} /> {doc.docType || 'Tài liệu'}
+                        <Book size={13} /> {doc.docType || 'Tài liệu'}
                       </span>
                       <h4>{doc.title}</h4>
                       <p>{doc.description}</p>
@@ -285,11 +285,11 @@ export default function DigitalLibraryPage() {
                     style={{ fontFamily: 'inherit' }}
                   >
                     <div className="lib-result-thumb lib-result-thumb-law">
-                      <Scale size={28} />
+                      <Bank size={28} />
                     </div>
                     <div className="lib-result-info">
                       <span className="lib-result-type" style={{ color: '#E65100' }}>
-                        <Scale size={13} /> {law.type} • {law.code}
+                        <Bank size={13} /> {law.type} • {law.code}
                       </span>
                       <h4>{law.title}</h4>
                       <p>{law.summary}</p>
@@ -410,7 +410,7 @@ export default function DigitalLibraryPage() {
           </div>
           <div className="lib-cta-visual">
             <div className="lib-cta-card">
-              <BookOpen size={24} />
+              <Book size={24} />
               <strong>125+</strong>
               <span>tài liệu đã được<br />đóng góp</span>
             </div>

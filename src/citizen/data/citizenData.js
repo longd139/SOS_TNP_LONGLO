@@ -2,10 +2,9 @@ export const citizenNavItems = [
   { label: 'Trang chủ', to: '/cong-dong' },
   { label: 'Thủ tục hành chính', to: '/cong-dong/thu-tuc' },
   { label: 'Tin tức', to: '/cong-dong/tin-tuc' },
-  { label: 'Gửi phản ánh', to: '/cong-dong/gui-phan-anh' },
-  { label: 'Tra cứu phản ánh', to: '/cong-dong/tra-cuu' },
-  { label: 'Liên hệ', to: '/cong-dong/lien-he' },
+  { label: 'Phản ánh', to: '/cong-dong/phan-anh' },
   { label: 'Thư viện số', to: '/cong-dong/thu-vien-so' },
+  { label: 'Liên hệ', to: '/cong-dong/lien-he' },
 ];
 
 export const heroBanners = [
@@ -38,7 +37,7 @@ export const heroBanners = [
 export const homeFeatures = [
   { label: 'Thủ tục hành chính', description: 'Hướng dẫn hồ sơ và quy trình thực hiện.', to: '/cong-dong/thu-tuc', icon: 'FileText', tone: 'blue' },
   { label: 'Tin tức', description: 'Thông báo và hoạt động mới nhất.', to: '/cong-dong/tin-tuc', icon: 'Newspaper', tone: 'green' },
-  { label: 'Phản ánh', description: 'Gửi ý kiến đến địa phương.', to: '/cong-dong/gui-phan-anh', icon: 'MessageSquare', tone: 'orange' },
+  { label: 'Phản ánh', description: 'Gửi ý kiến đến địa phương.', to: '/cong-dong/phan-anh', icon: 'MessageSquare', tone: 'orange' },
   { label: 'Liên hệ', description: 'Kênh hỗ trợ và danh bạ phường.', to: '/cong-dong/lien-he', icon: 'Phone', tone: 'purple' },
   { label: 'Dịch vụ công', description: 'Tra cứu dịch vụ trực tuyến.', to: '/cong-dong/thu-tuc', icon: 'BriefcaseBusiness', tone: 'blue' },
   { label: 'Lịch tiếp dân', description: 'Thông tin lịch làm việc định kỳ.', to: '/cong-dong/lich-tiep-dan', icon: 'CalendarDays', tone: 'blue' },

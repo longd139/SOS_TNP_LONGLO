@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { ArrowRight, BookOpen, BriefcaseBusiness, CalendarDays, FileImage, FileText, MessageSquare, Newspaper, Phone } from 'lucide-react';
+import { Button } from 'react-bootstrap';
+import { ArrowRight, Book, Briefcase, Calendar3, ChatDots, FileImage, FileText, Newspaper, Telephone } from 'react-bootstrap-icons';
 import { Link, useNavigate } from 'react-router-dom';
 import { emergencyContact, heroBanners, homeFeatures, importantNotices, procedures, news, contactInfo } from '../data/citizenMockDb';
 import { ProcedureCard, ProcessSteps, QuickSearch, TrustNote } from '../components/CitizenPrimitives';
@@ -15,6 +16,7 @@ export default function CitizenHomePage() {
   }, []);
 
   return <>
+    {/* Hero Carousel */}
     <section className={`citizen-hero citizen-hero-${activeBanner.id}`} style={{ background: `linear-gradient(170deg, rgba(10,22,48,.90) 0%, rgba(15,40,70,.72) 38%, rgba(10,30,56,.90) 100%), url(${process.env.PUBLIC_URL}/1.jpg) center/cover no-repeat` }} aria-roledescription="carousel" aria-label="Thông tin nổi bật">
       <div className="citizen-container citizen-hero-grid">
         <div className="citizen-hero-copy" key={activeBanner.id}>
@@ -28,7 +30,14 @@ export default function CitizenHomePage() {
             {activeBanner.id === 'thu-tuc' && <>Chủ động thực hiện<br /><em>thủ tục hành chính</em></>}
           </h1>
           <p className="hero-desc">{activeBanner.description}</p>
-          <div className="citizen-hero-actions"><Link to="/cong-dong/gui-phan-anh" className="citizen-button citizen-button-white">Gửi phản ánh <ArrowRight size={17} /></Link><Link to="/cong-dong/thu-tuc" className="citizen-button citizen-button-ghost">Xem thủ tục hành chính</Link></div>
+          <div className="citizen-hero-actions">
+            <Button as={Link} to="/cong-dong/phan-anh" variant="light" className="d-inline-flex align-items-center gap-2">
+              Gửi phản ánh <ArrowRight size={17} />
+            </Button>
+            <Button as={Link} to="/cong-dong/thu-tuc" variant="outline-light" className="d-inline-flex align-items-center gap-2">
+              Xem thủ tục hành chính
+            </Button>
+          </div>
           <TrustNote />
         </div>
       </div>
@@ -36,49 +45,65 @@ export default function CitizenHomePage() {
         {heroBanners.map((banner, index) => <button key={banner.id} className={index === activeIndex ? 'active' : ''} onClick={() => setActiveIndex(index)} aria-label={`Xem banner ${index + 1}`} />)}
       </div>
     </section>
-    <section className="citizen-quick-search"><div className="citizen-container"><div className="quick-search-label"><span>Tìm kiếm nhanh</span><small>Tra cứu thông tin bạn cần chỉ trong vài giây</small></div><QuickSearch onSubmit={(value) => value && navigate(`/cong-dong/thu-tuc?search=${encodeURIComponent(value)}`)} /></div></section>
 
-    {/* ═══ TIN TỨC NỔI BẬT ═══ */}
-    <section className="citizen-section citizen-container">
-      <div className="lib-section-head">
-        <div>
-          <span className="lib-section-tag">Tin tức & Sự kiện</span>
-          <h2 className="lib-section-title">Thông tin mới nhất từ địa phương</h2>
-          <p className="lib-section-desc">Cập nhật các hoạt động, thông báo và sự kiện đang diễn ra trên địa bàn phường.</p>
-        </div>
-        <Link to="/cong-dong/tin-tuc" className="citizen-text-link">Xem tất cả <ArrowRight size={16} /></Link>
+    {/* Quick Search */}
+    <section className="citizen-quick-search">
+      <div className="citizen-container">
+        <div className="quick-search-label"><span>Tìm kiếm nhanh</span><small>Tra cứu thông tin bạn cần chỉ trong vài giây</small></div>
+        <QuickSearch onSubmit={(value) => value && navigate(`/cong-dong/thu-tuc?search=${encodeURIComponent(value)}`)} />
       </div>
-      <div className="home-news-grid">
-        {news.slice(0, 6).map((item) => (
-          <Link key={item.id} to={`/cong-dong/tin-tuc/${item.id}`} className="home-news-card">
-            <div className="hn-card-img">
-              <img src={item.image} alt="" loading="lazy" />
-              <span className="hn-card-badge">{item.category}</span>
-            </div>
-            <div className="hn-card-body">
-              <div className="hn-card-meta">
-                <span>{item.category}</span>
-                <time>{item.date}</time>
+    </section>
+
+    {/* News */}
+    <section className="citizen-section">
+      <div className="citizen-container">
+        <div className="lib-section-head">
+          <div>
+            <span className="lib-section-tag">Tin tức & Sự kiện</span>
+            <h2 className="lib-section-title">Thông tin mới nhất từ địa phương</h2>
+            <p className="lib-section-desc">Cập nhật các hoạt động, thông báo và sự kiện đang diễn ra trên địa bàn phường.</p>
+          </div>
+          <Link to="/cong-dong/tin-tuc" className="citizen-text-link">Xem tất cả <ArrowRight size={16} /></Link>
+        </div>
+        <div className="home-news-grid">
+          {news.slice(0, 6).map((item) => {
+            const nc = { 'Thông báo': { bg: '#EEF2FF', color: '#818CF8' }, 'Đời sống': { bg: '#ECFDF5', color: '#6EE7B7' }, 'Cải cách hành chính': { bg: '#FFF7ED', color: '#FDBA74' } }[item.category] || { bg: '#F8FAFC', color: '#94A3B8' };
+            return (
+            <Link key={item.id} to={`/cong-dong/tin-tuc/${item.id}`} className="home-news-card">
+              <div className="hn-card-img">
+                <img src={item.image} alt="" loading="lazy" />
+                <span className="hn-card-badge" style={{background:nc.bg,color:nc.color}}>{item.category}</span>
               </div>
-              <h3>{item.title}</h3>
-              <p>{item.excerpt}</p>
-            </div>
-          </Link>
-        ))}
-      </div>
-    </section>
-
-    <section className="citizen-section citizen-container">
-      <div className="lib-section-head">
-        <div>
-          <span className="lib-section-tag">Chức năng chính</span>
-          <h2 className="lib-section-title">Bạn cần làm gì hôm nay?</h2>
-          <p className="lib-section-desc">Chọn một chức năng bên dưới để bắt đầu — mọi thứ đều được thiết kế đơn giản, dễ hiểu.</p>
+              <div className="hn-card-body">
+                <div className="hn-card-meta">
+                  <span>{item.category}</span>
+                  <time>{item.date}</time>
+                </div>
+                <h3>{item.title}</h3>
+                <p>{item.excerpt}</p>
+              </div>
+            </Link>
+          );
+          })}
         </div>
       </div>
-      <div className="citizen-mobile-feature-grid-v2">{homeFeatures.map((feature, index) => <MobileFeature key={feature.label} feature={feature} index={index} />)}</div>
     </section>
 
+    {/* Features */}
+    <section className="citizen-section">
+      <div className="citizen-container">
+        <div className="lib-section-head">
+          <div>
+            <span className="lib-section-tag">Chức năng chính</span>
+            <h2 className="lib-section-title">Bạn cần làm gì hôm nay?</h2>
+            <p className="lib-section-desc">Chọn một chức năng bên dưới để bắt đầu — mọi thứ đều được thiết kế đơn giản, dễ hiểu.</p>
+          </div>
+        </div>
+        <div className="citizen-mobile-feature-grid-v2">{homeFeatures.map((feature, index) => <MobileFeature key={feature.label} feature={feature} index={index} />)}</div>
+      </div>
+    </section>
+
+    {/* Important Notices */}
     <section className="citizen-section citizen-section-soft">
       <div className="citizen-container">
         <div className="lib-section-head">
@@ -91,7 +116,7 @@ export default function CitizenHomePage() {
         </div>
         <div className="citizen-notice-layout">
           <div className="citizen-notice-list">
-            {importantNotices.map((notice, i) => (
+            {importantNotices.map((notice) => (
               <Link key={notice.id} to={`/cong-dong/tin-tuc/${notice.id}`} className="notice-card-v2">
                 <div className="notice-card-left">
                   <span className={`notice-icon-badge ${notice.type === 'Quan trọng' ? 'is-urgent' : ''}`}>
@@ -113,7 +138,7 @@ export default function CitizenHomePage() {
           <aside className="citizen-emergency-card">
             <div className="emergency-top">
               <div className="emergency-icon-ring">
-                <Phone size={24} />
+                <Telephone size={24} />
               </div>
               <div>
                 <p className="emergency-label">Hỗ trợ 24/7</p>
@@ -122,18 +147,19 @@ export default function CitizenHomePage() {
             </div>
             <p className="emergency-desc">{emergencyContact.subtitle}</p>
             <div className="emergency-actions">
-              <a href={`tel:${contactInfo.phone}`} className="citizen-button citizen-button-danger">
-                <Phone size={15} /> Gọi ngay: {contactInfo.phone}
-              </a>
-              <Link to="/cong-dong/gui-phan-anh" className="citizen-button citizen-button-white">
+              <Button as="a" href={`tel:${contactInfo.phone}`} variant="danger" className="d-inline-flex align-items-center gap-2">
+                <Telephone size={15} /> Gọi ngay: {contactInfo.phone}
+              </Button>
+              <Button as={Link} to="/cong-dong/phan-anh" variant="light" className="d-inline-flex align-items-center gap-2">
                 Gửi phản ánh <ArrowRight size={15} />
-              </Link>
+              </Button>
             </div>
           </aside>
         </div>
       </div>
     </section>
 
+    {/* Featured Procedures */}
     <section className="citizen-section citizen-section-soft">
       <div className="citizen-container">
         <div className="lib-section-head">
@@ -148,6 +174,7 @@ export default function CitizenHomePage() {
       </div>
     </section>
 
+    {/* Process Steps */}
     <section className="citizen-section citizen-process-section">
       <div className="citizen-container">
         <div className="lib-section-head">
@@ -163,7 +190,7 @@ export default function CitizenHomePage() {
   </>;
 }
 
-const mobileIcons = { FileText, Newspaper, MessageSquare, Phone, BriefcaseBusiness, CalendarDays, BookOpen };
+const mobileIcons = { FileText, Newspaper, ChatDots, Telephone, Briefcase, Calendar3, Book };
 function MobileFeature({ feature, index }) {
   const Icon = mobileIcons[feature.icon] || FileImage;
   const tones = {
