@@ -15,6 +15,12 @@ export const adminSatisfactionMockDb = [
   { id: 'ADMIN-DG-008', code: 'PA-2026-00135', score: 4, comment: '', ratedAt: '2026-07-08' },
   { id: 'ADMIN-DG-009', code: 'PA-2026-00136', score: 3, comment: '', ratedAt: '2026-07-07' },
   { id: 'ADMIN-DG-010', code: 'PA-2026-00137', score: 1, comment: 'Chưa hài lòng với thời gian xử lý.', ratedAt: '2026-07-06' },
+  ...Array.from({ length: 50 }, (_, index) => {
+    const number = 138 + index;
+    const score = (index % 5) + 1;
+    const day = String((index % 28) + 1).padStart(2, '0');
+    return { id: `ADMIN-DG-${String(index + 11).padStart(3, '0')}`, code: `PA-2026-${String(number).padStart(5, '0')}`, score, comment: index % 3 === 0 ? `Góp ý mẫu cho phản ánh ${number}.` : '', ratedAt: `2026-06-${day}` };
+  }),
 ];
 
 export function readCitizenRatings() {
