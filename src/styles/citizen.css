@@ -2440,3 +2440,68 @@
   .citizen-button { width: 100%; }
   .citizen-hero-actions { flex-direction: column; align-items: stretch; }
 }
+
+/* Complaint process: one clear visual path on desktop, a guided timeline on mobile. */
+.process-pipeline { width: 100%; padding: 8px 0 4px; }
+.process-pipeline-track {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 20px;
+}
+.process-pipeline-track::before {
+  position: absolute;
+  top: 28px;
+  right: 11%;
+  left: 11%;
+  height: 2px;
+  content: '';
+  background: linear-gradient(90deg, #BFDBFE, #A7F3D0, #FED7AA, #DDD6FE);
+}
+.process-pipeline-step {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+.process-pipeline-node {
+  display: grid;
+  width: 56px;
+  height: 56px;
+  place-items: center;
+  flex: 0 0 auto;
+  border: 5px solid #fff;
+  border-radius: 50%;
+  box-shadow: 0 6px 16px rgba(15, 23, 42, .12);
+}
+.process-pipeline-card {
+  width: 100%;
+  min-height: 142px;
+  padding: 18px 17px 16px;
+  border: 1px solid color-mix(in srgb, var(--step-color) 18%, #E2E8F0);
+  border-radius: 14px;
+  background: linear-gradient(180deg, var(--step-bg), #fff 78%);
+  text-align: center;
+}
+.process-pipeline-num {
+  display: block;
+  margin-bottom: 7px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .12em;
+}
+.process-pipeline-card h3 { margin: 0 0 7px; color: var(--citizen-ink); font-size: 15px; line-height: 1.35; }
+.process-pipeline-card p { color: var(--citizen-muted) !important; font-size: 12px; line-height: 1.55; }
+
+@media (max-width: 760px) {
+  .process-pipeline { padding: 2px 0 2px 8px; }
+  .process-pipeline-track { display: grid; grid-template-columns: 1fr; gap: 14px; padding-left: 32px; }
+  .process-pipeline-track::before { top: 28px; bottom: 28px; left: 27px; width: 2px; height: auto; right: auto; background: linear-gradient(180deg, #BFDBFE, #A7F3D0, #FED7AA, #DDD6FE); }
+  .process-pipeline-step { display: grid; grid-template-columns: 56px minmax(0, 1fr); align-items: start; gap: 12px; }
+  .process-pipeline-node { grid-column: 1; grid-row: 1; }
+  .process-pipeline-card { grid-column: 2; grid-row: 1; min-height: 0; padding: 15px 16px; text-align: left; }
+  .process-pipeline-num { margin-bottom: 5px; }
+}
