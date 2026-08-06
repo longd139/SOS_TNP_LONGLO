@@ -2522,6 +2522,39 @@
   .citizen-mobile-feature-v2 small { font-size: 12px; }
 }
 
+/* Keep the seven primary actions on one rail; mobile uses horizontal touch scrolling. */
+.citizen-mobile-feature-grid-v2 {
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+}
+.citizen-mobile-feature-v2,
+.citizen-mobile-feature-v2.feature-hero { grid-column: auto; }
+
+@media (max-width: 900px) {
+  .citizen-mobile-feature-grid-v2 {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    padding: 3px 2px 12px;
+    scroll-snap-type: x proximity;
+    scrollbar-width: thin;
+  }
+  .citizen-mobile-feature-v2,
+  .citizen-mobile-feature-v2.feature-hero {
+    flex: 0 0 214px;
+    min-height: 166px;
+    scroll-snap-align: start;
+  }
+}
+
+@media (max-width: 480px) {
+  .citizen-mobile-feature-grid-v2 { gap: 10px; }
+  .citizen-mobile-feature-v2,
+  .citizen-mobile-feature-v2.feature-hero {
+    flex-basis: min(82vw, 260px);
+    min-height: 154px;
+  }
+}
+
 /* Complaint process: one clear visual path on desktop, a guided timeline on mobile. */
 .process-pipeline { width: 100%; padding: 8px 0 4px; }
 .process-pipeline-track {
