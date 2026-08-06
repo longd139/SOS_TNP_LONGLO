@@ -2716,6 +2716,24 @@
   .ph6-sidebar { overflow-x: auto; overflow-y: visible; }
 }
 
+/* Keep the filter visible while scrolling without clipping its contents. */
+.ph6-sidebar {
+  position: sticky;
+  top: 96px;
+  margin-top: 42px;
+  max-height: none;
+  overflow: visible;
+}
+@media (max-width: 780px) {
+  .ph6-sidebar {
+    position: sticky;
+    top: 78px;
+    margin-top: 0;
+    overflow-x: auto;
+    overflow-y: visible;
+  }
+}
+
 @media (max-width: 600px) {
   .citizen-app :where(.lib-search-bar, .ph6-search-bar) { padding: 6px; }
   .citizen-app .ph6-search-bar { flex-wrap: wrap; }
