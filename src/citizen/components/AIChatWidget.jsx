@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Bot, RotateCcw, Send, X, ArrowUpRight } from 'lucide-react';
+import { ArrowCounterclockwise, BoxArrowUpRight, Robot, Send, X } from 'react-bootstrap-icons';
 import { libraryDocuments, libraryCategories } from '../data/citizenMockDb';
 
 const quickReplies = [
@@ -35,8 +35,8 @@ function searchDocs(query) {
 
 const botResponses = {
   'thủ tục': { text: 'Bạn có thể tra cứu thủ tục hành chính tại mục <b>Thủ tục hành chính</b>. Mỗi thủ tục đều có hướng dẫn chi tiết về hồ sơ, trình tự thực hiện và thời gian xử lý.', link: '/cong-dong/thu-tuc', linkText: 'Xem thủ tục →' },
-  'phản ánh': { text: 'Bạn vào mục <b>Gửi phản ánh</b> để gửi ý kiến đến chính quyền. Mỗi phản ánh sẽ được cấp một mã số để bạn theo dõi tiến độ xử lý.', link: '/cong-dong/gui-phan-anh', linkText: 'Gửi phản ánh →' },
-  'tra cứu': { text: 'Bạn có thể tra cứu tiến độ phản ánh bằng mã số tại mục <b>Tra cứu phản ánh</b>. Nhập mã để xem tình trạng xử lý.', link: '/cong-dong/tra-cuu', linkText: 'Tra cứu ngay →' },
+  'phản ánh': { text: 'Bạn vào mục <b>Phản ánh</b> để gửi ý kiến đến chính quyền hoặc tra cứu tiến độ xử lý. Mỗi phản ánh sẽ được cấp một mã số để bạn theo dõi.', link: '/cong-dong/phan-anh', linkText: 'Đi đến Phản ánh →' },
+  'tra cứu': { text: 'Bạn có thể tra cứu tiến độ phản ánh bằng mã số tại mục <b>Phản ánh</b>. Vào tab Tra cứu, nhập mã để xem tình trạng xử lý.', link: '/cong-dong/phan-anh?tab=track', linkText: 'Tra cứu ngay →' },
   'liên hệ': { text: '📞 <b>(028) 3896 1234</b><br/>📍 12 Nguyễn Văn Tăng, P. Tăng Nhơn Phú<br/>🕐 Thứ Hai - Thứ Sáu, 7:30 - 17:00', link: '/cong-dong/lien-he', linkText: 'Xem chi tiết →' },
   'thư viện': { text: `📚 <b>Thư viện số</b> có <b>${libraryDocuments.length} tài liệu</b> gồm: sách cộng đồng, tài liệu hướng dẫn, văn bản pháp luật và bản đồ di tích. Bạn muốn tìm tài liệu về chủ đề gì? Hãy gõ từ khóa như: <b>lịch sử</b>, <b>PCCC</b>, <b>môi trường</b>, <b>luật</b>, <b>sức khỏe</b>...`, link: '/cong-dong/thu-vien-so', linkText: 'Vào Thư viện →' },
   'tài liệu': { text: '📚 Hãy cho tôi biết bạn cần tài liệu về chủ đề gì? Ví dụ: <b>lịch sử</b>, <b>pháp luật</b>, <b>PCCC</b>, <b>môi trường</b>, <b>sức khỏe</b>, <b>kỹ năng số</b>, <b>giao thông</b>, <b>di tích</b>... Tôi sẽ tìm giúp bạn!' },
@@ -126,7 +126,7 @@ export default function AIChatWidget() {
       >
         {open ? <X size={20} /> : (
           <>
-            <Bot size={20} />
+            <Robot size={20} />
             <span className="ai-fab-dot" />
           </>
         )}
@@ -137,14 +137,14 @@ export default function AIChatWidget() {
           <div className="ai-popup-header">
             <div className="ai-popup-brand">
               <div className="ai-popup-logo">
-                <Bot size={18} />
+                <Robot size={18} />
               </div>
               <div>
                 <strong>Trợ lý AI</strong>
                 <small>Hỏi đáp thông tin — UBND Tăng Nhơn Phú</small>
               </div>
             </div>
-            <button onClick={reset} className="ai-popup-reset" title="Tạo cuộc trò chuyện mới"><RotateCcw size={14} /></button>
+            <button onClick={reset} className="ai-popup-reset" title="Tạo cuộc trò chuyện mới"><ArrowCounterclockwise size={14} /></button>
             <button onClick={() => setOpen(false)} className="ai-popup-close"><X size={16} /></button>
           </div>
 
@@ -153,14 +153,14 @@ export default function AIChatWidget() {
               <div key={i} className={`ai-msg ${msg.role}`}>
                 {msg.role === 'bot' && (
                   <div className="ai-msg-avatar">
-                    <Bot size={14} />
+                    <Robot size={14} />
                   </div>
                 )}
                 <div className="ai-msg-content">
                   <div className="ai-msg-bubble" dangerouslySetInnerHTML={{ __html: msg.text }} />
                   {msg.link && (
                     <a href={msg.link} className="ai-msg-link">
-                      {msg.linkText} <ArrowUpRight size={12} />
+                      {msg.linkText} <BoxArrowUpRight size={12} />
                     </a>
                   )}
                   <span className="ai-msg-time">{formatTime(msg.time)}</span>
@@ -169,7 +169,7 @@ export default function AIChatWidget() {
             ))}
             {loading && (
               <div className="ai-msg bot">
-                <div className="ai-msg-avatar"><Bot size={14} /></div>
+                <div className="ai-msg-avatar"><Robot size={14} /></div>
                 <div className="ai-msg-content">
                   <div className="ai-msg-bubble ai-typing">
                     <span /><span /><span />

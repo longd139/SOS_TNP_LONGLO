@@ -1,7 +1,7 @@
 import React from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import CitizenLayout from './citizen/CitizenLayout';
-import { CitizenNotFound, ComplaintDetailPage, ContactPage, NewsDetailPage, NewsListPage, ProcedureDetailPage, ProcedureListPage, SubmitComplaintPage, TrackComplaintPage } from './citizen/CitizenPages';
+import { CitizenNotFound, ComplaintDetailPage, ComplaintPage, ContactPage, NewsDetailPage, NewsListPage, ProcedureDetailPage, ProcedureListPage, SubmitComplaintPage, TrackComplaintPage } from './citizen/CitizenPages';
 import CitizenHomePage from './citizen/pages/CitizenHomePage';
 import CitizenLoginPage from './citizen/pages/CitizenLoginPage';
 import { CitizenGuidePage, PublicServicesPage, ReceptionSchedulePage } from './citizen/pages/CitizenServicePages';
@@ -27,6 +27,8 @@ export default function CitizenApp() {
             <Route path="/cong-dong/tin-tuc/:id" element={<NewsDetailPage />} />
             <Route path="/cong-dong/gui-phan-anh" element={<SubmitComplaintPage />} />
             <Route path="/cong-dong/tra-cuu" element={<TrackComplaintPage />} />
+            <Route path="/cong-dong/phan-anh" element={<ComplaintPage />} />
+            <Route path="/cong-dong/phan-anh/:code" element={<ComplaintDetailPage />} />
             <Route path="/cong-dong/tra-cuu/:code" element={<ComplaintDetailPage />} />
             <Route path="/cong-dong/lien-he" element={<ContactPage />} />
             <Route path="/cong-dong/dich-vu-cong" element={<PublicServicesPage />} />

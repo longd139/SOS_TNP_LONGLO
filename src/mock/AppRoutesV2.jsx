@@ -6,7 +6,7 @@ import { AdminLayoutV2 } from './layouts/Layouts';
 import { useMock } from './MockContext';
 import CitizenLayout from '../citizen/CitizenLayout';
 import CitizenHomePage from '../citizen/pages/CitizenHomePage';
-import { ProcedureListPage, ProcedureDetailPage, NewsListPage, NewsDetailPage, SubmitComplaintPage, TrackComplaintPage, ComplaintDetailPage, ContactPage, CitizenNotFound } from '../citizen/CitizenPages';
+import { ProcedureListPage, ProcedureDetailPage, NewsListPage, NewsDetailPage, SubmitComplaintPage, TrackComplaintPage, ComplaintPage, ComplaintDetailPage, ContactPage, CitizenNotFound } from '../citizen/CitizenPages';
 import CitizenLoginPage from '../citizen/pages/CitizenLoginPage';
 import { CitizenGuidePage, PublicServicesPage, ReceptionSchedulePage } from '../citizen/pages/CitizenServicePages';
 import DigitalLibraryPage from '../citizen/pages/DigitalLibraryPage';
@@ -52,6 +52,8 @@ export default function AppRoutesV2() {
         <Route path="/cong-dong/tin-tuc/:id" element={<NewsDetailPage />} />
         <Route path="/cong-dong/gui-phan-anh" element={<SubmitComplaintPage />} />
         <Route path="/cong-dong/tra-cuu" element={<TrackComplaintPage />} />
+        <Route path="/cong-dong/phan-anh" element={<ComplaintPage />} />
+        <Route path="/cong-dong/phan-anh/:code" element={<ComplaintDetailPage />} />
         <Route path="/cong-dong/tra-cuu/:code" element={<ComplaintDetailPage />} />
         <Route path="/cong-dong/lien-he" element={<ContactPage />} />
         <Route path="/cong-dong/dich-vu-cong" element={<PublicServicesPage />} />
