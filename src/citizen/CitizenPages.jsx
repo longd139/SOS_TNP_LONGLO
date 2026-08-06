@@ -749,3 +749,5 @@ export function ContactPage() { const [query, setQuery] = useState(''); const fi
     </div></section>
   </>; }
 export function CitizenNotFound() { return <section className="citizen-section"><div className="citizen-container success-page not-found-page"><div className="not-found-number">404</div><h1>Trang bạn tìm không tồn tại</h1><p>Đường dẫn có thể đã thay đổi hoặc thông tin không còn được cung cấp.</p><Button as={Link} to="/cong-dong" variant="primary" className="d-inline-flex align-items-center gap-2">Về trang chủ <ArrowRight size={17} /></Button></div></section>; }
+export const SubmitComplaintPage = ComplaintPage;
+export const TrackComplaintPage = ComplaintPage;
