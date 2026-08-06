@@ -31,7 +31,7 @@ export default function CitizenHomePage() {
           </h1>
           <p className="hero-desc">{activeBanner.description}</p>
           <div className="citizen-hero-actions">
-            <Button as={Link} to="/cong-dong/gui-phan-anh" variant="light" className="d-inline-flex align-items-center gap-2">
+            <Button as={Link} to="/cong-dong/tra-cuu" variant="light" className="d-inline-flex align-items-center gap-2">
               Gửi phản ánh <ArrowRight size={17} />
             </Button>
             <Button as={Link} to="/cong-dong/thu-tuc" variant="outline-light" className="d-inline-flex align-items-center gap-2">
@@ -150,7 +150,7 @@ export default function CitizenHomePage() {
               <Button as="a" href={`tel:${contactInfo.phone}`} variant="danger" className="d-inline-flex align-items-center gap-2">
                 <Telephone size={15} /> Gọi ngay: {contactInfo.phone}
               </Button>
-              <Button as={Link} to="/cong-dong/gui-phan-anh" variant="light" className="d-inline-flex align-items-center gap-2">
+              <Button as={Link} to="/cong-dong/tra-cuu" variant="light" className="d-inline-flex align-items-center gap-2">
                 Gửi phản ánh <ArrowRight size={15} />
               </Button>
             </div>

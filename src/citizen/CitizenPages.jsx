@@ -350,6 +350,7 @@ export function TrackComplaintPage() { const [params] = useSearchParams(); const
               <button key={item.code} onClick={() => { setQuery(item.code); }}>{item.code}</button>
             ))}
           </div>
+          <Link to="/cong-dong/gui-phan-anh" className="citizen-button citizen-button-secondary tracking-submit-link">Gửi phản ánh mới <ArrowRight size={16} /></Link>
         </div>
 
         <div className="tracking-content">

@@ -2,7 +2,7 @@ export const citizenNavItems = [
   { label: 'Trang chủ', to: '/cong-dong' },
   { label: 'Thủ tục hành chính', to: '/cong-dong/thu-tuc' },
   { label: 'Tin tức', to: '/cong-dong/tin-tuc' },
-  { label: 'Phản ánh', to: '/cong-dong/phan-anh' },
+  { label: 'Phản ánh', to: '/cong-dong/tra-cuu' },
   { label: 'Thư viện số', to: '/cong-dong/thu-vien-so' },
   { label: 'Liên hệ', to: '/cong-dong/lien-he' },
 ];

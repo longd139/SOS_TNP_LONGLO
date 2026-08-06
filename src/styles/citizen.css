@@ -2377,6 +2377,7 @@
 .ph6-sidebar button.active span { background: #fff; color: #2563EB; box-shadow: 0 0 8px rgba(37,99,235,.30); }
 
 .tracking-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.tracking-submit-link { display: inline-flex; align-items: center; gap: 6px; margin-top: 18px; }
 .satisfaction-page { max-width: 760px; }
 .satisfaction-back { border: 0; background: transparent; padding: 0; cursor: pointer; margin-bottom: 20px; }
 .satisfaction-card { background: #fff; border: 1px solid #E8EDF3; border-radius: 18px; padding: 34px; box-shadow: 0 10px 35px rgba(15,23,42,.06); }
