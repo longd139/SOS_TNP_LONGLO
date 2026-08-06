@@ -2705,6 +2705,17 @@
   border-radius: 10px;
 }
 
+/* Procedure filters follow the document flow; never trap or hide the list. */
+.ph6-sidebar {
+  position: relative;
+  top: auto;
+  max-height: none;
+  overflow: visible;
+}
+@media (max-width: 780px) {
+  .ph6-sidebar { overflow-x: auto; overflow-y: visible; }
+}
+
 @media (max-width: 600px) {
   .citizen-app :where(.lib-search-bar, .ph6-search-bar) { padding: 6px; }
   .citizen-app .ph6-search-bar { flex-wrap: wrap; }
