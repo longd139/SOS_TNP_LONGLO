@@ -1,0 +1,12 @@
+.citizen-login-page { min-height: 680px; display: grid; place-items: center; padding: 58px 20px; background: #f8fafc; }
+.citizen-login-card { width: min(100%, 450px); padding: 36px; border: 1px solid #e2e8f0; border-radius: 16px; background: #fff; box-shadow: 0 18px 42px rgba(37,99,235,.08); }
+.citizen-login-mark { width: 58px; height: 58px; display: grid; place-items: center; margin-bottom: 21px; border-radius: 16px; color: #fff; background: #2563eb; }
+.citizen-login-card h1 { margin: 0; color: #12263a; font-size: 30px; letter-spacing: -.05em; }
+.citizen-login-description { color: #627488; font-size: 14px; margin: 9px 0 28px; }
+.citizen-input-with-icon { display: flex; align-items: center; gap: 9px; min-height: 47px; padding: 0 13px; border: 1px solid #cbd5e1; border-radius: 9px; color: #7890a0; }
+.citizen-input-with-icon:focus-within { border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,.12); }
+.citizen-input-with-icon input { width: 100%; min-width: 0; border: 0; outline: 0; color: #12263a; font-size: 14px; }
+.citizen-input-with-icon button { display: grid; place-items: center; border: 0; color: #7890a0; background: transparent; cursor: pointer; }
+.citizen-login-message { color: #1765a0; font-size: 12px; margin: -3px 0 15px; }
+.citizen-login-note { color: #8798a5; font-size: 11px; text-align: center; margin: 19px 0 0; }
+@media (max-width: 680px) { .citizen-login-card { padding: 26px 20px; } }
