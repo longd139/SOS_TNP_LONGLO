@@ -42,7 +42,7 @@ export default function SatisfactionPage() {
           <div className="satisfaction-stars" role="radiogroup" aria-label="Chấm điểm từ 1 đến 5 sao">
             {[1, 2, 3, 4, 5].map((value) => <button type="button" key={value} className={value <= score ? 'active' : ''} aria-label={`${value} sao`} aria-pressed={value <= score} onClick={() => setScore(value)}><Star size={38} fill={value <= score ? 'currentColor' : 'none'} /></button>)}
           </div>
-          <strong className="satisfaction-label">{score ? satisfactionLabel(score) : 'Chọn số sao để đánh giá'}</strong>
+          <strong className="satisfaction-label">{score ? `${score}/5 sao · ${satisfactionLabel(score)}` : 'Chọn số sao để đánh giá'}</strong>
         </fieldset>
         <label className="satisfaction-comment"><span>Góp ý thêm <small>(không bắt buộc)</small></span><textarea maxLength={2000} value={comment} onChange={(event) => setComment(event.target.value)} placeholder="Chia sẻ thêm trải nghiệm của bạn..." /><small>{comment.length}/2000 ký tự</small></label>
         <button type="submit" disabled={!score} className="citizen-button citizen-button-primary full-width">Gửi đánh giá</button>

@@ -13,7 +13,9 @@ export function readCitizenRatings() {
 }
 
 export function satisfactionLabel(score) {
-  if (score <= 2) return 'Không hài lòng';
+  if (score === 1) return 'Rất không hài lòng';
+  if (score === 2) return 'Không hài lòng';
   if (score === 3) return 'Bình thường';
-  return 'Hài lòng';
+  if (score === 4) return 'Hài lòng';
+  return 'Rất hài lòng';
 }
