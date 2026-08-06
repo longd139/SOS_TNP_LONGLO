@@ -2467,6 +2467,7 @@
 .ph6-layout { align-items: start; }
 .ph6-sidebar {
   top: 96px;
+  margin-top: 42px;
   max-height: calc(100vh - 120px);
   overflow-y: auto;
   scrollbar-width: thin;
@@ -2499,6 +2500,7 @@
   .ph6-sidebar {
     position: sticky;
     top: 78px;
+    margin-top: 0;
     z-index: 5;
     display: flex;
     align-items: center;
