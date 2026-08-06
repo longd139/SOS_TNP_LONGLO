@@ -110,7 +110,7 @@ function TrendBars({ days }) {
         <div key={d.label} className="flex-1 flex flex-col items-center gap-1">
           <span className="text-xs text-slate-400 font-medium">{d.count}</span>
           <div
-            className="w-full bg-cyan-400 rounded-t hover:bg-cyan-300 transition-colors"
+            className="w-full bg-blue-600 rounded-t hover:bg-blue-500 transition-colors"
             style={{ height: `${(d.count / max) * 100}%`, minHeight: d.count > 0 ? 4 : 0 }}
           />
           <span className="text-[10px] text-slate-500">{d.label.split('/')[0]}</span>
@@ -296,7 +296,7 @@ function DashboardLargeScreen() {
           <div className="grid grid-cols-2 gap-3 flex-1">
             <div className="bg-slate-800 rounded-xl p-4 flex flex-col justify-center">
               <p className="text-sm text-slate-400 mb-1">Tổng hôm nay</p>
-              <p className="text-3xl font-bold text-cyan-400">{stats.todayCount}</p>
+              <p className="text-3xl font-bold text-blue-500">{stats.todayCount}</p>
               <p className="text-xs text-slate-500 mt-1">/ {stats.total} tổng</p>
             </div>
             <div className="bg-slate-800 rounded-xl p-4 flex flex-col justify-center">
@@ -430,7 +430,7 @@ function DashboardLargeScreen() {
                       </div>
                       <div className="w-full bg-slate-700 rounded-full h-1.5 overflow-hidden">
                         <div
-                          className="h-full rounded-full bg-cyan-400"
+                          className="h-full rounded-full bg-blue-600"
                           style={{ width: `${Math.min((nb.total / Math.max(...topNeighborhoods.map((x) => x.total), 1)) * 100, 100)}%` }}
                         />
                       </div>
