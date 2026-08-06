@@ -1,6 +1,7 @@
 // ============================================================
 // APP ROUTES V2 — Role-based routing, all share AdminLayoutV2
 // ============================================================
+import { lazy, Suspense } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { AdminLayoutV2 } from './layouts/Layouts';
 import CitizenLayout from '../citizen/CitizenLayout';
@@ -9,22 +10,22 @@ import { ProcedureListPage, ProcedureDetailPage, NewsListPage, NewsDetailPage, S
 import SatisfactionPage from '../citizen/pages/SatisfactionPage';
 import CitizenLoginPage from '../citizen/pages/CitizenLoginPage';
 import { CitizenGuidePage, PublicServicesPage, ReceptionSchedulePage } from '../citizen/pages/CitizenServicePages';
-import DigitalLibraryPage from '../citizen/pages/DigitalLibraryPage';
 import AuthLayout from '../layouts/AuthLayout';
 import Login from '../pages/Auth/Login';
-
-import ComplaintList from '../pages-v2/admin/ComplaintList';
-import ComplaintDetail from '../pages-v2/admin/ComplaintDetail';
-import ExtensionList from '../pages-v2/admin/ExtensionList';
-import ExtensionDetail from '../pages-v2/admin/ExtensionDetail';
 import DashboardOverview from '../pages-v2/dashboard/DashboardOverview';
-import DashboardLargeScreen from '../pages-v2/dashboard/DashboardLargeScreen';
 import PlaceholderPage from '../pages-v2/PlaceholderPage';
-import DigitalMap from '../pages/DigitalMap/DigitalMap';
-import HistoryDocs from '../pages-v2/admin/HistoryDocs';
-import LegalDocs from '../pages-v2/admin/LegalDocs';
-import AppDownloadStatistics from '../pages/Statistic/AppDownloadStatistics';
-import SatisfactionDashboard from '../pages-v2/admin/SatisfactionDashboard';
+
+const DigitalLibraryPage = lazy(() => import('../citizen/pages/DigitalLibraryPage'));
+const ComplaintList = lazy(() => import('../pages-v2/admin/ComplaintList'));
+const ComplaintDetail = lazy(() => import('../pages-v2/admin/ComplaintDetail'));
+const ExtensionList = lazy(() => import('../pages-v2/admin/ExtensionList'));
+const ExtensionDetail = lazy(() => import('../pages-v2/admin/ExtensionDetail'));
+const DashboardLargeScreen = lazy(() => import('../pages-v2/dashboard/DashboardLargeScreen'));
+const DigitalMap = lazy(() => import('../pages/DigitalMap/DigitalMap'));
+const HistoryDocs = lazy(() => import('../pages-v2/admin/HistoryDocs'));
+const LegalDocs = lazy(() => import('../pages-v2/admin/LegalDocs'));
+const AppDownloadStatistics = lazy(() => import('../pages/Statistic/AppDownloadStatistics'));
+const SatisfactionDashboard = lazy(() => import('../pages-v2/admin/SatisfactionDashboard'));
 
 function RoleHome() {
   return <Navigate to="/cong-dong" replace />;
@@ -32,6 +33,7 @@ function RoleHome() {
 
 export default function AppRoutesV2() {
   return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center text-gray-500">Đang tải trang...</div>}>
     <Routes>
       <Route path="/" element={<RoleHome />} />
       <Route element={<CitizenLayout />}>
@@ -76,5 +78,6 @@ export default function AppRoutesV2() {
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
+    </Suspense>
   );
 }
