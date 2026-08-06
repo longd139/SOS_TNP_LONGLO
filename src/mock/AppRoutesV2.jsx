@@ -6,7 +6,10 @@ import { AdminLayoutV2 } from './layouts/Layouts';
 import { useMock } from './MockContext';
 import CitizenLayout from '../citizen/CitizenLayout';
 import CitizenHomePage from '../citizen/pages/CitizenHomePage';
-import { ProcedureListPage, ProcedureDetailPage, NewsListPage, NewsDetailPage, SubmitComplaintPage, TrackComplaintPage, ContactPage, CitizenNotFound } from '../citizen/CitizenPages';
+import { ProcedureListPage, ProcedureDetailPage, NewsListPage, NewsDetailPage, SubmitComplaintPage, TrackComplaintPage, ComplaintDetailPage, ContactPage, CitizenNotFound } from '../citizen/CitizenPages';
+import CitizenLoginPage from '../citizen/pages/CitizenLoginPage';
+import { CitizenGuidePage, PublicServicesPage, ReceptionSchedulePage } from '../citizen/pages/CitizenServicePages';
+import DigitalLibraryPage from '../citizen/pages/DigitalLibraryPage';
 import AuthLayout from '../layouts/AuthLayout';
 import Login from '../pages/Auth/Login';
 
@@ -42,13 +45,20 @@ export default function AppRoutesV2() {
       <Route path="/" element={<RoleHome />} />
       <Route element={<CitizenLayout />}>
         <Route path="/cong-dong" element={<CitizenHomePage />} />
+        <Route path="/cong-dong/dang-nhap" element={<CitizenLoginPage />} />
         <Route path="/cong-dong/thu-tuc" element={<ProcedureListPage />} />
         <Route path="/cong-dong/thu-tuc/:id" element={<ProcedureDetailPage />} />
         <Route path="/cong-dong/tin-tuc" element={<NewsListPage />} />
         <Route path="/cong-dong/tin-tuc/:id" element={<NewsDetailPage />} />
         <Route path="/cong-dong/gui-phan-anh" element={<SubmitComplaintPage />} />
         <Route path="/cong-dong/tra-cuu" element={<TrackComplaintPage />} />
+        <Route path="/cong-dong/tra-cuu/:code" element={<ComplaintDetailPage />} />
         <Route path="/cong-dong/lien-he" element={<ContactPage />} />
+        <Route path="/cong-dong/dich-vu-cong" element={<PublicServicesPage />} />
+        <Route path="/cong-dong/lich-tiep-dan" element={<ReceptionSchedulePage />} />
+        <Route path="/cong-dong/huong-dan" element={<CitizenGuidePage />} />
+        <Route path="/cong-dong/thu-vien-so" element={<DigitalLibraryPage />} />
+        <Route path="/cong-dong/ban-do-so" element={<DigitalMap />} />
         <Route path="/cong-dong/*" element={<CitizenNotFound />} />
       </Route>
       <Route element={<AuthLayout />}>
