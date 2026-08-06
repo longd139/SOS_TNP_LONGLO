@@ -42,6 +42,8 @@ export default function AppRoutesV2() {
         <Route path="/cong-dong/tin-tuc" element={<NewsListPage />} />
         <Route path="/cong-dong/tin-tuc/:id" element={<NewsDetailPage />} />
         <Route path="/cong-dong/gui-phan-anh" element={<SubmitComplaintPage />} />
+        <Route path="/submit" element={<Navigate to="/cong-dong/gui-phan-anh" replace />} />
+        <Route path="/my-complaints" element={<Navigate to="/cong-dong/tra-cuu" replace />} />
         <Route path="/cong-dong/phan-anh" element={<Navigate to="/cong-dong/gui-phan-anh" replace />} />
         <Route path="/cong-dong/tra-cuu" element={<TrackComplaintPage />} />
         <Route path="/cong-dong/tra-cuu/:code" element={<ComplaintDetailPage />} />
