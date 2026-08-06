@@ -84,7 +84,7 @@ export default function DigitalLibraryPage() {
       <>
         {/* Hero card */}
         <section className="lib-detail-hero-v2">
-          <div className="lib-detail-hero-bg" style={{ backgroundImage: `url(${selectedDoc.cover || 'https://images.unsplash.com/photo-1557683316-973673baf926?auto=format&fit=crop&w=1200&q=80'})` }} />
+          <div className="lib-detail-hero-bg" style={{ backgroundImage: `url(${selectedDoc.cover || 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&w=1200&q=80'})` }} />
           <div className="citizen-container lib-detail-hero-inner">
             <button className="back-link" onClick={() => setSelectedDoc(null)} style={{ color: '#fff' }}>← Quay lại Thư viện số</button>
             <div className="lib-detail-hero-card">
