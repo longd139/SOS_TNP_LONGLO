@@ -2441,6 +2441,87 @@
   .citizen-hero-actions { flex-direction: column; align-items: stretch; }
 }
 
+/* Final responsive pass for the citizen information architecture. */
+.citizen-topbar { display: none; }
+.citizen-mobile-feature-grid-v2 {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  align-items: stretch;
+}
+.citizen-mobile-feature-v2 {
+  min-height: 178px;
+  padding: 20px 18px 17px;
+  border-width: 1px;
+  border-color: #E2E8F0;
+  border-radius: 16px;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, .04);
+}
+.citizen-mobile-feature-v2.feature-hero { min-height: 196px; }
+.citizen-mobile-feature-icon-v2 { width: 42px; height: 42px; border-radius: 12px; }
+.citizen-mobile-feature-v2 strong { margin-top: 9px; font-size: 15px; line-height: 1.35; }
+.citizen-mobile-feature-v2 small { max-width: 250px; font-size: 12px; line-height: 1.55; }
+.citizen-mobile-feature-v2:not(.feature-hero) .feature-number-badge { color: color-mix(in srgb, var(--feat-icon) 30%, transparent); }
+.feature-action { opacity: 1; transform: none; }
+
+.ph6-layout { align-items: start; }
+.ph6-sidebar {
+  top: 96px;
+  max-height: calc(100vh - 120px);
+  overflow-y: auto;
+  scrollbar-width: thin;
+  background: rgba(255, 255, 255, .96);
+  box-shadow: 0 8px 24px rgba(15, 23, 42, .05);
+}
+.ph6-sidebar h3 { position: sticky; top: -20px; z-index: 1; background: #fff; }
+.ph6-main { min-width: 0; }
+
+.citizen-search,
+.ph6-search-bar,
+.lib-search-bar,
+.tracking-search-bar {
+  min-height: 54px;
+  border-radius: 14px;
+}
+.ph6-search-bar input,
+.lib-search-bar-input,
+.tracking-search-bar input,
+.citizen-search input { min-height: 44px; }
+
+@media (max-width: 780px) {
+  .citizen-mobile-feature-grid-v2 { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .citizen-mobile-feature-v2,
+  .citizen-mobile-feature-v2.feature-hero { min-height: 166px; }
+  .citizen-mobile-feature-v2 { padding: 17px 15px 15px; }
+  .citizen-mobile-feature-icon-v2 { width: 38px; height: 38px; }
+  .citizen-mobile-feature-v2 strong { font-size: 14px; }
+  .ph6-layout { grid-template-columns: 1fr; gap: 20px; }
+  .ph6-sidebar {
+    position: sticky;
+    top: 78px;
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    max-height: none;
+    padding: 12px;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+  .ph6-sidebar h3 { position: static; flex: 0 0 auto; padding: 0 8px; margin: 0; border: 0; }
+  .ph6-sidebar button { flex: 0 0 auto; width: auto; }
+}
+
+@media (max-width: 480px) {
+  .citizen-mobile-feature-grid-v2 { grid-template-columns: 1fr; gap: 12px; }
+  .citizen-mobile-feature-v2,
+  .citizen-mobile-feature-v2.feature-hero { min-height: 148px; }
+  .citizen-mobile-feature-v2 { padding: 18px; }
+  .citizen-mobile-feature-icon-v2 { width: 40px; height: 40px; }
+  .citizen-mobile-feature-v2 strong { font-size: 15px; }
+  .citizen-mobile-feature-v2 small { font-size: 12px; }
+}
+
 /* Complaint process: one clear visual path on desktop, a guided timeline on mobile. */
 .process-pipeline { width: 100%; padding: 8px 0 4px; }
 .process-pipeline-track {

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Button } from 'react-bootstrap';
-import { ArrowRight, Book, Briefcase, Calendar3, ChatDots, FileImage, FileText, Newspaper, Telephone } from 'react-bootstrap-icons';
+import { ArrowRight, Book, Briefcase, Calendar3, ChatDots, FileText, Newspaper, Telephone } from 'react-bootstrap-icons';
 import { Link, useNavigate } from 'react-router-dom';
 import { emergencyContact, heroBanners, homeFeatures, importantNotices, procedures, news, contactInfo } from '../data/citizenMockDb';
 import { ProcedureCard, ProcessSteps, QuickSearch, TrustNote } from '../components/CitizenPrimitives';
@@ -190,9 +190,17 @@ export default function CitizenHomePage() {
   </>;
 }
 
-const mobileIcons = { FileText, Newspaper, ChatDots, Telephone, Briefcase, Calendar3, Book };
+const mobileIcons = {
+  FileText,
+  Newspaper,
+  MessageSquare: ChatDots,
+  Phone: Telephone,
+  BriefcaseBusiness: Briefcase,
+  CalendarDays: Calendar3,
+  BookOpen: Book,
+};
 function MobileFeature({ feature, index }) {
-  const Icon = mobileIcons[feature.icon] || FileImage;
+  const Icon = mobileIcons[feature.icon] || FileText;
   const tones = {
     blue:   { bg: '#EFF6FF', iconBg: '#2563EB', accent: '#1E40AF' },
     green:  { bg: '#F0FDF4', iconBg: '#16A34A', accent: '#15803D' },

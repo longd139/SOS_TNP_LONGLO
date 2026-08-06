@@ -13,16 +13,6 @@ export default function CitizenLayout() {
 
   return (
     <div className="citizen-app">
-      {/* Topbar */}
-      <div className="citizen-topbar">
-        <Container className="citizen-topbar-inner">
-          <span>Ủy ban nhân dân phường Tăng Nhơn Phú</span>
-          <a href={`tel:${contactInfo.phone}`} className="text-white fw-semibold d-inline-flex align-items-center gap-2 text-decoration-none">
-            <Telephone size={14} /> {contactInfo.phone}
-          </a>
-        </Container>
-      </div>
-
       {/* Navbar */}
       <Navbar expand="lg" className="citizen-header" sticky="top">
         <Container className="citizen-header-inner">
