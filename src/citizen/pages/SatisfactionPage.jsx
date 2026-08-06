@@ -13,7 +13,7 @@ export default function SatisfactionPage() {
   const [submitted, setSubmitted] = useState(false);
   const alreadyRated = readCitizenRatings().some((item) => item.code === code);
 
-  if (!complaint || complaint.status !== 'Đã giải quyết') {
+  if (!complaint || (complaint.status !== 'Đã giải quyết' && complaint.status !== 'Hoàn thành')) {
     return <section className="citizen-section citizen-container success-page"><h1>Chưa thể đánh giá</h1><p>Chỉ phản ánh đã hoàn thành mới có thể đánh giá.</p><button className="citizen-button citizen-button-secondary" onClick={() => navigate('/cong-dong/tra-cuu')}>Quay lại tra cứu</button></section>;
   }
 

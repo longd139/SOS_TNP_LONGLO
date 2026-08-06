@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { ArrowLeft, ArrowRight, CalendarDays, CheckCircle2, Clock3, Mail, MapPin, Phone, Search, Star, Upload } from 'lucide-react';
 import { Link, useParams, useSearchParams } from 'react-router-dom';
 import { complaintStatuses, contactInfo, departments, news, newsCategories, procedures, procedureCategories } from './data/citizenMockDb';
+import { readCitizenRatings } from './data/satisfactionData';
 import { EmptyState, LoadingState, StatusBadge } from './components/CitizenPrimitives';
 
 const complaintEntries = Object.entries(complaintStatuses).map(([code, item]) => ({ code, ...item }));
@@ -368,7 +369,7 @@ export function TrackComplaintPage() { const [params] = useSearchParams(); const
       </div>
     </section>
   </>; }
-function ComplaintResult({ result }) { const completed = result.status === 'Đã giải quyết'; return (
+function ComplaintResult({ result }) { const completed = result.status === 'Đã giải quyết' || result.status === 'Hoàn thành'; const rated = completed && readCitizenRatings().some((item) => item.code === result.code); return (
   <div className="tracking-result-v3">
     <div className="tr3-header">
       <div className="tr3-code">
@@ -383,7 +384,7 @@ function ComplaintResult({ result }) { const completed = result.status === 'Đã
       <div className="tr3-info-item"><CalendarDays size={16} /><div><small>Ngày gửi</small><strong>{result.createdAt}</strong></div></div>
       <div className="tr3-info-item"><Clock3 size={16} /><div><small>Đơn vị xử lý</small><strong>UBND phường Tăng Nhơn Phú</strong></div></div>
     </div>
-    <div className="tracking-actions"><Link className="citizen-button citizen-button-primary" to={`/cong-dong/tra-cuu/${result.code}`}>Xem chi tiết tiến độ <ArrowRight size={16} /></Link>{completed && <Link className="citizen-button citizen-button-secondary" to={`/cong-dong/danh-gia/${result.code}`}><Star size={16} /> Đánh giá hài lòng</Link>}</div>
+    <div className="tracking-actions"><Link className="citizen-button citizen-button-primary" to={`/cong-dong/tra-cuu/${result.code}`}>Xem chi tiết tiến độ <ArrowRight size={16} /></Link>{completed && (rated ? <span className="citizen-button satisfaction-recorded-button" aria-disabled="true"><Star size={16} fill="currentColor" /> Đánh giá đã được ghi nhận</span> : <Link className="citizen-button citizen-button-secondary" to={`/cong-dong/danh-gia/${result.code}`}><Star size={16} /> Đánh giá hài lòng</Link>)}</div>
   </div>
 ); }
 export function ComplaintDetailPage() { const { code } = useParams(); const result = complaintEntries.find((item) => item.code === code); if (!result) return <CitizenNotFound />; return <>
