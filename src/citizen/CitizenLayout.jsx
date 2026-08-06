@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom';
-import { Button, Container, Nav, Navbar } from 'react-bootstrap';
-import { BoxArrowUpRight, Envelope, GeoAlt, List, Telephone, X } from 'react-bootstrap-icons';
+import { Link, NavLink, Outlet } from 'react-router-dom';
+import { Container, Nav, Navbar } from 'react-bootstrap';
+import { Envelope, GeoAlt, List, Telephone, X } from 'react-bootstrap-icons';
 import { citizenNavItems, contactInfo } from './data/citizenMockDb';
 import AIChatWidget from './components/AIChatWidget';
 import DigitalMapFab from './components/DigitalMapFab';
@@ -9,7 +9,6 @@ import '../styles/citizen.css';
 
 export default function CitizenLayout() {
   const [menuOpen, setMenuOpen] = useState(false);
-  const navigate = useNavigate();
   const closeMenu = () => setMenuOpen(false);
 
   return (
@@ -53,14 +52,6 @@ export default function CitizenLayout() {
                   {item.label}
                 </Nav.Link>
               ))}
-              <Button
-                variant="outline-primary"
-                size="sm"
-                className="citizen-officer-link ms-lg-2"
-                onClick={() => { closeMenu(); navigate('/cong-dong/dang-nhap'); }}
-              >
-                Đăng nhập người dân <BoxArrowUpRight size={16} />
-              </Button>
             </Nav>
           </Navbar.Collapse>
         </Container>

@@ -19,8 +19,6 @@
 .citizen-nav { display: flex; align-items: center; gap: 7px; }
 .citizen-nav a { padding: 10px 12px; color: #536579; text-decoration: none; font-size: 14px; font-weight: 600; border-radius: 9px; }
 .citizen-nav a:hover, .citizen-nav a.active { color: var(--citizen-blue-dark); background: var(--citizen-blue-soft); }
-.citizen-officer-link { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--citizen-blue); border-radius: 9px; color: var(--citizen-blue-dark); background: #fff; padding: 10px 14px; font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; margin-left: 8px; }
-.citizen-officer-link:hover { background: var(--citizen-blue-soft); }
 .citizen-menu-toggle { display: none; border: 0; background: transparent; color: var(--citizen-ink); padding: 8px; }
 .citizen-hero { overflow: hidden; color: white; background: linear-gradient(115deg, #1565C0 0%, #2563EB 57%, #1565C0 100%); }
 .citizen-hero-phan-anh { background: radial-gradient(circle at 83% 20%, rgba(227,242,253,.25), transparent 26%), linear-gradient(125deg, #2563EB 0%, #1565C0 58%, #2563EB 100%); }

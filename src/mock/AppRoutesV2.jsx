@@ -8,7 +8,6 @@ import CitizenLayout from '../citizen/CitizenLayout';
 import CitizenHomePage from '../citizen/pages/CitizenHomePage';
 import { ProcedureListPage, ProcedureDetailPage, NewsListPage, NewsDetailPage, SubmitComplaintPage, TrackComplaintPage, ComplaintDetailPage, ContactPage, CitizenNotFound } from '../citizen/CitizenPages';
 import SatisfactionPage from '../citizen/pages/SatisfactionPage';
-import CitizenLoginPage from '../citizen/pages/CitizenLoginPage';
 import { CitizenGuidePage, PublicServicesPage, ReceptionSchedulePage } from '../citizen/pages/CitizenServicePages';
 import AuthLayout from '../layouts/AuthLayout';
 import Login from '../pages/Auth/Login';
@@ -38,7 +37,6 @@ export default function AppRoutesV2() {
       <Route path="/" element={<RoleHome />} />
       <Route element={<CitizenLayout />}>
         <Route path="/cong-dong" element={<CitizenHomePage />} />
-        <Route path="/cong-dong/dang-nhap" element={<CitizenLoginPage />} />
         <Route path="/cong-dong/thu-tuc" element={<ProcedureListPage />} />
         <Route path="/cong-dong/thu-tuc/:id" element={<ProcedureDetailPage />} />
         <Route path="/cong-dong/tin-tuc" element={<NewsListPage />} />

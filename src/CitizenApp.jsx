@@ -3,7 +3,6 @@ import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import CitizenLayout from './citizen/CitizenLayout';
 import { CitizenNotFound, ComplaintDetailPage, ContactPage, NewsDetailPage, NewsListPage, ProcedureDetailPage, ProcedureListPage, SubmitComplaintPage, TrackComplaintPage } from './citizen/CitizenPages';
 import CitizenHomePage from './citizen/pages/CitizenHomePage';
-import CitizenLoginPage from './citizen/pages/CitizenLoginPage';
 import { CitizenGuidePage, PublicServicesPage, ReceptionSchedulePage } from './citizen/pages/CitizenServicePages';
 import DigitalLibraryPage from './citizen/pages/DigitalLibraryPage';
 import SatisfactionPage from './citizen/pages/SatisfactionPage';
@@ -21,7 +20,6 @@ export default function CitizenApp() {
           <Route element={<CitizenLayout />}>
             <Route path="/" element={<CitizenHomePage />} />
             <Route path="/cong-dong" element={<CitizenHomePage />} />
-            <Route path="/cong-dong/dang-nhap" element={<CitizenLoginPage />} />
             <Route path="/cong-dong/thu-tuc" element={<ProcedureListPage />} />
             <Route path="/cong-dong/thu-tuc/:id" element={<ProcedureDetailPage />} />
             <Route path="/cong-dong/tin-tuc" element={<NewsListPage />} />
