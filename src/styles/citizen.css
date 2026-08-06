@@ -2734,6 +2734,19 @@
   }
 }
 
+/* Header spacing: give the brand and navigation enough breathing room on desktop. */
+@media (min-width: 1101px) {
+  .citizen-header-inner { gap: 48px; }
+  .citizen-brand { gap: 14px; }
+  .citizen-nav { gap: 7px; }
+  .citizen-nav a { padding: 11px 14px; }
+}
+
+@media (min-width: 781px) and (max-width: 1100px) {
+  .citizen-header-inner { gap: 28px; }
+  .citizen-brand { gap: 13px; }
+}
+
 @media (max-width: 600px) {
   .citizen-app :where(.lib-search-bar, .ph6-search-bar) { padding: 6px; }
   .citizen-app .ph6-search-bar { flex-wrap: wrap; }
