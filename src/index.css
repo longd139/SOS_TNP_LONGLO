@@ -9,14 +9,17 @@ body { margin: 0; min-width: 320px; background: #fff; }
 button, input, textarea, select { font: inherit; }
 a, button { -webkit-tap-highlight-color: transparent; }
 
-/* Eliminate unwanted inner rectangular focus outline/box on inputs inside search bars & components */
-input:focus,
+/* Keep keyboard focus visible while allowing custom controls to own their ring. */
+*:focus-visible {
+  outline: 3px solid rgba(37, 99, 235, .35);
+  outline-offset: 2px;
+}
+
 input:focus-visible,
-textarea:focus,
-textarea:focus-visible {
-  outline: none !important;
-  outline-offset: 0 !important;
-  box-shadow: none !important;
+textarea:focus-visible,
+select:focus-visible {
+  outline: 3px solid rgba(37, 99, 235, .24);
+  outline-offset: 1px;
 }
 
 /* Specific resets for search inputs in container wrappers */
@@ -33,4 +36,17 @@ form[role="search"] input {
   outline-offset: 0 !important;
   box-shadow: none !important;
   border: none !important;
+}
+
+img { display: block; max-width: 100%; }
+button { cursor: pointer; }
+button:disabled { cursor: not-allowed; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    transition-duration: .01ms !important;
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+  }
 }

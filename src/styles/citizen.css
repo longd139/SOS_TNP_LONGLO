@@ -2394,3 +2394,49 @@
 .satisfaction-comment textarea:focus { border-color: var(--citizen-blue); box-shadow: 0 0 0 3px rgba(37,99,235,.1); }
 .satisfaction-comment > small { text-align: right; }
 @media (max-width: 600px) { .satisfaction-card { padding: 24px 18px; } .satisfaction-stars button svg { width: 32px; height: 32px; } }
+
+/* UI polish: consistent rhythm, readable measure and resilient mobile controls. */
+.citizen-container { width: min(1280px, calc(100% - 48px)); }
+.citizen-section-heading h2,
+.citizen-page-hero h1,
+.tracking-result-v3 h2,
+.satisfaction-card h1 { text-wrap: balance; }
+.citizen-section-heading > div { min-width: 0; }
+.citizen-button:focus-visible,
+.tracking-search-bar button:focus-visible,
+.tracking-suggestions button:focus-visible,
+.satisfaction-stars button:focus-visible { outline: 3px solid rgba(37, 99, 235, .28); outline-offset: 3px; }
+.citizen-button:hover:not(:disabled) { box-shadow: 0 8px 20px rgba(37, 99, 235, .16); }
+.citizen-button-secondary:hover:not(:disabled) { box-shadow: none; }
+.tracking-search-card { width: min(100%, 640px); }
+.tracking-search-bar input { min-height: 44px; }
+.tracking-result-v3 { overflow: hidden; }
+.tr3-info { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.tr3-info-item strong { overflow-wrap: anywhere; }
+.satisfaction-card { width: min(100%, 760px); margin-inline: auto; }
+.satisfaction-stars button { min-width: 44px; min-height: 44px; display: grid; place-items: center; }
+.satisfaction-comment textarea { width: 100%; min-height: 140px; line-height: 1.55; }
+
+@media (max-width: 760px) {
+  .citizen-container { width: min(100% - 32px, 640px); }
+  .citizen-section { padding-block: 48px; }
+  .citizen-section-heading { align-items: flex-start; gap: 14px; }
+  .citizen-section-heading h2 { font-size: clamp(24px, 7vw, 31px); }
+  .citizen-page-hero { padding-block: 44px 38px; }
+  .citizen-page-hero h1 { font-size: clamp(32px, 10vw, 44px); }
+  .tracking-search-card { padding: 28px 20px; margin-top: -30px; }
+  .tracking-search-bar { border-radius: 18px; }
+  .tracking-search-bar input { width: 100%; }
+  .tracking-search-bar button { width: 100%; }
+  .tr3-info { grid-template-columns: 1fr; }
+  .tr3-header { flex-direction: column; gap: 10px; }
+  .tracking-actions { flex-direction: column; }
+  .tracking-actions .citizen-button { width: 100%; }
+}
+
+@media (max-width: 420px) {
+  .citizen-container { width: calc(100% - 24px); }
+  .complaint-form, .satisfaction-card { padding-inline: 16px; }
+  .citizen-button { width: 100%; }
+  .citizen-hero-actions { flex-direction: column; align-items: stretch; }
+}

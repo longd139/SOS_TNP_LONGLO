@@ -194,7 +194,7 @@ export function NewsListPage() { const [query, setQuery] = useState(''); const [
               <>
                 {/* Hero article */}
                 <Link to={`/cong-dong/tin-tuc/${filtered[0].id}`} className="news-hero-article">
-                  <div className="nha-img"><img src={filtered[0].image} alt="" /></div>
+                  <div className="nha-img"><img src={filtered[0].image} alt={filtered[0].title} /></div>
                   <div className="nha-body">
                     <span className="nha-badge">{filtered[0].category}</span>
                     <h2>{filtered[0].title}</h2>
@@ -207,7 +207,7 @@ export function NewsListPage() { const [query, setQuery] = useState(''); const [
                 <div className="news-masonry">
                   {filtered.slice(1).map((item, i) => (
                     <Link key={item.id} to={`/cong-dong/tin-tuc/${item.id}`} className={`news-item-card ${i < 2 ? 'ni-featured' : ''}`}>
-                      <div className="ni-img"><img src={item.image} alt="" loading="lazy" /></div>
+                      <div className="ni-img"><img src={item.image} alt={item.title} loading="lazy" /></div>
                       <div className="ni-body">
                         <span className="ni-cat">{item.category}</span>
                         <h3>{item.title}</h3>
