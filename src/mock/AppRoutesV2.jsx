@@ -15,7 +15,6 @@ import ComplaintDetail from '../pages-v2/admin/ComplaintDetail';
 import ExtensionList from '../pages-v2/admin/ExtensionList';
 import ExtensionDetail from '../pages-v2/admin/ExtensionDetail';
 import DashboardOverview from '../pages-v2/dashboard/DashboardOverview';
-import DashboardNeighborhood from '../pages-v2/dashboard/DashboardNeighborhood';
 import DashboardLargeScreen from '../pages-v2/dashboard/DashboardLargeScreen';
 import PlaceholderPage from '../pages-v2/PlaceholderPage';
 import DigitalMap from '../pages/DigitalMap/DigitalMap';

@@ -3,7 +3,7 @@
 // ============================================================
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, MessageSquare, Clock, MapPin, FolderOpen, Building2, Users, Settings, ChevronLeft, FileText, Map, ChevronDown, ChevronRight, Smartphone } from 'lucide-react';
+import { LayoutDashboard, MessageSquare, Clock, FolderOpen, Building2, Users, Settings, ChevronLeft, FileText, Map, ChevronDown, ChevronRight, Smartphone } from 'lucide-react';
 import { useMock } from '../MockContext';
 
 const ALL_MENUS = [
