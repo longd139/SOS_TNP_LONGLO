@@ -120,7 +120,8 @@
 .citizen-mobile-feature-grid { gap: 16px; }.citizen-mobile-feature { min-height: 168px; justify-content: flex-start; border-radius: 14px; }.citizen-mobile-feature:first-child { grid-column: span 2; background: linear-gradient(135deg, var(--citizen-blue-soft), #fff); }.citizen-mobile-feature:first-child .citizen-mobile-feature-icon { color: #fff; background: var(--citizen-blue); }.citizen-mobile-feature strong { font-size: 16px; }.citizen-mobile-feature small { max-width: 230px; }.citizen-notice-card { border-left: 3px solid var(--citizen-blue); }.citizen-emergency-card { border-radius: 14px; box-shadow: 0 16px 32px rgba(21,101,192,.15); }
 .procedure-card-icon, .citizen-service-icon { border-radius: 12px; }.procedure-card-meta { color: var(--citizen-muted); }.citizen-news-card img { filter: saturate(.86); }.citizen-news-card-featured img { filter: saturate(1); }.process-step-icon { width: 52px; height: 52px; }.citizen-process-section { background: linear-gradient(180deg, var(--citizen-soft), #fff); }
 .procedure-filter { position: sticky; top: 102px; border-radius: 14px; }.listing-toolbar { align-items: center; }.citizen-sort select, .listing-toolbar select { min-height: 44px; border-color: var(--citizen-line); }.detail-facts { border-radius: 14px; }.complaint-form, .tracking-result { border-radius: 16px; box-shadow: 0 16px 36px rgba(21,101,192,.08); }.complaint-progress { padding: 12px; border-radius: 12px; background: var(--citizen-soft); }.form-field input, .form-field textarea, .form-field select { min-height: 48px; border-radius: 10px; }.form-field input:focus, .form-field textarea:focus, .form-field select:focus { box-shadow: 0 0 0 3px rgba(37,99,235,.14); }.tracking-step { padding-bottom: 8px; }
-.citizen-footer { margin-top: 0; }.citizen-footer-support h2 { line-height: 1.2; }.citizen-footer-grid { border: 0; }.citizen-button:focus-visible, .citizen-nav a:focus-visible, .citizen-mobile-feature:focus-visible, .citizen-card:focus-visible, .citizen-news-card:focus-visible { outline: 3px solid rgba(227,242,253,.9); outline-offset: 3px; }.citizen-app main a:focus-visible, .citizen-app main button:focus-visible, .citizen-app main input:focus-visible, .citizen-app main select:focus-visible, .citizen-app main textarea:focus-visible { outline: 3px solid rgba(37,99,235,.30); outline-offset: 2px; }
+.citizen-footer { margin-top: 0; }.citizen-footer-support h2 { line-height: 1.2; }.citizen-footer-grid { border: 0; }.citizen-button:focus-visible, .citizen-nav a:focus-visible, .citizen-mobile-feature:focus-visible, .citizen-card:focus-visible, .citizen-news-card:focus-visible { outline: 3px solid rgba(227,242,253,.9); outline-offset: 3px; }.citizen-app main a:focus-visible, .citizen-app main button:focus-visible, .citizen-app main select:focus-visible, .citizen-app main textarea:focus-visible { outline: 3px solid rgba(37,99,235,.30); outline-offset: 2px; }
+.tracking-search-bar input:focus, .tracking-search-bar-v2 input:focus, .lib-search-bar-input:focus, .ph6-search-bar input:focus, .department-search input:focus, .citizen-search input:focus { outline: none !important; outline-offset: 0 !important; box-shadow: none !important; border: 0 !important; }
 @media (max-width: 1100px) { .citizen-mobile-feature:first-child { grid-column: span 2; } }
 @media (max-width: 680px) { .citizen-quick-search { padding-top: 16px; }.citizen-quick-search .citizen-container { padding: 14px; transform: none; }.citizen-mobile-feature:first-child { grid-column: auto; }.citizen-hero::after { width: 340px; height: 340px; right: -140px; bottom: -160px; }.procedure-filter { position: static; }.citizen-section-heading h2 { font-size: 28px; }.citizen-mobile-feature { min-height: 138px; } }
 
@@ -1677,6 +1678,13 @@
   flex: 1; min-width: 0; border: 0; outline: 0;
   font: inherit; font-size: 14px; color: var(--citizen-ink);
   padding: 11px 0; background: transparent;
+}
+.tracking-search-bar-v2 input:focus,
+.tracking-search-bar-v2 input:focus-visible {
+  outline: none !important;
+  outline-offset: 0 !important;
+  box-shadow: none !important;
+  border: 0 !important;
 }
 .tracking-search-bar-v2 input::placeholder { color: #A0AEC0; }
 .tracking-search-bar-v2 button {
