@@ -71,7 +71,7 @@ export default function CitizenHomePage() {
             return (
             <Link key={item.id} to={`/cong-dong/tin-tuc/${item.id}`} className="home-news-card">
               <div className="hn-card-img">
-                <img src={item.image} alt="" loading="lazy" />
+                <img src={item.image} alt="" loading="lazy" onError={(e) => { e.target.onerror = null; e.target.src = `${process.env.PUBLIC_URL}/1.jpg`; }} />
                 <span className="hn-card-badge" style={{background:nc.bg,color:nc.color}}>{item.category}</span>
               </div>
               <div className="hn-card-body">

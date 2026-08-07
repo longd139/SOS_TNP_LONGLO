@@ -89,7 +89,7 @@ export default function DigitalLibraryPage() {
             <button className="back-link" onClick={() => setSelectedDoc(null)} style={{ color: '#fff' }}>← Quay lại Thư viện số</button>
             <div className="lib-detail-hero-card">
               <div className="lib-detail-hero-img">
-                <img src={selectedDoc.cover} alt="" />
+                <img src={selectedDoc.cover} alt="" onError={(e) => { e.target.onerror = null; e.target.src = `${process.env.PUBLIC_URL}/1.jpg`; }} />
               </div>
               <div className="lib-detail-hero-body">
                 <span className="lib-detail-hero-tag" style={{ background: category?.color || '#2563EB' }}>{category?.label || 'Tài liệu'}</span>
@@ -259,7 +259,7 @@ export default function DigitalLibraryPage() {
                 {localResults.map((doc) => (
                   <button key={doc.id} className="lib-result-row" onClick={() => { setSelectedDoc(doc); window.scrollTo(0, 0); }} style={{ fontFamily: 'inherit' }}>
                     <div className="lib-result-thumb">
-                      <img src={doc.cover} alt="" />
+                      <img src={doc.cover} alt="" onError={(e) => { e.target.onerror = null; e.target.src = `${process.env.PUBLIC_URL}/1.jpg`; }} />
                     </div>
                     <div className="lib-result-info">
                       <span className="lib-result-type" style={{ color: 'var(--citizen-blue)' }}>

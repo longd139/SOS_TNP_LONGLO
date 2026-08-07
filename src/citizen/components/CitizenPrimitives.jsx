@@ -96,7 +96,7 @@ export function ProcedureCard({ procedure }) {
 export function NewsCard({ item, featured = false }) {
   return (
     <Card as={Link} to={`/cong-dong/tin-tuc/${item.id}`} className={`citizen-news-card text-decoration-none text-dark h-100 ${featured ? 'citizen-news-card-featured' : ''}`}>
-      <Card.Img variant="top" src={item.image} alt="" loading="lazy" />
+      <Card.Img variant="top" src={item.image} alt="" loading="lazy" onError={(e) => { e.target.onerror = null; e.target.src = `${process.env.PUBLIC_URL}/1.jpg`; }} />
       <Card.Body className="d-flex flex-column">
         <div className="citizen-news-meta mb-2">
           <span>{item.category}</span>

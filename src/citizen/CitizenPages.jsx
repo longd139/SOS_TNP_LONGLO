@@ -246,7 +246,7 @@ export function NewsListPage() { const [query, setQuery] = useState(''); const [
             {filtered.length === 0 ? <EmptyState title="Không tìm thấy tin tức" /> : (
               <>
                 <Link to={`/cong-dong/tin-tuc/${filtered[0].id}`} className="news-hero-article">
-                  <div className="nha-img"><img src={filtered[0].image} alt="" /></div>
+                  <div className="nha-img"><img src={filtered[0].image} alt="" onError={(e) => { e.target.onerror = null; e.target.src = `${process.env.PUBLIC_URL}/1.jpg`; }} /></div>
                   <div className="nha-body">
                     <span className="nha-badge" style={(newsCatColors[filtered[0].category] && {background:newsCatColors[filtered[0].category].bg,color:newsCatColors[filtered[0].category].color}) || {}}>{filtered[0].category}</span>
                     <h2>{filtered[0].title}</h2>
@@ -258,7 +258,7 @@ export function NewsListPage() { const [query, setQuery] = useState(''); const [
                 <div className="news-masonry">
                   {filtered.slice(1).map((item, i) => (
                     <Link key={item.id} to={`/cong-dong/tin-tuc/${item.id}`} className={`news-item-card ${i < 2 ? 'ni-featured' : ''}`}>
-                      <div className="ni-img"><img src={item.image} alt="" loading="lazy" /></div>
+                      <div className="ni-img"><img src={item.image} alt="" loading="lazy" onError={(e) => { e.target.onerror = null; e.target.src = `${process.env.PUBLIC_URL}/1.jpg`; }} /></div>
                       <div className="ni-body">
                         <span className="ni-cat" style={(newsCatColors[item.category] && {background:newsCatColors[item.category].bg,color:newsCatColors[item.category].color}) || {}}>{item.category}</span>
                         <h3>{item.title}</h3>
