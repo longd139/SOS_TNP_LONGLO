@@ -1,4 +1,4 @@
-import { BarChart3, Calendar, FileText, FolderOpen, LayoutDashboard, MessageSquare, Newspaper, Phone, UserCog, Menu, ChevronLeft, X, ClipboardList, Shield, FileCheck } from 'lucide-react';
+import { BarChart3, Calendar, FileText, FolderOpen, LayoutDashboard, MessageSquare, Newspaper, Phone, UserCog, Menu, ChevronLeft, X, ClipboardList, Shield, FileCheck, Map, Smartphone } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import React from 'react';
 import PropTypes from 'prop-types';
@@ -104,6 +104,14 @@ const menuItems = [
         modulePrefix: 'RPT' 
     },
     {
+        id: 'app-statistics',
+        label: 'Thống kê lượt tải App',
+        icon: Smartphone,
+        path: ROUTE_PATH.APP_STATISTICS,
+        hasSubmenu: false,
+        requiresPermission: false
+    },
+    {
         id: 'accounts',
         label: 'Quản lý tài khoản',
         icon: UserCog,
@@ -126,6 +134,14 @@ const menuItems = [
         path: ROUTE_PATH.AUDIT_LOG,
         hasSubmenu: false,
         modulePrefix: 'ADL'
+    },
+    {
+        id: 'digital-map',
+        label: 'Bản đồ số',
+        icon: Map,
+        path: ROUTE_PATH.DIGITAL_MAP,
+        hasSubmenu: false,
+        requiresPermission: false
     }
 ];
 

@@ -190,19 +190,42 @@ export function MockProvider({ children }) {
   }, [state.complaints]);
 
   const getNeighborhoodStats = useCallback(() => {
-    return state.neighborhoods.map(n => {
+    return state.neighborhoods.map((n, idx) => {
       const nc = state.complaints.filter(c => c.neighborhoodId === n.id);
+      const totalFromComplaints = nc.length;
+      const seed = (idx + 1) * 31 + 17;
+      const baseTotal = totalFromComplaints > 0 ? totalFromComplaints : 45 + (seed % 150);
+      const urgent = totalFromComplaints > 0
+        ? nc.filter(c => (c.confirmedUrgency || c.citizenUrgency) === 'URGENT').length
+        : Math.round(baseTotal * (0.08 + (seed % 12) / 100));
+      const completed = totalFromComplaints > 0
+        ? nc.filter(c => c.status === 'COMPLETED').length
+        : Math.round(baseTotal * (0.75 + (seed % 18) / 100));
+      const inProgress = totalFromComplaints > 0
+        ? nc.filter(c => c.status === 'IN_PROGRESS' || c.status === 'EXTENSION_PENDING').length
+        : Math.round((baseTotal - completed) * 0.7);
+      const overdue = totalFromComplaints > 0
+        ? nc.filter(c => c.slaStatus === 'OVERDUE' || c.slaStatus === 'COMPLETED_LATE').length
+        : Math.round(baseTotal * ((seed % 8) / 100));
+      const onTime = totalFromComplaints > 0
+        ? nc.filter(c => c.slaStatus === 'COMPLETED_ON_TIME' || (c.status !== 'COMPLETED' && c.slaStatus === 'ON_TIME')).length
+        : Math.max(0, baseTotal - overdue);
+      const onTimeRate = baseTotal > 0 ? Math.min(100, Math.max(0, Math.round((onTime / baseTotal) * 100))) : 85;
+      const avgDays = Math.round((1.8 + (seed % 24) / 10) * 10) / 10;
+
       return {
         neighborhoodId: n.id,
         neighborhoodName: n.name,
-        total: nc.length,
-        urgent: nc.filter(c => (c.confirmedUrgency || c.citizenUrgency) === 'URGENT').length,
-        inProgress: nc.filter(c => c.status === 'IN_PROGRESS' || c.status === 'EXTENSION_PENDING').length,
-        completed: nc.filter(c => c.status === 'COMPLETED').length,
-        overdue: nc.filter(c => c.slaStatus === 'OVERDUE' || c.slaStatus === 'COMPLETED_LATE').length,
-        onTime: nc.filter(c => c.slaStatus === 'COMPLETED_ON_TIME' || (c.status !== 'COMPLETED' && c.slaStatus === 'ON_TIME')).length,
+        total: baseTotal,
+        urgent,
+        inProgress,
+        completed,
+        overdue,
+        onTime,
+        onTimeRate,
+        avgDays,
       };
-    }).filter(x => x.total > 0);
+    });
   }, [state.complaints, state.neighborhoods]);
 
   const value = useMemo(() => ({
