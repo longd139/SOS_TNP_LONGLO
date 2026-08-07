@@ -17,6 +17,7 @@ const menuItems = [
     { id: 'government', path: ROUTE_PATH.GOVERNMENT, disabled: false },
     { id: 'categoryNews', path: ROUTE_PATH.CATEGORY_NEWS, disabled: false },
     { id: 'reportAreas', path: ROUTE_PATH.REPORT_AREAS, disabled: false },
+    { id: 'appStatistics', path: ROUTE_PATH.APP_STATISTICS, disabled: false },
 ];
 
 export const getDefaultEnabledRoute = () => {
