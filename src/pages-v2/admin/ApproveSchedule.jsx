@@ -129,6 +129,7 @@ export default function ApproveSchedule() {
   const [data, setData] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedTicket, setSelectedTicket] = useState(null);
+  const [activeTab, setActiveTab] = useState('PENDING');
 
   useEffect(() => {
     const localData = localStorage.getItem('citizen-approvals-v5');
@@ -342,114 +343,51 @@ export default function ApproveSchedule() {
         <p className="text-gray-500 text-[14px] m-0 mt-1">Xem, xét duyệt, theo dõi và đánh giá toàn bộ yêu cầu tiếp xúc công dân với Lãnh đạo Phường.</p>
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
-        <div className="bg-[#fef2f2] border-2 border-blue-400 rounded-lg p-4 flex flex-col justify-center relative overflow-hidden">
-          <div className="text-[24px] font-bold text-red-600 leading-none mb-1">{pendingCount}</div>
-          <div className="text-[13px] font-medium text-red-600">Chờ duyệt</div>
-        </div>
-        <div className="bg-[#eff6ff] border border-blue-100 rounded-lg p-4 flex flex-col justify-center">
-          <div className="text-[24px] font-bold text-blue-700 leading-none mb-1">{approvedCount}</div>
-          <div className="text-[13px] font-medium text-blue-700">Đã duyệt</div>
-        </div>
-        <div className="bg-[#f0fdf4] border border-green-100 rounded-lg p-4 flex flex-col justify-center">
-          <div className="text-[24px] font-bold text-green-700 leading-none mb-1">{doneCount}</div>
-          <div className="text-[13px] font-medium text-green-700">Đã tiếp xong</div>
-        </div>
-        <div className="bg-[#fff7ed] border border-orange-100 rounded-lg p-4 flex flex-col justify-center">
-          <div className="text-[24px] font-bold text-orange-600 leading-none mb-1">{rejectedCount}</div>
-          <div className="text-[13px] font-medium text-orange-600">Từ chối</div>
-        </div>
-        <div className="bg-[#f9fafb] border border-gray-100 rounded-lg p-4 flex flex-col justify-center">
-          <div className="text-[24px] font-bold text-gray-700 leading-none mb-1">{canceledCount}</div>
-          <div className="text-[13px] font-medium text-gray-700">Đã hủy</div>
-        </div>
-      </div>
+
 
       {/* Main Table Area */}
-      <div className="bg-white rounded-lg border border-gray-200 shadow-sm h-fit">
-        <Tabs 
-          defaultActiveKey="1" 
-          className="px-4 pt-2 custom-tabs"
-          items={[
-            {
-              key: '1',
-              label: (
-                <div className="flex items-center text-[14px] font-bold py-2">
-                  <span className="text-blue-600">Chờ duyệt</span>
-                  <span className="ml-2 w-5 h-5 rounded-full bg-red-500 text-white text-[11px] flex items-center justify-center font-bold">{pendingCount}</span>
-                </div>
-              ),
-              children: (
-                <div className="border-t border-gray-100 -mx-4">
-                  <Table 
-                    columns={columns} 
-                    dataSource={data.filter(d => d.status === 'PENDING')} 
-                    rowKey="id" 
-                    pagination={false}
-                    className="custom-table"
-                  />
-                </div>
-              )
-            },
-            {
-              key: '2',
-              label: (
-                <div className="flex items-center text-[14px] font-bold py-2 text-gray-600">
-                  <span>Đã duyệt</span>
-                  <span className="ml-2 w-5 h-5 rounded-full bg-blue-500 text-white text-[11px] flex items-center justify-center font-bold">{approvedCount}</span>
-                </div>
-              ),
-              children: (
-                <div className="border-t border-gray-100 -mx-4">
-                  <Table columns={columns} dataSource={data.filter(d => d.status === 'APPROVED')} rowKey="id" pagination={false} className="custom-table" />
-                </div>
-              )
-            },
-            {
-              key: '3',
-              label: (
-                <div className="flex items-center text-[14px] font-bold py-2 text-gray-600">
-                  <span>Đã tiếp xong</span>
-                  <span className="ml-2 w-5 h-5 rounded-full bg-green-500 text-white text-[11px] flex items-center justify-center font-bold">{doneCount}</span>
-                </div>
-              ),
-              children: (
-                <div className="border-t border-gray-100 -mx-4">
-                  <Table columns={columns} dataSource={data.filter(d => d.status === 'DONE')} rowKey="id" pagination={false} className="custom-table" />
-                </div>
-              )
-            },
-            {
-              key: '4',
-              label: (
-                <div className="flex items-center text-[14px] font-bold py-2 text-gray-600">
-                  <span>Từ chối</span>
-                  <span className="ml-2 w-5 h-5 rounded-full bg-orange-400 text-white text-[11px] flex items-center justify-center font-bold">{rejectedCount}</span>
-                </div>
-              ),
-              children: (
-                <div className="border-t border-gray-100 -mx-4">
-                  <Table columns={columns} dataSource={data.filter(d => d.status === 'REJECTED')} rowKey="id" pagination={false} className="custom-table" />
-                </div>
-              )
-            },
-            {
-              key: '5',
-              label: (
-                <div className="flex items-center text-[14px] font-bold py-2 text-gray-600">
-                  <span>Đã hủy</span>
-                  <span className="ml-2 w-5 h-5 rounded-full bg-gray-400 text-white text-[11px] flex items-center justify-center font-bold">{canceledCount}</span>
-                </div>
-              ),
-              children: (
-                <div className="border-t border-gray-100 -mx-4">
-                  <Table columns={columns} dataSource={data.filter(d => d.status === 'CANCELED')} rowKey="id" pagination={false} className="custom-table" />
-                </div>
-              )
-            }
-          ]}
-        />
+      <div className="bg-white rounded-xl border border-slate-200 shadow-2xs overflow-hidden">
+        {/* Quick tabs bar - Synchronized with system design */}
+        <div className="flex border-b border-slate-200 px-4 pt-3 overflow-x-auto bg-slate-50/60">
+          {[
+            { key: 'PENDING',  label: 'Chờ duyệt',      count: pendingCount },
+            { key: 'APPROVED', label: 'Đã duyệt',       count: approvedCount },
+            { key: 'DONE',     label: 'Đã tiếp xong',   count: doneCount },
+            { key: 'REJECTED', label: 'Từ chối',        count: rejectedCount },
+            { key: 'CANCELED', label: 'Đã hủy',         count: canceledCount },
+          ].map(t => {
+            const isActive = activeTab === t.key;
+            return (
+              <button
+                key={t.key}
+                onClick={() => setActiveTab(t.key)}
+                className={`flex items-center gap-2 px-4 py-2.5 text-xs font-medium whitespace-nowrap border-b-2 transition-all cursor-pointer ${
+                  isActive
+                    ? 'border-blue-600 text-blue-600 font-bold bg-white rounded-t-lg border-x border-t border-slate-200 -mb-[1px] shadow-2xs'
+                    : 'border-transparent text-slate-600 hover:text-slate-900 hover:border-slate-300'
+                }`}
+              >
+                <span>{t.label}</span>
+                <span className={`px-2 py-0.5 rounded-full text-[11px] font-bold ${
+                  isActive ? 'bg-blue-100 text-blue-700' : 'bg-slate-200/70 text-slate-600'
+                }`}>
+                  {t.count}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Table view */}
+        <div>
+          <Table 
+            columns={columns} 
+            dataSource={data.filter(d => d.status === activeTab)} 
+            rowKey="id" 
+            pagination={false}
+            className="custom-table"
+          />
+        </div>
       </div>
 
       <Modal
