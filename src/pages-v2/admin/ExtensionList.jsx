@@ -18,15 +18,16 @@ const EXT_STATUS = {
 };
 
 const TABS = [
-  { key: "PENDING",  label: "Chờ phê duyệt" },
-  { key: "APPROVED", label: "Đã phê duyệt" },
-  { key: "REJECTED", label: "Đã từ chối" },
+  { key: "PENDING",  label: "Chờ phê duyệt gia hạn" },
+  { key: "APPROVED", label: "Đã phê duyệt (Đã gia hạn)" },
+  { key: "REJECTED", label: "Đã từ chối gia hạn" },
 ];
 
 function renderStatusBadge(status) {
   const s = EXT_STATUS[status] || { label: status, bg: "#F3F4F6", color: "#6B7280" };
   return (
-    <span className="inline-flex items-center gap-1 px-3 py-1 text-xs font-medium rounded-full" style={{ backgroundColor: s.bg, color: s.color }}>
+    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-bold rounded-full border" style={{ backgroundColor: s.bg, color: s.color, borderColor: s.color + '40' }}>
+      <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: s.color }} />
       {s.label}
     </span>
   );
@@ -35,7 +36,6 @@ function renderStatusBadge(status) {
 export default function ExtensionList() {
   const navigate = useNavigate();
   const { extensions } = useMock();
-
   const [activeTab, setActiveTab] = useState("PENDING");
   const [showFilters, setShowFilters] = useState(false);
   const [page, setPage] = useState(1);
@@ -100,8 +100,8 @@ export default function ExtensionList() {
     <div className="min-h-screen">
       {/* ---- Page title ---- */}
       <div className="mb-4">
-        <h1 className="text-2xl font-bold text-gray-900">Quản lý gia hạn</h1>
-        <p className="text-gray-600 mt-1">Phê duyệt yêu cầu gia hạn từ các đơn vị xử lý</p>
+        <h1 className="text-2xl font-bold text-slate-900">Quản lý phê duyệt gia hạn</h1>
+        <p className="text-xs text-slate-500 mt-1">Xét duyệt và phê duyệt đề xuất gia hạn thời gian xử lý phản ánh từ các đơn vị</p>
       </div>
 
       {/* ---- Quick tabs ---- */}
