@@ -9,6 +9,15 @@ body { margin: 0; min-width: 320px; background: #fff; }
 button, input, textarea, select { font: inherit; }
 a, button { -webkit-tap-highlight-color: transparent; }
 
+/* Keep Vietnamese glyphs consistent across the citizen-reception schedule area. */
+.schedule-management-font,
+.schedule-management-font button,
+.schedule-management-font input,
+.schedule-management-font textarea,
+.schedule-management-font select {
+  font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+}
+
 /* Keep keyboard focus visible while allowing custom controls to own their ring. */
 *:focus-visible {
   outline: 3px solid rgba(37, 99, 235, .35);

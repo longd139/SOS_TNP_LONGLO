@@ -330,7 +330,7 @@ export default function ApproveSchedule() {
   );
 
   return (
-    <div className="p-4 md:p-6 bg-[#f8f9fa] min-h-screen font-sans">
+    <div className="schedule-management-font p-4 md:p-6 bg-[#f8f9fa] min-h-screen font-sans">
       
       {/* Header */}
       <div className="bg-white p-5 rounded-lg border border-gray-200 shadow-sm mb-6 flex flex-col justify-center">
