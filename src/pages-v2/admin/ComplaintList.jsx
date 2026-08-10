@@ -78,8 +78,8 @@ function ComplaintDetailModal({ isOpen, onClose, complaint, mode, onModeChange, 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto">
       <div className="flex items-center justify-center min-h-screen px-4">
-        <div className="fixed inset-0 bg-black bg-opacity-40" onClick={onClose} />
-        <div className="relative bg-white rounded-xl shadow-xl max-w-5xl w-full max-h-[85vh] overflow-y-auto">
+        <div className="fixed inset-0 z-0 bg-gray-900/40" onClick={onClose} />
+        <div className="relative z-10 bg-white rounded-xl shadow-xl max-w-5xl w-full max-h-[85vh] overflow-y-auto">
           {/* Header */}
           <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 z-10 rounded-t-xl">
             <h3 className="text-lg font-semibold text-gray-900">
@@ -691,8 +691,8 @@ export default function ComplaintList() {
       {showAddModal && (
         <div className="fixed inset-0 z-50 overflow-y-auto">
           <div className="flex items-center justify-center min-h-screen px-4">
-            <div className="fixed inset-0 bg-black bg-opacity-40" onClick={() => setShowAddModal(false)} />
-            <div className="relative bg-white rounded-xl shadow-xl max-w-lg w-full max-h-[85vh] overflow-y-auto">
+            <div className="fixed inset-0 z-0 bg-gray-900/40" onClick={() => setShowAddModal(false)} />
+            <div className="relative z-10 bg-white rounded-xl shadow-xl max-w-lg w-full max-h-[85vh] overflow-y-auto">
               <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 z-10 rounded-t-xl">
                 <h3 className="text-lg font-semibold text-gray-900">Thêm phản ánh mới</h3>
                 <p className="text-sm text-gray-500 mt-0.5">Cán bộ tiếp nhận phản ánh từ người dân</p>
