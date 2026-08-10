@@ -134,8 +134,14 @@ const repairVietnameseText = (value) => {
       '’': 0x92, '“': 0x93, '”': 0x94, '•': 0x95, '–': 0x96, '—': 0x97, '˜': 0x98,
       '™': 0x99, 'š': 0x9A, '›': 0x9B, 'œ': 0x9C, 'ž': 0x9E, 'Ÿ': 0x9F,
     };
-    const bytes = Uint8Array.from(Array.from(value, (character) => cp1252Bytes[character] ?? character.charCodeAt(0) & 0xff));
-    return new TextDecoder('utf-8').decode(bytes);
+    let repaired = value;
+    for (let attempt = 0; attempt < 3 && /[ÃÂÄÆáºá»]/.test(repaired); attempt += 1) {
+      const bytes = Uint8Array.from(Array.from(repaired, (character) => cp1252Bytes[character] ?? (character.charCodeAt(0) & 0xff)));
+      const nextValue = new TextDecoder('utf-8').decode(bytes);
+      if (nextValue === repaired) break;
+      repaired = nextValue;
+    }
+    return repaired;
   } catch {
     return value;
   }
