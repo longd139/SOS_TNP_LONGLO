@@ -5,7 +5,7 @@ import { jwtDecode } from 'jwt-decode';
 
 const TwoFALoginModal = ({ isOpen, onClose, tenDangNhap, onSuccess, onError }) => {
     const [otp, setOtp] = useState('');
-    const [error, setError] = useState('');
+    const [, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
 
     const handleSubmit = async (e) => {

@@ -5,7 +5,7 @@ import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   AlertTriangle, CheckCircle, Clock, FileCheck,
-  MessageSquare, Send, TrendingUp, TrendingDown, Filter,
+  MessageSquare, Send, Filter,
   BarChart3, Layers, SlidersHorizontal, Award, Sparkles,
   Building2, Users
 } from 'lucide-react';

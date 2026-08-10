@@ -84,12 +84,12 @@ export default function DigitalLibraryPage() {
       <>
         {/* Hero card */}
         <section className="lib-detail-hero-v2">
-          <div className="lib-detail-hero-bg" style={{ backgroundImage: `url(${selectedDoc.cover || 'https://images.unsplash.com/photo-1557683316-973673baf926?auto=format&fit=crop&w=1200&q=80'})` }} />
+          <div className="lib-detail-hero-bg" style={{ backgroundImage: `url(${selectedDoc.cover || 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&w=1200&q=80'})` }} />
           <div className="citizen-container lib-detail-hero-inner">
             <button className="back-link" onClick={() => setSelectedDoc(null)} style={{ color: '#fff' }}>← Quay lại Thư viện số</button>
             <div className="lib-detail-hero-card">
               <div className="lib-detail-hero-img">
-                <img src={selectedDoc.cover} alt="" onError={(e) => { e.target.onerror = null; e.target.src = `${process.env.PUBLIC_URL}/1.jpg`; }} />
+                <img src={selectedDoc.cover} alt={`Ảnh bìa ${selectedDoc.title}`} />
               </div>
               <div className="lib-detail-hero-body">
                 <span className="lib-detail-hero-tag" style={{ background: category?.color || '#2563EB' }}>{category?.label || 'Tài liệu'}</span>
@@ -259,7 +259,7 @@ export default function DigitalLibraryPage() {
                 {localResults.map((doc) => (
                   <button key={doc.id} className="lib-result-row" onClick={() => { setSelectedDoc(doc); window.scrollTo(0, 0); }} style={{ fontFamily: 'inherit' }}>
                     <div className="lib-result-thumb">
-                      <img src={doc.cover} alt="" onError={(e) => { e.target.onerror = null; e.target.src = `${process.env.PUBLIC_URL}/1.jpg`; }} />
+                      <img src={doc.cover} alt={`Ảnh bìa ${doc.title}`} />
                     </div>
                     <div className="lib-result-info">
                       <span className="lib-result-type" style={{ color: 'var(--citizen-blue)' }}>
@@ -461,7 +461,7 @@ function DocCardV2({ doc, onClick }) {
       <div className="lib-doc-img-v2">
         <img
           src={doc.cover}
-          alt=""
+          alt={`Ảnh bìa ${doc.title}`}
           loading="lazy"
           onError={(e) => { e.target.src = `data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="260" fill="%23DBEAFE"><rect width="400" height="260"/><text x="200" y="140" text-anchor="middle" fill="%232563EB" font-size="16" font-family="Arial">${encodeURIComponent(doc.title.slice(0, 20))}</text></svg>`; }}
         />

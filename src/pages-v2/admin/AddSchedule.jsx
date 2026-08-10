@@ -58,8 +58,8 @@ export default function AddSchedule() {
     .sort((a, b) => new Date(a.date) - new Date(b.date));
 
   return (
-    <div className="p-4 md:p-6 bg-[#f8f9fa] min-h-screen font-sans">
-      
+    <div className="schedule-management-font p-4 md:p-6 bg-[#f8f9fa] min-h-screen font-sans">
+
       {/* Header Card */}
       <div className="bg-white p-5 rounded-lg border border-gray-200 shadow-sm mb-6 flex flex-col justify-center">
         <div className="flex items-center mb-1">
@@ -70,33 +70,33 @@ export default function AddSchedule() {
       </div>
 
       <div className="flex flex-col lg:flex-row gap-6">
-        
+
         {/* Left Column */}
         <div className="w-full lg:w-[35%] bg-white rounded-lg border border-gray-200 shadow-sm h-fit">
           <div className="p-4 border-b border-gray-100">
             <h3 className="font-bold text-[16px] text-gray-800 m-0">Thêm lịch rảnh mới</h3>
           </div>
-          
+
           <div className="p-5">
             <Form form={form} layout="vertical" onFinish={onFinish} initialValues={{ timeType: 'Sáng (09:00 - 10:30)' }}>
-              
-              <Form.Item 
-                name="date" 
-                label={<span className="font-medium text-[14px] text-gray-700"><span className="text-red-500 mr-1">*</span>Ngày tiếp dân</span>} 
+
+              <Form.Item
+                name="date"
+                label={<span className="font-medium text-[14px] text-gray-700"><span className="text-red-500 mr-1">*</span>Ngày tiếp dân</span>}
                 rules={[{ required: true, message: 'Vui lòng chọn ngày' }]}
                 className="mb-4"
               >
-                <DatePicker 
-                  size="large" 
-                  className="w-full rounded" 
-                  format="DD/MM/YYYY" 
+                <DatePicker
+                  size="large"
+                  className="w-full rounded"
+                  format="DD/MM/YYYY"
                   disabledDate={(current) => current && current < dayjs().startOf('day')}
-                  placeholder="Chọn ngày tiếp" 
+                  placeholder="Chọn ngày tiếp"
                 />
               </Form.Item>
 
-              <Form.Item 
-                name="timeType" 
+              <Form.Item
+                name="timeType"
                 label={<span className="font-medium text-[14px] text-gray-700"><span className="text-red-500 mr-1">*</span>Khung giờ tiếp</span>}
                 className="mb-4"
               >
@@ -108,8 +108,8 @@ export default function AddSchedule() {
               </Form.Item>
 
               {timeType === 'Khác (Tự chọn thời gian)' && (
-                <Form.Item 
-                  name="customTime" 
+                <Form.Item
+                  name="customTime"
                   label={<span className="font-medium text-[14px] text-gray-700"><span className="text-red-500 mr-1">*</span>Chọn khoảng thời gian</span>}
                   rules={[{ required: true, message: 'Vui lòng chọn thời gian' }]}
                   className="mb-6"
@@ -118,10 +118,10 @@ export default function AddSchedule() {
                 </Form.Item>
               )}
 
-              <Button 
-                type="primary" 
-                htmlType="submit" 
-                size="large" 
+              <Button
+                type="primary"
+                htmlType="submit"
+                size="large"
                 icon={<Calendar className="w-4 h-4" />}
                 className="w-full bg-[#2563eb] hover:bg-blue-700 rounded h-[42px] text-[14px] font-medium shadow-sm border-none mt-2"
               >
@@ -139,7 +139,7 @@ export default function AddSchedule() {
               {availableSlots.length}
             </div>
           </div>
-          
+
           <div className="p-5">
             {availableSlots.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-48 text-gray-400">
@@ -172,14 +172,14 @@ export default function AddSchedule() {
                         </div>
                       </div>
                     </div>
-                    
+
                     <div className="flex items-center space-x-6">
                       <div className="flex items-center text-green-600 text-[14px] font-medium">
                         <div className="w-1.5 h-1.5 rounded-full bg-green-500 mr-2"></div>
                         Khả dụng
                         <div className="w-2.5 h-2.5 rounded-full bg-gradient-to-tr from-green-400 to-green-300 ml-2 shadow-[0_0_4px_rgba(74,222,128,0.5)]"></div>
                       </div>
-                      
+
                       <Popconfirm
                         title="Xoá lịch này?"
                         onConfirm={() => handleDelete(slot.id)}
@@ -198,7 +198,7 @@ export default function AddSchedule() {
             )}
           </div>
         </div>
-        
+
       </div>
     </div>
   );

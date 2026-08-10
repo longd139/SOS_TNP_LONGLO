@@ -3,25 +3,25 @@
 // ============================================================
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, MessageSquare, Clock, FolderOpen, Building2, Users, Settings, ChevronLeft, FileText, Map, ChevronDown, ChevronRight, Smartphone, Calendar } from 'lucide-react';
+import { LayoutDashboard, MessageSquare, Clock, FolderOpen, Building2, Users, Settings, ChevronLeft, FileText, Map, ChevronDown, ChevronRight, Smartphone, Star, Calendar } from 'lucide-react';
 import { useMock } from '../MockContext';
 
 const ALL_MENUS = [
   { id: 'dashboard', label: 'Tổng quan', icon: LayoutDashboard, path: '/dashboard', roles: ['APPROVER','LEADER','ADMIN'] },
   { id: 'complaints', label: 'Quản lý phản ánh', icon: MessageSquare, path: '/admin/complaints', roles: ['RECEPTION_OFFICER','PROCESSING_OFFICER','APPROVER','LEADER','ADMIN'] },
   { id: 'extensions', label: 'Quản lý gia hạn', icon: Clock, path: '/admin/extensions', roles: ['PROCESSING_OFFICER','APPROVER','LEADER','ADMIN'] },
-  { 
-    id: 'reception-schedules-v2', 
-    label: 'Quản lý lịch tiếp công dân', 
-    icon: Calendar, 
+  {
+    id: 'reception-schedules-v2',
+    label: 'Quản lý lịch tiếp công dân',
+    icon: Calendar,
     roles: ['RECEPTION_OFFICER','PROCESSING_OFFICER','APPROVER','LEADER','ADMIN'],
     submenu: [
       { id: 'approve-schedule', label: 'Duyệt lịch hẹn', path: '/admin/schedules/approve' },
-      { id: 'add-schedule', label: 'Thêm lịch hẹn', path: '/admin/schedules/add' }
-    ]
+      { id: 'add-schedule', label: 'Thêm lịch hẹn', path: '/admin/schedules/add' },
+    ],
   },
-  { 
-    id: 'documents', 
+  {
+    id: 'documents',
     label: 'Quản lý Tài liệu', 
     icon: FileText, 
     roles: ['PROCESSING_OFFICER','APPROVER','LEADER','ADMIN'],
@@ -33,8 +33,7 @@ const ALL_MENUS = [
   { id: 'large-screen', label: 'Màn hình lớn', icon: LayoutDashboard, path: '/dashboard/large-screen', roles: ['APPROVER','LEADER','ADMIN'] },
   { id: 'digital-map', label: 'Bản đồ số', icon: Map, path: '/admin/digital-map', roles: ['APPROVER','LEADER','ADMIN'] },
   { id: 'app-statistics', label: 'Thống kê lượt tải App', icon: Smartphone, path: '/admin/app-statistics', roles: ['APPROVER','LEADER','ADMIN'] },
-  { id: 'submit', label: 'Gửi phản ánh', icon: FileText, path: '/submit', roles: ['CITIZEN','RECEPTION_OFFICER','ADMIN'] },
-  { id: 'my-complaints', label: 'Phản ánh của tôi', icon: MessageSquare, path: '/my-complaints', roles: ['CITIZEN'] },
+  { id: 'satisfaction', label: 'Đánh giá hài lòng', icon: Star, path: '/admin/satisfaction', roles: ['APPROVER','LEADER','ADMIN'] },
   { type: 'divider' },
   { id: 'categories', label: 'Loại phản ánh', icon: FolderOpen, path: '/placeholder', disabled: true },
   { id: 'neighborhoods', label: 'Khu phố', icon: Building2, path: '/placeholder', disabled: true },

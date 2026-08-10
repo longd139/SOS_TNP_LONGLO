@@ -2,7 +2,7 @@
 // HEADER V2 — Có role switcher để demo nhanh các vai trò
 // ============================================================
 import React, { useState, useEffect, useMemo } from 'react';
-import { Menu, Bell, Search, User, ChevronDown, ShieldCheck } from 'lucide-react';
+import { Menu, Bell, Search, ChevronDown, ShieldCheck } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useMock } from '../MockContext';
 
@@ -16,9 +16,8 @@ const ROLES = [
 
 export default function HeaderV2({ onMobileMenuToggle, isMobileMenuOpen }) {
   const navigate = useNavigate();
-  const { currentUser, roleLabel, switchRole, getFilteredComplaints, setFilters, filters } = useMock();
+  const { currentUser, roleLabel, switchRole, setFilters, filters } = useMock();
   const [showRoleSwitcher, setShowRoleSwitcher] = useState(false);
-  const [searchOpen, setSearchOpen] = useState(false);
 
   const [notifications, setNotifications] = useState(() => {
     const saved = localStorage.getItem('notifications_v2');

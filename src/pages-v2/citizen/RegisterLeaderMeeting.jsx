@@ -66,14 +66,14 @@ export default function RegisterLeaderMeeting() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {availableSlots.map(slot => (
-              <div 
-                key={slot.id} 
+              <div
+                key={slot.id}
                 className="group relative bg-white/90 backdrop-blur-xl border border-gray-100 p-8 rounded-3xl shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all duration-300 cursor-pointer overflow-hidden"
                 onClick={() => openBookModal(slot)}
               >
                 {/* Decorative background shape */}
                 <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-50 rounded-bl-full -z-10 transition-transform group-hover:scale-110"></div>
-                
+
                 <div className="flex justify-between items-start mb-6">
                   <Tag color="success" className="px-4 py-1.5 rounded-full border-emerald-200 bg-emerald-50 text-emerald-600 font-bold border-0">Đang khả dụng</Tag>
                   <div className="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
@@ -118,7 +118,7 @@ export default function RegisterLeaderMeeting() {
             <Form.Item name="name" label={<span className="font-bold text-gray-700">Họ và tên của bạn</span>} rules={[{ required: true, message: 'Vui lòng nhập họ tên' }]}>
               <Input size="large" placeholder="Nguyễn Văn A" className="rounded-xl h-12" />
             </Form.Item>
-            
+
             <div className="grid grid-cols-2 gap-4">
               <Form.Item name="phone" label={<span className="font-bold text-gray-700">Số điện thoại liên hệ</span>} rules={[{ required: true, message: 'Vui lòng nhập SĐT' }]}>
                 <Input size="large" placeholder="0909123456" className="rounded-xl h-12" />

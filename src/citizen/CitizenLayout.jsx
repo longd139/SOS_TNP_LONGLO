@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom';
-import { Button, Container, Nav, Navbar } from 'react-bootstrap';
-import { ArrowUpRight, BoxArrowUpRight, Envelope, GeoAlt, List, Telephone, X } from 'react-bootstrap-icons';
+import { Link, NavLink, Outlet } from 'react-router-dom';
+import { Container, Nav, Navbar } from 'react-bootstrap';
+import { Envelope, GeoAlt, List, Telephone, X } from 'react-bootstrap-icons';
 import { citizenNavItems, contactInfo } from './data/citizenMockDb';
 import AIChatWidget from './components/AIChatWidget';
 import DigitalMapFab from './components/DigitalMapFab';
@@ -9,21 +9,10 @@ import '../styles/citizen.css';
 
 export default function CitizenLayout() {
   const [menuOpen, setMenuOpen] = useState(false);
-  const navigate = useNavigate();
   const closeMenu = () => setMenuOpen(false);
 
   return (
     <div className="citizen-app">
-      {/* Topbar */}
-      <div className="citizen-topbar">
-        <Container className="citizen-topbar-inner">
-          <span>Ủy ban nhân dân phường Tăng Nhơn Phú</span>
-          <a href={`tel:${contactInfo.phone}`} className="text-white fw-semibold d-inline-flex align-items-center gap-2 text-decoration-none">
-            <Telephone size={14} /> {contactInfo.phone}
-          </a>
-        </Container>
-      </div>
-
       {/* Navbar */}
       <Navbar expand="lg" className="citizen-header" sticky="top">
         <Container className="citizen-header-inner">
@@ -53,14 +42,6 @@ export default function CitizenLayout() {
                   {item.label}
                 </Nav.Link>
               ))}
-              <Button
-                variant="outline-primary"
-                size="sm"
-                className="citizen-officer-link ms-lg-2"
-                onClick={() => { closeMenu(); navigate('/cong-dong/dang-nhap'); }}
-              >
-                Đăng nhập người dân <BoxArrowUpRight size={16} />
-              </Button>
             </Nav>
           </Navbar.Collapse>
         </Container>
@@ -89,7 +70,7 @@ export default function CitizenLayout() {
               <h3>Liên kết nhanh</h3>
               <Link to="/cong-dong/thu-tuc">Thủ tục hành chính</Link>
               <Link to="/cong-dong/tin-tuc">Tin tức</Link>
-              <Link to="/cong-dong/phan-anh">Phản ánh</Link>
+              <Link to="/cong-dong/gui-phan-anh">Phản ánh</Link>
               <Link to="/cong-dong/thu-vien-so">Thư viện số</Link>
               <Link to="/cong-dong/lien-he">Liên hệ</Link>
             </div>

@@ -61,11 +61,11 @@ const BaseModal = ({
         onMouseMove={handleMouseMove}
         onClick={handleOverlayClick}
       >
-        <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
+        <div className="fixed inset-0 z-0 bg-gray-900/40 transition-opacity" />
 
         <div
           className={`
-          inline-block align-bottom bg-white text-left shadow-xl transform transition-all overflow-hidden
+          relative z-10 inline-block align-bottom bg-white text-left shadow-xl transform transition-all overflow-hidden
           sm:my-8 sm:align-middle sm:w-full ${sizeClasses[size]} ${className}
         `}
           style={{ borderRadius: "12px", wordWrap: "break-word" }}

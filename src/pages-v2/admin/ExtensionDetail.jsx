@@ -4,7 +4,7 @@
 import React, { useState, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
-  ArrowLeft, Clock, User, Building2, FileText, Calendar,
+  ArrowLeft, User, Building2, Calendar,
   CheckCircle, XCircle, MessageSquare, Image, Send,
 } from 'lucide-react';
 import { useMock } from '../../mock/MockContext';
@@ -327,7 +327,7 @@ export default function ExtensionDetail() {
               </span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-gray-500">SLA:</span>
+              <span className="text-gray-500">Tiến độ:</span>
               <SlaBadge slaStatus={complaint.slaStatus} />
             </div>
             <div>

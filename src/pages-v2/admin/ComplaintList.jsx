@@ -1,27 +1,26 @@
 // ============================================================
 // COMPLAINT LIST — Bản sao y chang ReportList.jsx gốc
 // ============================================================
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import BaseTable from "../../components/base/BaseTable";
 import { useMock } from "../../mock/MockContext";
 import {
-  getCategoryById, getNeighborhoodById, getDepartmentById,
-  getUserById, getTimeRemaining, getSlaLabel, getSlaColor,
+  getCategoryById, getNeighborhoodById, getUserById, getTimeRemaining,
   categories, neighborhoods, departments, users,
 } from "../../mock/db";
-import { StatusBadge, SlaBadge, UrgencyBadge } from "../../mock/components/Badges";
+import { StatusBadge, UrgencyBadge } from "../../mock/components/Badges";
 import dayjs from "dayjs";
 
 // ---- Quick tabs (giống pattern MyComplaints) ----
 const TABS = [
-  { key: 'ALL',              label: 'Tất cả',              filter: () => true },
-  { key: 'NEW',              label: 'Mới tiếp nhận',       filter: (c) => c.status === 'NEW' || c.status === 'PENDING_RECEPTION' },
-  { key: 'AWAITING_ASSIGN',  label: 'Chờ phân công',       filter: (c) => c.status === 'RECEIVED' },
-  { key: 'IN_PROGRESS',      label: 'Đang xử lý',          filter: (c) => ['ASSIGNED','IN_PROGRESS'].includes(c.status) },
-  { key: 'EXT_PENDING',      label: 'Chờ duyệt gia hạn',   filter: (c) => c.status === 'EXTENSION_PENDING' },
-  { key: 'NEAR_DUE',         label: 'Sắp quá hạn',         filter: (c) => c.slaStatus === 'NEAR_DUE' },
-  { key: 'OVERDUE',          label: 'Quá hạn',             filter: (c) => c.slaStatus === 'OVERDUE' },
-  { key: 'COMPLETED',        label: 'Hoàn thành',           filter: (c) => c.status === 'COMPLETED' },
+  { key: 'ALL',              label: 'Tất cả phản ánh',             filter: () => true },
+  { key: 'NEW',              label: 'Chờ tiếp nhận (Mới gửi)',     filter: (c) => c.status === 'NEW' || c.status === 'PENDING_RECEPTION' },
+  { key: 'AWAITING_ASSIGN',  label: 'Chờ phân công đơn vị',      filter: (c) => c.status === 'RECEIVED' },
+  { key: 'IN_PROGRESS',      label: 'Đang xử lý',                 filter: (c) => ['ASSIGNED','IN_PROGRESS'].includes(c.status) },
+  { key: 'EXT_PENDING',      label: 'Chờ duyệt gia hạn',          filter: (c) => c.status === 'EXTENSION_PENDING' },
+  { key: 'NEAR_DUE',         label: 'Sắp quá hạn',                filter: (c) => c.slaStatus === 'NEAR_DUE' },
+  { key: 'OVERDUE',          label: 'Quá hạn xử lý',              filter: (c) => c.slaStatus === 'OVERDUE' },
+  { key: 'COMPLETED',        label: 'Hoàn thành giải quyết',      filter: (c) => c.status === 'COMPLETED' },
 ];
 
 // ---- Badge renderers (shared from Badges.jsx) ----
@@ -30,35 +29,19 @@ const renderCategoryBadge = (catId) => {
   if (!cat) return <span className="text-sm text-gray-400">-</span>;
   return <span className="text-sm text-gray-900">{cat.name}</span>;
 };
-const renderContactInfo = (c, maxWidth = 180) => {
-  const user = getUserById(c.citizenId);
-  const name = user?.fullName || "Ẩn danh";
-  const phone = user?.phone || null;
-  const isAnonymous = name === "Ẩn danh";
-  const fullText = phone ? `${name}\n${phone}` : name;
-
-  return (
-    <div className="text-sm overflow-wrap-anywhere max-w-full" style={{ maxWidth: `${maxWidth}px` }} title={fullText}>
-      {isAnonymous ? (
-        <span className="inline-flex items-center text-gray-600 bg-gray-100 px-2.5 py-1 rounded-md text-xs break-words">{name}</span>
-      ) : (
-        <div className="space-y-1">
-          <div className="text-gray-900 break-words">{name}</div>
-          {phone && <div className="text-gray-600 break-words">{phone}</div>}
-        </div>
-      )}
-    </div>
-  );
-};
-const renderSlaBadge = (c) => {
-  const label = getSlaLabel(c.slaStatus);
-  const s = getSlaColor(c.slaStatus);
-  return <span className="inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium rounded-full" style={{ backgroundColor: s.bg, color: s.color }}>{label}</span>;
-};
-
 // ---- COMPLAINT DETAIL MODAL (bản sao ReportDetailModal gốc) ----
 function ComplaintDetailModal({ isOpen, onClose, complaint, mode, onModeChange, onStatusUpdated }) {
   const mock = useMock();
+  const complaintId = complaint?.id;
+  const complaintStatus = complaint?.status;
+  const [nextStatus, setNextStatus] = useState(complaintStatus || 'NEW');
+  const [responseNote, setResponseNote] = useState('');
+
+  useEffect(() => {
+    if (!complaintId) return;
+    setNextStatus(complaintStatus);
+    setResponseNote('');
+  }, [complaintId, complaintStatus]);
 
   if (!isOpen || !complaint) return null;
 
@@ -66,9 +49,28 @@ function ComplaintDetailModal({ isOpen, onClose, complaint, mode, onModeChange, 
   const history = mock.getHistoryByComplaint(complaint.id) || [];
   const attachments = mock.getAttachmentsByComplaint(complaint.id) || [];
   const hasImages = complaint.hasImages && attachments.length > 0;
-
   const handleEditMode = () => { if (onModeChange) onModeChange("edit"); };
   const handleUpdateStatus = () => {
+    const updatedAt = new Date().toISOString();
+    const isCompleted = nextStatus === 'COMPLETED';
+    mock.updateComplaint(complaint.id, {
+      status: nextStatus,
+      updatedAt,
+      completedAt: isCompleted ? updatedAt : null,
+      progressPercent: isCompleted ? 100 : nextStatus === 'IN_PROGRESS' ? 50 : 0,
+    });
+    mock.addHistory({
+      complaintId: complaint.id,
+      actionType: 'STATUS_CHANGED',
+      performedBy: 'USR-030',
+      performedRole: 'APPROVER',
+      performedAt: updatedAt,
+      oldValue: { status: complaint.status },
+      newValue: { status: nextStatus },
+      internalNote: responseNote.trim() || null,
+      publicNote: responseNote.trim() || 'Trạng thái phản ánh đã được cập nhật.',
+      isPublic: true,
+    });
     if (onStatusUpdated) onStatusUpdated();
     onClose();
   };
@@ -76,8 +78,8 @@ function ComplaintDetailModal({ isOpen, onClose, complaint, mode, onModeChange, 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto">
       <div className="flex items-center justify-center min-h-screen px-4">
-        <div className="fixed inset-0 bg-black bg-opacity-40" onClick={onClose} />
-        <div className="relative bg-white rounded-xl shadow-xl max-w-5xl w-full max-h-[85vh] overflow-y-auto">
+        <div className="fixed inset-0 z-0 bg-gray-900/40" onClick={onClose} />
+        <div className="relative z-10 bg-white rounded-xl shadow-xl max-w-5xl w-full max-h-[85vh] overflow-y-auto">
           {/* Header */}
           <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 z-10 rounded-t-xl">
             <h3 className="text-lg font-semibold text-gray-900">
@@ -184,7 +186,7 @@ function ComplaintDetailModal({ isOpen, onClose, complaint, mode, onModeChange, 
                 <div>
                   <div className="flex items-center justify-between">
                     <h4 className="text-sm font-semibold text-gray-900 mb-2 flex items-center gap-2">Trạng thái hiện tại</h4>
-                    <button onClick={handleEditMode} className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 focus:ring-blue-500 text-white px-4 py-2 rounded-md text-sm font-medium">
+                    <button type="button" hidden onClick={handleEditMode} className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 focus:ring-blue-500 text-white px-4 py-2 rounded-md text-sm font-medium">
                       <svg className="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
                       Cập nhật trạng thái
                     </button>
@@ -235,14 +237,16 @@ function ComplaintDetailModal({ isOpen, onClose, complaint, mode, onModeChange, 
                 <div className="mt-0">
                   <h4 className="text-sm font-semibold text-gray-900 mb-3 required-label">Cập nhật trạng thái</h4>
                   <div className="space-y-3">
-                    <select className="w-full px-3 py-2.5 text-gray-700 bg-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm resize-none" style={{ border: 'none' }}>
-                      <option>Đã gửi</option>
-                      <option>Đang xử lý</option>
-                      <option>Đã giải quyết</option>
+                    <select value={nextStatus} onChange={(event) => setNextStatus(event.target.value)} className="w-full px-3 py-2.5 text-gray-700 bg-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm resize-none" style={{ border: 'none' }}>
+                      <option value="NEW">Đã gửi</option>
+                      <option value="IN_PROGRESS">Đang xử lý</option>
+                      <option value="COMPLETED">Đã giải quyết</option>
                     </select>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">Nội dung phản hồi</label>
                       <textarea
+                        value={responseNote}
+                        onChange={(event) => setResponseNote(event.target.value)}
                         placeholder="Nhập nội dung phản hồi cho người dân..."
                         rows="3"
                         className="w-full px-3 py-2 text-gray-700 bg-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm resize-none break-words"
@@ -443,13 +447,13 @@ export default function ComplaintList() {
 
   return (
     <div className="min-h-screen">
-      {/* Page title — giống hệt gốc + nút Thêm mới */}
+      {/* Page title — synchronized typography */}
       <div className="mb-4 flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Quản lý phản ánh</h1>
-          <p className="text-gray-600 mt-1">Xem và xử lý phản ánh từ người dân</p>
+          <h1 className="text-2xl font-bold text-slate-900">Quản lý phản ánh kiến nghị</h1>
+          <p className="text-xs text-slate-500 mt-1">Tiếp nhận, phân công, xử lý và theo dõi tiến độ phản ánh từ người dân</p>
         </div>
-        <button onClick={() => setShowAddModal(true)} className="inline-flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 text-sm font-medium transition-colors">
+        <button onClick={() => setShowAddModal(true)} className="inline-flex items-center gap-2 bg-blue-600 text-white px-3.5 py-2 rounded-lg hover:bg-blue-700 text-xs font-semibold shadow-2xs transition-colors">
           <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
           Thêm phản ánh
         </button>
@@ -528,7 +532,7 @@ export default function ComplaintList() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">SLA</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Tiến độ thời hạn</label>
                   <select value={filters.slaStatus} onChange={e => setFilters(p => ({ ...p, slaStatus: e.target.value }))}
                     className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                     <option value="">Tất cả</option>
@@ -687,8 +691,8 @@ export default function ComplaintList() {
       {showAddModal && (
         <div className="fixed inset-0 z-50 overflow-y-auto">
           <div className="flex items-center justify-center min-h-screen px-4">
-            <div className="fixed inset-0 bg-black bg-opacity-40" onClick={() => setShowAddModal(false)} />
-            <div className="relative bg-white rounded-xl shadow-xl max-w-lg w-full max-h-[85vh] overflow-y-auto">
+            <div className="fixed inset-0 z-0 bg-gray-900/40" onClick={() => setShowAddModal(false)} />
+            <div className="relative z-10 bg-white rounded-xl shadow-xl max-w-lg w-full max-h-[85vh] overflow-y-auto">
               <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 z-10 rounded-t-xl">
                 <h3 className="text-lg font-semibold text-gray-900">Thêm phản ánh mới</h3>
                 <p className="text-sm text-gray-500 mt-0.5">Cán bộ tiếp nhận phản ánh từ người dân</p>

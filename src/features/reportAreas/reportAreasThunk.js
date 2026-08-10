@@ -72,7 +72,7 @@ export const deleteReportArea = createAsyncThunk(
     'reportAreas/deleteReportArea',
     async (reportAreaId, { rejectWithValue }) => {
         try {
-            const response = await REPORT_AREAS_API.deleteReportArea(reportAreaId);
+            await REPORT_AREAS_API.deleteReportArea(reportAreaId);
             return { reportAreaId };
         } catch (error) {
             return rejectWithValue(error.message || 'Xóa lĩnh vực phản ánh thất bại');
