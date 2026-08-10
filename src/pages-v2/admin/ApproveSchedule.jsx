@@ -1,126 +1,126 @@
-﻿import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Table, Dropdown, message, Tabs, Modal, Button } from 'antd';
 import { ClipboardCheck, User, MoreHorizontal, Eye, Check, X, Award, CalendarCheck } from 'lucide-react';
 
 const MOCK_DATA = [
   {
     id: 'TICKET-001',
-    leader: 'Ã”ng Nguyá»…n VÄƒn An',
+    leader: 'Ông Nguyễn Văn An',
     date: '2026-08-22',
-    dayOfWeek: 'Thá»© SÃ¡u',
-    timeSlot: 'SÃ¡ng (09:00 - 10:30)',
+    dayOfWeek: 'Thứ Sáu',
+    timeSlot: 'Sáng (09:00 - 10:30)',
     status: 'PENDING',
     citizenInfo: {
-      name: 'Nguyá»…n Thá»‹ Lan',
+      name: 'Nguyễn Thị Lan',
       phone: '0901234501',
       cccd: '079196001001',
-      address: '12 ÄÆ°á»ng sá»‘ 5, Khu phá»‘ 2, PhÆ°á»ng TÄƒng NhÆ¡n PhÃº B',
-      content: 'ÄÆ°á»ng háº»m 23 Ä‘Æ°á»ng sá»‘ 7 xuá»‘ng cáº¥p nghiÃªm trá»ng, cÃ³ nhiá»u á»• gÃ  lá»›n gÃ¢y nguy hiá»ƒm cho ngÆ°á»i Ä‘i xe mÃ¡y vÃ o ban Ä‘Ãªm. KÃ­nh Ä‘á» nghá»‹...'
+      address: '12 Đường số 5, Khu phố 2, Phường Tăng Nhơn Phú B',
+      content: 'Đường hẻm 23 đường số 7 xuống cấp nghiêm trọng, có nhiều ổ gà lớn gây nguy hiểm cho người đi xe máy vào ban đêm. Kính đề nghị...'
     }
   },
   {
     id: 'TICKET-002',
-    leader: 'BÃ  Pháº¡m Thá»‹ Mai',
+    leader: 'Bà Phạm Thị Mai',
     date: '2026-08-23',
-    dayOfWeek: 'Thá»© Báº£y',
-    timeSlot: 'Chiá»u (14:00 - 15:30)',
+    dayOfWeek: 'Thứ Bảy',
+    timeSlot: 'Chiều (14:00 - 15:30)',
     status: 'PENDING',
     citizenInfo: {
-      name: 'Tráº§n VÄƒn HÃ¹ng',
+      name: 'Trần Văn Hùng',
       phone: '0912345502',
       cccd: '079196001002',
-      address: '45/2 ÄÆ°á»ng sá»‘ 15, Khu phá»‘ 3, PhÆ°á»ng TÄƒng NhÆ¡n PhÃº B',
-      content: 'Khu vá»±c bÃ£i rÃ¡c tá»± phÃ¡t táº¡i cuá»‘i háº»m 45 Ä‘Æ°á»ng sá»‘ 15 gÃ¢y Ã´ nhiá»…m náº·ng. MÃ¹i hÃ´i thá»‘i áº£nh hÆ°á»Ÿng Ä‘áº¿n cuá»™c sá»‘ng sinh hoáº¡t...'
+      address: '45/2 Đường số 15, Khu phố 3, Phường Tăng Nhơn Phú B',
+      content: 'Khu vực bãi rác tự phát tại cuối hẻm 45 đường số 15 gây ô nhiễm nặng. Mùi hôi thối ảnh hưởng đến cuộc sống sinh hoạt...'
     }
   },
   {
     id: 'TICKET-003',
-    leader: 'Ã”ng Tráº§n HoÃ ng Nam',
+    leader: 'Ông Trần Hoàng Nam',
     date: '2026-08-25',
-    dayOfWeek: 'Thá»© Ba',
-    timeSlot: 'SÃ¡ng (09:00 - 10:30)',
+    dayOfWeek: 'Thứ Ba',
+    timeSlot: 'Sáng (09:00 - 10:30)',
     status: 'PENDING',
     citizenInfo: {
-      name: 'LÃª Thá»‹ BÃ­ch',
+      name: 'Lê Thị Bích',
       phone: '0934567803',
       cccd: '079196001003',
-      address: '8 ÄÆ°á»ng sá»‘ 3, Khu phá»‘ 1, PhÆ°á»ng TÄƒng NhÆ¡n PhÃº B',
-      content: 'TÃ¬nh tráº¡ng tá»¥ táº­p nhÃ³m thanh niÃªn gÃ¢y máº¥t tráº­t tá»± cÃ´ng cá»™ng vÃ o buá»•i tá»‘i táº¡i khu vá»±c sÃ¢n chÆ¡i khu phá»‘ 1. Äá» nghá»‹ tÄƒng cÆ°á»ng tuáº§n tra an ninh táº¡i khu vá»±c nÃ y.'
+      address: '8 Đường số 3, Khu phố 1, Phường Tăng Nhơn Phú B',
+      content: 'Tình trạng tụ tập nhóm thanh niên gây mất trật tự công cộng vào buổi tối tại khu vực sân chơi khu phố 1. Đề nghị tăng cường tuần tra an ninh tại khu vực này.'
     }
   },
   {
     id: 'TICKET-004',
-    leader: 'Ã”ng Nguyá»…n VÄƒn An',
+    leader: 'Ông Nguyễn Văn An',
     date: '2026-08-20',
-    dayOfWeek: 'Thá»© NÄƒm',
-    timeSlot: 'Chiá»u (14:00 - 15:30)',
+    dayOfWeek: 'Thứ Năm',
+    timeSlot: 'Chiều (14:00 - 15:30)',
     status: 'APPROVED',
     citizenInfo: {
-      name: 'Pháº¡m Quá»‘c Äáº¡t',
+      name: 'Phạm Quốc Đạt',
       phone: '0945678904',
       cccd: '079196001004',
-      address: '102 ÄÆ°á»ng sá»‘ 12, Khu phá»‘ 7, PhÆ°á»ng TÄƒng NhÆ¡n PhÃº B',
-      content: 'HÃ ng xÃ³m xÃ¢y dá»±ng cÃ´ng trÃ¬nh sai phÃ©p, láº¥n chiáº¿m pháº§n diá»‡n tÃ­ch Ä‘áº¥t nhÃ  tÃ´i theo báº£n Ä‘á»“ Ä‘á»‹a chÃ­nh. Äá» nghá»‹ cÆ¡ quan cÃ³ tháº©m quyá»n vÃ o kiá»ƒm tra vÃ  xá»­ lÃ½ theo quy Ä‘á»‹nh phÃ¡p luáº­t.'
+      address: '102 Đường số 12, Khu phố 7, Phường Tăng Nhơn Phú B',
+      content: 'Hàng xóm xây dựng công trình sai phép, lấn chiếm phần diện tích đất nhà tôi theo bản đồ địa chính. Đề nghị cơ quan có thẩm quyền vào kiểm tra và xử lý theo quy định pháp luật.'
     }
   },
   {
     id: 'TICKET-005',
-    leader: 'BÃ  Pháº¡m Thá»‹ Mai',
+    leader: 'Bà Phạm Thị Mai',
     date: '2026-08-27',
-    dayOfWeek: 'Thá»© NÄƒm',
-    timeSlot: 'SÃ¡ng (09:00 - 10:30)',
+    dayOfWeek: 'Thứ Năm',
+    timeSlot: 'Sáng (09:00 - 10:30)',
     status: 'PENDING',
     citizenInfo: {
-      name: 'Äinh Tuáº¥n TÃ i',
+      name: 'Đinh Tuấn Tài',
       phone: '0987654325',
       cccd: '079196001005',
-      address: '33 ÄÆ°á»ng BÆ°ng Ã”ng ThoÃ n, Khu phá»‘ 2, PhÆ°á»ng TÄƒng NhÆ¡n PhÃº B',
-      content: 'CÃ¢y xanh trÆ°á»›c nhÃ  sá»‘ 33 BÆ°ng Ã”ng ThoÃ n quÃ¡ lá»›n, cÃ nh lÃ¡ vÆ°á»›ng vÃ o Ä‘Æ°á»ng dÃ¢y Ä‘iá»‡n nguy hiá»ƒm trong mÃ¹a mÆ°a bÃ£o. Xin LÃ£nh Ä‘áº¡o chá»‰ Ä‘áº¡o cáº¯t tá»‰a.'
+      address: '33 Đường Bưng Ông Thoàn, Khu phố 2, Phường Tăng Nhơn Phú B',
+      content: 'Cây xanh trước nhà số 33 Bưng Ông Thoàn quá lớn, cành lá vướng vào đường dây điện nguy hiểm trong mùa mưa bão. Xin Lãnh đạo chỉ đạo cắt tỉa.'
     }
   },
   {
     id: 'TICKET-006',
-    leader: 'Ã”ng Tráº§n HoÃ ng Nam',
+    leader: 'Ông Trần Hoàng Nam',
     date: '2026-08-28',
-    dayOfWeek: 'Thá»© SÃ¡u',
-    timeSlot: 'Chiá»u (14:00 - 15:30)',
+    dayOfWeek: 'Thứ Sáu',
+    timeSlot: 'Chiều (14:00 - 15:30)',
     status: 'PENDING',
     citizenInfo: {
-      name: 'NgÃ´ Thanh VÃ¢n',
+      name: 'Ngô Thanh Vân',
       phone: '0909090909',
       cccd: '079196001006',
-      address: '40/12 ÄÃ¬nh Phong PhÃº, PhÆ°á»ng TÄƒng NhÆ¡n PhÃº B',
-      content: 'Äá» nghá»‹ LÃ£nh Ä‘áº¡o há»— trá»£ giáº£i quyáº¿t thá»§ tá»¥c tÃ¡ch thá»­a Ä‘áº¥t nÃ´ng nghiá»‡p kÃ©o dÃ i hÆ¡n 6 thÃ¡ng chÆ°a cÃ³ káº¿t quáº£ máº·c dÃ¹ Ä‘Ã£ ná»™p Ä‘á»§ há»“ sÆ¡.'
+      address: '40/12 Đình Phong Phú, Phường Tăng Nhơn Phú B',
+      content: 'Đề nghị Lãnh đạo hỗ trợ giải quyết thủ tục tách thửa đất nông nghiệp kéo dài hơn 6 tháng chưa có kết quả mặc dù đã nộp đủ hồ sơ.'
     }
   },
   {
     id: 'TICKET-007',
-    leader: 'Ã”ng Nguyá»…n VÄƒn An',
+    leader: 'Ông Nguyễn Văn An',
     date: '2026-08-29',
-    dayOfWeek: 'Thá»© Báº£y',
-    timeSlot: 'SÃ¡ng (09:00 - 10:30)',
+    dayOfWeek: 'Thứ Bảy',
+    timeSlot: 'Sáng (09:00 - 10:30)',
     status: 'PENDING',
     citizenInfo: {
-      name: 'Phan BÃ¡ CÆ°á»ng',
+      name: 'Phan Bá Cường',
       phone: '0933112233',
       cccd: '079196001007',
-      address: 'Chung cÆ° Safira, PhÆ°á»ng TÄƒng NhÆ¡n PhÃº B',
-      content: 'Chá»§ Ä‘áº§u tÆ° chung cÆ° thu phÃ­ quáº£n lÃ½ quÃ¡ cao so vá»›i thá»a thuáº­n ban Ä‘áº§u, gÃ¢y bá»©c xÃºc cho cÆ° dÃ¢n. Mong LÃ£nh Ä‘áº¡o chÃ­nh quyá»n Ä‘á»©ng ra tá»• chá»©c Ä‘á»‘i thoáº¡i.'
+      address: 'Chung cư Safira, Phường Tăng Nhơn Phú B',
+      content: 'Chủ đầu tư chung cư thu phí quản lý quá cao so với thỏa thuận ban đầu, gây bức xúc cho cư dân. Mong Lãnh đạo chính quyền đứng ra tổ chức đối thoại.'
     }
   },
   {
     id: 'TICKET-008',
-    leader: 'BÃ  Pháº¡m Thá»‹ Mai',
+    leader: 'Bà Phạm Thị Mai',
     date: '2026-08-30',
-    dayOfWeek: 'Chá»§ Nháº­t',
-    timeSlot: 'TÃ¹y chá»n thá»i gian',
+    dayOfWeek: 'Chủ Nhật',
+    timeSlot: 'Tùy chọn thời gian',
     status: 'PENDING',
     citizenInfo: {
-      name: 'ÄoÃ n Nháº­t Lá»‡',
+      name: 'Đoàn Nhật Lệ',
       phone: '0911888999',
       cccd: '079196001008',
-      address: '88 LÃ£ XuÃ¢n Oai, PhÆ°á»ng TÄƒng NhÆ¡n PhÃº B',
-      content: 'Há»‡ thá»‘ng cá»‘ng thoÃ¡t nÆ°á»›c táº¡i tuyáº¿n Ä‘Æ°á»ng LÃ£ XuÃ¢n Oai thÆ°á»ng xuyÃªn ngáº­p ngháº¹t khi mÆ°a lá»›n. Xin kiáº¿n nghá»‹ cáº£i táº¡o náº¡o vÃ©t gáº¥p.'
+      address: '88 Lã Xuân Oai, Phường Tăng Nhơn Phú B',
+      content: 'Hệ thống cống thoát nước tại tuyến đường Lã Xuân Oai thường xuyên ngập nghẹt khi mưa lớn. Xin kiến nghị cải tạo nạo vét gấp.'
     }
   }
 ];
@@ -147,11 +147,11 @@ export default function ApproveSchedule() {
     setData(updatedData);
     localStorage.setItem('citizen-approvals-v5', JSON.stringify(updatedData));
 
-    let msg = 'ÄÃ£ cáº­p nháº­t tráº¡ng thÃ¡i';
-    if (newStatus === 'APPROVED') msg = 'ÄÃ£ duyá»‡t lá»‹ch háº¹n thÃ nh cÃ´ng';
-    if (newStatus === 'REJECTED') msg = 'ÄÃ£ tá»« chá»‘i lá»‹ch háº¹n';
-    if (newStatus === 'CANCELED') msg = 'ÄÃ£ há»§y lá»‹ch háº¹n';
-    if (newStatus === 'DONE') msg = 'ÄÃ£ Ä‘Ã¡nh dáº¥u tiáº¿p xong';
+    let msg = 'Đã cập nhật trạng thái';
+    if (newStatus === 'APPROVED') msg = 'Đã duyệt lịch hẹn thành công';
+    if (newStatus === 'REJECTED') msg = 'Đã từ chối lịch hẹn';
+    if (newStatus === 'CANCELED') msg = 'Đã hủy lịch hẹn';
+    if (newStatus === 'DONE') msg = 'Đã đánh dấu tiếp xong';
     message.success(msg);
     setIsModalOpen(false);
   };
@@ -169,7 +169,7 @@ export default function ApproveSchedule() {
 
   const columns = [
     {
-      title: 'MÃ£ phiáº¿u',
+      title: 'Mã phiếu',
       dataIndex: 'id',
       key: 'id',
       render: (text) => (
@@ -179,7 +179,7 @@ export default function ApproveSchedule() {
       )
     },
     {
-      title: 'Há» tÃªn / SÄT',
+      title: 'Họ tên / SĐT',
       key: 'citizen',
       render: (_, record) => (
         <div className="flex items-center space-x-3">
@@ -198,7 +198,7 @@ export default function ApproveSchedule() {
       )
     },
     {
-      title: 'LÃ£nh Ä‘áº¡o Ä‘Æ°á»£c háº¹n',
+      title: 'Lãnh đạo được hẹn',
       dataIndex: 'leader',
       key: 'leader',
       render: (text) => (
@@ -209,17 +209,17 @@ export default function ApproveSchedule() {
       )
     },
     {
-      title: 'NgÃ y giá» háº¹n',
+      title: 'Ngày giờ hẹn',
       key: 'time',
       render: (_, record) => (
         <div className="flex flex-col">
           <span className="text-[13px] font-medium text-gray-800 leading-none mb-1">{record.timeSlot}</span>
-          <span className="text-[12px] text-gray-500 leading-none">{record.dayOfWeek} â€” {record.date.split('-').reverse().join('/')}</span>
+          <span className="text-[12px] text-gray-500 leading-none">{record.dayOfWeek} — {record.date.split('-').reverse().join('/')}</span>
         </div>
       )
     },
     {
-      title: 'Ná»™i dung kiáº¿n nghá»‹',
+      title: 'Nội dung kiến nghị',
       key: 'content',
       render: (_, record) => (
         <div className="text-[13px] text-gray-500 max-w-[300px] truncate" title={record.citizenInfo?.content}>
@@ -228,14 +228,14 @@ export default function ApproveSchedule() {
       )
     },
     {
-      title: 'HÃ nh Ä‘á»™ng',
+      title: 'Hành động',
       key: 'action',
       align: 'center',
       render: (_, record) => {
         let items = [
           {
             key: 'view',
-            label: <span className="flex items-center text-gray-700"><Eye className="w-4 h-4 mr-2" /> Xem chi tiáº¿t há»“ sÆ¡</span>,
+            label: <span className="flex items-center text-gray-700"><Eye className="w-4 h-4 mr-2" /> Xem chi tiết hồ sơ</span>,
             onClick: () => openDetailModal(record)
           }
         ];
@@ -244,24 +244,24 @@ export default function ApproveSchedule() {
           items.push({ type: 'divider' });
           items.push({
             key: 'approve',
-            label: <span className="flex items-center text-[#049669] font-medium"><Check className="w-4 h-4 mr-2" /> Duyá»‡t háº¹n</span>,
+            label: <span className="flex items-center text-[#049669] font-medium"><Check className="w-4 h-4 mr-2" /> Duyệt hẹn</span>,
             onClick: () => handleAction(record.id, 'APPROVED')
           });
           items.push({
             key: 'reject',
-            label: <span className="flex items-center text-[#ef4444] font-medium"><X className="w-4 h-4 mr-2" /> Tá»« chá»‘i</span>,
+            label: <span className="flex items-center text-[#ef4444] font-medium"><X className="w-4 h-4 mr-2" /> Từ chối</span>,
             onClick: () => handleAction(record.id, 'REJECTED')
           });
         } else if (record.status === 'APPROVED') {
           items.push({ type: 'divider' });
           items.push({
             key: 'done',
-            label: <span className="flex items-center text-blue-600 font-medium"><CalendarCheck className="w-4 h-4 mr-2" /> ÄÃ¡nh dáº¥u Tiáº¿p xong</span>,
+            label: <span className="flex items-center text-blue-600 font-medium"><CalendarCheck className="w-4 h-4 mr-2" /> Đánh dấu Tiếp xong</span>,
             onClick: () => handleAction(record.id, 'DONE')
           });
           items.push({
             key: 'cancel',
-            label: <span className="flex items-center text-[#ef4444] font-medium"><X className="w-4 h-4 mr-2" /> Há»§y lá»‹ch háº¹n</span>,
+            label: <span className="flex items-center text-[#ef4444] font-medium"><X className="w-4 h-4 mr-2" /> Hủy lịch hẹn</span>,
             onClick: () => handleAction(record.id, 'CANCELED')
           });
         }
@@ -301,27 +301,27 @@ export default function ApproveSchedule() {
       <div className="mr-8">
         {selectedTicket?.status === 'PENDING' && (
           <span className="border border-red-300 text-red-500 text-[12px] font-medium px-3 py-1 rounded-full bg-white shadow-sm">
-            Chá» duyá»‡t
+            Chờ duyệt
           </span>
         )}
         {selectedTicket?.status === 'APPROVED' && (
           <span className="border border-blue-300 text-blue-600 text-[12px] font-medium px-3 py-1 rounded-full bg-blue-50 shadow-sm">
-            ÄÃ£ duyá»‡t
+            Đã duyệt
           </span>
         )}
         {selectedTicket?.status === 'DONE' && (
           <span className="border border-green-300 text-green-600 text-[12px] font-medium px-3 py-1 rounded-full bg-green-50 shadow-sm">
-            ÄÃ£ tiáº¿p xong
+            Đã tiếp xong
           </span>
         )}
         {selectedTicket?.status === 'REJECTED' && (
           <span className="border border-orange-300 text-orange-600 text-[12px] font-medium px-3 py-1 rounded-full bg-orange-50 shadow-sm">
-            Tá»« chá»‘i
+            Từ chối
           </span>
         )}
         {selectedTicket?.status === 'CANCELED' && (
           <span className="border border-gray-300 text-gray-500 text-[12px] font-medium px-3 py-1 rounded-full bg-gray-50 shadow-sm">
-            ÄÃ£ há»§y
+            Đã hủy
           </span>
         )}
       </div>
@@ -337,32 +337,32 @@ export default function ApproveSchedule() {
           <div className="w-6 h-6 bg-blue-100 rounded flex items-center justify-center mr-2">
             <ClipboardCheck className="w-4 h-4 text-blue-600" />
           </div>
-          <h2 className="text-[20px] font-bold text-gray-800 m-0">PhÃª duyá»‡t & Quáº£n lÃ½ Lá»‹ch háº¹n Tiáº¿p dÃ¢n</h2>
+          <h2 className="text-[20px] font-bold text-gray-800 m-0">Phê duyệt & Quản lý Lịch hẹn Tiếp dân</h2>
         </div>
-        <p className="text-gray-500 text-[14px] m-0 mt-1">Xem, xÃ©t duyá»‡t, theo dÃµi vÃ  Ä‘Ã¡nh giÃ¡ toÃ n bá»™ yÃªu cáº§u tiáº¿p xÃºc cÃ´ng dÃ¢n vá»›i LÃ£nh Ä‘áº¡o PhÆ°á»ng.</p>
+        <p className="text-gray-500 text-[14px] m-0 mt-1">Xem, xét duyệt, theo dõi và đánh giá toàn bộ yêu cầu tiếp xúc công dân với Lãnh đạo Phường.</p>
       </div>
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
         <div className="bg-[#fef2f2] border-2 border-blue-400 rounded-lg p-4 flex flex-col justify-center relative overflow-hidden">
           <div className="text-[24px] font-bold text-red-600 leading-none mb-1">{pendingCount}</div>
-          <div className="text-[13px] font-medium text-red-600">Chá» duyá»‡t</div>
+          <div className="text-[13px] font-medium text-red-600">Chờ duyệt</div>
         </div>
         <div className="bg-[#eff6ff] border border-blue-100 rounded-lg p-4 flex flex-col justify-center">
           <div className="text-[24px] font-bold text-blue-700 leading-none mb-1">{approvedCount}</div>
-          <div className="text-[13px] font-medium text-blue-700">ÄÃ£ duyá»‡t</div>
+          <div className="text-[13px] font-medium text-blue-700">Đã duyệt</div>
         </div>
         <div className="bg-[#f0fdf4] border border-green-100 rounded-lg p-4 flex flex-col justify-center">
           <div className="text-[24px] font-bold text-green-700 leading-none mb-1">{doneCount}</div>
-          <div className="text-[13px] font-medium text-green-700">ÄÃ£ tiáº¿p xong</div>
+          <div className="text-[13px] font-medium text-green-700">Đã tiếp xong</div>
         </div>
         <div className="bg-[#fff7ed] border border-orange-100 rounded-lg p-4 flex flex-col justify-center">
           <div className="text-[24px] font-bold text-orange-600 leading-none mb-1">{rejectedCount}</div>
-          <div className="text-[13px] font-medium text-orange-600">Tá»« chá»‘i</div>
+          <div className="text-[13px] font-medium text-orange-600">Từ chối</div>
         </div>
         <div className="bg-[#f9fafb] border border-gray-100 rounded-lg p-4 flex flex-col justify-center">
           <div className="text-[24px] font-bold text-gray-700 leading-none mb-1">{canceledCount}</div>
-          <div className="text-[13px] font-medium text-gray-700">ÄÃ£ há»§y</div>
+          <div className="text-[13px] font-medium text-gray-700">Đã hủy</div>
         </div>
       </div>
 
@@ -376,7 +376,7 @@ export default function ApproveSchedule() {
               key: '1',
               label: (
                 <div className="flex items-center text-[14px] font-bold py-2">
-                  <span className="text-blue-600">Chá» duyá»‡t</span>
+                  <span className="text-blue-600">Chờ duyệt</span>
                   <span className="ml-2 w-5 h-5 rounded-full bg-red-500 text-white text-[11px] flex items-center justify-center font-bold">{pendingCount}</span>
                 </div>
               ),
@@ -396,7 +396,7 @@ export default function ApproveSchedule() {
               key: '2',
               label: (
                 <div className="flex items-center text-[14px] font-bold py-2 text-gray-600">
-                  <span>ÄÃ£ duyá»‡t</span>
+                  <span>Đã duyệt</span>
                   <span className="ml-2 w-5 h-5 rounded-full bg-blue-500 text-white text-[11px] flex items-center justify-center font-bold">{approvedCount}</span>
                 </div>
               ),
@@ -410,7 +410,7 @@ export default function ApproveSchedule() {
               key: '3',
               label: (
                 <div className="flex items-center text-[14px] font-bold py-2 text-gray-600">
-                  <span>ÄÃ£ tiáº¿p xong</span>
+                  <span>Đã tiếp xong</span>
                   <span className="ml-2 w-5 h-5 rounded-full bg-green-500 text-white text-[11px] flex items-center justify-center font-bold">{doneCount}</span>
                 </div>
               ),
@@ -424,7 +424,7 @@ export default function ApproveSchedule() {
               key: '4',
               label: (
                 <div className="flex items-center text-[14px] font-bold py-2 text-gray-600">
-                  <span>Tá»« chá»‘i</span>
+                  <span>Từ chối</span>
                   <span className="ml-2 w-5 h-5 rounded-full bg-orange-400 text-white text-[11px] flex items-center justify-center font-bold">{rejectedCount}</span>
                 </div>
               ),
@@ -438,7 +438,7 @@ export default function ApproveSchedule() {
               key: '5',
               label: (
                 <div className="flex items-center text-[14px] font-bold py-2 text-gray-600">
-                  <span>ÄÃ£ há»§y</span>
+                  <span>Đã hủy</span>
                   <span className="ml-2 w-5 h-5 rounded-full bg-gray-400 text-white text-[11px] flex items-center justify-center font-bold">{canceledCount}</span>
                 </div>
               ),
@@ -465,16 +465,16 @@ export default function ApproveSchedule() {
         {selectedTicket && (
           <div className="mt-4 mb-0 space-y-4">
 
-            {/* THÃ”NG TIN CÃ”NG DÃ‚N */}
+            {/* THÔNG TIN CÔNG DÂN */}
             <div className="bg-[#f8f9fa] rounded-2xl p-4">
-              <h4 className="text-[12px] font-bold text-gray-400 mb-3 uppercase tracking-wide">THÃ”NG TIN CÃ”NG DÃ‚N</h4>
+              <h4 className="text-[12px] font-bold text-gray-400 mb-3 uppercase tracking-wide">THÔNG TIN CÔNG DÂN</h4>
               <div className="grid grid-cols-3 gap-4 mb-3">
                 <div>
-                  <div className="text-[12px] text-gray-400 mb-1">Há» vÃ  tÃªn</div>
+                  <div className="text-[12px] text-gray-400 mb-1">Họ và tên</div>
                   <div className="font-extrabold text-gray-900 text-[15px]">{selectedTicket.citizenInfo?.name || '---'}</div>
                 </div>
                 <div>
-                  <div className="text-[12px] text-gray-400 mb-1">Äiá»‡n thoáº¡i</div>
+                  <div className="text-[12px] text-gray-400 mb-1">Điện thoại</div>
                   <div className="font-semibold text-gray-800 text-[15px]">{selectedTicket.citizenInfo?.phone || '---'}</div>
                 </div>
                 <div>
@@ -483,30 +483,30 @@ export default function ApproveSchedule() {
                 </div>
               </div>
               <div>
-                <div className="text-[12px] text-gray-400 mb-1">Äá»‹a chá»‰ cÆ° trÃº</div>
+                <div className="text-[12px] text-gray-400 mb-1">Địa chỉ cư trú</div>
                 <div className="font-semibold text-gray-800 text-[15px]">{selectedTicket.citizenInfo?.address || '---'}</div>
               </div>
             </div>
 
-            {/* CHI TIáº¾T Lá»ŠCH Háº¸N */}
+            {/* CHI TIẾT LỊCH HẸN */}
             <div className="bg-white border border-blue-100 rounded-2xl p-4">
-              <h4 className="text-[12px] font-bold text-blue-500 mb-3 uppercase tracking-wide">CHI TIáº¾T Lá»ŠCH Háº¸N</h4>
+              <h4 className="text-[12px] font-bold text-blue-500 mb-3 uppercase tracking-wide">CHI TIẾT LỊCH HẸN</h4>
               <div className="grid grid-cols-3 gap-4">
                 <div>
-                  <div className="text-[12px] text-gray-400 mb-1">LÃ£nh Ä‘áº¡o Ä‘Æ°á»£c háº¹n</div>
+                  <div className="text-[12px] text-gray-400 mb-1">Lãnh đạo được hẹn</div>
                   <div className="font-extrabold text-gray-900 text-[15px] flex items-center">
                     <Award className="w-4 h-4 mr-2 text-blue-500" />
                     {selectedTicket.leader}
                   </div>
                 </div>
                 <div>
-                  <div className="text-[12px] text-gray-400 mb-1">NgÃ y tiáº¿p</div>
+                  <div className="text-[12px] text-gray-400 mb-1">Ngày tiếp</div>
                   <div className="font-semibold text-gray-800 text-[15px]">
                     {selectedTicket.date.split('-').reverse().join('/')}
                   </div>
                 </div>
                 <div>
-                  <div className="text-[12px] text-gray-400 mb-1">Khung giá»</div>
+                  <div className="text-[12px] text-gray-400 mb-1">Khung giờ</div>
                   <div className="font-semibold text-gray-800 text-[15px]">
                     {selectedTicket.timeSlot}
                   </div>
@@ -514,9 +514,9 @@ export default function ApproveSchedule() {
               </div>
             </div>
 
-            {/* LÃ DO */}
+            {/* LÝ DO */}
             <div className="pt-1">
-              <h4 className="text-[12px] font-bold text-gray-400 mb-2 uppercase tracking-wide">TOÃ€N VÄ‚N LÃ DO Gáº¶P Máº¶T / KIáº¾N NGHá»Š</h4>
+              <h4 className="text-[12px] font-bold text-gray-400 mb-2 uppercase tracking-wide">TOÀN VĂN LÝ DO GẶP MẶT / KIẾN NGHỊ</h4>
               <div className="bg-white border border-gray-200 rounded-xl p-4">
                 <p className="italic text-gray-700 text-[14px] leading-relaxed m-0">
                   "{selectedTicket.citizenInfo?.content}"
