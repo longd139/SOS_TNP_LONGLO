@@ -1,7 +1,7 @@
 // ============================================================
 // COMPLAINT LIST — Bản sao y chang ReportList.jsx gốc
 // ============================================================
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import BaseTable from "../../components/base/BaseTable";
 import { useMock } from "../../mock/MockContext";
 import {
@@ -32,6 +32,16 @@ const renderCategoryBadge = (catId) => {
 // ---- COMPLAINT DETAIL MODAL (bản sao ReportDetailModal gốc) ----
 function ComplaintDetailModal({ isOpen, onClose, complaint, mode, onModeChange, onStatusUpdated }) {
   const mock = useMock();
+  const complaintId = complaint?.id;
+  const complaintStatus = complaint?.status;
+  const [nextStatus, setNextStatus] = useState(complaintStatus || 'NEW');
+  const [responseNote, setResponseNote] = useState('');
+
+  useEffect(() => {
+    if (!complaintId) return;
+    setNextStatus(complaintStatus);
+    setResponseNote('');
+  }, [complaintId, complaintStatus]);
 
   if (!isOpen || !complaint) return null;
 
@@ -39,9 +49,28 @@ function ComplaintDetailModal({ isOpen, onClose, complaint, mode, onModeChange, 
   const history = mock.getHistoryByComplaint(complaint.id) || [];
   const attachments = mock.getAttachmentsByComplaint(complaint.id) || [];
   const hasImages = complaint.hasImages && attachments.length > 0;
-
   const handleEditMode = () => { if (onModeChange) onModeChange("edit"); };
   const handleUpdateStatus = () => {
+    const updatedAt = new Date().toISOString();
+    const isCompleted = nextStatus === 'COMPLETED';
+    mock.updateComplaint(complaint.id, {
+      status: nextStatus,
+      updatedAt,
+      completedAt: isCompleted ? updatedAt : null,
+      progressPercent: isCompleted ? 100 : nextStatus === 'IN_PROGRESS' ? 50 : 0,
+    });
+    mock.addHistory({
+      complaintId: complaint.id,
+      actionType: 'STATUS_CHANGED',
+      performedBy: 'USR-030',
+      performedRole: 'APPROVER',
+      performedAt: updatedAt,
+      oldValue: { status: complaint.status },
+      newValue: { status: nextStatus },
+      internalNote: responseNote.trim() || null,
+      publicNote: responseNote.trim() || 'Trạng thái phản ánh đã được cập nhật.',
+      isPublic: true,
+    });
     if (onStatusUpdated) onStatusUpdated();
     onClose();
   };
@@ -157,7 +186,7 @@ function ComplaintDetailModal({ isOpen, onClose, complaint, mode, onModeChange, 
                 <div>
                   <div className="flex items-center justify-between">
                     <h4 className="text-sm font-semibold text-gray-900 mb-2 flex items-center gap-2">Trạng thái hiện tại</h4>
-                    <button onClick={handleEditMode} className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 focus:ring-blue-500 text-white px-4 py-2 rounded-md text-sm font-medium">
+                    <button type="button" hidden onClick={handleEditMode} className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 focus:ring-blue-500 text-white px-4 py-2 rounded-md text-sm font-medium">
                       <svg className="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
                       Cập nhật trạng thái
                     </button>
@@ -208,14 +237,16 @@ function ComplaintDetailModal({ isOpen, onClose, complaint, mode, onModeChange, 
                 <div className="mt-0">
                   <h4 className="text-sm font-semibold text-gray-900 mb-3 required-label">Cập nhật trạng thái</h4>
                   <div className="space-y-3">
-                    <select className="w-full px-3 py-2.5 text-gray-700 bg-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm resize-none" style={{ border: 'none' }}>
-                      <option>Đã gửi</option>
-                      <option>Đang xử lý</option>
-                      <option>Đã giải quyết</option>
+                    <select value={nextStatus} onChange={(event) => setNextStatus(event.target.value)} className="w-full px-3 py-2.5 text-gray-700 bg-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm resize-none" style={{ border: 'none' }}>
+                      <option value="NEW">Đã gửi</option>
+                      <option value="IN_PROGRESS">Đang xử lý</option>
+                      <option value="COMPLETED">Đã giải quyết</option>
                     </select>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">Nội dung phản hồi</label>
                       <textarea
+                        value={responseNote}
+                        onChange={(event) => setResponseNote(event.target.value)}
                         placeholder="Nhập nội dung phản hồi cho người dân..."
                         rows="3"
                         className="w-full px-3 py-2 text-gray-700 bg-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm resize-none break-words"
