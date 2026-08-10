@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { ArrowLeft, CheckCircle2, Star } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { complaintStatuses } from '../data/citizenMockDb';
-import { SATISFACTION_STORAGE_KEY, readCitizenRatings, satisfactionLabel } from '../data/satisfactionData';
+import { SATISFACTION_STORAGE_KEY, SATISFACTION_UPDATED_EVENT, readCitizenRatings, satisfactionLabel } from '../data/satisfactionData';
 
 export default function SatisfactionPage() {
   const { code } = useParams();
@@ -11,14 +11,29 @@ export default function SatisfactionPage() {
   const [score, setScore] = useState(0);
   const [comment, setComment] = useState('');
   const [submitted, setSubmitted] = useState(false);
-  const alreadyRated = readCitizenRatings().some((item) => item.code === code);
+  const savedRating = readCitizenRatings().find((item) => item.code === code);
+  const alreadyRated = Boolean(savedRating);
 
   if (!complaint || (complaint.status !== 'Đã giải quyết' && complaint.status !== 'Hoàn thành')) {
     return <section className="citizen-section citizen-container success-page"><h1>Chưa thể đánh giá</h1><p>Chỉ phản ánh đã hoàn thành mới có thể đánh giá.</p><button className="citizen-button citizen-button-secondary" onClick={() => navigate('/cong-dong/tra-cuu')}>Quay lại tra cứu</button></section>;
   }
 
-  if (submitted || alreadyRated) {
+  if (submitted) {
     return <section className="citizen-section citizen-container success-page"><div className="success-icon-v2"><CheckCircle2 size={36} /></div><p className="citizen-eyebrow">Đã ghi nhận</p><h1>Cảm ơn bạn đã đánh giá</h1><p>Đánh giá cho mã phản ánh <strong>{code}</strong> đã được ghi nhận.</p><button className="citizen-button citizen-button-primary" onClick={() => navigate(`/cong-dong/tra-cuu?code=${code}`)}>Quay lại tra cứu</button></section>;
+  }
+
+  if (alreadyRated) {
+    return <section className="citizen-section citizen-container satisfaction-page">
+      <button className="back-link satisfaction-back" onClick={() => navigate(`/cong-dong/tra-cuu?code=${code}`)}><ArrowLeft size={17} /> Quay lại tra cứu</button>
+      <div className="satisfaction-card satisfaction-record-card">
+        <p className="citizen-eyebrow">SOS-018 · Chi tiết đánh giá</p>
+        <h1>Đánh giá đã gửi</h1>
+        <p className="satisfaction-reference">Mã phản ánh: <strong>{code}</strong><br />{complaint.title}</p>
+        <div className="saved-rating-summary"><div className="satisfaction-stars" aria-label={`${savedRating.score} trên 5 sao`}>{[1, 2, 3, 4, 5].map((value) => <Star key={value} size={30} fill={value <= savedRating.score ? 'currentColor' : 'none'} />)}</div><strong>{savedRating.score}/5 sao · {satisfactionLabel(savedRating.score)}</strong></div>
+        <div className="saved-rating-comment"><span>Góp ý</span><p>{savedRating.comment || 'Không có góp ý thêm.'}</p></div>
+        <p className="saved-rating-date">Đã gửi ngày {savedRating.ratedAt}</p>
+      </div>
+    </section>;
   }
 
   const submit = (event) => {
@@ -27,6 +42,7 @@ export default function SatisfactionPage() {
     const ratings = readCitizenRatings();
     ratings.push({ id: `DG-${Date.now()}`, code, score, comment: comment.trim(), ratedAt: new Date().toISOString().slice(0, 10) });
     window.localStorage.setItem(SATISFACTION_STORAGE_KEY, JSON.stringify(ratings));
+    window.dispatchEvent(new CustomEvent(SATISFACTION_UPDATED_EVENT));
     setSubmitted(true);
   };
 

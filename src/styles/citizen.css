@@ -2380,6 +2380,14 @@
 .satisfaction-page { max-width: 760px; }
 .satisfaction-back { border: 0; background: transparent; padding: 0; cursor: pointer; margin-bottom: 20px; }
 .satisfaction-card { background: #fff; border: 1px solid #E8EDF3; border-radius: 18px; padding: 34px; box-shadow: 0 10px 35px rgba(15,23,42,.06); }
+.satisfaction-record-card { text-align: left; }
+.saved-rating-summary { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 20px 16px; border-radius: 14px; background: #FFF8E7; color: #B7791F; }
+.saved-rating-summary .satisfaction-stars { margin-bottom: 0; color: #F59E0B; }
+.saved-rating-summary .satisfaction-stars svg { flex: 0 0 auto; }
+.saved-rating-comment { margin-top: 18px; padding: 14px 16px; border-radius: 12px; background: #F8FAFC; }
+.saved-rating-comment span { color: #64748B; font-size: 13px; font-weight: 700; }
+.saved-rating-comment p { margin: 6px 0 0; color: #334155; line-height: 1.6; white-space: pre-wrap; }
+.saved-rating-date { margin: 14px 0 0; color: #94A3B8; font-size: 13px; }
 .satisfaction-card h1 { margin: 6px 0 10px; color: var(--citizen-ink); }
 .satisfaction-reference { color: #64748B; line-height: 1.7; margin-bottom: 30px; }
 .satisfaction-rating-field { border: 0; padding: 0; margin: 0 0 26px; text-align: center; }

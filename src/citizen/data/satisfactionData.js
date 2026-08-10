@@ -1,4 +1,5 @@
 export const SATISFACTION_STORAGE_KEY = 'sos_citizen_satisfaction_ratings_v2';
+export const SATISFACTION_UPDATED_EVENT = 'sos-citizen-satisfaction-updated';
 
 // Bản demo bắt đầu với 10 phản ánh hoàn thành nhưng chưa có đánh giá.
 export const satisfactionSeedRatings = [];
@@ -7,14 +8,6 @@ export const satisfactionSeedRatings = [];
 export const adminSatisfactionMockDb = [
   { id: 'ADMIN-DG-001', code: 'PA-2026-00091', score: 5, comment: 'Cán bộ hỗ trợ nhanh và rõ ràng.', ratedAt: '2026-07-15' },
   { id: 'ADMIN-DG-002', code: 'PA-2026-00022', score: 4, comment: 'Kết quả xử lý tốt.', ratedAt: '2026-07-14' },
-  { id: 'ADMIN-DG-003', code: 'PA-2026-00130', score: 5, comment: '', ratedAt: '2026-07-13' },
-  { id: 'ADMIN-DG-004', code: 'PA-2026-00131', score: 3, comment: 'Thời gian xử lý có thể nhanh hơn.', ratedAt: '2026-07-12' },
-  { id: 'ADMIN-DG-005', code: 'PA-2026-00132', score: 4, comment: '', ratedAt: '2026-07-11' },
-  { id: 'ADMIN-DG-006', code: 'PA-2026-00133', score: 2, comment: 'Chưa nhận được thông tin cập nhật kịp thời.', ratedAt: '2026-07-10' },
-  { id: 'ADMIN-DG-007', code: 'PA-2026-00134', score: 5, comment: 'Hài lòng với kết quả giải quyết.', ratedAt: '2026-07-09' },
-  { id: 'ADMIN-DG-008', code: 'PA-2026-00135', score: 4, comment: '', ratedAt: '2026-07-08' },
-  { id: 'ADMIN-DG-009', code: 'PA-2026-00136', score: 3, comment: '', ratedAt: '2026-07-07' },
-  { id: 'ADMIN-DG-010', code: 'PA-2026-00137', score: 1, comment: 'Chưa hài lòng với thời gian xử lý.', ratedAt: '2026-07-06' },
   ...Array.from({ length: 50 }, (_, index) => {
     const number = 138 + index;
     const score = (index % 5) + 1;

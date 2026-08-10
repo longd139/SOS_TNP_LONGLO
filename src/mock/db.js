@@ -97,7 +97,7 @@ const C = (overrides = {}) => {
 
   return {
     id,
-    code: `PA-${String(cid).padStart(4,'0')}`,
+    code: overrides.code || `PA-${String(cid).padStart(4,'0')}`,
     citizenId: pick(users.filter(u => u.role === 'CITIZEN')).id,
     title: overrides.title || "Phản ánh mẫu",
     description: overrides.description || "Mô tả chi tiết phản ánh",
@@ -253,6 +253,27 @@ function makeComplaints() {
     const completed = new Date(new Date(origDeadline).getTime() + pick([1,2,3]) * 86400000).toISOString();
     list.push(C({ status: "COMPLETED", createdAt: created, receivedAt: received, originalDeadline: origDeadline, currentDeadline: origDeadline, completedAt: completed, slaStatus: "COMPLETED_LATE", progressPercent: 100 }));
   }
+
+  // 5 phản ánh hoàn thành, chưa đánh giá - đồng bộ với Citizen Web SOS-018
+  [
+    { code: 'PA-2026-00130', title: 'Đèn tín hiệu tại ngã tư hoạt động chập chờn', categoryId: 'CAT-INFRA', neighborhoodId: 'KP-05', createdAt: d(-28, 8, 30), completedAt: d(-27, 11, 30) },
+    { code: 'PA-2026-00131', title: 'Rác tồn đọng tại khu phố 4', categoryId: 'CAT-ENV', neighborhoodId: 'KP-04', createdAt: d(-29, 9, 0), completedAt: d(-28, 14, 0) },
+    { code: 'PA-2026-00132', title: 'Nắp cống bị hư hỏng trước trường học', categoryId: 'CAT-INFRA', neighborhoodId: 'KP-02', createdAt: d(-30, 10, 0), completedAt: d(-29, 15, 0) },
+    { code: 'PA-2026-00133', title: 'Đề nghị bổ sung thùng rác công cộng', categoryId: 'CAT-ENV', neighborhoodId: 'KP-05', createdAt: d(-31, 8, 0), completedAt: d(-30, 13, 30) },
+    { code: 'PA-2026-00134', title: 'Vạch qua đường bị mờ', categoryId: 'CAT-URBAN', neighborhoodId: 'KP-01', createdAt: d(-32, 7, 30), completedAt: d(-31, 16, 0) },
+  ].forEach((item) => {
+    const departmentId = item.categoryId === 'CAT-ENV' ? 'DEP-ENV' : item.categoryId === 'CAT-URBAN' ? 'DEP-URBAN' : 'DEP-INFRA';
+    const officer = users.find((user) => user.departmentId === departmentId);
+    list.push(C({
+      ...item,
+      status: 'COMPLETED',
+      receivedAt: item.createdAt,
+      assignedDepartmentId: departmentId,
+      assignedOfficerId: officer?.id || null,
+      progressPercent: 100,
+      slaStatus: 'COMPLETED_ON_TIME',
+    }));
+  });
 
   // 3 REJECTED
   for (let i = 0; i < 3; i++) {
