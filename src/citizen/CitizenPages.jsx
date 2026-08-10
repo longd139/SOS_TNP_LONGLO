@@ -1,9 +1,23 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { ArrowLeft, ArrowRight, CalendarDays, CheckCircle2, Clock3, Mail, MapPin, Phone, Search, Star, Upload } from 'lucide-react';
 import { Link, useParams, useSearchParams } from 'react-router-dom';
+import { MapContainer, TileLayer, Marker } from 'react-leaflet';
+import L from 'leaflet';
+import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
+import markerIcon from 'leaflet/dist/images/marker-icon.png';
+import markerShadow from 'leaflet/dist/images/marker-shadow.png';
+import 'leaflet/dist/leaflet.css';
 import { complaintStatuses, contactInfo, departments, news, newsCategories, procedures, procedureCategories } from './data/citizenMockDb';
 import { readCitizenRatings } from './data/satisfactionData';
 import { EmptyState, LoadingState, StatusBadge } from './components/CitizenPrimitives';
+
+// Fix Leaflet default marker icon với webpack
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: markerIcon2x,
+  iconUrl: markerIcon,
+  shadowUrl: markerShadow,
+});
 
 const complaintEntries = Object.entries(complaintStatuses).map(([code, item]) => ({ code, ...item }));
 const complaintFields = ['Nội dung phản ánh', 'Vị trí và hình ảnh', 'Thông tin người gửi', 'Xác nhận'];
@@ -369,7 +383,7 @@ export function TrackComplaintPage() { const [params] = useSearchParams(); const
       </div>
     </section>
   </>; }
-function ComplaintResult({ result }) { const completed = result.status === 'Đã giải quyết' || result.status === 'Hoàn thành'; const rated = completed && readCitizenRatings().some((item) => item.code === result.code); return (
+function ComplaintResult({ result, hideDetailLink }) { const completed = result.status === 'Đã giải quyết' || result.status === 'Hoàn thành'; const rated = completed && readCitizenRatings().some((item) => item.code === result.code); return (
   <div className="tracking-result-v3">
     <div className="tr3-header">
       <div className="tr3-code">
@@ -384,7 +398,10 @@ function ComplaintResult({ result }) { const completed = result.status === 'Đã
       <div className="tr3-info-item"><CalendarDays size={16} /><div><small>Ngày gửi</small><strong>{result.createdAt}</strong></div></div>
       <div className="tr3-info-item"><Clock3 size={16} /><div><small>Đơn vị xử lý</small><strong>UBND phường Tăng Nhơn Phú</strong></div></div>
     </div>
-    <div className="tracking-actions">{!completed && <Link className="citizen-button citizen-button-primary" to={`/cong-dong/tra-cuu/${result.code}`}>Xem chi tiết tiến độ <ArrowRight size={16} /></Link>}{completed && (rated ? <Link className="citizen-button citizen-button-secondary" to={`/cong-dong/danh-gia/${result.code}`}><Star size={16} fill="currentColor" /> Xem chi tiết đánh giá</Link> : <Link className="citizen-button citizen-button-secondary" to={`/cong-dong/danh-gia/${result.code}`}><Star size={16} /> Đánh giá hài lòng</Link>)}</div>
+    <div className="tracking-actions">
+      {!completed && !hideDetailLink && <Link className="citizen-button citizen-button-primary" to={`/cong-dong/tra-cuu/${result.code}`}>Xem chi tiết tiến độ <ArrowRight size={16} /></Link>}
+      {completed && (rated ? <Link className="citizen-button citizen-button-secondary" to={`/cong-dong/danh-gia/${result.code}`}><Star size={16} fill="currentColor" /> Xem chi tiết đánh giá</Link> : <Link className="citizen-button citizen-button-secondary" to={`/cong-dong/danh-gia/${result.code}`}><Star size={16} /> Đánh giá hài lòng</Link>)}
+    </div>
   </div>
 ); }
 export function ComplaintDetailPage() { const { code } = useParams(); const result = complaintEntries.find((item) => item.code === code); if (!result) return <CitizenNotFound />; return <>
@@ -395,7 +412,7 @@ export function ComplaintDetailPage() { const { code } = useParams(); const resu
         <h1><em>{result.title.split(' ').slice(0, 2).join(' ')}</em> {result.title.split(' ').slice(2).join(' ')}</h1>
       </div>
     </section>
-    <section className="citizen-section citizen-container tracking-section"><ComplaintResult result={result} /><div className="tracking-timeline-v2"><h2>Tiến trình xử lý</h2><div className="timeline-steps">{result.timeline.map((item, i) => <div className={`tl-step ${item.done ? 'done' : ''}`} key={item.label}><div className="tl-dot">{item.done ? <CheckCircle2 size={14} /> : <span>{i + 1}</span>}</div><div className="tl-line" /><div className="tl-content"><strong>{item.label}</strong><small>{item.date}</small></div></div>)}</div></div></section>
+    <section className="citizen-section citizen-container tracking-section"><ComplaintResult result={result} hideDetailLink /><div className="tracking-timeline-v2"><h2>Tiến trình xử lý</h2><div className="timeline-steps">{result.timeline.map((item, i) => <div className={`tl-step ${item.done ? 'done' : ''}`} key={item.label}><div className="tl-dot">{item.done ? <CheckCircle2 size={14} /> : <span>{i + 1}</span>}</div><div className="tl-line" /><div className="tl-content"><strong>{item.label}</strong><small>{item.date}</small></div></div>)}</div></div></section>
   </>; }
 
 export function ContactPage() { const [query, setQuery] = useState(''); const filtered = departments.filter((department) => `${department.name} ${department.description}`.toLocaleLowerCase().includes(query.toLocaleLowerCase())); return <>
@@ -407,7 +424,15 @@ export function ContactPage() { const [query, setQuery] = useState(''); const fi
     </section>
     <section className="citizen-section citizen-container">
       <div className="contact-lower">
-        <div className="contact-map"><MapPin size={29} /><strong>Trung tâm hành chính phường</strong><p>{contactInfo.address}</p><a className="citizen-button citizen-button-white" href="https://maps.google.com">Chỉ đường</a></div>
+        <div className="contact-map">
+            <MapContainer center={[10.8460, 106.7885]} zoom={16} scrollWheelZoom={false} className="contact-leaflet-map">
+              <TileLayer attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>' url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+              <Marker position={[10.8460, 106.7885]} />
+            </MapContainer>
+            <div className="contact-map-overlay">
+              <MapPin size={29} /><strong>Trung tâm hành chính phường</strong><p>{contactInfo.address}</p><a className="citizen-button citizen-button-white" href="https://maps.google.com">Chỉ đường</a>
+            </div>
+          </div>
         <div className="departments">
           <p className="citizen-eyebrow">Danh bạ phòng ban</p>
           <h2>Liên hệ đúng nơi bạn cần</h2>

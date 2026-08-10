@@ -59,7 +59,7 @@ export function ReceptionSchedulePage() {
 
       <div className="citizen-container">
         <Row className="sch-layout g-4">
-          <Col lg={8}>
+          <Col lg={7}>
             <h2>Lịch trong tuần</h2>
             <div className="sch-list">
               {citizenReceptionSchedule.map((schedule) => (
@@ -84,7 +84,7 @@ export function ReceptionSchedulePage() {
             </div>
           </Col>
 
-          <Col lg={4}>
+          <Col lg={5}>
             <div className="sch-sidebar">
               <Card className="sch-card mb-3">
                 <Card.Body>
