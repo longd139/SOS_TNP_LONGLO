@@ -14,14 +14,14 @@ import dayjs from "dayjs";
 
 // ---- Quick tabs (giống pattern MyComplaints) ----
 const TABS = [
-  { key: 'ALL',              label: 'Tất cả',              filter: () => true },
-  { key: 'NEW',              label: 'Mới tiếp nhận',       filter: (c) => c.status === 'NEW' || c.status === 'PENDING_RECEPTION' },
-  { key: 'AWAITING_ASSIGN',  label: 'Chờ phân công',       filter: (c) => c.status === 'RECEIVED' },
-  { key: 'IN_PROGRESS',      label: 'Đang xử lý',          filter: (c) => ['ASSIGNED','IN_PROGRESS'].includes(c.status) },
-  { key: 'EXT_PENDING',      label: 'Chờ duyệt gia hạn',   filter: (c) => c.status === 'EXTENSION_PENDING' },
-  { key: 'NEAR_DUE',         label: 'Sắp quá hạn',         filter: (c) => c.slaStatus === 'NEAR_DUE' },
-  { key: 'OVERDUE',          label: 'Quá hạn',             filter: (c) => c.slaStatus === 'OVERDUE' },
-  { key: 'COMPLETED',        label: 'Hoàn thành',           filter: (c) => c.status === 'COMPLETED' },
+  { key: 'ALL',              label: 'Tất cả phản ánh',             filter: () => true },
+  { key: 'NEW',              label: 'Chờ tiếp nhận (Mới gửi)',     filter: (c) => c.status === 'NEW' || c.status === 'PENDING_RECEPTION' },
+  { key: 'AWAITING_ASSIGN',  label: 'Chờ phân công đơn vị',      filter: (c) => c.status === 'RECEIVED' },
+  { key: 'IN_PROGRESS',      label: 'Đang xử lý',                 filter: (c) => ['ASSIGNED','IN_PROGRESS'].includes(c.status) },
+  { key: 'EXT_PENDING',      label: 'Chờ duyệt gia hạn',          filter: (c) => c.status === 'EXTENSION_PENDING' },
+  { key: 'NEAR_DUE',         label: 'Sắp quá hạn',                filter: (c) => c.slaStatus === 'NEAR_DUE' },
+  { key: 'OVERDUE',          label: 'Quá hạn xử lý',              filter: (c) => c.slaStatus === 'OVERDUE' },
+  { key: 'COMPLETED',        label: 'Hoàn thành giải quyết',      filter: (c) => c.status === 'COMPLETED' },
 ];
 
 // ---- Badge renderers (shared from Badges.jsx) ----
@@ -443,13 +443,13 @@ export default function ComplaintList() {
 
   return (
     <div className="min-h-screen">
-      {/* Page title — giống hệt gốc + nút Thêm mới */}
+      {/* Page title — synchronized typography */}
       <div className="mb-4 flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Quản lý phản ánh</h1>
-          <p className="text-gray-600 mt-1">Xem và xử lý phản ánh từ người dân</p>
+          <h1 className="text-2xl font-bold text-slate-900">Quản lý phản ánh kiến nghị</h1>
+          <p className="text-xs text-slate-500 mt-1">Tiếp nhận, phân công, xử lý và theo dõi tiến độ phản ánh từ người dân</p>
         </div>
-        <button onClick={() => setShowAddModal(true)} className="inline-flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 text-sm font-medium transition-colors">
+        <button onClick={() => setShowAddModal(true)} className="inline-flex items-center gap-2 bg-blue-600 text-white px-3.5 py-2 rounded-lg hover:bg-blue-700 text-xs font-semibold shadow-2xs transition-colors">
           <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
           Thêm phản ánh
         </button>
@@ -528,7 +528,7 @@ export default function ComplaintList() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">SLA</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Tiến độ thời hạn</label>
                   <select value={filters.slaStatus} onChange={e => setFilters(p => ({ ...p, slaStatus: e.target.value }))}
                     className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                     <option value="">Tất cả</option>

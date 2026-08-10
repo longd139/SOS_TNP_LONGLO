@@ -891,7 +891,7 @@ export default function ComplaintDetail() {
             </h4>
             <div className="space-y-2.5 text-sm">
               <div className="flex items-center gap-2">
-                <span className="text-gray-600">Loại SLA:</span>
+                <span className="text-gray-600">Quy định thời hạn:</span>
                 <span className="font-medium text-gray-900">
                   {complaint.slaType === 'URGENT_24_HOURS' ? 'Khẩn cấp (24h)' : `Thường (${complaint.slaHours || '?'}h)`}
                 </span>
@@ -977,9 +977,9 @@ export default function ComplaintDetail() {
             </h4>
             <div className="space-y-3">
               <div className="flex items-center gap-2">
-                <span className="text-sm text-gray-600">Trạng thái:</span>
-                <StatusBadge status={complaint.status} />
-              </div>
+              <span className="text-gray-500">Tiến độ:</span>
+              <SlaBadge slaStatus={complaint.slaStatus} />
+            </div>
 
               {/* Progress meter */}
               {complaint.progressPercent > 0 && complaint.status !== 'COMPLETED' && (
@@ -1065,7 +1065,7 @@ export default function ComplaintDetail() {
           </Field>
 
           {receiveUrgency === 'NORMAL' && (
-            <Field label="Thời hạn xử lý (SLA)">
+            <Field label="Thời hạn xử lý">
               <div className="flex gap-4 flex-wrap">
                 {SLA_HOURS_OPTIONS.map(o => (
                   <label key={o.value} className="flex items-center gap-1.5 text-sm cursor-pointer">
@@ -1247,7 +1247,7 @@ export default function ComplaintDetail() {
                 Dự kiến: {slaPreview.label}
               </p>
               <p className="text-xs text-gray-600 mt-0.5">
-                Hạn SLA: {formatDate(complaint.currentDeadline)}
+                Hạn xử lý: {formatDate(complaint.currentDeadline)}
               </p>
             </div>
           )}

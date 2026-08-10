@@ -327,7 +327,7 @@ export default function ExtensionDetail() {
               </span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-gray-500">SLA:</span>
+              <span className="text-gray-500">Tiến độ:</span>
               <SlaBadge slaStatus={complaint.slaStatus} />
             </div>
             <div>

@@ -25,12 +25,6 @@ export default function AppDataSourceModal({ isOpen, onClose, onSaveConfig }) {
             measurementId: 'G-X987654321',
             lastSync: 'Vừa xong',
             activeNow: 45
-        },
-        directServer: {
-            status: 'connected',
-            apkServerUrl: 'https://api.tangnhonphu.gov.vn/downloads/sos-latest.apk',
-            lastSync: 'Vừa xong',
-            downloadsToday: 34
         }
     });
 
@@ -46,7 +40,7 @@ export default function AppDataSourceModal({ isOpen, onClose, onSaveConfig }) {
             setIsTesting(false);
             setTestResult({
                 success: true,
-                message: 'Kết nối thành công tới 4/4 nguồn dữ liệu! Dữ liệu kho ứng dụng đã đồng bộ mới nhất.'
+                message: 'Kết nối thành công tới 3/3 nguồn dữ liệu! Dữ liệu kho ứng dụng đã đồng bộ mới nhất.'
             });
         }, 1200);
     };
@@ -118,7 +112,7 @@ export default function AppDataSourceModal({ isOpen, onClose, onSaveConfig }) {
                             </div>
 
                             {/* Cards list */}
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                 {/* Google Play */}
                                 <div className="border border-gray-200 rounded-lg p-4 bg-white hover:shadow-md transition-shadow">
                                     <div className="flex items-center justify-between mb-2">
@@ -127,7 +121,7 @@ export default function AppDataSourceModal({ isOpen, onClose, onSaveConfig }) {
                                                 GP
                                             </div>
                                             <div>
-                                                <h4 className="font-semibold text-sm text-gray-900">Google Play Store</h4>
+                                                <h4 className="font-semibold text-sm text-gray-900">Google Play</h4>
                                                 <p className="text-xs text-gray-500">Android Platform</p>
                                             </div>
                                         </div>
@@ -138,7 +132,7 @@ export default function AppDataSourceModal({ isOpen, onClose, onSaveConfig }) {
                                     <div className="text-xs text-gray-600 space-y-1 mt-3">
                                         <p><span className="text-gray-400">Package:</span> {configs.googlePlay.packageName}</p>
                                         <p><span className="text-gray-400">Lượt tải hôm nay:</span> <strong className="text-gray-800">+{configs.googlePlay.downloadsToday}</strong></p>
-                                        <p><span className="text-gray-400">Đồng bộ gần nhất:</span> {configs.googlePlay.lastSync}</p>
+                                        <p><span className="text-gray-400">Đồng bộ:</span> {configs.googlePlay.lastSync}</p>
                                     </div>
                                 </div>
 
@@ -150,8 +144,8 @@ export default function AppDataSourceModal({ isOpen, onClose, onSaveConfig }) {
                                                 iOS
                                             </div>
                                             <div>
-                                                <h4 className="font-semibold text-sm text-gray-900">Apple App Store</h4>
-                                                <p className="text-xs text-gray-500">iOS / iPadOS Platform</p>
+                                                <h4 className="font-semibold text-sm text-gray-900">App Store</h4>
+                                                <p className="text-xs text-gray-500">iOS Platform</p>
                                             </div>
                                         </div>
                                         <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
@@ -161,7 +155,7 @@ export default function AppDataSourceModal({ isOpen, onClose, onSaveConfig }) {
                                     <div className="text-xs text-gray-600 space-y-1 mt-3">
                                         <p><span className="text-gray-400">App ID:</span> {configs.appStore.appId}</p>
                                         <p><span className="text-gray-400">Lượt tải hôm nay:</span> <strong className="text-gray-800">+{configs.appStore.downloadsToday}</strong></p>
-                                        <p><span className="text-gray-400">Đồng bộ gần nhất:</span> {configs.appStore.lastSync}</p>
+                                        <p><span className="text-gray-400">Đồng bộ:</span> {configs.appStore.lastSync}</p>
                                     </div>
                                 </div>
 
@@ -173,8 +167,8 @@ export default function AppDataSourceModal({ isOpen, onClose, onSaveConfig }) {
                                                 FA
                                             </div>
                                             <div>
-                                                <h4 className="font-semibold text-sm text-gray-900">Firebase Analytics</h4>
-                                                <p className="text-xs text-gray-500">Chỉ số người dùng & Sự kiện SOS</p>
+                                                <h4 className="font-semibold text-sm text-gray-900">Firebase</h4>
+                                                <p className="text-xs text-gray-500">Sự kiện SOS</p>
                                             </div>
                                         </div>
                                         <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
@@ -184,30 +178,7 @@ export default function AppDataSourceModal({ isOpen, onClose, onSaveConfig }) {
                                     <div className="text-xs text-gray-600 space-y-1 mt-3">
                                         <p><span className="text-gray-400">Project:</span> {configs.firebase.projectId}</p>
                                         <p><span className="text-gray-400">Đang hoạt động:</span> <strong className="text-green-600">{configs.firebase.activeNow} người dùng</strong></p>
-                                        <p><span className="text-gray-400">Đồng bộ gần nhất:</span> {configs.firebase.lastSync}</p>
-                                    </div>
-                                </div>
-
-                                {/* Direct APK Server */}
-                                <div className="border border-gray-200 rounded-lg p-4 bg-white hover:shadow-md transition-shadow">
-                                    <div className="flex items-center justify-between mb-2">
-                                        <div className="flex items-center gap-2">
-                                            <div className="w-8 h-8 rounded-full bg-purple-100 text-purple-700 flex items-center justify-center font-bold text-xs">
-                                                APK
-                                            </div>
-                                            <div>
-                                                <h4 className="font-semibold text-sm text-gray-900">Cổng tải APK / Web Direct</h4>
-                                                <p className="text-xs text-gray-500">Tải trực tiếp qua Cổng Phường</p>
-                                            </div>
-                                        </div>
-                                        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
-                                            ● Đã kết nối
-                                        </span>
-                                    </div>
-                                    <div className="text-xs text-gray-600 space-y-1 mt-3">
-                                        <p><span className="text-gray-400">Server Log:</span> Active</p>
-                                        <p><span className="text-gray-400">Lượt tải hôm nay:</span> <strong className="text-gray-800">+{configs.directServer.downloadsToday}</strong></p>
-                                        <p><span className="text-gray-400">Đồng bộ gần nhất:</span> {configs.directServer.lastSync}</p>
+                                        <p><span className="text-gray-400">Đồng bộ:</span> {configs.firebase.lastSync}</p>
                                     </div>
                                 </div>
                             </div>

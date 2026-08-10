@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { 
     Download, Smartphone, Users, Star, RefreshCw, 
     Filter, FileSpreadsheet, Server, ShieldCheck, CheckCircle2, 
-    ArrowUpRight, Layers, Activity
+    ArrowUpRight, Layers, Activity, ChevronDown, FileText
 } from 'lucide-react';
 import AppDownloadCharts from '../../components/statisticalReport/AppDownloadCharts';
 import AppDataSourceModal from '../../components/statisticalReport/AppDataSourceModal';
@@ -13,47 +13,63 @@ export default function AppDownloadStatistics() {
     const [isDataSourceModalOpen, setIsDataSourceModalOpen] = useState(false);
     const [exportLoading, setExportLoading] = useState(false);
     const [toastMessage, setToastMessage] = useState(null);
+    const [isExportDropdownOpen, setIsExportDropdownOpen] = useState(false);
+    const exportDropdownRef = useRef(null);
+
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (exportDropdownRef.current && !exportDropdownRef.current.contains(event.target)) {
+                setIsExportDropdownOpen(false);
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
 
     // Summary KPIs
     const kpiMetrics = [
         {
             title: 'Tổng số lượt tải App SOS',
-            value: '29,500',
+            value: '26,380',
             unit: 'lượt',
             change: '+14.2%',
             isPositive: true,
             icon: Download,
-            color: 'blue',
-            subtitle: 'Tích lũy từ tất cả kho ứng dụng'
+            iconStyle: 'bg-blue-50 text-blue-600 border-blue-100',
+            badgeStyle: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+            subtitle: 'Google Play & App Store'
         },
         {
-            title: 'Người dùng hoạt động hàng tháng (MAU)',
+            title: 'Người dùng hàng tháng',
             value: '21,400',
             unit: 'người dùng',
             change: '+8.6%',
             isPositive: true,
             icon: Users,
-            color: 'emerald',
-            subtitle: 'Chiếm 72.5% tổng lượt tải'
+            iconStyle: 'bg-emerald-50 text-emerald-600 border-emerald-100',
+            badgeStyle: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+            subtitle: '72.5% tổng lượt tải'
         },
         {
-            title: 'Người dùng hoạt động hàng ngày (DAU)',
+            title: 'Người dùng hàng ngày',
             value: '4,850',
-            unit: 'người dùng/ngày',
+            unit: 'người/ngày',
             change: '+6.1%',
             isPositive: true,
             icon: Activity,
-            color: 'indigo',
-            subtitle: 'Tương tác bình quân trong ngày'
+            iconStyle: 'bg-indigo-50 text-indigo-600 border-indigo-100',
+            badgeStyle: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+            subtitle: 'Tương tác bình quân'
         },
         {
             title: 'Đánh giá ứng dụng trung bình',
             value: '4.8',
             unit: '★ / 5.0',
-            change: '2,480+ đánh giá',
+            change: '2,480+ lượt',
             isPositive: true,
             icon: Star,
-            color: 'amber',
+            iconStyle: 'bg-amber-50 text-amber-600 border-amber-100',
+            badgeStyle: 'bg-amber-50 text-amber-700 border-amber-200',
             subtitle: 'Google Play & App Store'
         }
     ];
@@ -81,17 +97,6 @@ export default function AppDownloadStatistics() {
             avgRating: '4.9 ★',
             status: 'Đã kết nối API',
             lastSync: '15 phút trước'
-        },
-        {
-            id: 'apk-direct',
-            platform: 'Cổng tải APK / Web Direct',
-            os: 'File APK cài trực tiếp',
-            newDownloads: '3,120',
-            activeUsers: '1,630',
-            uninstalls: '85',
-            avgRating: 'N/A',
-            status: 'Tự động đồng bộ Server',
-            lastSync: 'Vừa xong'
         }
     ];
 
@@ -147,24 +152,53 @@ export default function AppDownloadStatistics() {
                         <Server className="w-4 h-4 text-blue-600" />
                         Xác nhận Nguồn dữ liệu kho App
                     </button>
-                    
-                    <button
-                        onClick={() => handleExportReport('excel')}
-                        disabled={exportLoading}
-                        className="inline-flex items-center gap-2 px-3.5 py-2 text-xs font-semibold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-lg transition-colors shadow-sm"
-                    >
-                        <FileSpreadsheet className="w-4 h-4 text-emerald-600" />
-                        Xuất Excel
-                    </button>
 
-                    <button
-                        onClick={() => handleExportReport('pdf')}
-                        disabled={exportLoading}
-                        className="inline-flex items-center gap-2 px-3.5 py-2 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors shadow-sm"
-                    >
-                        <Download className="w-4 h-4" />
-                        Xuất Báo cáo PDF
-                    </button>
+                    {/* Export File Dropdown */}
+                    <div className="relative inline-block text-left" ref={exportDropdownRef}>
+                        <button
+                            type="button"
+                            onClick={() => setIsExportDropdownOpen(!isExportDropdownOpen)}
+                            disabled={exportLoading}
+                            className="inline-flex items-center gap-2 px-3.5 py-2 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors shadow-sm"
+                        >
+                            <Download className="w-4 h-4" />
+                            <span>{exportLoading ? 'Đang xuất...' : 'Xuất file'}</span>
+                            <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${isExportDropdownOpen ? 'rotate-180' : ''}`} />
+                        </button>
+
+                        {isExportDropdownOpen && (
+                            <div className="origin-top-right absolute right-0 mt-2 w-52 rounded-lg shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-50 divide-y divide-gray-100 animate-fade-in">
+                                <div className="py-1">
+                                    <button
+                                        onClick={() => {
+                                            setIsExportDropdownOpen(false);
+                                            handleExportReport('excel');
+                                        }}
+                                        className="w-full text-left px-3.5 py-2 text-xs text-gray-700 hover:bg-gray-50 flex items-center gap-2.5 transition-colors"
+                                    >
+                                        <FileSpreadsheet className="w-4 h-4 text-emerald-600 flex-shrink-0" />
+                                        <div>
+                                            <div className="font-semibold text-gray-900">Xuất file Excel (.xlsx)</div>
+                                            <div className="text-[11px] text-gray-500">Chi tiết lượt tải</div>
+                                        </div>
+                                    </button>
+                                    <button
+                                        onClick={() => {
+                                            setIsExportDropdownOpen(false);
+                                            handleExportReport('pdf');
+                                        }}
+                                        className="w-full text-left px-3.5 py-2 text-xs text-gray-700 hover:bg-gray-50 flex items-center gap-2.5 transition-colors"
+                                    >
+                                        <FileText className="w-4 h-4 text-red-600 flex-shrink-0" />
+                                        <div>
+                                            <div className="font-semibold text-gray-900">Xuất file PDF (.pdf)</div>
+                                            <div className="text-[11px] text-gray-500">Báo cáo tổng hợp</div>
+                                        </div>
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+                    </div>
                 </div>
             </div>
 
@@ -218,10 +252,9 @@ export default function AppDownloadStatistics() {
                             onChange={(e) => setSelectedPlatform(e.target.value)}
                             className="text-xs p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white text-gray-700 font-medium"
                         >
-                            <option value="all">Tất cả Nền tảng (Google Play, App Store, APK)</option>
+                            <option value="all">Tất cả Nền tảng (Google Play, App Store)</option>
                             <option value="android">Google Play Store (Android)</option>
                             <option value="ios">Apple App Store (iOS)</option>
-                            <option value="apk">File APK / Tải trực tiếp Web</option>
                         </select>
                     </div>
 
@@ -233,27 +266,45 @@ export default function AppDownloadStatistics() {
             </div>
 
             {/* KPI Cards Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
                 {kpiMetrics.map((kpi, idx) => {
                     const IconComponent = kpi.icon;
                     return (
-                        <div key={idx} className="bg-white rounded-xl shadow-sm border border-gray-200 p-5 hover:shadow-md transition-shadow">
-                            <div className="flex items-center justify-between mb-3">
-                                <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">{kpi.title}</span>
-                                <div className={`p-2 rounded-lg bg-${kpi.color}-50 text-${kpi.color}-600`}>
-                                    <IconComponent className="w-5 h-5" />
+                        <div 
+                            key={idx} 
+                            className="bg-white rounded-xl shadow-sm border border-slate-200/80 p-4 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 flex flex-col justify-between"
+                        >
+                            {/* Header: Title & Icon */}
+                            <div>
+                                <div className="flex items-start justify-between gap-2 mb-2">
+                                    <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider leading-snug line-clamp-2 min-h-[30px]">
+                                        {kpi.title}
+                                    </span>
+                                    <div className={`p-2 rounded-lg border flex-shrink-0 ${kpi.iconStyle}`}>
+                                        <IconComponent className="w-4 h-4" />
+                                    </div>
+                                </div>
+
+                                {/* Number & Unit */}
+                                <div className="flex items-baseline gap-1.5 mb-2">
+                                    <span className="text-xl lg:text-2xl font-bold text-slate-900 tracking-tight">
+                                        {kpi.value}
+                                    </span>
+                                    <span className="text-xs font-semibold text-slate-500">
+                                        {kpi.unit}
+                                    </span>
                                 </div>
                             </div>
-                            <div className="flex items-baseline gap-2 mb-1">
-                                <span className="text-2xl font-extrabold text-gray-900">{kpi.value}</span>
-                                <span className="text-xs text-gray-500 font-medium">{kpi.unit}</span>
-                            </div>
-                            <div className="flex items-center justify-between text-xs mt-2 pt-2 border-t border-gray-100">
-                                <span className="text-emerald-600 font-semibold flex items-center gap-0.5">
-                                    <ArrowUpRight className="w-3.5 h-3.5" />
+
+                            {/* Footer: Pill Badge & Subtitle cleanly separated */}
+                            <div className="pt-2.5 border-t border-slate-100 flex items-center justify-between gap-2 flex-wrap text-xs">
+                                <span className={`inline-flex items-center gap-0.5 px-2 py-0.5 rounded-md text-[10px] font-bold border ${kpi.badgeStyle}`}>
+                                    {kpi.isPositive && <ArrowUpRight className="w-3 h-3 stroke-[2.5]" />}
                                     {kpi.change}
                                 </span>
-                                <span className="text-gray-400 text-[11px]">{kpi.subtitle}</span>
+                                <span className="text-slate-400 text-[10px] font-medium truncate max-w-[120px]" title={kpi.subtitle}>
+                                    {kpi.subtitle}
+                                </span>
                             </div>
                         </div>
                     );
@@ -290,7 +341,7 @@ export default function AppDownloadStatistics() {
                                 <th className="py-3.5 px-5">Kho Ứng Dụng / Nền Tảng</th>
                                 <th className="py-3.5 px-4">Yêu cầu HĐH</th>
                                 <th className="py-3.5 px-4 text-right">Lượt tải mới</th>
-                                <th className="py-3.5 px-4 text-right">Active Users (MAU)</th>
+                                <th className="py-3.5 px-4 text-right">Người dùng hoạt động</th>
                                 <th className="py-3.5 px-4 text-right">Lượt gỡ cài đặt</th>
                                 <th className="py-3.5 px-4 text-center">Đánh giá trung bình</th>
                                 <th className="py-3.5 px-4">Nguồn Dữ Liệu</th>
@@ -302,10 +353,9 @@ export default function AppDownloadStatistics() {
                                 <tr key={row.id} className="hover:bg-gray-50/80 transition-colors">
                                     <td className="py-4 px-5 font-bold text-gray-900 flex items-center gap-3">
                                         <div className={`w-8 h-8 rounded-lg flex items-center justify-center font-bold text-xs ${
-                                            row.id === 'google-play' ? 'bg-green-100 text-green-700' :
-                                            row.id === 'app-store' ? 'bg-blue-100 text-blue-700' : 'bg-purple-100 text-purple-700'
+                                            row.id === 'google-play' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'
                                         }`}>
-                                            {row.id === 'google-play' ? 'GP' : row.id === 'app-store' ? 'iOS' : 'APK'}
+                                            {row.id === 'google-play' ? 'GP' : 'iOS'}
                                         </div>
                                         <div>
                                             <div className="font-bold text-gray-900">{row.platform}</div>
