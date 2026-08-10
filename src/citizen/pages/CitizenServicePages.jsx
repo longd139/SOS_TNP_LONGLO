@@ -85,25 +85,27 @@ export function ReceptionSchedulePage() {
           </Col>
 
           <Col lg={4}>
-            <Card className="sch-card mb-3">
-              <Card.Body>
-                <div className="sch-card-head">
-                  <Telephone size={20} />
-                  <h3>Đặt lịch trao đổi</h3>
-                </div>
-                <p className="text-muted small">Nếu nội dung cần trao đổi nhiều, hãy liên hệ trước để được sắp xếp thời gian phù hợp.</p>
-                <Button as="a" href="tel:(028)38961234" variant="primary" className="w-100">Gọi Bộ phận Một cửa</Button>
-              </Card.Body>
-            </Card>
-            <Card className="sch-card sch-note">
-              <Card.Body>
-                <div className="sch-card-head">
-                  <FileText size={20} />
-                  <h3>Lưu ý</h3>
-                </div>
-                <p className="text-muted small">Vui lòng mang theo CCCD và các giấy tờ liên quan để việc trao đổi được thuận tiện.</p>
-              </Card.Body>
-            </Card>
+            <div className="sch-sidebar">
+              <Card className="sch-card mb-3">
+                <Card.Body>
+                  <div className="sch-card-head">
+                    <Telephone size={20} />
+                    <h3>Đặt lịch trao đổi</h3>
+                  </div>
+                  <p className="text-muted small">Nếu nội dung cần trao đổi nhiều, hãy liên hệ trước để được sắp xếp thời gian phù hợp.</p>
+                  <Button as="a" href="tel:(028)38961234" variant="primary" className="w-100">Gọi Bộ phận Một cửa</Button>
+                </Card.Body>
+              </Card>
+              <Card className="sch-card sch-note">
+                <Card.Body>
+                  <div className="sch-card-head">
+                    <FileText size={20} />
+                    <h3>Lưu ý</h3>
+                  </div>
+                  <p className="text-muted small">Vui lòng mang theo CCCD và các giấy tờ liên quan để việc trao đổi được thuận tiện.</p>
+                </Card.Body>
+              </Card>
+            </div>
           </Col>
         </Row>
       </div>

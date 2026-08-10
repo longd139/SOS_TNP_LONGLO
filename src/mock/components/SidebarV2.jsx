@@ -3,15 +3,25 @@
 // ============================================================
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, MessageSquare, Clock, FolderOpen, Building2, Users, Settings, ChevronLeft, FileText, Map, ChevronDown, ChevronRight, Smartphone, Star } from 'lucide-react';
+import { LayoutDashboard, MessageSquare, Clock, FolderOpen, Building2, Users, Settings, ChevronLeft, FileText, Map, ChevronDown, ChevronRight, Smartphone, Star, Calendar } from 'lucide-react';
 import { useMock } from '../MockContext';
 
 const ALL_MENUS = [
   { id: 'dashboard', label: 'Tổng quan', icon: LayoutDashboard, path: '/dashboard', roles: ['APPROVER','LEADER','ADMIN'] },
   { id: 'complaints', label: 'Quản lý phản ánh', icon: MessageSquare, path: '/admin/complaints', roles: ['RECEPTION_OFFICER','PROCESSING_OFFICER','APPROVER','LEADER','ADMIN'] },
   { id: 'extensions', label: 'Quản lý gia hạn', icon: Clock, path: '/admin/extensions', roles: ['PROCESSING_OFFICER','APPROVER','LEADER','ADMIN'] },
-  { 
-    id: 'documents', 
+  {
+    id: 'reception-schedules-v2',
+    label: 'Quản lý lịch tiếp công dân',
+    icon: Calendar,
+    roles: ['RECEPTION_OFFICER','PROCESSING_OFFICER','APPROVER','LEADER','ADMIN'],
+    submenu: [
+      { id: 'approve-schedule', label: 'Duyệt lịch hẹn', path: '/admin/schedules/approve' },
+      { id: 'add-schedule', label: 'Thêm lịch hẹn', path: '/admin/schedules/add' },
+    ],
+  },
+  {
+    id: 'documents',
     label: 'Quản lý Tài liệu', 
     icon: FileText, 
     roles: ['PROCESSING_OFFICER','APPROVER','LEADER','ADMIN'],

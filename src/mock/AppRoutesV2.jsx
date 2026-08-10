@@ -9,10 +9,13 @@ import CitizenHomePage from '../citizen/pages/CitizenHomePage';
 import { ProcedureListPage, ProcedureDetailPage, NewsListPage, NewsDetailPage, SubmitComplaintPage, TrackComplaintPage, ComplaintDetailPage, ContactPage, CitizenNotFound } from '../citizen/CitizenPages';
 import SatisfactionPage from '../citizen/pages/SatisfactionPage';
 import { CitizenGuidePage, PublicServicesPage, ReceptionSchedulePage } from '../citizen/pages/CitizenServicePages';
+import RegisterLeaderMeeting from '../pages-v2/citizen/RegisterLeaderMeeting';
 import AuthLayout from '../layouts/AuthLayout';
 import Login from '../pages/Auth/Login';
 import DashboardOverview from '../pages-v2/dashboard/DashboardOverview';
 import PlaceholderPage from '../pages-v2/PlaceholderPage';
+import AddSchedule from '../pages-v2/admin/AddSchedule';
+import ApproveSchedule from '../pages-v2/admin/ApproveSchedule';
 
 const DigitalLibraryPage = lazy(() => import('../citizen/pages/DigitalLibraryPage'));
 const ComplaintList = lazy(() => import('../pages-v2/admin/ComplaintList'));
@@ -35,6 +38,7 @@ export default function AppRoutesV2() {
     <Suspense fallback={<div className="min-h-screen flex items-center justify-center text-gray-500">Đang tải trang...</div>}>
     <Routes>
       <Route path="/" element={<RoleHome />} />
+      <Route path="/register-meeting" element={<RegisterLeaderMeeting />} />
       <Route element={<CitizenLayout />}>
         <Route path="/cong-dong" element={<CitizenHomePage />} />
         <Route path="/cong-dong/thu-tuc" element={<ProcedureListPage />} />
@@ -72,6 +76,8 @@ export default function AppRoutesV2() {
         <Route path="/admin/satisfaction" element={<SatisfactionDashboard />} />
         <Route path="/admin/documents/history" element={<HistoryDocs />} />
         <Route path="/admin/documents/legal" element={<LegalDocs />} />
+        <Route path="/admin/schedules/approve" element={<ApproveSchedule />} />
+        <Route path="/admin/schedules/add" element={<AddSchedule />} />
         <Route path="/placeholder" element={<PlaceholderPage />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
