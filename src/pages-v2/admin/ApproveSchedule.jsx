@@ -125,6 +125,24 @@ const MOCK_DATA = [
   }
 ];
 
+const repairVietnameseText = (value) => {
+  if (typeof value !== 'string' || !/[ÃÂÄÆáºá»]/.test(value)) return value;
+  try {
+    return decodeURIComponent(escape(value));
+  } catch {
+    return value;
+  }
+};
+
+const repairScheduleData = (items) => items.map((item) => Object.fromEntries(
+  Object.entries(item).map(([key, value]) => [
+    key,
+    value && typeof value === 'object' && !Array.isArray(value)
+      ? Object.fromEntries(Object.entries(value).map(([nestedKey, nestedValue]) => [nestedKey, repairVietnameseText(nestedValue)]))
+      : repairVietnameseText(value),
+  ])
+));
+
 export default function ApproveSchedule() {
   const [data, setData] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -137,7 +155,9 @@ export default function ApproveSchedule() {
       localStorage.setItem('citizen-approvals-v5', JSON.stringify(MOCK_DATA));
       setData(MOCK_DATA);
     } else {
-      setData(JSON.parse(localData));
+      const repairedData = repairScheduleData(JSON.parse(localData));
+      setData(repairedData);
+      localStorage.setItem('citizen-approvals-v5', JSON.stringify(repairedData));
     }
   }, []);
 
