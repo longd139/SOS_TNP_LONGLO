@@ -4,10 +4,10 @@ import { counterReceptionFeedbackQueue } from '../../citizen/data/receptionFeedb
 
 export default function CounterReceptionFeedbackPage() {
   return <ReceptionFeedbackDispatchPage
-    eyebrow="Tiếp dân tại quầy"
-    title="Điều phối đánh giá tiếp dân tại quầy"
-    description="Cán bộ quầy chọn đúng phiếu tiếp dân đã hoàn tất để gọi màn hình đánh giá trên iPad."
+    eyebrow="Lịch tiếp dân"
+    title="Quản lý lịch tiếp dân tại quầy"
+    description="Kiểm tra thông tin đơn, phê duyệt lượt tiếp dân và mời người dân đánh giá sau khi hoàn tất buổi tiếp."
     queue={counterReceptionFeedbackQueue}
-    allowedRoles={['RECEPTION_OFFICER', 'PROCESSING_OFFICER', 'ADMIN']}
+    allowedRoles={['OFFICER', 'ADMIN']}
   />;
 }

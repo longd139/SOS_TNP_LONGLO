@@ -4,6 +4,7 @@
 import { lazy, Suspense } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { AdminLayoutV2 } from './layouts/Layouts';
+import { useMock } from './MockContext';
 import CitizenLayout from '../citizen/CitizenLayout';
 import CitizenHomePage from '../citizen/pages/CitizenHomePage';
 import { ProcedureListPage, ProcedureDetailPage, NewsListPage, NewsDetailPage, SubmitComplaintPage, TrackComplaintPage, ComplaintDetailPage, ContactPage, CitizenNotFound } from '../citizen/CitizenPages';
@@ -34,6 +35,12 @@ const LeaderMeetingFeedbackPage = lazy(() => import('../pages-v2/admin/LeaderMee
 
 function RoleHome() {
   return <Navigate to="/cong-dong" replace />;
+}
+
+function ScheduleRoleGuard({ children }) {
+  const { currentUser } = useMock();
+  const allowed = ['APPROVER', 'LEADER', 'ADMIN'].includes(currentUser?.role);
+  return allowed ? children : <Navigate to="/dashboard" replace />;
 }
 
 export default function AppRoutesV2() {
@@ -82,8 +89,8 @@ export default function AppRoutesV2() {
         <Route path="/admin/leader-meeting-feedback" element={<LeaderMeetingFeedbackPage />} />
         <Route path="/admin/documents/history" element={<HistoryDocs />} />
         <Route path="/admin/documents/legal" element={<LegalDocs />} />
-        <Route path="/admin/schedules/approve" element={<ApproveSchedule />} />
-        <Route path="/admin/schedules/add" element={<AddSchedule />} />
+        <Route path="/admin/schedules/approve" element={<ScheduleRoleGuard><ApproveSchedule /></ScheduleRoleGuard>} />
+        <Route path="/admin/schedules/add" element={<ScheduleRoleGuard><AddSchedule /></ScheduleRoleGuard>} />
         <Route path="/placeholder" element={<PlaceholderPage />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />

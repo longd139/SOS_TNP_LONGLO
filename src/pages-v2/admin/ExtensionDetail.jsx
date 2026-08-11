@@ -488,7 +488,7 @@ export default function ExtensionDetail() {
                     <p className="text-xs text-gray-500">
                       {actor?.fullName || entry.performedBy}{' '}
                       <span className="text-gray-400">
-                        ({actor?.role === 'CITIZEN' ? 'Người dân' : actor?.role === 'RECEPTION_OFFICER' ? 'Cán bộ tiếp nhận' : actor?.role === 'PROCESSING_OFFICER' ? 'Cán bộ xử lý' : actor?.role || '—'})
+                        ({actor?.role === 'CITIZEN' ? 'Người dân' : ['RECEPTION_OFFICER', 'PROCESSING_OFFICER', 'OFFICER'].includes(actor?.role) ? 'Cán bộ' : actor?.role || '—'})
                       </span>
                     </p>
                     {entry.oldValue && entry.newValue && (

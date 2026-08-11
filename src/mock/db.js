@@ -22,14 +22,14 @@ export const users = [
   { id: "USR-003", fullName: "Lê Văn Cường",      phone: "0901234569", role: "CITIZEN",              departmentId: null,         status: "ACTIVE", avatarUrl: "/mock/avatars/03.png" },
   { id: "USR-004", fullName: "Phạm Thị Dung",      phone: "0901234570", role: "CITIZEN",              departmentId: null,         status: "ACTIVE", avatarUrl: "/mock/avatars/04.png" },
   { id: "USR-005", fullName: "Hoàng Văn Em",       phone: "0901234571", role: "CITIZEN",              departmentId: null,         status: "ACTIVE", avatarUrl: "/mock/avatars/05.png" },
-  { id: "USR-010", fullName: "Vũ Thị Hoa",         phone: "0987654321", role: "RECEPTION_OFFICER",    departmentId: "DEP-RECEPTION", status: "ACTIVE", avatarUrl: "/mock/avatars/10.png" },
-  { id: "USR-011", fullName: "Mai Văn Khánh",      phone: "0987654322", role: "RECEPTION_OFFICER",    departmentId: "DEP-RECEPTION", status: "ACTIVE", avatarUrl: "/mock/avatars/11.png" },
-  { id: "USR-020", fullName: "Đặng Minh Luân",     phone: "0987654330", role: "PROCESSING_OFFICER",   departmentId: "DEP-URBAN",   status: "ACTIVE", avatarUrl: "/mock/avatars/20.png" },
-  { id: "USR-021", fullName: "Bùi Thanh Mai",      phone: "0987654331", role: "PROCESSING_OFFICER",   departmentId: "DEP-URBAN",   status: "ACTIVE", avatarUrl: "/mock/avatars/21.png" },
-  { id: "USR-022", fullName: "Ngô Quốc Nam",       phone: "0987654332", role: "PROCESSING_OFFICER",   departmentId: "DEP-ENV",     status: "ACTIVE", avatarUrl: "/mock/avatars/22.png" },
-  { id: "USR-023", fullName: "Lý Thị Oanh",        phone: "0987654333", role: "PROCESSING_OFFICER",   departmentId: "DEP-ENV",     status: "ACTIVE", avatarUrl: "/mock/avatars/23.png" },
-  { id: "USR-024", fullName: "Trịnh Văn Phong",    phone: "0987654334", role: "PROCESSING_OFFICER",   departmentId: "DEP-INFRA",   status: "ACTIVE", avatarUrl: "/mock/avatars/24.png" },
-  { id: "USR-025", fullName: "Hồ Thị Quyên",       phone: "0987654335", role: "PROCESSING_OFFICER",   departmentId: "DEP-INFRA",   status: "ACTIVE", avatarUrl: "/mock/avatars/25.png" },
+  { id: "USR-010", fullName: "Vũ Thị Hoa",         phone: "0987654321", role: "OFFICER", departmentId: "DEP-RECEPTION", status: "ACTIVE", avatarUrl: "/mock/avatars/10.png" },
+  { id: "USR-011", fullName: "Mai Văn Khánh",      phone: "0987654322", role: "OFFICER", departmentId: "DEP-RECEPTION", status: "ACTIVE", avatarUrl: "/mock/avatars/11.png" },
+  { id: "USR-020", fullName: "Đặng Minh Luân",     phone: "0987654330", role: "OFFICER", departmentId: "DEP-URBAN", status: "ACTIVE", avatarUrl: "/mock/avatars/20.png" },
+  { id: "USR-021", fullName: "Bùi Thanh Mai",      phone: "0987654331", role: "OFFICER", departmentId: "DEP-URBAN", status: "ACTIVE", avatarUrl: "/mock/avatars/21.png" },
+  { id: "USR-022", fullName: "Ngô Quốc Nam",       phone: "0987654332", role: "OFFICER", departmentId: "DEP-ENV", status: "ACTIVE", avatarUrl: "/mock/avatars/22.png" },
+  { id: "USR-023", fullName: "Lý Thị Oanh",        phone: "0987654333", role: "OFFICER", departmentId: "DEP-ENV", status: "ACTIVE", avatarUrl: "/mock/avatars/23.png" },
+  { id: "USR-024", fullName: "Trịnh Văn Phong",    phone: "0987654334", role: "OFFICER", departmentId: "DEP-INFRA", status: "ACTIVE", avatarUrl: "/mock/avatars/24.png" },
+  { id: "USR-025", fullName: "Hồ Thị Quyên",       phone: "0987654335", role: "OFFICER", departmentId: "DEP-INFRA", status: "ACTIVE", avatarUrl: "/mock/avatars/25.png" },
   { id: "USR-030", fullName: "Đỗ Văn Sơn",         phone: "0987654340", role: "APPROVER",             departmentId: "DEP-LEADERSHIP", status: "ACTIVE", avatarUrl: "/mock/avatars/30.png" },
   { id: "USR-031", fullName: "Phan Thị Thảo",      phone: "0987654341", role: "LEADER",               departmentId: "DEP-LEADERSHIP", status: "ACTIVE", avatarUrl: "/mock/avatars/31.png" },
   { id: "USR-032", fullName: "Võ Minh Tuấn",       phone: "0987654342", role: "ADMIN",                departmentId: "DEP-LEADERSHIP", status: "ACTIVE", avatarUrl: "/mock/avatars/32.png" },
@@ -324,7 +324,7 @@ complaints.forEach(c => {
       departmentId: c.assignedDepartmentId,
       primaryOfficerId: c.assignedOfficerId,
       supportOfficerIds: Math.random() > 0.6 ? [pick(users.filter(u => u.departmentId === c.assignedDepartmentId && u.id !== c.assignedOfficerId))?.id].filter(Boolean) : [],
-      assignedBy: pick(users.filter(u => u.role === 'RECEPTION_OFFICER')).id,
+      assignedBy: pick(users.filter(u => u.role === 'OFFICER')).id,
       assignedAt: c.receivedAt ? new Date(new Date(c.receivedAt).getTime() + 3600000).toISOString() : c.createdAt,
       assignmentNote: "Phân công xử lý phản ánh",
       status: "ACTIVE",
@@ -421,7 +421,7 @@ complaints.forEach(c => {
 
   // RECEIVED
   if (c.receivedAt) {
-    const receiver = pick(users.filter(u => u.role === 'RECEPTION_OFFICER'));
+    const receiver = pick(users.filter(u => u.role === 'OFFICER'));
     hisId++;
     history.push({ id: `HIS-${String(hisId).padStart(4,'0')}`, complaintId: c.id, actionType: "COMPLAINT_RECEIVED", performedBy: receiver.id, performedRole: receiver.role, performedAt: c.receivedAt, oldValue: { status: "NEW" }, newValue: { status: "RECEIVED", urgency: c.confirmedUrgency, deadline: c.originalDeadline }, internalNote: "Đã kiểm tra và tiếp nhận phản ánh", publicNote: "Phản ánh đã được tiếp nhận.", isPublic: true });
   }
@@ -461,7 +461,7 @@ complaints.forEach(c => {
 
   // REJECTED
   if (c.status === 'REJECTED') {
-    const rejecter = pick(users.filter(u => u.role === 'RECEPTION_OFFICER'));
+    const rejecter = pick(users.filter(u => u.role === 'OFFICER'));
     hisId++;
     history.push({ id: `HIS-${String(hisId).padStart(4,'0')}`, complaintId: c.id, actionType: "REJECTED", performedBy: rejecter.id, performedRole: rejecter.role, performedAt: c.completedAt || c.receivedAt, oldValue: { status: "PENDING_RECEPTION" }, newValue: { status: "REJECTED" }, internalNote: "Phản ánh không đủ thông tin hoặc trùng lặp", publicNote: "Phản ánh không được tiếp nhận do thiếu thông tin.", isPublic: true });
   }

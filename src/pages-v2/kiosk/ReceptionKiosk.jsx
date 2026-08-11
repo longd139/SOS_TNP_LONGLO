@@ -4,6 +4,7 @@ import { clearReceptionFeedback, readActiveReceptionFeedback, RECEPTION_FEEDBACK
 import './ReceptionKiosk.css';
 
 export const RECEPTION_FEEDBACK_STORAGE_KEY = 'sos_reception_feedback_v1';
+export const RECEPTION_FEEDBACK_UPDATED_EVENT = 'sos-reception-feedback-updated';
 
 const criteria = [
   { id: 'attitude', label: 'Thái độ phục vụ', hint: 'Lịch sự, lắng nghe và tôn trọng', icon: HeartHandshake },
@@ -12,7 +13,11 @@ const criteria = [
 ];
 
 const ratingLabels = { 1: 'Rất chưa hài lòng', 2: 'Chưa hài lòng', 3: 'Bình thường', 4: 'Hài lòng', 5: 'Rất hài lòng' };
-const reasons = ['Được hướng dẫn rõ ràng', 'Cán bộ lắng nghe và hỗ trợ tận tình', 'Thời gian tiếp nhận phù hợp', 'Quy trình thuận tiện', 'Thái độ phục vụ thân thiện'];
+const positiveReasonGroups = {
+  low: ['Ý kiến của tôi đã được tiếp nhận', 'Mong được hướng dẫn rõ ràng hơn', 'Mong thời gian hỗ trợ phù hợp hơn', 'Mong quy trình thuận tiện hơn', 'Cảm ơn cán bộ đã hỗ trợ'],
+  medium: ['Được tiếp nhận và hướng dẫn cơ bản', 'Có thể cung cấp thêm thông tin chi tiết', 'Thời gian tiếp nhận tương đối phù hợp', 'Quy trình có thể thuận tiện hơn', 'Cán bộ đã lắng nghe ý kiến'],
+  high: ['Được hướng dẫn rõ ràng', 'Cán bộ lắng nghe và hỗ trợ tận tình', 'Thời gian tiếp nhận phù hợp', 'Quy trình thuận tiện', 'Thái độ phục vụ thân thiện'],
+};
 
 function RatingStars({ value, onChange, label }) {
   return <div className="reception-kiosk-stars" role="radiogroup" aria-label={label}>
@@ -36,6 +41,21 @@ export default function ReceptionKiosk() {
   const [comment, setComment] = useState('');
   const [submitted, setSubmitted] = useState(false);
   const totalSteps = 4;
+  const suggestedReasons = useMemo(() => {
+    const criterionSuggestions = {
+      attitude: 'Mong cán bộ tiếp tục lắng nghe và hỗ trợ tận tình hơn',
+      guidance: 'Mong được hướng dẫn rõ ràng và dễ hiểu hơn',
+      waiting: 'Mong thời gian tiếp nhận và hỗ trợ phù hợp hơn',
+    };
+    const lowCriteria = criteria
+      .filter((criterion) => criterionRatings[criterion.id] && criterionRatings[criterion.id] <= 3)
+      .map((criterion) => criterionSuggestions[criterion.id]);
+    const averageCriteria = Object.values(criterionRatings).length
+      ? Object.values(criterionRatings).reduce((sum, value) => sum + value, 0) / Object.values(criterionRatings).length
+      : overall;
+    const scoreSuggestions = overall <= 2 || averageCriteria <= 2 ? positiveReasonGroups.low : overall === 3 || averageCriteria < 4 ? positiveReasonGroups.medium : positiveReasonGroups.high;
+    return [...new Set([...lowCriteria, ...scoreSuggestions])].slice(0, 5);
+  }, [criterionRatings, overall]);
 
   const canContinue = useMemo(() => {
     if (step === 0) return Boolean(activeSession);
@@ -89,6 +109,7 @@ export default function ReceptionKiosk() {
     try {
       const existing = JSON.parse(window.localStorage.getItem(RECEPTION_FEEDBACK_STORAGE_KEY) || '[]');
       window.localStorage.setItem(RECEPTION_FEEDBACK_STORAGE_KEY, JSON.stringify([...existing, payload]));
+      window.dispatchEvent(new Event(RECEPTION_FEEDBACK_UPDATED_EVENT));
     } catch (error) {
       // The kiosk still shows a successful state when browser storage is unavailable.
     }
@@ -111,13 +132,13 @@ export default function ReceptionKiosk() {
     <section className={`reception-kiosk-content reception-kiosk-step-${step}`}>
       {!activeSession && <div className="reception-kiosk-welcome"><div className="reception-kiosk-hero-icon"><ShieldCheck size={42} /></div><p className="reception-kiosk-eyebrow">SOS TNP · Tiếp dân</p><h1>iPad đang sẵn sàng</h1><p className="reception-kiosk-lead">Cán bộ sẽ chọn phiếu tiếp dân trên màn hình quản lý. Khi được gọi, thông tin phiếu sẽ hiển thị tại đây.</p><div className="reception-kiosk-waiting-pill"><span /> Đang chờ phiên đánh giá</div><p className="reception-kiosk-privacy"><ShieldCheck size={16} /> Không yêu cầu người dân nhập mã hoặc thông tin cá nhân</p></div>}
 
-      {activeSession && step === 0 && <div className="reception-kiosk-welcome"><div className="reception-kiosk-hero-icon"><UsersRound size={42} /></div><p className="reception-kiosk-eyebrow">SOS TNP · {activeSession.feedbackType === 'LEADER_MEETING' ? 'Gặp lãnh đạo' : 'Tiếp dân tại quầy'}</p><h1>Hãy đánh giá trải nghiệm của bạn</h1><div className="reception-kiosk-active-ticket"><span>{activeSession.feedbackType === 'LEADER_MEETING' ? 'Mã phiếu gặp lãnh đạo' : 'Mã phiếu tiếp dân'}</span><strong>{activeSession.ticketNo}</strong><div><b>{activeSession.date}</b><b>{activeSession.slot}</b></div><p>{activeSession.topic}</p></div><button type="button" className="reception-kiosk-primary reception-kiosk-start" onClick={goNext}>Bắt đầu đánh giá <ChevronRight size={22} /></button></div>}
+      {activeSession && step === 0 && <div className="reception-kiosk-welcome"><div className="reception-kiosk-hero-icon"><UsersRound size={42} /></div><p className="reception-kiosk-eyebrow">SOS TNP · {activeSession.feedbackType === 'LEADER_MEETING' ? 'Gặp lãnh đạo' : 'Tiếp dân tại quầy'}</p><h1>Hãy đánh giá trải nghiệm của bạn</h1><div className="reception-kiosk-active-ticket"><span>{activeSession.feedbackType === 'LEADER_MEETING' ? 'Mã phiếu gặp lãnh đạo' : 'Mã phiếu tiếp dân'}</span><strong>{activeSession.ticketNo}</strong><div><b>{activeSession.date}</b><b>{activeSession.slot}</b></div><div className="reception-kiosk-citizen"><b>Người dân</b><span>{activeSession.fullName || activeSession.citizenName || 'Chưa cập nhật'}</span><b>Điện thoại</b><span>{activeSession.phone || 'Chưa cập nhật'}</span></div><p>{activeSession.topic}</p></div></div>}
 
       {activeSession && step === 1 && <div className="reception-kiosk-panel"><p className="reception-kiosk-eyebrow">Bước 1 · Đánh giá chung</p><h1>Buổi tiếp dân hôm nay của bạn thế nào?</h1><p className="reception-kiosk-lead">Chạm vào số sao phù hợp nhất với trải nghiệm của bạn.</p><RatingStars value={overall} onChange={setOverall} label="Đánh giá chung từ 1 đến 5 sao" /><strong className="reception-kiosk-rating-label">{overall ? `${overall}/5 · ${ratingLabels[overall]}` : 'Chọn số sao để tiếp tục'}</strong></div>}
 
       {activeSession && step === 2 && <div className="reception-kiosk-panel reception-kiosk-criteria-panel"><p className="reception-kiosk-eyebrow">Bước 2 · Các tiêu chí</p><h1>Điều gì tạo nên trải nghiệm của bạn?</h1><p className="reception-kiosk-lead">Chạm chọn số sao cho từng nội dung.</p><div className="reception-kiosk-criteria">{criteria.map(({ id, label, hint, icon: Icon }) => <div className="reception-kiosk-criterion" key={id}><div className="reception-kiosk-criterion-copy"><span><Icon size={21} /></span><div><strong>{label}</strong><small>{hint}</small></div></div><RatingStars value={criterionRatings[id] || 0} onChange={(value) => updateCriterion(id, value)} label={`Đánh giá ${label}`} /></div>)}</div></div>}
 
-      {activeSession && step === 3 && <div className="reception-kiosk-panel reception-kiosk-comment-panel"><p className="reception-kiosk-eyebrow">Bước 3 · Góp ý thêm</p><h1>Bạn có muốn chia sẻ thêm không?</h1><p className="reception-kiosk-lead">Nội dung góp ý là không bắt buộc.</p><div className="reception-kiosk-reasons">{reasons.map((reason) => <button key={reason} type="button" className={selectedReasons.includes(reason) ? 'is-selected' : ''} onClick={() => toggleReason(reason)}>{reason}</button>)}</div><label className="reception-kiosk-comment-field"><span>Góp ý của bạn</span><textarea maxLength={500} value={comment} onChange={(event) => setComment(event.target.value)} placeholder="Chia sẻ điều bạn muốn chúng tôi cải thiện..." /><small>{comment.length}/500 ký tự</small></label></div>}
+      {activeSession && step === 3 && <div className="reception-kiosk-panel reception-kiosk-comment-panel"><p className="reception-kiosk-eyebrow">Bước 3 · Góp ý thêm</p><h1>Bạn có muốn chia sẻ thêm không?</h1><p className="reception-kiosk-lead">Gợi ý được điều chỉnh theo mức đánh giá của bạn. Nội dung góp ý là không bắt buộc.</p><div className="reception-kiosk-reasons">{suggestedReasons.map((reason) => <button key={reason} type="button" className={selectedReasons.includes(reason) ? 'is-selected' : ''} onClick={() => toggleReason(reason)}>{reason}</button>)}</div><label className="reception-kiosk-comment-field"><span>Góp ý của bạn</span><textarea maxLength={500} value={comment} onChange={(event) => setComment(event.target.value)} placeholder="Chia sẻ điều bạn muốn chúng tôi cải thiện..." /><small>{comment.length}/500 ký tự</small></label></div>}
     </section>
     {activeSession && <footer className="reception-kiosk-footer"><span>Đánh giá của bạn được ghi nhận bảo mật.</span><button type="button" className="reception-kiosk-primary" disabled={!canContinue} onClick={goNext}>{step === 3 ? 'Gửi đánh giá' : 'Tiếp tục'} <ChevronRight size={21} /></button></footer>}
   </main>;

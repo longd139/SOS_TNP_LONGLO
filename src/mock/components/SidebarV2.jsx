@@ -8,23 +8,25 @@ import { useMock } from '../MockContext';
 
 const ALL_MENUS = [
   { id: 'dashboard', label: 'Tổng quan', icon: LayoutDashboard, path: '/dashboard', roles: ['APPROVER','LEADER','ADMIN'] },
-  { id: 'complaints', label: 'Quản lý phản ánh', icon: MessageSquare, path: '/admin/complaints', roles: ['RECEPTION_OFFICER','PROCESSING_OFFICER','APPROVER','LEADER','ADMIN'] },
-  { id: 'extensions', label: 'Quản lý gia hạn', icon: Clock, path: '/admin/extensions', roles: ['PROCESSING_OFFICER','APPROVER','LEADER','ADMIN'] },
+  { id: 'complaints', label: 'Quản lý phản ánh', icon: MessageSquare, path: '/admin/complaints', roles: ['OFFICER','APPROVER','LEADER','ADMIN'] },
+  { id: 'extensions', label: 'Quản lý gia hạn', icon: Clock, path: '/admin/extensions', roles: ['OFFICER','APPROVER','LEADER','ADMIN'] },
   {
     id: 'reception-schedules-v2',
     label: 'Quản lý lịch tiếp công dân',
     icon: Calendar,
-    roles: ['RECEPTION_OFFICER','PROCESSING_OFFICER','APPROVER','LEADER','ADMIN'],
+    roles: ['APPROVER','LEADER','ADMIN'],
     submenu: [
-      { id: 'approve-schedule', label: 'Duyệt lịch hẹn', path: '/admin/schedules/approve' },
-      { id: 'add-schedule', label: 'Thêm lịch hẹn', path: '/admin/schedules/add' },
+      { id: 'approve-schedule', label: 'Duyệt lịch hẹn', path: '/admin/schedules/approve', roles: ['APPROVER','LEADER','ADMIN'] },
+      { id: 'add-schedule', label: 'Thêm lịch hẹn', path: '/admin/schedules/add', roles: ['APPROVER','LEADER','ADMIN'] },
+      { id: 'leader-meeting-feedback', label: 'Đánh giá gặp lãnh đạo', path: '/admin/leader-meeting-feedback', roles: ['APPROVER','LEADER','ADMIN'] },
     ],
   },
+  { id: 'counter-reception-feedback', label: 'Lịch tiếp dân', icon: Calendar, path: '/admin/counter-reception-feedback', roles: ['OFFICER','ADMIN'] },
   {
     id: 'documents',
     label: 'Quản lý Tài liệu', 
     icon: FileText, 
-    roles: ['PROCESSING_OFFICER','APPROVER','LEADER','ADMIN'],
+    roles: ['OFFICER','APPROVER','LEADER','ADMIN'],
     submenu: [
       { id: 'doc-history', label: 'Văn hóa lịch sử', path: '/admin/documents/history' },
       { id: 'doc-legal', label: 'Quy phạm pháp luật', path: '/admin/documents/legal' }
@@ -33,8 +35,6 @@ const ALL_MENUS = [
   { id: 'large-screen', label: 'Màn hình lớn', icon: LayoutDashboard, path: '/dashboard/large-screen', roles: ['APPROVER','LEADER','ADMIN'] },
   { id: 'digital-map', label: 'Bản đồ số', icon: Map, path: '/admin/digital-map', roles: ['APPROVER','LEADER','ADMIN'] },
   { id: 'app-statistics', label: 'Thống kê lượt tải App', icon: Smartphone, path: '/admin/app-statistics', roles: ['APPROVER','LEADER','ADMIN'] },
-  { id: 'counter-reception-feedback', label: 'Đánh giá tiếp dân tại quầy', icon: Star, path: '/admin/counter-reception-feedback', roles: ['RECEPTION_OFFICER','PROCESSING_OFFICER','ADMIN'] },
-  { id: 'leader-meeting-feedback', label: 'Đánh giá gặp lãnh đạo', icon: Star, path: '/admin/leader-meeting-feedback', roles: ['APPROVER','LEADER','ADMIN'] },
   { id: 'satisfaction', label: 'Thống kê đánh giá', icon: Star, path: '/admin/satisfaction', roles: ['APPROVER','LEADER','ADMIN'] },
   { type: 'divider' },
   { id: 'categories', label: 'Loại phản ánh', icon: FolderOpen, path: '/placeholder', disabled: true },
@@ -48,7 +48,7 @@ export default function SidebarV2({ collapsed, onToggle }) {
   const location = useLocation();
   const { currentUser } = useMock();
   const role = currentUser?.role || 'CITIZEN';
-  const [openMenus, setOpenMenus] = useState({ documents: true });
+  const [openMenus, setOpenMenus] = useState({ documents: true, 'reception-schedules-v2': true });
 
   const toggleSubmenu = (id) => {
     setOpenMenus(prev => ({ ...prev, [id]: !prev[id] }));
@@ -103,7 +103,7 @@ export default function SidebarV2({ collapsed, onToggle }) {
                       </div>
                       {!collapsed && isSubOpen && (
                         <ul className="mt-1 ml-9 space-y-1">
-                          {item.submenu.map(sub => {
+                          {item.submenu.filter((sub) => !sub.roles || sub.roles.includes(role)).map(sub => {
                             if (sub.submenu) {
                               const isLevel3Open = openMenus[sub.id];
                               const isLevel3Active = sub.submenu.some(sub3 => location.pathname === sub3.path.split('?')[0]);
@@ -169,7 +169,7 @@ export default function SidebarV2({ collapsed, onToggle }) {
       </nav>
 
       <div className={`border-t border-gray-200 p-3 ${collapsed ? 'text-center' : ''}`}>
-        <p className="text-xs text-gray-400">{role === 'CITIZEN' ? 'Người dân' : role === 'RECEPTION_OFFICER' ? 'Cán bộ tiếp nhận' : role === 'PROCESSING_OFFICER' ? 'Cán bộ xử lý' : role === 'APPROVER' || role === 'LEADER' ? 'Lãnh đạo' : 'Admin'} — v2.0</p>
+        <p className="text-xs text-gray-400">{role === 'CITIZEN' ? 'Người dân' : ['OFFICER', 'RECEPTION_OFFICER', 'PROCESSING_OFFICER'].includes(role) ? 'Cán bộ' : role === 'APPROVER' || role === 'LEADER' ? 'Lãnh đạo' : 'Admin'} — v2.0</p>
       </div>
     </aside>
   );

@@ -4,9 +4,9 @@ import { leaderMeetingFeedbackQueue } from '../../citizen/data/receptionFeedback
 
 export default function LeaderMeetingFeedbackPage() {
   return <ReceptionFeedbackDispatchPage
-    eyebrow="Gặp lãnh đạo"
-    title="Điều phối đánh giá buổi gặp lãnh đạo"
-    description="Lãnh đạo hoặc người được phân quyền chọn đúng phiếu hẹn để gọi màn hình đánh giá trên iPad."
+    eyebrow="Lịch gặp lãnh đạo"
+    title="Quản lý lịch gặp lãnh đạo"
+    description="Kiểm tra đơn đăng ký, phê duyệt lịch gặp và mời người dân đánh giá sau khi buổi làm việc hoàn tất."
     queue={leaderMeetingFeedbackQueue}
     allowedRoles={['APPROVER', 'LEADER', 'ADMIN']}
   />;
