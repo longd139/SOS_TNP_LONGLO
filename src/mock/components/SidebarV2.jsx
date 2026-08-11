@@ -14,7 +14,7 @@ const ALL_MENUS = [
     id: 'reception-schedules-v2',
     label: 'Quản lý lịch tiếp công dân',
     icon: Calendar,
-    roles: ['RECEPTION_OFFICER','PROCESSING_OFFICER','APPROVER','LEADER','ADMIN'],
+    roles: ['RECEPTION_OFFICER','APPROVER','LEADER','ADMIN'],
     submenu: [
       { id: 'approve-schedule', label: 'Duyệt lịch hẹn', path: '/admin/schedules/approve' },
       { id: 'add-schedule', label: 'Thêm lịch hẹn', path: '/admin/schedules/add' },
