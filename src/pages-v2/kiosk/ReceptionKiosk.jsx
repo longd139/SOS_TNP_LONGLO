@@ -85,7 +85,7 @@ export default function ReceptionKiosk() {
   const toggleReason = (reason) => setSelectedReasons((current) => current.includes(reason) ? current.filter((item) => item !== reason) : [...current, reason]);
 
   const submitFeedback = () => {
-    const payload = { id: `TD-${Date.now()}`, type: 'TIEP_DAN', feedbackType: activeSession?.feedbackType, receptionId: activeSession?.receptionId, ticketNo: activeSession?.ticketNo, kioskId: 'KIOSK-TIEP-DAN-01', overall, criteria: criterionRatings, reasons: selectedReasons, comment: comment.trim(), createdAt: new Date().toISOString() };
+    const payload = { id: `TD-${Date.now()}`, type: 'TIEP_DAN', feedbackType: activeSession?.feedbackType, receptionId: activeSession?.receptionId, ticketNo: activeSession?.ticketNo, receptionDate: activeSession?.date, receptionSlot: activeSession?.slot, topic: activeSession?.topic, citizenName: activeSession?.citizenName, office: activeSession?.office, kioskId: 'KIOSK-TIEP-DAN-01', overall, criteria: criterionRatings, reasons: selectedReasons, comment: comment.trim(), createdAt: new Date().toISOString() };
     try {
       const existing = JSON.parse(window.localStorage.getItem(RECEPTION_FEEDBACK_STORAGE_KEY) || '[]');
       window.localStorage.setItem(RECEPTION_FEEDBACK_STORAGE_KEY, JSON.stringify([...existing, payload]));
