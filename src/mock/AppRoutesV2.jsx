@@ -16,6 +16,7 @@ import DashboardOverview from '../pages-v2/dashboard/DashboardOverview';
 import PlaceholderPage from '../pages-v2/PlaceholderPage';
 import AddSchedule from '../pages-v2/admin/AddSchedule';
 import ApproveSchedule from '../pages-v2/admin/ApproveSchedule';
+import FeedbackKiosk from '../pages-v2/kiosk/FeedbackKiosk';
 
 const DigitalLibraryPage = lazy(() => import('../citizen/pages/DigitalLibraryPage'));
 const ComplaintList = lazy(() => import('../pages-v2/admin/ComplaintList'));
@@ -39,6 +40,7 @@ export default function AppRoutesV2() {
     <Routes>
       <Route path="/" element={<RoleHome />} />
       <Route path="/register-meeting" element={<RegisterLeaderMeeting />} />
+      <Route path="/kiosk/feedback" element={<FeedbackKiosk />} />
       <Route element={<CitizenLayout />}>
         <Route path="/cong-dong" element={<CitizenHomePage />} />
         <Route path="/cong-dong/thu-tuc" element={<ProcedureListPage />} />
