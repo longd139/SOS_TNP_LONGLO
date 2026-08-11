@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Table, Dropdown, message, Tabs, Modal, Button } from 'antd';
+import { Table, Dropdown, message, Tabs, Modal, Button, Input } from 'antd';
 import { ClipboardCheck, User, MoreHorizontal, Eye, Check, X, Award, CalendarCheck } from 'lucide-react';
 
 const MOCK_DATA = [
@@ -131,6 +131,8 @@ export default function ApproveSchedule() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedTicket, setSelectedTicket] = useState(null);
   const [activeTab, setActiveTab] = useState('PENDING');
+  const [actionModal, setActionModal] = useState({ isOpen: false, action: null, ticketId: null });
+  const [actionNote, setActionNote] = useState('');
 
   useEffect(() => {
     const localData = localStorage.getItem('citizen-approvals-v7');
@@ -143,8 +145,18 @@ export default function ApproveSchedule() {
   }, []);
 
   const handleAction = (id, newStatus) => {
+    if (newStatus === 'REJECTED' || newStatus === 'CANCELED') {
+      setActionModal({ isOpen: true, action: newStatus, ticketId: id });
+      setActionNote('');
+      setIsModalOpen(false);
+      return;
+    }
+    executeAction(id, newStatus);
+  };
+
+  const executeAction = (id, newStatus, note = '') => {
     const updatedData = data.map(item => 
-      item.id === id ? { ...item, status: newStatus } : item
+      item.id === id ? { ...item, status: newStatus, note: note || item.note } : item
     );
     setData(updatedData);
     localStorage.setItem('citizen-approvals-v7', JSON.stringify(updatedData));
@@ -156,6 +168,7 @@ export default function ApproveSchedule() {
     if (newStatus === 'DONE') msg = 'Đã đánh dấu tiếp xong';
     message.success(msg);
     setIsModalOpen(false);
+    setActionModal({ isOpen: false, action: null, ticketId: null });
   };
 
   const getInitials = (name) => {
@@ -463,8 +476,44 @@ export default function ApproveSchedule() {
               </div>
             </div>
 
+            {/* GHI CHÚ TỪ CHỐI / HỦY (NẾU CÓ) */}
+            {selectedTicket.note && (selectedTicket.status === 'REJECTED' || selectedTicket.status === 'CANCELED') && (
+              <div className="pt-2">
+                <h4 className="text-[12px] font-bold text-red-500 mb-2 uppercase tracking-wide">
+                  LÝ DO {selectedTicket.status === 'REJECTED' ? 'TỪ CHỐI' : 'HỦY LỊCH'}
+                </h4>
+                <div className="bg-red-50 border border-red-200 rounded-xl p-4">
+                  <p className="text-red-700 text-[14px] leading-relaxed m-0 font-medium">
+                    {selectedTicket.note}
+                  </p>
+                </div>
+              </div>
+            )}
           </div>
         )}
+      </Modal>
+
+      <Modal
+        title={actionModal.action === 'REJECTED' ? 'Xác nhận từ chối' : 'Xác nhận hủy lịch'}
+        open={actionModal.isOpen}
+        onCancel={() => setActionModal({ isOpen: false, action: null, ticketId: null })}
+        onOk={() => executeAction(actionModal.ticketId, actionModal.action, actionNote)}
+        okText="Xác nhận"
+        cancelText="Bỏ qua"
+        okButtonProps={{ danger: true, className: "bg-red-500 hover:bg-red-600 border-none shadow-md" }}
+        cancelButtonProps={{ className: "border-none shadow-sm" }}
+        centered
+      >
+        <div className="mb-4 text-gray-600 text-[15px]">
+          Bạn có chắc chắn muốn <strong className="text-red-500">{actionModal.action === 'REJECTED' ? 'từ chối' : 'hủy'}</strong> lịch hẹn này không?
+        </div>
+        <Input.TextArea
+          rows={4}
+          placeholder="Nhập ghi chú / lý do (không bắt buộc)..."
+          value={actionNote}
+          onChange={(e) => setActionNote(e.target.value)}
+          className="rounded-xl p-3"
+        />
       </Modal>
 
       <style jsx global>{`
