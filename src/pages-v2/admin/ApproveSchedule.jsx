@@ -4,7 +4,7 @@ import { ClipboardCheck, User, MoreHorizontal, Eye, Check, X, Award, CalendarChe
 
 const MOCK_DATA = [
   {
-    id: 'TICKET-001',
+    id: 'PA-1001',
     leader: 'Ông Nguyễn Văn An',
     date: '2026-08-22',
     dayOfWeek: 'Thứ Sáu',
@@ -19,7 +19,7 @@ const MOCK_DATA = [
     }
   },
   {
-    id: 'TICKET-002',
+    id: 'PA-1002',
     leader: 'Bà Phạm Thị Mai',
     date: '2026-08-23',
     dayOfWeek: 'Thứ Bảy',
@@ -34,7 +34,7 @@ const MOCK_DATA = [
     }
   },
   {
-    id: 'TICKET-003',
+    id: 'PA-1003',
     leader: 'Ông Trần Hoàng Nam',
     date: '2026-08-25',
     dayOfWeek: 'Thứ Ba',
@@ -49,7 +49,7 @@ const MOCK_DATA = [
     }
   },
   {
-    id: 'TICKET-004',
+    id: 'PA-1004',
     leader: 'Ông Nguyễn Văn An',
     date: '2026-08-20',
     dayOfWeek: 'Thứ Năm',
@@ -64,7 +64,7 @@ const MOCK_DATA = [
     }
   },
   {
-    id: 'TICKET-005',
+    id: 'PA-1005',
     leader: 'Bà Phạm Thị Mai',
     date: '2026-08-27',
     dayOfWeek: 'Thứ Năm',
@@ -79,7 +79,7 @@ const MOCK_DATA = [
     }
   },
   {
-    id: 'TICKET-006',
+    id: 'PA-1006',
     leader: 'Ông Trần Hoàng Nam',
     date: '2026-08-28',
     dayOfWeek: 'Thứ Sáu',
@@ -94,7 +94,7 @@ const MOCK_DATA = [
     }
   },
   {
-    id: 'TICKET-007',
+    id: 'PA-1007',
     leader: 'Ông Nguyễn Văn An',
     date: '2026-08-29',
     dayOfWeek: 'Thứ Bảy',
@@ -109,7 +109,7 @@ const MOCK_DATA = [
     }
   },
   {
-    id: 'TICKET-008',
+    id: 'PA-1008',
     leader: 'Bà Phạm Thị Mai',
     date: '2026-08-30',
     dayOfWeek: 'Chủ Nhật',
@@ -125,36 +125,6 @@ const MOCK_DATA = [
   }
 ];
 
-const repairVietnameseText = (value) => {
-  if (typeof value !== 'string' || !/[ÃÂÄÆáºá»]/.test(value)) return value;
-  try {
-    const cp1252Bytes = {
-      '€': 0x80, '‚': 0x82, 'ƒ': 0x83, '„': 0x84, '…': 0x85, '†': 0x86, '‡': 0x87,
-      'ˆ': 0x88, '‰': 0x89, 'Š': 0x8A, '‹': 0x8B, 'Œ': 0x8C, 'Ž': 0x8E, '‘': 0x91,
-      '’': 0x92, '“': 0x93, '”': 0x94, '•': 0x95, '–': 0x96, '—': 0x97, '˜': 0x98,
-      '™': 0x99, 'š': 0x9A, '›': 0x9B, 'œ': 0x9C, 'ž': 0x9E, 'Ÿ': 0x9F,
-    };
-    let repaired = value;
-    for (let attempt = 0; attempt < 3 && /[ÃÂÄÆáºá»]/.test(repaired); attempt += 1) {
-      const bytes = Uint8Array.from(Array.from(repaired, (character) => cp1252Bytes[character] ?? (character.charCodeAt(0) & 0xff)));
-      const nextValue = new TextDecoder('utf-8').decode(bytes);
-      if (nextValue === repaired) break;
-      repaired = nextValue;
-    }
-    return repaired;
-  } catch {
-    return value;
-  }
-};
-
-const repairScheduleData = (items) => items.map((item) => Object.fromEntries(
-  Object.entries(item).map(([key, value]) => [
-    key,
-    value && typeof value === 'object' && !Array.isArray(value)
-      ? Object.fromEntries(Object.entries(value).map(([nestedKey, nestedValue]) => [nestedKey, repairVietnameseText(nestedValue)]))
-      : repairVietnameseText(value),
-  ])
-));
 
 export default function ApproveSchedule() {
   const [data, setData] = useState([]);
@@ -163,14 +133,12 @@ export default function ApproveSchedule() {
   const [activeTab, setActiveTab] = useState('PENDING');
 
   useEffect(() => {
-    const localData = localStorage.getItem('citizen-approvals-v5');
+    const localData = localStorage.getItem('citizen-approvals-v7');
     if (!localData) {
-      localStorage.setItem('citizen-approvals-v5', JSON.stringify(MOCK_DATA));
+      localStorage.setItem('citizen-approvals-v7', JSON.stringify(MOCK_DATA));
       setData(MOCK_DATA);
     } else {
-      const repairedData = repairScheduleData(JSON.parse(localData));
-      setData(repairedData);
-      localStorage.setItem('citizen-approvals-v5', JSON.stringify(repairedData));
+      setData(JSON.parse(localData));
     }
   }, []);
 
@@ -179,7 +147,7 @@ export default function ApproveSchedule() {
       item.id === id ? { ...item, status: newStatus } : item
     );
     setData(updatedData);
-    localStorage.setItem('citizen-approvals-v5', JSON.stringify(updatedData));
+    localStorage.setItem('citizen-approvals-v7', JSON.stringify(updatedData));
     
     let msg = 'Đã cập nhật trạng thái';
     if (newStatus === 'APPROVED') msg = 'Đã duyệt lịch hẹn thành công';
