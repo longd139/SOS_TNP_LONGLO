@@ -342,29 +342,7 @@ export default function ApproveSchedule() {
         <p className="text-gray-500 text-[14px] m-0 mt-1">Xem, xét duyệt, theo dõi và đánh giá toàn bộ yêu cầu tiếp xúc công dân với Lãnh đạo Phường.</p>
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
-        <div className="bg-[#fef2f2] border-2 border-blue-400 rounded-lg p-4 flex flex-col justify-center relative overflow-hidden">
-          <div className="text-[24px] font-bold text-red-600 leading-none mb-1">{pendingCount}</div>
-          <div className="text-[13px] font-medium text-red-600">Chờ duyệt</div>
-        </div>
-        <div className="bg-[#eff6ff] border border-blue-100 rounded-lg p-4 flex flex-col justify-center">
-          <div className="text-[24px] font-bold text-blue-700 leading-none mb-1">{approvedCount}</div>
-          <div className="text-[13px] font-medium text-blue-700">Đã duyệt</div>
-        </div>
-        <div className="bg-[#f0fdf4] border border-green-100 rounded-lg p-4 flex flex-col justify-center">
-          <div className="text-[24px] font-bold text-green-700 leading-none mb-1">{doneCount}</div>
-          <div className="text-[13px] font-medium text-green-700">Đã tiếp xong</div>
-        </div>
-        <div className="bg-[#fff7ed] border border-orange-100 rounded-lg p-4 flex flex-col justify-center">
-          <div className="text-[24px] font-bold text-orange-600 leading-none mb-1">{rejectedCount}</div>
-          <div className="text-[13px] font-medium text-orange-600">Từ chối</div>
-        </div>
-        <div className="bg-[#f9fafb] border border-gray-100 rounded-lg p-4 flex flex-col justify-center">
-          <div className="text-[24px] font-bold text-gray-700 leading-none mb-1">{canceledCount}</div>
-          <div className="text-[13px] font-medium text-gray-700">Đã hủy</div>
-        </div>
-      </div>
+
 
       {/* Main Table Area */}
       <div className="bg-white rounded-lg border border-gray-200 shadow-sm h-fit">
