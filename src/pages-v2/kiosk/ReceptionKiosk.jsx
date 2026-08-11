@@ -12,7 +12,7 @@ const criteria = [
 ];
 
 const ratingLabels = { 1: 'Rất chưa hài lòng', 2: 'Chưa hài lòng', 3: 'Bình thường', 4: 'Hài lòng', 5: 'Rất hài lòng' };
-const reasons = ['Chờ đợi lâu', 'Hướng dẫn chưa rõ', 'Phải đi lại nhiều lần', 'Quy trình chưa thuận tiện', 'Thái độ phục vụ'];
+const reasons = ['Được hướng dẫn rõ ràng', 'Cán bộ lắng nghe và hỗ trợ tận tình', 'Thời gian tiếp nhận phù hợp', 'Quy trình thuận tiện', 'Thái độ phục vụ thân thiện'];
 
 function RatingStars({ value, onChange, label }) {
   return <div className="reception-kiosk-stars" role="radiogroup" aria-label={label}>

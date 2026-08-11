@@ -18,6 +18,7 @@ function ComplaintDetailModal({ code, onClose }) {
   const category = complaint ? getCategoryById(complaint.categoryId)?.name : fallback?.category;
   const neighborhood = complaint ? getNeighborhoodById(complaint.neighborhoodId)?.name : fallback?.location;
   const sender = complaint ? getUserById(complaint.citizenId)?.fullName : null;
+  const kioskRating = readKioskRatings().find((item) => item.code === code);
   const complaintAttachments = complaint ? attachments.filter((item) => item.complaintId === complaint.id) : [];
   const images = complaintAttachments.filter((item) => item.fileType?.startsWith('image/'));
   const videos = complaintAttachments.filter((item) => item.fileType?.startsWith('video/'));
@@ -30,6 +31,7 @@ function ComplaintDetailModal({ code, onClose }) {
         <button type="button" className="rounded-lg p-2 text-gray-500 hover:bg-gray-100 hover:text-gray-800" onClick={onClose} aria-label="Đóng"><X size={20} /></button>
       </header>
       <div className="space-y-5 p-6">
+        {kioskRating && <div className="rounded-xl bg-amber-50 p-4"><p className="text-xs font-semibold uppercase tracking-wide text-amber-700">Chi tiết đánh giá</p><p className="mt-2 text-2xl font-bold text-amber-600">{'★'.repeat(kioskRating.score)} <span className="text-sm text-gray-700">{kioskRating.score}/5 · {satisfactionLabel(kioskRating.score)}</span></p>{kioskRating.criteria && <div className="mt-3 grid gap-2 sm:grid-cols-3">{Object.entries(kioskRating.criteria).map(([key, value]) => <div key={key} className="rounded-lg bg-white/70 p-2 text-xs text-gray-600">{key}: <strong>{value}/5</strong></div>)}</div>}{kioskRating.reasons?.length > 0 && <div className="mt-3 flex flex-wrap gap-2">{kioskRating.reasons.map((reason) => <span key={reason} className="rounded-full bg-blue-100 px-2.5 py-1 text-xs text-blue-700">{reason}</span>)}</div>}<p className="mt-3 whitespace-pre-wrap rounded-lg bg-white/70 p-3 text-sm text-gray-700">{kioskRating.comment || 'Không có góp ý thêm.'}</p></div>}
         <div><p className="mb-1 text-xs font-medium uppercase tracking-wide text-gray-500">Tiêu đề</p><h3 className="text-lg font-semibold text-gray-900">{complaint?.title || fallback?.title || 'Chưa có dữ liệu tiêu đề'}</h3></div>
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <InfoItem label="Lĩnh vực" value={category} />
