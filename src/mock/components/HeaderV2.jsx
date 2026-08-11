@@ -3,7 +3,7 @@
 // ============================================================
 import React, { useState, useEffect, useMemo } from 'react';
 import { Menu, Bell, Search, ChevronDown, ShieldCheck } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useMock } from '../MockContext';
 
 const ROLES = [
@@ -16,6 +16,7 @@ const ROLES = [
 
 export default function HeaderV2({ onMobileMenuToggle, isMobileMenuOpen }) {
   const navigate = useNavigate();
+  const location = useLocation();
   const { currentUser, roleLabel, switchRole, setFilters, filters } = useMock();
   const [showRoleSwitcher, setShowRoleSwitcher] = useState(false);
 
@@ -91,6 +92,8 @@ export default function HeaderV2({ onMobileMenuToggle, isMobileMenuOpen }) {
     setNotifications(updated);
   };
 
+  const isAdminPage = location.pathname.startsWith('/admin/complaints');
+
   return (
     <header className="bg-white border-b border-gray-200 sticky top-0 z-30">
       <div className="flex items-center justify-between h-16 px-4">
@@ -155,6 +158,19 @@ export default function HeaderV2({ onMobileMenuToggle, isMobileMenuOpen }) {
               </>
             )}
           </div>
+
+          {isAdminPage && (
+            <select
+              value={filters.slaStatus || ''}
+              onChange={e => setFilters({ slaStatus: e.target.value })}
+              className="px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-gray-700"
+            >
+              <option value="">Tất cả hạn xử lý</option>
+              <option value="ON_TIME">Còn hạn</option>
+              <option value="NEAR_DUE">Sắp đến hạn</option>
+              <option value="OVERDUE">Quá hạn</option>
+            </select>
+          )}
 
           {/* Notifications Bell */}
           <div className="relative">

@@ -59,3 +59,27 @@ button:disabled { cursor: not-allowed; }
     animation-iteration-count: 1 !important;
   }
 }
+
+/* ---- Auto-hide scrollbar ---- */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: transparent;
+  border-radius: 3px;
+}
+:hover::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+}

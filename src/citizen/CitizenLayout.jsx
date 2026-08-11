@@ -1,20 +1,82 @@
-import React, { useState } from 'react';
-import { Link, NavLink, Outlet } from 'react-router-dom';
+import React, { useState, useRef, useEffect, useCallback, Suspense } from 'react';
+import { Link, NavLink, Outlet, useLocation } from 'react-router-dom';
 import { Container, Nav, Navbar } from 'react-bootstrap';
 import { Envelope, GeoAlt, List, Telephone, X } from 'react-bootstrap-icons';
 import { citizenNavItems, contactInfo } from './data/citizenMockDb';
 import AIChatWidget from './components/AIChatWidget';
-import DigitalMapFab from './components/DigitalMapFab';
 import '../styles/citizen.css';
+
+function CitizenPageLoader() {
+  return (
+    <div className="citizen-page-loader">
+      <div className="skeleton-container">
+        {/* Header skeleton */}
+        <div className="skeleton-card">
+          <div className="skeleton-line h28 w40" />
+          <div className="skeleton-line w60" style={{ marginTop: 14 }} />
+        </div>
+        {/* Content skeleton */}
+        <div className="skeleton-card">
+          <div className="skeleton-line h20 w30" />
+          <div className="skeleton-line w100" style={{ marginTop: 16 }} />
+          <div className="skeleton-line w100" />
+          <div className="skeleton-line w80" />
+        </div>
+        {/* Card skeleton */}
+        <div className="skeleton-card">
+          <div className="skeleton-line h20 w25" />
+          <div className="skeleton-line w100" style={{ marginTop: 16 }} />
+          <div className="skeleton-line w60" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function PageTransitionWrapper({ children, locationKey }) {
+  return (
+    <div key={locationKey}>
+      {children}
+    </div>
+  );
+}
 
 export default function CitizenLayout() {
   const [menuOpen, setMenuOpen] = useState(false);
   const closeMenu = () => setMenuOpen(false);
 
+  const location = useLocation();
+  const navRef = useRef(null);
+  const [indicatorStyle, setIndicatorStyle] = useState({ left: 0, width: 0, opacity: 0 });
+
+  const updateIndicator = useCallback(() => {
+    if (!navRef.current) return;
+    const activeLink = navRef.current.querySelector('.citizen-nav-link.active');
+    if (activeLink) {
+      const navRect = navRef.current.getBoundingClientRect();
+      const linkRect = activeLink.getBoundingClientRect();
+      setIndicatorStyle({
+        left: linkRect.left - navRect.left,
+        width: linkRect.width,
+        opacity: 1,
+      });
+    }
+  }, []);
+
+  useEffect(() => {
+    const timer = setTimeout(updateIndicator, 0);
+    return () => clearTimeout(timer);
+  }, [location, updateIndicator]);
+
+  useEffect(() => {
+    window.addEventListener('resize', updateIndicator);
+    return () => window.removeEventListener('resize', updateIndicator);
+  }, [updateIndicator]);
+
   return (
     <div className="citizen-app">
       {/* Navbar */}
-      <Navbar expand="lg" className="citizen-header" sticky="top">
+      <Navbar expand="lg" className="citizen-header" sticky="top" expanded={menuOpen} onToggle={setMenuOpen}>
         <Container className="citizen-header-inner">
           <Navbar.Brand as={Link} to="/cong-dong" className="citizen-brand" onClick={closeMenu}>
             <img src={`${process.env.PUBLIC_URL}/5.jpg`} alt="Logo" className="citizen-brand-logo" />
@@ -24,12 +86,12 @@ export default function CitizenLayout() {
             </span>
           </Navbar.Brand>
 
-          <Navbar.Toggle aria-controls="citizen-navbar" onClick={() => setMenuOpen(!menuOpen)}>
+          <Navbar.Toggle aria-controls="citizen-navbar">
             {menuOpen ? <X size={20} /> : <List size={20} />}
           </Navbar.Toggle>
 
           <Navbar.Collapse id="citizen-navbar">
-            <Nav className="ms-auto citizen-nav align-items-lg-center gap-1">
+            <Nav className="ms-auto citizen-nav align-items-lg-center gap-1" ref={navRef}>
               {citizenNavItems.map((item) => (
                 <Nav.Link
                   as={NavLink}
@@ -42,13 +104,20 @@ export default function CitizenLayout() {
                   {item.label}
                 </Nav.Link>
               ))}
+              <div className="citizen-nav-indicator" style={indicatorStyle} />
             </Nav>
           </Navbar.Collapse>
         </Container>
       </Navbar>
 
       {/* Main Content */}
-      <main><Outlet /></main>
+      <main>
+        <Suspense fallback={<CitizenPageLoader />}>
+          <PageTransitionWrapper locationKey={location.pathname}>
+            <Outlet />
+          </PageTransitionWrapper>
+        </Suspense>
+      </main>
 
       {/* Footer */}
       <footer className="citizen-footer">
@@ -95,7 +164,6 @@ export default function CitizenLayout() {
           </div>
         </div>
       </footer>
-      <DigitalMapFab />
       <AIChatWidget />
     </div>
   );

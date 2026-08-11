@@ -93,7 +93,7 @@ const C = (overrides = {}) => {
   const createdAt = overrides.createdAt || d(pick([-30,-25,-20,-15,-10,-7,-5,-3,-2,-1,0]), pick([7,8,9,10,14,15,16,19,20]), pick([0,15,30,45]));
   const receivedAt = overrides.receivedAt || (overrides.status && overrides.status !== 'NEW' && overrides.status !== 'PENDING_RECEPTION' ? d(0, 10, 5) : null);
   const status = overrides.status || 'NEW';
-  const originalDeadline = receivedAt ? new Date(new Date(receivedAt).getTime() + slaHours * 3600000).toISOString() : null;
+  const originalDeadline = overrides.originalDeadline || (receivedAt ? new Date(new Date(receivedAt).getTime() + slaHours * 3600000).toISOString() : null);
 
   return {
     id,
@@ -258,6 +258,76 @@ function makeComplaints() {
   for (let i = 0; i < 3; i++) {
     list.push(C({ status: "REJECTED", createdAt: d(-3-i, pick([8,10,14]), 0), receivedAt: d(-2-i, 9, 0), completedAt: d(-1-i, 11, 0), slaStatus: "NOT_APPLICABLE" }));
   }
+
+  // ---- DEMO SLA scenarios ----
+  // 4 ON_TIME (còn hạn — deadline còn xa)
+  const ON_TIME_TITLES = [
+    { t: "Cần lắp thêm biển báo giao thông tại đường số 3", cat: "CAT-INFRA", urg: "NORMAL", kp: "KP-04", desc: "Ngã tư đường số 3 thiếu biển báo ưu tiên, tiềm ẩn nguy cơ tai nạn giao thông." },
+    { t: "Đề nghị sửa chữa vỉa hè bị bong tróc", cat: "CAT-URBAN", urg: "NORMAL", kp: "KP-08", desc: "Vỉa hè đường số 11 bị bong tróc gạch, gây khó khăn cho người đi bộ." },
+    { t: "Kiến nghị lắp đặt camera an ninh khu dân cư", cat: "CAT-SEC", urg: "NORMAL", kp: "KP-10", desc: "Khu dân cư thường xuyên mất trộm vặt, đề nghị lắp camera giám sát." },
+    { t: "Đề xuất cắt tỉa cây xanh che khuất tầm nhìn", cat: "CAT-ENV", urg: "NORMAL", kp: "KP-12", desc: "Hàng cây trên đường số 7 phát triển quá rậm rạp, che khuất tầm nhìn và biển báo." },
+  ];
+  ON_TIME_TITLES.forEach((x, i) => {
+    const dept = pick(departments.filter(d => d.id !== 'DEP-RECEPTION' && d.id !== 'DEP-LEADERSHIP'));
+    const officer = pick(users.filter(u => u.departmentId === dept.id));
+    const created = d(-2-i, 8, 0);
+    const received = d(-1-i, 9, 0);
+    // deadline in 3-7 days → ON_TIME
+    const futureDeadline = new Date(Date.now() + pick([3, 4, 5, 7]) * 86400000).toISOString();
+    list.push(C({
+      title: x.t, description: x.desc, categoryId: x.cat, citizenUrgency: x.urg, confirmedUrgency: x.urg,
+      neighborhoodId: x.kp, status: "IN_PROGRESS", createdAt: created, receivedAt: received,
+      assignedDepartmentId: dept.id, assignedOfficerId: officer.id,
+      originalDeadline: futureDeadline, currentDeadline: futureDeadline,
+      slaStatus: "ON_TIME", progressPercent: pick([40, 60, 80]),
+    }));
+  });
+
+  // 4 NEAR_DUE (sắp đến hạn — deadline trong vài giờ tới)
+  const NEAR_DUE_TITLES = [
+    { t: "Đèn tín hiệu giao thông bị hỏng tại ngã tư", cat: "CAT-INFRA", urg: "URGENT", kp: "KP-03", desc: "Đèn tín hiệu giao thông tại ngã tư đường số 2 - Tăng Nhơn Phú bị hỏng hoàn toàn." },
+    { t: "Nước sinh hoạt bị cúp đột ngột khu dân cư", cat: "CAT-ELEC", urg: "URGENT", kp: "KP-07", desc: "Khu dân cư 200 hộ bị cúp nước đột ngột không rõ nguyên nhân từ sáng sớm." },
+    { t: "Rác thải y tế vứt bừa bãi gần trường học", cat: "CAT-ENV", urg: "URGENT", kp: "KP-05", desc: "Phát hiện nhiều túi rác thải y tế bị vứt gần cổng trường tiểu học, nguy cơ lây nhiễm cao." },
+    { t: "Tiếng ồn từ quán karaoke hoạt động quá giờ", cat: "CAT-SEC", urg: "NORMAL", kp: "KP-01", desc: "Quán karaoke mở nhạc đến 1h sáng, ảnh hưởng nghiêm trọng đến giấc ngủ người dân xung quanh." },
+  ];
+  NEAR_DUE_TITLES.forEach((x, i) => {
+    const dept = pick(departments.filter(d => d.id !== 'DEP-RECEPTION' && d.id !== 'DEP-LEADERSHIP'));
+    const officer = pick(users.filter(u => u.departmentId === dept.id));
+    const created = d(-3-i, 7, 0);
+    const received = d(-2-i, 9, 0);
+    // deadline in next 2-12 hours → NEAR_DUE
+    const nearDeadline = new Date(Date.now() + pick([2, 4, 6, 8, 12]) * 3600000).toISOString();
+    list.push(C({
+      title: x.t, description: x.desc, categoryId: x.cat, citizenUrgency: x.urg, confirmedUrgency: x.urg,
+      neighborhoodId: x.kp, status: "IN_PROGRESS", createdAt: created, receivedAt: received,
+      assignedDepartmentId: dept.id, assignedOfficerId: officer.id,
+      originalDeadline: nearDeadline, currentDeadline: nearDeadline,
+      slaStatus: "NEAR_DUE", progressPercent: pick([30, 50, 70]),
+    }));
+  });
+
+  // 4 OVERDUE (quá hạn — deadline đã qua)
+  const OVERDUE_TITLES = [
+    { t: "Hố ga mất nắp gây nguy hiểm trên đường số 5", cat: "CAT-INFRA", urg: "URGENT", kp: "KP-02", desc: "Hố ga không có nắp đậy nằm ngay giữa đường, đã có người dân suýt té." },
+    { t: "Cây xanh chết khô có nguy cơ gãy đổ", cat: "CAT-ENV", urg: "URGENT", kp: "KP-09", desc: "Cây xanh lớn đã chết khô, cành lá khô rụng, nguy cơ gãy đổ trong mùa mưa bão." },
+    { t: "Vứt xác động vật chết xuống kênh", cat: "CAT-ENV", urg: "URGENT", kp: "KP-11", desc: "Xác động vật bị vứt xuống kênh gây ô nhiễm nguồn nước và bốc mùi hôi thối." },
+    { t: "Lấn chiếm hành lang an toàn giao thông", cat: "CAT-URBAN", urg: "NORMAL", kp: "KP-06", desc: "Hàng quán lấn chiếm hoàn toàn hành lang an toàn giao thông trên đường chính." },
+  ];
+  OVERDUE_TITLES.forEach((x, i) => {
+    const dept = pick(departments.filter(d => d.id !== 'DEP-RECEPTION' && d.id !== 'DEP-LEADERSHIP'));
+    const officer = pick(users.filter(u => u.departmentId === dept.id));
+    const created = d(-10-i, 7, 0);
+    const received = d(-9-i, 9, 0);
+    // deadline in the past (1-5 days ago) → OVERDUE
+    const pastDeadline = new Date(Date.now() - pick([1, 2, 3, 5]) * 86400000).toISOString();
+    list.push(C({
+      title: x.t, description: x.desc, categoryId: x.cat, citizenUrgency: x.urg, confirmedUrgency: x.urg,
+      neighborhoodId: x.kp, status: "IN_PROGRESS", createdAt: created, receivedAt: received,
+      assignedDepartmentId: dept.id, assignedOfficerId: officer.id,
+      originalDeadline: pastDeadline, currentDeadline: pastDeadline,
+      slaStatus: "OVERDUE", progressPercent: pick([10, 25, 40]),
+    }));
+  });
 
   return list;
 }

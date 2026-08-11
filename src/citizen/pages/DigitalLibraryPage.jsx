@@ -4,17 +4,7 @@ import { Link } from 'react-router-dom';
 import { libraryCategories, libraryDocuments } from '../data/citizenMockDb';
 import { SectionHeading, LoadingState } from '../components/CitizenPrimitives';
 import { searchLaws } from '../../services/libraryService';
-
-/* ─── Scroll reveal ─── */
-function useScrollReveal() {
-  useEffect(() => {
-    const obs = new IntersectionObserver((entries) => {
-      entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('revealed'); });
-    }, { threshold: 0.08, rootMargin: '0px 0px -30px 0px' });
-    document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
-    return () => obs.disconnect();
-  }, []);
-}
+import useScrollReveal from '../hooks/useScrollReveal';
 
 /* ─── Icon map cho danh mục ─── */
 const categoryIcons = { BookOpen: Book, FileText, ScrollText: FileEarmarkText, Map };

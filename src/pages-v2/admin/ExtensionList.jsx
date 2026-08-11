@@ -4,7 +4,7 @@
 // ============================================================
 import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { Filter, Search, ChevronDown, ChevronUp, X, ArrowRight } from "lucide-react";
+import { Filter, X, ArrowRight } from "lucide-react";
 import { useMock } from "../../mock/MockContext";
 import { getComplaintById, getDepartmentById, getUserById, neighborhoods, categories, departments } from "../../mock/db";
 import dayjs from "dayjs";
@@ -16,12 +16,6 @@ const EXT_STATUS = {
   APPROVED: { label: "Đã phê duyệt",   bg: "#D1FAE5", color: "#065F46" },
   REJECTED: { label: "Đã từ chối",     bg: "#FEE2E2", color: "#991B1B" },
 };
-
-const TABS = [
-  { key: "PENDING",  label: "Chờ phê duyệt gia hạn" },
-  { key: "APPROVED", label: "Đã phê duyệt (Đã gia hạn)" },
-  { key: "REJECTED", label: "Đã từ chối gia hạn" },
-];
 
 function renderStatusBadge(status) {
   const s = EXT_STATUS[status] || { label: status, bg: "#F3F4F6", color: "#6B7280" };
@@ -36,12 +30,13 @@ function renderStatusBadge(status) {
 export default function ExtensionList() {
   const navigate = useNavigate();
   const { extensions } = useMock();
-  const [activeTab, setActiveTab] = useState("PENDING");
   const [showFilters, setShowFilters] = useState(false);
   const [page, setPage] = useState(1);
   const [filters, setFilters] = useState({
     search: "", extensionStatus: "", neighborhoodId: "", categoryId: "", departmentId: "", urgency: "",
   });
+  const [sortKey, setSortKey] = useState('');
+  const [sortDirection, setSortDirection] = useState('asc');
 
   // join extension with its complaint
   const enriched = useMemo(() => extensions.map(ext => {
@@ -54,9 +49,9 @@ export default function ExtensionList() {
     return { ...ext, complaint, requester, reviewer, dept, cat, nb };
   }), [extensions]);
 
-  // apply tab + filters
+  // apply filters
   const filtered = useMemo(() => {
-    let list = enriched.filter(e => e.status === activeTab);
+    let list = enriched;
     if (filters.search) {
       const q = filters.search.toLowerCase();
       list = list.filter(e =>
@@ -76,25 +71,67 @@ export default function ExtensionList() {
         return urg === filters.urgency;
       });
     }
-    return list.sort((a, b) => new Date(b.requestedAt) - new Date(a.requestedAt));
-  }, [enriched, activeTab, filters]);
-
-  const tabCounts = useMemo(() => {
-    const c = {};
-    TABS.forEach(t => { c[t.key] = enriched.filter(e => e.status === t.key).length; });
-    return c;
-  }, [enriched]);
+    // Sort
+    list = [...list].sort((a, b) => new Date(b.requestedAt) - new Date(a.requestedAt));
+    if (sortKey) {
+      const dir = sortDirection === 'asc' ? 1 : -1;
+      list.sort((a, b) => {
+        let va, vb;
+        switch (sortKey) {
+          case 'code': va = (a.complaint?.code || '').toLowerCase(); vb = (b.complaint?.code || '').toLowerCase(); break;
+          case 'title': va = (a.complaint?.title || '').toLowerCase(); vb = (b.complaint?.title || '').toLowerCase(); break;
+          case 'department': va = (a.dept?.name || '').toLowerCase(); vb = (b.dept?.name || '').toLowerCase(); break;
+          case 'requester': va = (a.requester?.fullName || '').toLowerCase(); vb = (b.requester?.fullName || '').toLowerCase(); break;
+          case 'deadline': va = a.requestedDeadline ? new Date(a.requestedDeadline).getTime() : 0; vb = b.requestedDeadline ? new Date(b.requestedDeadline).getTime() : 0; break;
+          case 'reason': va = (a.reason || '').toLowerCase(); vb = (b.reason || '').toLowerCase(); break;
+          case 'requestedAt': va = new Date(a.requestedAt).getTime(); vb = new Date(b.requestedAt).getTime(); break;
+          case 'status': va = (a.status || '').toLowerCase(); vb = (b.status || '').toLowerCase(); break;
+          default: return 0;
+        }
+        if (va < vb) return -1 * dir;
+        if (va > vb) return 1 * dir;
+        return 0;
+      });
+    }
+    return list;
+  }, [enriched, filters, sortKey, sortDirection]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const safePage = Math.min(page, totalPages);
   const paginated = useMemo(() => filtered.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE), [filtered, safePage]);
 
-  const handleTabChange = (key) => { setActiveTab(key); setPage(1); };
   const handleFilterChange = (k, v) => { setFilters(p => ({ ...p, [k]: v })); setPage(1); };
   const handleResetFilters = () => { setFilters({ search: "", extensionStatus: "", neighborhoodId: "", categoryId: "", departmentId: "", urgency: "" }); setPage(1); };
   const handleView = (ext) => navigate(`/admin/extensions/${ext.id}`);
+  const handleSort = (key) => {
+    if (sortKey === key) {
+      setSortDirection(d => d === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortKey(key);
+      setSortDirection('asc');
+    }
+  };
 
   const hasActiveFilters = filters.search || filters.extensionStatus || filters.neighborhoodId || filters.categoryId || filters.departmentId || filters.urgency;
+
+  const renderSortIcon = (key) => {
+    const isActive = sortKey === key;
+    const isAsc = isActive && sortDirection === 'asc';
+    const isDesc = isActive && sortDirection === 'desc';
+    return (
+      <svg className={`w-3 h-3 transition-transform ${isAsc ? 'text-blue-600' : isDesc ? 'text-blue-600 rotate-180' : 'text-gray-300'}`} viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+        <line x1="6" y1="10" x2="6" y2="2" />
+        <polyline points="3.5,4.5 6,2 8.5,4.5" />
+      </svg>
+    );
+  };
+
+  const SortHeader = ({ label, sortKey: key }) => (
+    <button onClick={() => handleSort(key)} className="inline-flex items-center gap-1 text-xs font-medium text-gray-500 uppercase tracking-wider hover:text-gray-700 cursor-pointer select-none">
+      {label}
+      {renderSortIcon(key)}
+    </button>
+  );
 
   return (
     <div className="min-h-screen">
@@ -104,81 +141,70 @@ export default function ExtensionList() {
         <p className="text-xs text-slate-500 mt-1">Xét duyệt và phê duyệt đề xuất gia hạn thời gian xử lý phản ánh từ các đơn vị</p>
       </div>
 
-      {/* ---- Quick tabs ---- */}
-      <div className="flex border-b border-gray-200 overflow-x-auto mb-4">
-        {TABS.map(t => (
-          <button key={t.key} onClick={() => handleTabChange(t.key)}
-            className={`px-4 py-2.5 text-sm font-medium whitespace-nowrap border-b-2 transition-colors ${activeTab === t.key ? "border-blue-600 text-blue-600" : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"}`}>
-            {t.label}
-            <span className={`ml-1.5 px-1.5 py-0.5 rounded-full text-xs ${activeTab === t.key ? "bg-blue-100 text-blue-700" : "bg-gray-100 text-gray-500"}`}>{tabCounts[t.key]}</span>
-          </button>
-        ))}
-      </div>
-
-      {/* ---- Filter bar ---- */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-4">
-        <div className="flex items-center gap-3 flex-wrap">
-          <div className="relative flex-1 min-w-[200px] max-w-sm">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-            <input type="text" placeholder="Tìm kiếm theo mã, tiêu đề, người đề nghị..." value={filters.search}
-              onChange={e => handleFilterChange("search", e.target.value)}
-              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent pl-10" />
-          </div>
-          <button onClick={() => setShowFilters(!showFilters)}
-            className={`inline-flex items-center gap-2 px-4 py-2 text-sm font-medium border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors ${showFilters ? "bg-blue-50 border-blue-300 text-blue-700" : "text-gray-700"}`}>
-            <Filter className="w-4 h-4" />Bộ lọc{showFilters ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-          </button>
-          {hasActiveFilters && <button onClick={handleResetFilters} className="inline-flex items-center gap-1 px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors"><X className="w-4 h-4" />Xoá bộ lọc</button>}
-        </div>
-        {showFilters && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mt-4 pt-4 border-t border-gray-200">
-            <select value={filters.extensionStatus} onChange={e => handleFilterChange("extensionStatus", e.target.value)} className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-              <option value="">Tất cả trạng thái</option>
-              <option value="PENDING">Chờ phê duyệt</option>
-              <option value="APPROVED">Đã phê duyệt</option>
-              <option value="REJECTED">Đã từ chối</option>
-            </select>
-            <select value={filters.neighborhoodId} onChange={e => handleFilterChange("neighborhoodId", e.target.value)} className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-              <option value="">Tất cả khu phố</option>
-              {neighborhoods.filter(n => n.status === "ACTIVE").map(n => <option key={n.id} value={n.id}>{n.name}</option>)}
-            </select>
-            <select value={filters.categoryId} onChange={e => handleFilterChange("categoryId", e.target.value)} className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-              <option value="">Tất cả danh mục</option>
-              {categories.filter(c => c.status === "ACTIVE").map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-            </select>
-            <select value={filters.departmentId} onChange={e => handleFilterChange("departmentId", e.target.value)} className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-              <option value="">Tất cả đơn vị</option>
-              {departments.filter(d => d.status === "ACTIVE").map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
-            </select>
-            <select value={filters.urgency} onChange={e => handleFilterChange("urgency", e.target.value)} className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-              <option value="">Tất cả mức độ</option>
-              <option value="URGENT">Khẩn cấp</option>
-              <option value="NORMAL">Thông thường</option>
-            </select>
-          </div>
-        )}
-      </div>
-
-      {/* ---- Count bar ---- */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-4 px-4 py-3">
-        <h3 className="font-semibold text-gray-900">Danh sách yêu cầu gia hạn ({filtered.length})</h3>
-      </div>
-
-      {/* ---- Table ---- */}
+      {/* ---- Filter bar + Table — unified card ---- */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+        <div className="px-4 py-3 border-b border-gray-100">
+          <div className="flex items-center gap-3 flex-wrap">
+            <div className="relative" style={{ maxWidth: 280 }}>
+              <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              <input type="text" placeholder="Tìm kiếm theo mã, tiêu đề, người đề nghị..." value={filters.search}
+                onChange={e => handleFilterChange("search", e.target.value)}
+                className="w-full pl-10 pr-10 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
+              {filters.search && (
+                <button onClick={() => handleFilterChange("search", "")} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                  <X className="w-4 h-4" />
+                </button>
+              )}
+            </div>
+            <button onClick={() => setShowFilters(!showFilters)}
+              className={`inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg border transition-colors ${showFilters || hasActiveFilters ? 'bg-blue-50 border-blue-500 text-blue-700' : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'}`}>
+              <Filter className="w-4 h-4" />Bộ lọc
+            </button>
+            {hasActiveFilters && <button onClick={handleResetFilters} className="inline-flex items-center gap-1 px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors"><X className="w-4 h-4" />Xoá bộ lọc</button>}
+          </div>
+          {showFilters && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mt-4 pt-4 border-t border-gray-200">
+              <select value={filters.extensionStatus} onChange={e => handleFilterChange("extensionStatus", e.target.value)} className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                <option value="">Tất cả trạng thái</option>
+                <option value="PENDING">Chờ phê duyệt</option>
+                <option value="APPROVED">Đã phê duyệt</option>
+                <option value="REJECTED">Đã từ chối</option>
+              </select>
+              <select value={filters.neighborhoodId} onChange={e => handleFilterChange("neighborhoodId", e.target.value)} className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                <option value="">Tất cả khu phố</option>
+                {neighborhoods.filter(n => n.status === "ACTIVE").map(n => <option key={n.id} value={n.id}>{n.name}</option>)}
+              </select>
+              <select value={filters.categoryId} onChange={e => handleFilterChange("categoryId", e.target.value)} className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                <option value="">Tất cả danh mục</option>
+                {categories.filter(c => c.status === "ACTIVE").map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+              </select>
+              <select value={filters.departmentId} onChange={e => handleFilterChange("departmentId", e.target.value)} className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                <option value="">Tất cả đơn vị</option>
+                {departments.filter(d => d.status === "ACTIVE").map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
+              </select>
+              <select value={filters.urgency} onChange={e => handleFilterChange("urgency", e.target.value)} className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                <option value="">Tất cả mức độ</option>
+                <option value="URGENT">Khẩn cấp</option>
+                <option value="NORMAL">Thông thường</option>
+              </select>
+            </div>
+          )}
+        </div>
+
+        {/* ---- Table ---- */}
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-3 py-2.5 text-left text-xs font-medium text-gray-500 uppercase whitespace-nowrap">Mã PA</th>
-                <th className="px-3 py-2.5 text-left text-xs font-medium text-gray-500 uppercase whitespace-nowrap">Tiêu đề</th>
-                <th className="px-3 py-2.5 text-left text-xs font-medium text-gray-500 uppercase whitespace-nowrap">Đơn vị</th>
-                <th className="px-3 py-2.5 text-left text-xs font-medium text-gray-500 uppercase whitespace-nowrap">Người đề nghị</th>
-                <th className="px-3 py-2.5 text-left text-xs font-medium text-gray-500 uppercase whitespace-nowrap">Hạn</th>
-                <th className="px-3 py-2.5 text-left text-xs font-medium text-gray-500 uppercase whitespace-nowrap">Lý do</th>
-                <th className="px-3 py-2.5 text-left text-xs font-medium text-gray-500 uppercase whitespace-nowrap">Ngày ĐN</th>
-                <th className="px-3 py-2.5 text-left text-xs font-medium text-gray-500 uppercase whitespace-nowrap">Trạng thái</th>
-                <th className="px-3 py-2.5 text-left text-xs font-medium text-gray-500 uppercase whitespace-nowrap">Thao tác</th>
+                <th className="px-3 py-2.5 text-left"><SortHeader label="Mã PA" sortKey="code" /></th>
+                <th className="px-3 py-2.5 text-left"><SortHeader label="Tiêu đề" sortKey="title" /></th>
+                <th className="px-3 py-2.5 text-left"><SortHeader label="Đơn vị" sortKey="department" /></th>
+                <th className="px-3 py-2.5 text-left"><SortHeader label="Người đề nghị" sortKey="requester" /></th>
+                <th className="px-3 py-2.5 text-left"><SortHeader label="Hạn" sortKey="deadline" /></th>
+                <th className="px-3 py-2.5 text-left"><SortHeader label="Lý do" sortKey="reason" /></th>
+                <th className="px-3 py-2.5 text-left"><SortHeader label="Ngày ĐN" sortKey="requestedAt" /></th>
+                <th className="px-3 py-2.5 text-left"><SortHeader label="Trạng thái" sortKey="status" /></th>
+                <th className="px-3 py-2.5 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">Thao tác</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
