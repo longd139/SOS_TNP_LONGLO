@@ -16,6 +16,7 @@ import DashboardOverview from '../pages-v2/dashboard/DashboardOverview';
 import PlaceholderPage from '../pages-v2/PlaceholderPage';
 import AddSchedule from '../pages-v2/admin/AddSchedule';
 import ApproveSchedule from '../pages-v2/admin/ApproveSchedule';
+import ReceptionKiosk from '../pages-v2/kiosk/ReceptionKiosk';
 
 const DigitalLibraryPage = lazy(() => import('../citizen/pages/DigitalLibraryPage'));
 const ComplaintList = lazy(() => import('../pages-v2/admin/ComplaintList'));
@@ -28,6 +29,8 @@ const HistoryDocs = lazy(() => import('../pages-v2/admin/HistoryDocs'));
 const LegalDocs = lazy(() => import('../pages-v2/admin/LegalDocs'));
 const AppDownloadStatistics = lazy(() => import('../pages/Statistic/AppDownloadStatistics'));
 const SatisfactionDashboard = lazy(() => import('../pages-v2/admin/SatisfactionDashboard'));
+const CounterReceptionFeedbackPage = lazy(() => import('../pages-v2/admin/CounterReceptionFeedbackPage'));
+const LeaderMeetingFeedbackPage = lazy(() => import('../pages-v2/admin/LeaderMeetingFeedbackPage'));
 
 function RoleHome() {
   return <Navigate to="/cong-dong" replace />;
@@ -39,6 +42,7 @@ export default function AppRoutesV2() {
     <Routes>
       <Route path="/" element={<RoleHome />} />
       <Route path="/register-meeting" element={<RegisterLeaderMeeting />} />
+      <Route path="/kiosk/tiep-dan" element={<ReceptionKiosk />} />
       <Route element={<CitizenLayout />}>
         <Route path="/cong-dong" element={<CitizenHomePage />} />
         <Route path="/cong-dong/thu-tuc" element={<ProcedureListPage />} />
@@ -74,6 +78,8 @@ export default function AppRoutesV2() {
         <Route path="/admin/digital-map" element={<DigitalMap />} />
         <Route path="/admin/app-statistics" element={<AppDownloadStatistics />} />
         <Route path="/admin/satisfaction" element={<SatisfactionDashboard />} />
+        <Route path="/admin/counter-reception-feedback" element={<CounterReceptionFeedbackPage />} />
+        <Route path="/admin/leader-meeting-feedback" element={<LeaderMeetingFeedbackPage />} />
         <Route path="/admin/documents/history" element={<HistoryDocs />} />
         <Route path="/admin/documents/legal" element={<LegalDocs />} />
         <Route path="/admin/schedules/approve" element={<ApproveSchedule />} />
