@@ -252,7 +252,7 @@ function DashboardLargeScreen() {
   const updateStr = lastUpdate.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
 
   return (
-    <div className="h-screen bg-slate-900 text-white flex flex-col overflow-hidden">
+    <div className={`${isFullscreen ? 'fixed inset-0 z-50' : ''} h-screen bg-slate-900 text-white flex flex-col overflow-hidden`}>
       {/* ---- Top bar ---- */}
       <div className="flex items-center justify-between px-6 py-2.5 border-b border-slate-700 flex-shrink-0">
         <div className="flex items-center gap-4">

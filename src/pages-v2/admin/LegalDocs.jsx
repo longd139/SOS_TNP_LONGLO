@@ -335,16 +335,6 @@ const LegalDocs = () => {
                 addNotification('Tài liệu đã bị thu hồi', `Văn bản Pháp luật "${record.title}" đã bị Lãnh đạo thu hồi.`, 'OFFICER');
               }
             }] : []),
-            ...(record.status === 'Đã thu hồi' ? [{
-              key: 'restore-doc',
-              label: 'Chuyển thành Chờ duyệt',
-              icon: <SyncOutlined className="text-amber-500" />,
-              onClick: () => {
-                setData(prev => prev.map(item => item.id === record.id ? { ...item, status: 'Chờ duyệt', isEditing: false, aiLearned: false, approver: null } : item));
-                message.info('Đã chuyển trạng thái sang Chờ duyệt');
-                addNotification('Yêu cầu duyệt tài liệu', `Văn bản Pháp luật "${record.title}" đã được đưa về trạng thái chờ duyệt.`, 'LEADER');
-              }
-            }] : []),
             ...(record.status === 'Đã duyệt' ? [{
               key: 'sync-ai',
               label: record.aiLearned ? 'Cập nhật tri thức cho Trợ lý AI' : 'Nạp tri thức cho Trợ lý AI',
@@ -412,9 +402,9 @@ const LegalDocs = () => {
           ...restValues, 
           fileName: uploadedFileName, 
           fileUrl: fileUrl || item.fileUrl,
-          status: isUserLeader ? item.status : 'Chờ duyệt',
+          status: isUserLeader ? (item.status === 'Đã thu hồi' ? 'Đã duyệt' : item.status) : 'Chờ duyệt',
           approver: isUserLeader ? item.approver : null,
-          aiLearned: isUserLeader ? item.aiLearned : false,
+          aiLearned: isUserLeader ? (item.status === 'Đã thu hồi' ? false : item.aiLearned) : false,
           isEditing: isUserLeader ? item.isEditing : true
         } : item));
         if (!isUserLeader) {

@@ -19,7 +19,10 @@ const BaseTable = ({
     showActions = true,
     actionColumnWidth = "100px",
     emptyMessage = "Không có dữ liệu",
-    className = ""
+    className = "",
+    sortKey,
+    sortDirection,
+    onSort,
 }) => {
     if (loading) {
         return (
@@ -38,16 +41,29 @@ const BaseTable = ({
                 <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gray-50">
                         <tr>
-                            {columns.map((column, index) => (
-                                <th
-                                    key={column.key || index}
-                                    className={`px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap ${column.width ? `w-${column.width}` : ''
-                                        }`}
-                                    style={column.width ? { width: column.width, maxWidth: column.width } : {}}
-                                >
-                                    {column.title}
-                                </th>
-                            ))}
+                            {columns.map((column, index) => {
+                                const isActive = column.sortable && sortKey === column.key;
+                                const isAsc = isActive && sortDirection === 'asc';
+                                const isDesc = isActive && sortDirection === 'desc';
+                                return (
+                                    <th
+                                        key={column.key || index}
+                                        className={`px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap ${column.width ? `w-${column.width}` : ''} ${column.sortable ? 'cursor-pointer select-none hover:text-gray-700' : ''} ${column.header ? 'relative' : ''}`}
+                                        style={column.width ? { width: column.width, maxWidth: column.width } : {}}
+                                        onClick={column.sortable && onSort ? () => onSort(column.key) : undefined}
+                                    >
+                                        <span className="inline-flex items-center gap-1">
+                                            {column.header ? column.header() : column.title}
+                                            {column.sortable && (
+                                                <svg className={`w-3 h-3 transition-transform ${isAsc ? 'text-blue-600' : isDesc ? 'text-blue-600 rotate-180' : 'text-gray-300'}`} viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+                                                    <line x1="6" y1="10" x2="6" y2="2" />
+                                                    <polyline points="3.5,4.5 6,2 8.5,4.5" />
+                                                </svg>
+                                            )}
+                                        </span>
+                                    </th>
+                                );
+                            })}
                             {showActions && (
                                 <th
                                     className="px-6 text-left py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap"

@@ -6,10 +6,6 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import { AdminLayoutV2 } from './layouts/Layouts';
 import { useMock } from './MockContext';
 import CitizenLayout from '../citizen/CitizenLayout';
-import CitizenHomePage from '../citizen/pages/CitizenHomePage';
-import { ProcedureListPage, ProcedureDetailPage, NewsListPage, NewsDetailPage, SubmitComplaintPage, TrackComplaintPage, ComplaintDetailPage, ContactPage, CitizenNotFound } from '../citizen/CitizenPages';
-import SatisfactionPage from '../citizen/pages/SatisfactionPage';
-import { CitizenGuidePage, PublicServicesPage, ReceptionSchedulePage } from '../citizen/pages/CitizenServicePages';
 import RegisterLeaderMeeting from '../pages-v2/citizen/RegisterLeaderMeeting';
 import AuthLayout from '../layouts/AuthLayout';
 import Login from '../pages/Auth/Login';
@@ -17,7 +13,23 @@ import DashboardOverview from '../pages-v2/dashboard/DashboardOverview';
 import PlaceholderPage from '../pages-v2/PlaceholderPage';
 import AddSchedule from '../pages-v2/admin/AddSchedule';
 import ApproveSchedule from '../pages-v2/admin/ApproveSchedule';
-import ReceptionKiosk from '../pages-v2/kiosk/ReceptionKiosk';
+import FeedbackKiosk from '../pages-v2/kiosk/FeedbackKiosk';
+
+// Lazy-loaded citizen pages
+const CitizenHomePage = lazy(() => import('../citizen/pages/CitizenHomePage'));
+const ProcedureListPage = lazy(() => import('../citizen/CitizenPages').then(m => ({ default: m.ProcedureListPage })));
+const ProcedureDetailPage = lazy(() => import('../citizen/CitizenPages').then(m => ({ default: m.ProcedureDetailPage })));
+const NewsListPage = lazy(() => import('../citizen/CitizenPages').then(m => ({ default: m.NewsListPage })));
+const NewsDetailPage = lazy(() => import('../citizen/CitizenPages').then(m => ({ default: m.NewsDetailPage })));
+const SubmitComplaintPage = lazy(() => import('../citizen/CitizenPages').then(m => ({ default: m.SubmitComplaintPage })));
+const TrackComplaintPage = lazy(() => import('../citizen/CitizenPages').then(m => ({ default: m.TrackComplaintPage })));
+const ComplaintDetailPage = lazy(() => import('../citizen/CitizenPages').then(m => ({ default: m.ComplaintDetailPage })));
+const ContactPage = lazy(() => import('../citizen/CitizenPages').then(m => ({ default: m.ContactPage })));
+const CitizenNotFound = lazy(() => import('../citizen/CitizenPages').then(m => ({ default: m.CitizenNotFound })));
+const SatisfactionPage = lazy(() => import('../citizen/pages/SatisfactionPage'));
+const CitizenGuidePage = lazy(() => import('../citizen/pages/CitizenServicePages').then(m => ({ default: m.CitizenGuidePage })));
+const PublicServicesPage = lazy(() => import('../citizen/pages/CitizenServicePages').then(m => ({ default: m.PublicServicesPage })));
+const ReceptionSchedulePage = lazy(() => import('../citizen/pages/CitizenServicePages').then(m => ({ default: m.ReceptionSchedulePage })));
 
 const DigitalLibraryPage = lazy(() => import('../citizen/pages/DigitalLibraryPage'));
 const ComplaintList = lazy(() => import('../pages-v2/admin/ComplaintList'));

@@ -4,11 +4,14 @@ import { ArrowRight, Book, Briefcase, Calendar3, ChatDots, FileText, Newspaper, 
 import { Link, useNavigate } from 'react-router-dom';
 import { emergencyContact, heroBanners, homeFeatures, importantNotices, procedures, news, contactInfo } from '../data/citizenMockDb';
 import { ProcedureCard, ProcessSteps, QuickSearch, TrustNote } from '../components/CitizenPrimitives';
+import useScrollReveal from '../hooks/useScrollReveal';
 
 export default function CitizenHomePage() {
   const [activeIndex, setActiveIndex] = useState(0);
   const navigate = useNavigate();
   const activeBanner = heroBanners[activeIndex];
+
+  useScrollReveal();
 
   useEffect(() => {
     const timer = window.setInterval(() => setActiveIndex((current) => (current + 1) % heroBanners.length), 6500);
@@ -47,7 +50,7 @@ export default function CitizenHomePage() {
     </section>
 
     {/* Quick Search */}
-    <section className="citizen-quick-search">
+    <section className="citizen-quick-search reveal">
       <div className="citizen-container">
         <div className="quick-search-label"><span>Tìm kiếm nhanh</span><small>Tra cứu thông tin bạn cần chỉ trong vài giây</small></div>
         <QuickSearch onSubmit={(value) => value && navigate(`/cong-dong/thu-tuc?search=${encodeURIComponent(value)}`)} />
@@ -55,7 +58,7 @@ export default function CitizenHomePage() {
     </section>
 
     {/* News */}
-    <section className="citizen-section">
+    <section className="citizen-section reveal">
       <div className="citizen-container">
         <div className="lib-section-head">
           <div>
@@ -90,7 +93,7 @@ export default function CitizenHomePage() {
     </section>
 
     {/* Features */}
-    <section className="citizen-section">
+    <section className="citizen-section reveal">
       <div className="citizen-container">
         <div className="lib-section-head">
           <div>
@@ -104,7 +107,7 @@ export default function CitizenHomePage() {
     </section>
 
     {/* Important Notices */}
-    <section className="citizen-section citizen-section-soft">
+    <section className="citizen-section citizen-section-soft reveal">
       <div className="citizen-container">
         <div className="lib-section-head">
           <div>
@@ -160,7 +163,7 @@ export default function CitizenHomePage() {
     </section>
 
     {/* Featured Procedures */}
-    <section className="citizen-section citizen-section-soft">
+    <section className="citizen-section citizen-section-soft reveal">
       <div className="citizen-container">
         <div className="lib-section-head">
           <div>
@@ -175,7 +178,7 @@ export default function CitizenHomePage() {
     </section>
 
     {/* Process Steps */}
-    <section className="citizen-section citizen-process-section">
+    <section className="citizen-section citizen-process-section reveal">
       <div className="citizen-container">
         <div className="lib-section-head">
           <div>

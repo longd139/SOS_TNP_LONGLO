@@ -14,7 +14,7 @@ const ALL_MENUS = [
     id: 'reception-schedules-v2',
     label: 'Quản lý lịch tiếp công dân',
     icon: Calendar,
-    roles: ['APPROVER','LEADER','ADMIN'],
+    roles: ['RECEPTION_OFFICER','APPROVER','LEADER','ADMIN'],
     submenu: [
       { id: 'approve-schedule', label: 'Duyệt lịch hẹn', path: '/admin/schedules/approve', roles: ['APPROVER','LEADER','ADMIN'] },
       { id: 'add-schedule', label: 'Thêm lịch hẹn', path: '/admin/schedules/add', roles: ['APPROVER','LEADER','ADMIN'] },
@@ -56,7 +56,7 @@ export default function SidebarV2({ collapsed, onToggle }) {
 
   return (
     <aside className={`bg-white border-r border-gray-200 h-screen overflow-y-auto transition-all duration-300 flex-shrink-0 ${collapsed ? 'w-20' : 'w-64'}`}>
-      <div className={`border-b border-gray-200 bg-white transition-all duration-300 ${collapsed ? 'p-3' : 'p-4'}`}>
+      <div className={`border-b border-gray-200 bg-white transition-all duration-300 flex items-center ${collapsed ? 'p-3 h-16' : 'p-4 h-16'}`}>
         <div className="flex items-center justify-between">
           {!collapsed && (
             <div className="flex-1">

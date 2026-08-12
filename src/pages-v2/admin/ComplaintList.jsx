@@ -1,7 +1,7 @@
 // ============================================================
 // COMPLAINT LIST — Bản sao y chang ReportList.jsx gốc
 // ============================================================
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import BaseTable from "../../components/base/BaseTable";
 import { useMock } from "../../mock/MockContext";
 import {
@@ -10,18 +10,6 @@ import {
 } from "../../mock/db";
 import { StatusBadge, UrgencyBadge } from "../../mock/components/Badges";
 import dayjs from "dayjs";
-
-// ---- Quick tabs (giống pattern MyComplaints) ----
-const TABS = [
-  { key: 'ALL',              label: 'Tất cả phản ánh',             filter: () => true },
-  { key: 'NEW',              label: 'Chờ tiếp nhận (Mới gửi)',     filter: (c) => c.status === 'NEW' || c.status === 'PENDING_RECEPTION' },
-  { key: 'AWAITING_ASSIGN',  label: 'Chờ phân công đơn vị',      filter: (c) => c.status === 'RECEIVED' },
-  { key: 'IN_PROGRESS',      label: 'Đang xử lý',                 filter: (c) => ['ASSIGNED','IN_PROGRESS'].includes(c.status) },
-  { key: 'EXT_PENDING',      label: 'Chờ duyệt gia hạn',          filter: (c) => c.status === 'EXTENSION_PENDING' },
-  { key: 'NEAR_DUE',         label: 'Sắp quá hạn',                filter: (c) => c.slaStatus === 'NEAR_DUE' },
-  { key: 'OVERDUE',          label: 'Quá hạn xử lý',              filter: (c) => c.slaStatus === 'OVERDUE' },
-  { key: 'COMPLETED',        label: 'Hoàn thành giải quyết',      filter: (c) => c.status === 'COMPLETED' },
-];
 
 // ---- Badge renderers (shared from Badges.jsx) ----
 const renderCategoryBadge = (catId) => {
@@ -314,13 +302,28 @@ export default function ComplaintList() {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [showFilters, setShowFilters] = useState(false);
-  const [tab, setTab] = useState('ALL');
   const [showAddModal, setShowAddModal] = useState(false);
   const [addForm, setAddForm] = useState({ title: '', description: '', categoryId: '', neighborhoodId: '', urgency: 'NORMAL', citizenName: '', citizenPhone: '', address: '' });
+  const [sortKey, setSortKey] = useState('');
+  const [sortDirection, setSortDirection] = useState('asc');
+  const [statusDropdownOpen, setStatusDropdownOpen] = useState(false);
+  const statusDropdownRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (statusDropdownRef.current && !statusDropdownRef.current.contains(e.target)) {
+        setStatusDropdownOpen(false);
+      }
+    };
+    if (statusDropdownOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => document.removeEventListener('mousedown', handleClickOutside);
+    }
+  }, [statusDropdownOpen]);
 
   // ---- filters (khớp cấu trúc gốc) ----
   const [filters, setFilters] = useState({
-    status: "", categoryId: "", neighborhoodId: "", urgency: "", search: "", sortTime: "desc", slaStatus: "", departmentId: "",
+    status: "", statuses: [], categoryId: "", neighborhoodId: "", urgency: "", search: "", sortTime: "desc", slaStatus: "", departmentId: "",
     officerId: "", dateFrom: "", dateTo: "", deadlineFrom: "", deadlineTo: "", hasExtension: "", hasEvidence: "", hasLocation: "",
   });
 
@@ -332,10 +335,12 @@ export default function ComplaintList() {
       list = list.filter(c => c.code.toLowerCase().includes(q) || c.title.toLowerCase().includes(q) || (c.address && c.address.toLowerCase().includes(q)));
     }
     if (filters.status) list = list.filter(c => c.status === filters.status);
+    if (filters.statuses.length > 0) list = list.filter(c => filters.statuses.includes(c.status));
     if (filters.categoryId) list = list.filter(c => c.categoryId === filters.categoryId);
     if (filters.neighborhoodId) list = list.filter(c => c.neighborhoodId === filters.neighborhoodId);
     if (filters.urgency) list = list.filter(c => (c.confirmedUrgency || c.citizenUrgency) === filters.urgency);
-    if (filters.slaStatus) list = list.filter(c => c.slaStatus === filters.slaStatus);
+    const effectiveSlaStatus = filters.slaStatus || mock.filters.slaStatus;
+    if (effectiveSlaStatus) list = list.filter(c => c.slaStatus === effectiveSlaStatus);
     if (filters.departmentId) list = list.filter(c => c.assignedDepartmentId === filters.departmentId);
     if (filters.officerId) list = list.filter(c => c.assignedOfficerId === filters.officerId);
     if (filters.dateFrom) list = list.filter(c => new Date(c.createdAt) >= new Date(filters.dateFrom));
@@ -350,29 +355,44 @@ export default function ComplaintList() {
     if (filters.hasLocation === 'no') list = list.filter(c => !c.hasLocation);
     if (filters.sortTime === 'asc') list = [...list].sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
     else list = [...list].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    // Auto-priority: NEAR_DUE & OVERDUE rise to top when no column sort & no SLA filter active
+    if (!sortKey && !effectiveSlaStatus) {
+      const priority = { OVERDUE: 0, NEAR_DUE: 1 };
+      list = [...list].sort((a, b) => {
+        const pa = priority[a.slaStatus] ?? 2;
+        const pb = priority[b.slaStatus] ?? 2;
+        if (pa !== pb) return pa - pb;
+        return new Date(b.createdAt) - new Date(a.createdAt);
+      });
+    }
+    // Column header sort
+    if (sortKey) {
+      const dir = sortDirection === 'asc' ? 1 : -1;
+      list = [...list].sort((a, b) => {
+        let va, vb;
+        switch (sortKey) {
+          case 'title': va = (a.title || '').toLowerCase(); vb = (b.title || '').toLowerCase(); break;
+          case 'categoryId': va = (getCategoryById(a.categoryId)?.name || '').toLowerCase(); vb = (getCategoryById(b.categoryId)?.name || '').toLowerCase(); break;
+          case 'neighborhoodId': va = (getNeighborhoodById(a.neighborhoodId)?.name || '').toLowerCase(); vb = (getNeighborhoodById(b.neighborhoodId)?.name || '').toLowerCase(); break;
+          case 'createdAt': va = new Date(a.createdAt).getTime(); vb = new Date(b.createdAt).getTime(); break;
+          case 'status': va = (a.status || '').toLowerCase(); vb = (b.status || '').toLowerCase(); break;
+          case 'urgency': va = (a.confirmedUrgency || a.citizenUrgency || '').toLowerCase(); vb = (b.confirmedUrgency || b.citizenUrgency || '').toLowerCase(); break;
+          case 'deadline': va = a.originalDeadline ? new Date(a.currentDeadline || a.originalDeadline).getTime() : 0; vb = b.originalDeadline ? new Date(b.currentDeadline || b.originalDeadline).getTime() : 0; break;
+          default: return 0;
+        }
+        if (va < vb) return -1 * dir;
+        if (va > vb) return 1 * dir;
+        return 0;
+      });
+    }
     return list;
-  }, [complaints, filters]);
+  }, [complaints, filters, sortKey, sortDirection, mock.filters]);
 
   const totalItems = filtered.length;
   const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
   const safePage = Math.min(page, totalPages);
 
-  // Tab counts + tab filter
-  const tabCounts = useMemo(() => {
-    const c = {};
-    TABS.forEach(t => { c[t.key] = filtered.filter(t.filter).length; });
-    return c;
-  }, [filtered]);
-
-  const tabFiltered = useMemo(() => {
-    const t = TABS.find(t => t.key === tab);
-    return t ? filtered.filter(t.filter) : filtered;
-  }, [filtered, tab]);
-
-  const tabTotalItems = tabFiltered.length;
-  const tabTotalPages = Math.max(1, Math.ceil(tabTotalItems / pageSize));
-  const tabSafePage = Math.min(page, tabTotalPages);
-  const paginated = tabFiltered.slice((tabSafePage - 1) * pageSize, tabSafePage * pageSize);
+  const paginated = filtered.slice((safePage - 1) * pageSize, safePage * pageSize);
 
   // ---- Handlers (giống hệt gốc) ----
   const handleView = (item) => {
@@ -393,9 +413,51 @@ export default function ComplaintList() {
     setModalMode("view");
   };
 
-  const hasActiveFilters = filters.status || filters.categoryId || filters.neighborhoodId || filters.urgency || filters.slaStatus || filters.departmentId || filters.officerId || filters.dateFrom || filters.dateTo || filters.deadlineFrom || filters.deadlineTo || filters.hasExtension || filters.hasEvidence || filters.hasLocation;
+  const hasActiveFilters = filters.status || filters.statuses.length > 0 || filters.categoryId || filters.neighborhoodId || filters.urgency || filters.slaStatus || filters.departmentId || filters.officerId || filters.dateFrom || filters.dateTo || filters.deadlineFrom || filters.deadlineTo || filters.hasExtension || filters.hasEvidence || filters.hasLocation;
+
+  const slaBadgeCount = useMemo(() => {
+    const nearDue = filtered.filter(c => c.slaStatus === 'NEAR_DUE').length;
+    const overdue = filtered.filter(c => c.slaStatus === 'OVERDUE').length;
+    return { nearDue, overdue };
+  }, [filtered]);
 
   const handlePageChange = (p) => setPage(p);
+
+  const handleSort = (key) => {
+    if (sortKey === key) {
+      setSortDirection(d => d === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortKey(key);
+      setSortDirection('asc');
+    }
+  };
+
+  const STATUS_OPTIONS = [
+    { value: 'NEW', label: 'Đã gửi', color: '#3B82F6' },
+    { value: 'PENDING_RECEPTION', label: 'Chờ tiếp nhận', color: '#F59E0B' },
+    { value: 'RECEIVED', label: 'Đã tiếp nhận', color: '#8B5CF6' },
+    { value: 'ASSIGNED', label: 'Đã phân công', color: '#06B6D4' },
+    { value: 'IN_PROGRESS', label: 'Đang xử lý', color: '#EC4899' },
+    { value: 'EXTENSION_PENDING', label: 'Chờ gia hạn', color: '#F97316' },
+    { value: 'COMPLETED', label: 'Đã giải quyết', color: '#10B981' },
+    { value: 'REJECTED', label: 'Từ chối', color: '#6B7280' },
+  ];
+
+  const toggleStatusFilter = (status) => {
+    setFilters(p => {
+      const next = p.statuses.includes(status)
+        ? p.statuses.filter(s => s !== status)
+        : [...p.statuses, status];
+      return { ...p, statuses: next };
+    });
+    setPage(1);
+  };
+
+  const handleSlaBadgeClick = (status) => {
+    const effectiveSlaStatus = filters.slaStatus || mock.filters.slaStatus;
+    setFilters(p => ({ ...p, slaStatus: effectiveSlaStatus === status ? '' : status }));
+    setPage(1);
+  };
 
   // ---- Columns (rút gọn: 8 cột, vừa 1 màn hình) ----
   const columns = [
@@ -410,37 +472,116 @@ export default function ComplaintList() {
       render: (value) => <span className="text-sm font-mono text-blue-700">{value}</span>,
     },
     {
-      title: "Tiêu đề", dataIndex: "title", key: "title",
+      title: "Tiêu đề", dataIndex: "title", key: "title", sortable: true,
       render: (value) => (
         <div className="text-sm text-gray-900 max-w-[160px] truncate" title={value}>{value}</div>
       ),
     },
     {
-      title: "Lĩnh vực", dataIndex: "categoryId", key: "categoryId",
+      title: "Lĩnh vực", dataIndex: "categoryId", key: "categoryId", sortable: true,
       render: (value) => renderCategoryBadge(value),
     },
     {
-      title: "Khu phố", dataIndex: "neighborhoodId", key: "neighborhoodId",
+      title: "Khu phố", dataIndex: "neighborhoodId", key: "neighborhoodId", sortable: true,
       render: (value) => <span className="text-sm text-gray-600 whitespace-nowrap">{getNeighborhoodById(value)?.name || '—'}</span>,
     },
     {
-      title: "Ngày gửi", dataIndex: "createdAt", key: "createdAt",
+      title: "Ngày gửi", dataIndex: "createdAt", key: "createdAt", sortable: true,
       render: (value) => <span className="text-sm text-gray-600 whitespace-nowrap">{dayjs(value).format("DD/MM HH:mm")}</span>,
     },
     {
-      title: "Trạng thái", key: "status",
+      title: "Trạng thái", key: "status", sortable: true,
+      header: () => (
+        <span className="inline-flex items-center gap-1.5" ref={statusDropdownRef}>
+          <span>Trạng thái</span>
+          <button
+            onClick={(e) => { e.stopPropagation(); setStatusDropdownOpen(!statusDropdownOpen); }}
+            className={`p-0.5 rounded hover:bg-gray-200 transition-colors ${filters.statuses.length > 0 ? 'text-blue-600' : 'text-gray-400'}`}
+            title="Lọc trạng thái"
+          >
+            <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
+            </svg>
+          </button>
+          {statusDropdownOpen && (
+            <div className="absolute top-full left-0 mt-1 bg-white rounded-lg shadow-lg border border-gray-200 z-[100] py-1 min-w-[180px]"
+              onClick={(e) => e.stopPropagation()}>
+              {STATUS_OPTIONS.map(opt => {
+                const checked = filters.statuses.includes(opt.value);
+                return (
+                  <button
+                    key={opt.value}
+                    onClick={() => toggleStatusFilter(opt.value)}
+                    className="flex items-center gap-2 w-full px-3 py-1.5 hover:bg-gray-50 text-sm text-gray-700 whitespace-nowrap text-left"
+                  >
+                    <span className={`w-4 h-4 rounded border flex items-center justify-center flex-shrink-0 ${checked ? 'bg-blue-600 border-blue-600' : 'border-gray-300'}`}>
+                      {checked && (
+                        <svg className="w-3 h-3 text-white" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <polyline points="1.5,6 4.5,9 10.5,3" />
+                        </svg>
+                      )}
+                    </span>
+                    <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: opt.color }} />
+                    {opt.label}
+                  </button>
+                );
+              })}
+              {filters.statuses.length > 0 && (
+                <div className="border-t border-gray-100 mt-1 pt-1 px-3">
+                  <button
+                    onClick={() => { setFilters(p => ({ ...p, statuses: [] })); setPage(1); }}
+                    className="text-xs text-red-500 hover:text-red-600 font-medium"
+                  >
+                    Xóa bộ lọc
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+        </span>
+      ),
       render: (value, record) => <StatusBadge status={record.status} />,
     },
     {
-      title: "Độ khẩn", key: "urgency",
+      title: "Độ khẩn", key: "urgency", sortable: true,
       render: (value, record) => <UrgencyBadge urgency={record.confirmedUrgency || record.citizenUrgency} />,
     },
     {
-      title: "Hạn xử lý", key: "deadline",
+      title: "Hạn xử lý", key: "deadline", sortable: true,
+      header: () => {
+          const activeSla = filters.slaStatus || mock.filters.slaStatus;
+          return (
+            <span className="inline-flex items-center gap-1.5">
+              Hạn xử lý
+              {slaBadgeCount.overdue > 0 && (
+                <button
+                  onClick={(e) => { e.stopPropagation(); handleSlaBadgeClick('OVERDUE'); }}
+                  className={`inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 text-white text-[10px] font-bold rounded-full leading-none transition-opacity hover:opacity-80 ${activeSla === 'OVERDUE' ? 'ring-2 ring-red-300' : ''}`}
+                  style={{ backgroundColor: '#EF4444' }}
+                  title="Lọc quá hạn"
+                >
+                  {slaBadgeCount.overdue}
+                </button>
+              )}
+              {slaBadgeCount.nearDue > 0 && (
+                <button
+                  onClick={(e) => { e.stopPropagation(); handleSlaBadgeClick('NEAR_DUE'); }}
+                  className={`inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 text-white text-[10px] font-bold rounded-full leading-none transition-opacity hover:opacity-80 ${activeSla === 'NEAR_DUE' ? 'ring-2 ring-yellow-300' : ''}`}
+                  style={{ backgroundColor: '#EAB308' }}
+                  title="Lọc sắp đến hạn"
+                >
+                  {slaBadgeCount.nearDue}
+                </button>
+              )}
+            </span>
+          );
+        },
       render: (value, record) => (
-        <span className={`text-sm whitespace-nowrap ${record.slaStatus === 'OVERDUE' ? 'text-red-600 font-medium' : record.slaStatus === 'NEAR_DUE' ? 'text-yellow-600 font-medium' : 'text-gray-600'}`}>
-          {record.originalDeadline ? dayjs(record.currentDeadline || record.originalDeadline).format("DD/MM HH:mm") : '—'}
-        </span>
+        <div className={`text-sm whitespace-nowrap ${record.slaStatus === 'OVERDUE' ? 'text-red-600 font-medium' : record.slaStatus === 'NEAR_DUE' ? 'text-yellow-600 font-medium' : 'text-gray-600'}`}>
+          <div>{record.originalDeadline ? dayjs(record.currentDeadline || record.originalDeadline).format("DD/MM HH:mm") : '—'}</div>
+          {record.slaStatus === 'OVERDUE' && <div className="text-[10px] font-bold text-red-500">Quá hạn</div>}
+          {record.slaStatus === 'NEAR_DUE' && <div className="text-[10px] font-bold text-yellow-500">Sắp hết hạn</div>}
+        </div>
       ),
     },
   ];
@@ -459,34 +600,12 @@ export default function ComplaintList() {
         </button>
       </div>
 
-      {/* ---- Quick tabs ---- */}
-      <div className="flex border-b border-gray-200 overflow-x-auto mb-4">
-        {TABS.map(t => (
-          <button
-            key={t.key}
-            onClick={() => { setTab(t.key); setPage(1); }}
-            className={`px-4 py-2.5 text-sm font-medium whitespace-nowrap border-b-2 transition-colors ${
-              tab === t.key
-                ? 'border-blue-600 text-blue-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-            }`}
-          >
-            {t.label}
-            <span className={`ml-1.5 px-1.5 py-0.5 rounded-full text-xs ${
-              tab === t.key ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-500'
-            }`}>
-              {tabCounts[t.key]}
-            </span>
-          </button>
-        ))}
-      </div>
-
-      {/* Filter bar — giống hệt BaseFilter gốc */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-4">
-        <div className="px-4 py-3">
+      {/* Filter bar + Table — unified card */}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+        <div className="px-4 py-3 border-b border-gray-100">
           <div className="flex items-center gap-3">
             {/* Search input */}
-            <div className="flex-1 relative">
+            <div className="relative" style={{ maxWidth: 240 }}>
               <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
               <input
                 type="text"
@@ -507,13 +626,6 @@ export default function ComplaintList() {
               className={`inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg border transition-colors ${showFilters || hasActiveFilters ? 'bg-blue-50 border-blue-500 text-blue-700' : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'}`}>
               <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
               Bộ lọc
-            </button>
-
-            {/* Tìm kiếm button */}
-            <button onClick={() => setPage(1)}
-              className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-              Tìm kiếm
             </button>
           </div>
 
@@ -653,12 +765,6 @@ export default function ComplaintList() {
             </div>
           )}
         </div>
-      </div>
-
-      {/* Count bar — giống hệt gốc */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-4 px-4 py-3">
-        <h3 className="font-semibold text-gray-900 mb-0">Danh sách phản ánh ({tabTotalItems})</h3>
-      </div>
 
       {/* BaseTable — dùng component thật từ dự án gốc */}
       <BaseTable
@@ -668,14 +774,18 @@ export default function ComplaintList() {
         onEdit={handleEdit}
         showActions={true}
         emptyMessage="Không có phản ánh nào"
+        sortKey={sortKey}
+        sortDirection={sortDirection}
+        onSort={handleSort}
         pagination={{
-          current: tabSafePage,
+          current: safePage,
           pageSize: pageSize,
-          total: tabTotalItems,
-          totalPages: tabTotalPages,
+          total: totalItems,
+          totalPages: totalPages,
           onChange: handlePageChange,
         }}
       />
+      </div>
 
       {/* ComplaintDetailModal — bản sao ReportDetailModal */}
       <ComplaintDetailModal

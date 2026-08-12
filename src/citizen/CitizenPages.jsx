@@ -1,16 +1,78 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { ArrowLeft, ArrowRight, CalendarDays, CheckCircle2, Clock3, Mail, MapPin, Phone, Search, Star, Upload } from 'lucide-react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { ArrowLeft, ArrowRight, CalendarDays, CheckCircle2, ChevronDown, Clock3, Mail, MapPin, Phone, Search, Star, Upload } from 'lucide-react';
 import { Link, useParams, useSearchParams } from 'react-router-dom';
+import { MapContainer, TileLayer, Marker } from 'react-leaflet';
+import L from 'leaflet';
+import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
+import markerIcon from 'leaflet/dist/images/marker-icon.png';
+import markerShadow from 'leaflet/dist/images/marker-shadow.png';
+import 'leaflet/dist/leaflet.css';
 import { complaintStatuses, contactInfo, departments, news, newsCategories, procedures, procedureCategories } from './data/citizenMockDb';
 import { readCitizenRatings } from './data/satisfactionData';
 import { EmptyState, LoadingState, StatusBadge } from './components/CitizenPrimitives';
+import useScrollReveal from './hooks/useScrollReveal';
+
+// Fix Leaflet default marker icon với webpack
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: markerIcon2x,
+  iconUrl: markerIcon,
+  shadowUrl: markerShadow,
+});
 
 const complaintEntries = Object.entries(complaintStatuses).map(([code, item]) => ({ code, ...item }));
 const complaintFields = ['Nội dung phản ánh', 'Vị trí và hình ảnh', 'Thông tin người gửi', 'Xác nhận'];
 
+const sortOptions = [
+  { value: 'name', label: 'A → Z' },
+  { value: 'duration', label: 'Thời hạn' },
+];
+
+function SortDropdown({ value, onChange }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef(null);
+  const selected = sortOptions.find((o) => o.value === value) || sortOptions[0];
+
+  useEffect(() => {
+    const handler = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
+  return (
+    <div className="ph6-sort-wrap" ref={ref}>
+      <button
+        type="button"
+        className="ph6-sort-trigger"
+        onClick={() => setOpen(!open)}
+        aria-expanded={open}
+      >
+        <span>{selected.label}</span>
+        <ChevronDown size={14} className={`ph6-sort-arrow ${open ? 'ph6-sort-arrow-open' : ''}`} />
+      </button>
+      {open && (
+        <div className="ph6-sort-menu">
+          {sortOptions.map((opt) => (
+            <button
+              key={opt.value}
+              type="button"
+              className={`ph6-sort-option ${opt.value === value ? 'ph6-sort-option-active' : ''}`}
+              onClick={() => { onChange(opt.value); setOpen(false); }}
+            >
+              {opt.label}
+              {opt.value === value && <span className="ph6-sort-check">✓</span>}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function ProcedureListPage() {
   const [params] = useSearchParams(); const [query, setQuery] = useState(params.get('search') || ''); const [category, setCategory] = useState('Tất cả lĩnh vực'); const [sort, setSort] = useState('name');
   const filtered = useMemo(() => procedures.filter((item) => (category === 'Tất cả lĩnh vực' || item.category === category) && `${item.title} ${item.summary}`.toLocaleLowerCase().includes(query.toLocaleLowerCase())).sort((a, b) => sort === 'duration' ? a.duration.localeCompare(b.duration) : a.title.localeCompare(b.title, 'vi')), [query, category, sort]);
+  useScrollReveal();
   return <>
     <section className="proc-page-v6">
       <div className="proc-hero-v6" style={{ backgroundImage: `linear-gradient(170deg, rgba(10,22,48,.92), rgba(15,40,70,.72)), url(${process.env.PUBLIC_URL}/2.jpg)` }}>
@@ -24,13 +86,10 @@ export function ProcedureListPage() {
         <div className="ph6-search-bar">
           <Search size={18} />
           <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Tìm thủ tục bạn cần..." />
-          <select value={sort} onChange={(e) => setSort(e.target.value)} className="ph6-sort-inline">
-            <option value="name">A → Z</option>
-            <option value="duration">Thời hạn</option>
-          </select>
+          <SortDropdown value={sort} onChange={setSort} />
         </div>
         <div className="ph6-layout">
-          <aside className="ph6-sidebar">
+          <aside className="ph6-sidebar reveal">
             <h3>Lĩnh vực</h3>
             {procedureCategories.map((item) => (
               <button key={item} className={category === item ? 'active' : ''} onClick={() => setCategory(item)}>
@@ -39,7 +98,7 @@ export function ProcedureListPage() {
             ))}
           </aside>
 
-          <div className="ph6-main">
+          <div className="ph6-main reveal">
           <div className="ph6-head">
               <h2>{category === 'Tất cả lĩnh vực' ? 'Tất cả thủ tục' : category} <span>({filtered.length})</span></h2>
             </div>
@@ -72,6 +131,7 @@ export function ProcedureListPage() {
 }
 
 export function ProcedureDetailPage() {
+  useScrollReveal();
   const { id } = useParams(); const procedure = procedures.find((item) => item.id === id); if (!procedure) return <CitizenNotFound />;
   return <>
     <section className="proc-page-v6">
@@ -166,7 +226,9 @@ export function ProcedureDetailPage() {
   </>;
 }
 
-export function NewsListPage() { const [query, setQuery] = useState(''); const [category, setCategory] = useState('Tất cả'); const filtered = news.filter((item) => (category === 'Tất cả' || item.category === category) && `${item.title} ${item.excerpt}`.toLocaleLowerCase().includes(query.toLocaleLowerCase())); return <>
+export function NewsListPage() { const [query, setQuery] = useState(''); const [category, setCategory] = useState('Tất cả'); const filtered = news.filter((item) => (category === 'Tất cả' || item.category === category) && `${item.title} ${item.excerpt}`.toLocaleLowerCase().includes(query.toLocaleLowerCase()));
+  useScrollReveal();
+  return <>
     <section className="news-page">
       <div className="news-hero-v2" style={{ backgroundImage: `linear-gradient(170deg, rgba(10,22,48,.92), rgba(15,40,70,.72)), url(${process.env.PUBLIC_URL}/3.jpg)` }}>
         <div className="citizen-container">
@@ -189,7 +251,7 @@ export function NewsListPage() { const [query, setQuery] = useState(''); const [
         </div>
 
         <div className="news-content-layout">
-          <div className="news-content-main">
+          <div className="news-content-main reveal">
             {filtered.length === 0 ? <EmptyState title="Không tìm thấy tin tức" /> : (
               <>
                 {/* Hero article */}
@@ -237,7 +299,8 @@ export function NewsListPage() { const [query, setQuery] = useState(''); const [
     </section>
   </>; }
 
-export function NewsDetailPage() { const { id } = useParams(); const item = news.find((newsItem) => newsItem.id === id); if (!item) return <CitizenNotFound />; return <>
+export function NewsDetailPage() { useScrollReveal(); const { id } = useParams(); const item = news.find((newsItem) => newsItem.id === id); if (!item) return <CitizenNotFound />;
+  return <>
     <article className="news-article-page">
       <div className="nap-hero" style={{ backgroundImage: `url(${item.image})` }}>
         <div className="nap-hero-overlay">
@@ -283,6 +346,7 @@ export function NewsDetailPage() { const { id } = useParams(); const item = news
   </>; }
 
 export function SubmitComplaintPage() {
+  useScrollReveal();
   const [step, setStep] = useState(0); const [files, setFiles] = useState([]); const [submittedCode, setSubmittedCode] = useState(''); const [form, setForm] = useState({ title: '', category: '', description: '', address: '', name: '', phone: '', consent: false }); const [errors, setErrors] = useState({});
   const update = (key) => (event) => setForm((current) => ({ ...current, [key]: event.target.type === 'checkbox' ? event.target.checked : event.target.value }));
   const validate = () => { const next = {}; if (step === 0 && !form.title.trim()) next.title = 'Vui lòng nhập tiêu đề phản ánh.'; if (step === 0 && !form.category) next.category = 'Vui lòng chọn lĩnh vực.'; if (step === 0 && form.description.trim().length < 20) next.description = 'Nội dung cần có ít nhất 20 ký tự.'; if (step === 1 && !form.address.trim()) next.address = 'Vui lòng nhập địa điểm xảy ra sự việc.'; if (step === 2 && !form.name.trim()) next.name = 'Vui lòng nhập họ và tên.'; if (step === 2 && !/^0\d{9}$/.test(form.phone)) next.phone = 'Số điện thoại gồm 10 chữ số.'; if (step === 3 && !form.consent) next.consent = 'Bạn cần đồng ý trước khi gửi.'; setErrors(next); return !Object.keys(next).length; };
@@ -325,7 +389,8 @@ export function SubmitComplaintPage() {
 function FormTitle({ number, title, text }) { return <div className="form-section-title"><span>{number}</span><div><h2>{title}</h2><p>{text}</p></div></div>; }
 function Field({ label, required, as = 'input', error, children, ...props }) { const Tag = as; return <label className="form-field"><span>{label}{required && <b> *</b>}</span><Tag {...props} className={error ? 'has-error' : ''}>{children}</Tag>{error && <small className="field-error">{error}</small>}</label>; }
 
-export function TrackComplaintPage() { const [params] = useSearchParams(); const [query, setQuery] = useState(params.get('code') || ''); const [result, setResult] = useState(null); const [searched, setSearched] = useState(false); const [loading, setLoading] = useState(false); useEffect(() => { const code = params.get('code'); if (!code) return; const found = complaintEntries.find((item) => item.code.toLocaleLowerCase() === code.toLocaleLowerCase()); setResult(found || null); setSearched(true); }, [params]); const find = (event) => { event.preventDefault(); if (!query.trim()) return; setLoading(true); setSearched(false); window.setTimeout(() => { const value = query.trim().toLocaleLowerCase(); setResult(complaintEntries.find((item) => item.code.toLocaleLowerCase() === value || item.title.toLocaleLowerCase().includes(value)) || null); setLoading(false); setSearched(true); }, 500); }; return <>
+export function TrackComplaintPage() { const [params] = useSearchParams(); const [query, setQuery] = useState(params.get('code') || ''); const [result, setResult] = useState(null); const [searched, setSearched] = useState(false); const [loading, setLoading] = useState(false); useEffect(() => { const code = params.get('code'); if (!code) return; const found = complaintEntries.find((item) => item.code.toLocaleLowerCase() === code.toLocaleLowerCase()); setResult(found || null); setSearched(true); }, [params]); const find = (event) => { event.preventDefault(); if (!query.trim()) return; setLoading(true); setSearched(false); window.setTimeout(() => { const value = query.trim().toLocaleLowerCase(); setResult(complaintEntries.find((item) => item.code.toLocaleLowerCase() === value || item.title.toLocaleLowerCase().includes(value)) || null); setLoading(false); setSearched(true); }, 500); };
+  useScrollReveal(); return <>
     <section className="tracking-page">
       <div className="tracking-hero" style={{ backgroundImage: `linear-gradient(170deg, rgba(10,22,48,.92), rgba(15,40,70,.72)), url(${process.env.PUBLIC_URL}/4.jpg)` }}>
         <div className="citizen-container">
@@ -336,7 +401,7 @@ export function TrackComplaintPage() { const [params] = useSearchParams(); const
         </div>
       </div>
 
-      <div className="citizen-container">
+      <div className="citizen-container reveal">
         <div className="tracking-search-card">
           <div className="tracking-search-icon"><Search size={28} /></div>
           <h2>Nhập mã phản ánh của bạn</h2>
@@ -369,7 +434,7 @@ export function TrackComplaintPage() { const [params] = useSearchParams(); const
       </div>
     </section>
   </>; }
-function ComplaintResult({ result }) { const completed = result.status === 'Đã giải quyết' || result.status === 'Hoàn thành'; const rated = completed && readCitizenRatings().some((item) => item.code === result.code); return (
+function ComplaintResult({ result, hideDetailLink }) { const completed = result.status === 'Đã giải quyết' || result.status === 'Hoàn thành'; const rated = completed && readCitizenRatings().some((item) => item.code === result.code); return (
   <div className="tracking-result-v3">
     <div className="tr3-header">
       <div className="tr3-code">
@@ -384,21 +449,153 @@ function ComplaintResult({ result }) { const completed = result.status === 'Đã
       <div className="tr3-info-item"><CalendarDays size={16} /><div><small>Ngày gửi</small><strong>{result.createdAt}</strong></div></div>
       <div className="tr3-info-item"><Clock3 size={16} /><div><small>Đơn vị xử lý</small><strong>UBND phường Tăng Nhơn Phú</strong></div></div>
     </div>
-    <div className="tracking-actions">{!completed && <Link className="citizen-button citizen-button-primary" to={`/cong-dong/tra-cuu/${result.code}`}>Xem chi tiết tiến độ <ArrowRight size={16} /></Link>}{completed && (rated ? <Link className="citizen-button citizen-button-secondary" to={`/cong-dong/danh-gia/${result.code}`}><Star size={16} fill="currentColor" /> Xem chi tiết đánh giá</Link> : <Link className="citizen-button citizen-button-secondary" to={`/cong-dong/danh-gia/${result.code}`}><Star size={16} /> Đánh giá hài lòng</Link>)}</div>
+    <div className="tracking-actions">
+      {!hideDetailLink && <Link className="citizen-button citizen-button-primary" to={`/cong-dong/tra-cuu/${result.code}`}>Xem chi tiết</Link>}
+      {completed && (rated ? <Link className="citizen-button citizen-button-secondary" to={`/cong-dong/danh-gia/${result.code}`}><Star size={16} fill="currentColor" /> Xem chi tiết đánh giá</Link> : <Link className="citizen-button citizen-button-secondary" to={`/cong-dong/danh-gia/${result.code}`}><Star size={16} /> Đánh giá hài lòng</Link>)}
+    </div>
   </div>
 ); }
-export function ComplaintDetailPage() { const { code } = useParams(); const result = complaintEntries.find((item) => item.code === code); if (!result) return <CitizenNotFound />; return <>
-    <section className="citizen-page-hero proc-hero" style={{ '--proc-bg': `url(${process.env.PUBLIC_URL}/4.jpg)` }}>
+export function ComplaintDetailPage() { useScrollReveal(); const { code } = useParams(); const result = complaintEntries.find((item) => item.code === code); if (!result) return <CitizenNotFound />;
+  const completed = result.status === 'Đã giải quyết' || result.status === 'Hoàn thành';
+  return <>
+    <section className="complaint-detail-page reveal">
       <div className="citizen-container">
-        <Link to="/cong-dong/tra-cuu" className="back-link" style={{ color: 'rgba(255,255,255,.75)' }}><ArrowLeft size={17} /> Quay lại tra cứu</Link>
-        <span className="lib-section-tag" style={{ background: 'rgba(255,255,255,.15)', color: '#fff', marginBottom: 16 }}>{result.code}</span>
-        <h1><em>{result.title.split(' ').slice(0, 2).join(' ')}</em> {result.title.split(' ').slice(2).join(' ')}</h1>
+        <Link to="/cong-dong/tra-cuu" className="cd-back">
+          <ArrowLeft size={17} /> Quay lại tra cứu
+        </Link>
+
+        <div className="cd-header">
+          <div className="cd-header-top">
+            <span className="cd-code">Chi tiết phản ánh: {result.code}</span>
+            <StatusBadge tone={result.statusTone}>{result.status}</StatusBadge>
+          </div>
+          <h1 className="cd-title">{result.title}</h1>
+        </div>
+
+        <div className="cd-grid">
+          {/* Left column */}
+          <div className="cd-main">
+            {/* Card: Thông tin người phản ánh */}
+            <div className="cd-card">
+              <h3 className="cd-card-title">Thông tin người phản ánh</h3>
+              <div className="cd-card-body">
+                <div className="cd-info-row">
+                  <span className="cd-info-label">Họ tên</span>
+                  <span className="cd-info-value">{result.citizenName || '***'}</span>
+                </div>
+                <div className="cd-info-row">
+                  <span className="cd-info-label">Số điện thoại</span>
+                  <span className="cd-info-value">{result.citizenPhone || '***'}</span>
+                </div>
+                <div className="cd-info-row">
+                  <span className="cd-info-label">Ngày gửi</span>
+                  <span className="cd-info-value">{result.createdAt}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Card: Nội dung phản ánh */}
+            <div className="cd-card">
+              <h3 className="cd-card-title">Nội dung phản ánh</h3>
+              <div className="cd-card-body">
+                <div className="cd-info-row">
+                  <span className="cd-info-label">Lĩnh vực</span>
+                  <span className="cd-info-value"><span className="cd-category-tag">{result.category}</span></span>
+                </div>
+                <div className="cd-description">
+                  {result.description || 'Không có nội dung chi tiết.'}
+                </div>
+                {result.images && result.images.length > 0 && (
+                  <div className="cd-images">
+                    <h4 className="cd-images-title">Hình ảnh đính kèm ({result.images.length})</h4>
+                    <div className="cd-images-grid">
+                      {result.images.map((img, i) => (
+                        <div key={i} className="cd-image-item">
+                          <img src={img} alt={`Ảnh ${i + 1}`} loading="lazy" onError={(e) => { e.target.onerror = null; e.target.style.display = 'none'; e.target.parentElement.classList.add('cd-image-fallback'); }} />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Card: Địa điểm */}
+            <div className="cd-card">
+              <h3 className="cd-card-title">Địa điểm phản ánh</h3>
+              <div className="cd-card-body">
+                <div className="cd-info-row">
+                  <span className="cd-info-label">Địa chỉ</span>
+                  <span className="cd-info-value"><MapPin size={14} style={{marginRight: 4}} />{result.location}</span>
+                </div>
+                <div className="cd-map-placeholder">
+                  <MapPin size={28} />
+                  <span>{result.location}</span>
+                  <small>Bản đồ (minh họa)</small>
+                </div>
+              </div>
+            </div>
+
+            {/* Card: Tiến trình xử lý */}
+            <div className="cd-card">
+              <h3 className="cd-card-title">Tiến trình xử lý</h3>
+              <div className="cd-card-body">
+                <div className="cd-timeline">
+                  {result.timeline.map((item, i) => (
+                    <div className={`cd-tl-step ${item.done ? 'cd-tl-done' : ''}`} key={item.label}>
+                      <div className="cd-tl-marker">
+                        {item.done ? <CheckCircle2 size={16} /> : <span>{i + 1}</span>}
+                      </div>
+                      {i < result.timeline.length - 1 && <div className="cd-tl-line" />}
+                      <div className="cd-tl-content">
+                        <strong>{item.label}</strong>
+                        <small>{item.date}</small>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Right column */}
+          <div className="cd-sidebar">
+            {/* Card: Trạng thái xử lý */}
+            <div className="cd-card">
+              <h3 className="cd-card-title">Trạng thái xử lý</h3>
+              <div className="cd-card-body">
+                <div className="cd-info-row">
+                  <span className="cd-info-label">Trạng thái</span>
+                  <StatusBadge tone={result.statusTone}>{result.status}</StatusBadge>
+                </div>
+                <div className="cd-info-row">
+                  <span className="cd-info-label">Đơn vị xử lý</span>
+                  <span className="cd-info-value">UBND phường Tăng Nhơn Phú</span>
+                </div>
+                <div className="cd-info-row">
+                  <span className="cd-info-label">Lĩnh vực</span>
+                  <span className="cd-info-value">{result.category}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Actions */}
+            <div className="cd-actions">
+              {completed && (
+                <Link to={`/cong-dong/danh-gia/${result.code}`} className="citizen-button citizen-button-secondary cd-action-btn">
+                  <Star size={16} /> Đánh giá hài lòng
+                </Link>
+              )}
+            </div>
+          </div>
+        </div>
       </div>
     </section>
-    <section className="citizen-section citizen-container tracking-section"><ComplaintResult result={result} /><div className="tracking-timeline-v2"><h2>Tiến trình xử lý</h2><div className="timeline-steps">{result.timeline.map((item, i) => <div className={`tl-step ${item.done ? 'done' : ''}`} key={item.label}><div className="tl-dot">{item.done ? <CheckCircle2 size={14} /> : <span>{i + 1}</span>}</div><div className="tl-line" /><div className="tl-content"><strong>{item.label}</strong><small>{item.date}</small></div></div>)}</div></div></section>
   </>; }
 
-export function ContactPage() { const [query, setQuery] = useState(''); const filtered = departments.filter((department) => `${department.name} ${department.description}`.toLocaleLowerCase().includes(query.toLocaleLowerCase())); return <>
+export function ContactPage() { const [query, setQuery] = useState(''); const filtered = departments.filter((department) => `${department.name} ${department.description}`.toLocaleLowerCase().includes(query.toLocaleLowerCase()));
+  useScrollReveal();
+  return <>
     <section className="citizen-page-hero proc-hero" style={{ '--proc-bg': `url(${process.env.PUBLIC_URL}/4.jpg)` }}>
       <div className="citizen-container">
         <h1>Liên hệ</h1>
@@ -407,7 +604,15 @@ export function ContactPage() { const [query, setQuery] = useState(''); const fi
     </section>
     <section className="citizen-section citizen-container">
       <div className="contact-lower">
-        <div className="contact-map"><MapPin size={29} /><strong>Trung tâm hành chính phường</strong><p>{contactInfo.address}</p><a className="citizen-button citizen-button-white" href="https://maps.google.com">Chỉ đường</a></div>
+        <div className="contact-map">
+            <MapContainer center={[10.8460, 106.7885]} zoom={16} scrollWheelZoom={false} className="contact-leaflet-map">
+              <TileLayer attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>' url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+              <Marker position={[10.8460, 106.7885]} />
+            </MapContainer>
+            <div className="contact-map-overlay">
+              <MapPin size={29} /><strong>Trung tâm hành chính phường</strong><p>{contactInfo.address}</p><a className="citizen-button citizen-button-white" href="https://maps.google.com">Chỉ đường</a>
+            </div>
+          </div>
         <div className="departments">
           <p className="citizen-eyebrow">Danh bạ phòng ban</p>
           <h2>Liên hệ đúng nơi bạn cần</h2>

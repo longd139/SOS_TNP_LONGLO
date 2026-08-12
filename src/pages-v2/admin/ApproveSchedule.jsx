@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { Table, Dropdown, message, Tabs, Modal, Button } from 'antd';
+import { Table, Dropdown, message, Tabs, Modal, Button, Input } from 'antd';
 import { ClipboardCheck, User, MoreHorizontal, Eye, Check, X, Award, CalendarCheck } from 'lucide-react';
 
 const MOCK_DATA = [
   {
-    id: 'TICKET-001',
+    id: 'PA-1001',
     leader: 'Ông Nguyễn Văn An',
     date: '2026-08-22',
     dayOfWeek: 'Thứ Sáu',
@@ -19,7 +19,7 @@ const MOCK_DATA = [
     }
   },
   {
-    id: 'TICKET-002',
+    id: 'PA-1002',
     leader: 'Bà Phạm Thị Mai',
     date: '2026-08-23',
     dayOfWeek: 'Thứ Bảy',
@@ -34,7 +34,7 @@ const MOCK_DATA = [
     }
   },
   {
-    id: 'TICKET-003',
+    id: 'PA-1003',
     leader: 'Ông Trần Hoàng Nam',
     date: '2026-08-25',
     dayOfWeek: 'Thứ Ba',
@@ -49,7 +49,7 @@ const MOCK_DATA = [
     }
   },
   {
-    id: 'TICKET-004',
+    id: 'PA-1004',
     leader: 'Ông Nguyễn Văn An',
     date: '2026-08-20',
     dayOfWeek: 'Thứ Năm',
@@ -64,7 +64,7 @@ const MOCK_DATA = [
     }
   },
   {
-    id: 'TICKET-005',
+    id: 'PA-1005',
     leader: 'Bà Phạm Thị Mai',
     date: '2026-08-27',
     dayOfWeek: 'Thứ Năm',
@@ -79,7 +79,7 @@ const MOCK_DATA = [
     }
   },
   {
-    id: 'TICKET-006',
+    id: 'PA-1006',
     leader: 'Ông Trần Hoàng Nam',
     date: '2026-08-28',
     dayOfWeek: 'Thứ Sáu',
@@ -94,7 +94,7 @@ const MOCK_DATA = [
     }
   },
   {
-    id: 'TICKET-007',
+    id: 'PA-1007',
     leader: 'Ông Nguyễn Văn An',
     date: '2026-08-29',
     dayOfWeek: 'Thứ Bảy',
@@ -109,7 +109,7 @@ const MOCK_DATA = [
     }
   },
   {
-    id: 'TICKET-008',
+    id: 'PA-1008',
     leader: 'Bà Phạm Thị Mai',
     date: '2026-08-30',
     dayOfWeek: 'Chủ Nhật',
@@ -125,61 +125,41 @@ const MOCK_DATA = [
   }
 ];
 
-const repairVietnameseText = (value) => {
-  if (typeof value !== 'string' || !/[ÃÂÄÆáºá»]/.test(value)) return value;
-  try {
-    const cp1252Bytes = {
-      '€': 0x80, '‚': 0x82, 'ƒ': 0x83, '„': 0x84, '…': 0x85, '†': 0x86, '‡': 0x87,
-      'ˆ': 0x88, '‰': 0x89, 'Š': 0x8A, '‹': 0x8B, 'Œ': 0x8C, 'Ž': 0x8E, '‘': 0x91,
-      '’': 0x92, '“': 0x93, '”': 0x94, '•': 0x95, '–': 0x96, '—': 0x97, '˜': 0x98,
-      '™': 0x99, 'š': 0x9A, '›': 0x9B, 'œ': 0x9C, 'ž': 0x9E, 'Ÿ': 0x9F,
-    };
-    let repaired = value;
-    for (let attempt = 0; attempt < 3 && /[ÃÂÄÆáºá»]/.test(repaired); attempt += 1) {
-      const bytes = Uint8Array.from(Array.from(repaired, (character) => cp1252Bytes[character] ?? (character.charCodeAt(0) & 0xff)));
-      const nextValue = new TextDecoder('utf-8').decode(bytes);
-      if (nextValue === repaired) break;
-      repaired = nextValue;
-    }
-    return repaired;
-  } catch {
-    return value;
-  }
-};
-
-const repairScheduleData = (items) => items.map((item) => Object.fromEntries(
-  Object.entries(item).map(([key, value]) => [
-    key,
-    value && typeof value === 'object' && !Array.isArray(value)
-      ? Object.fromEntries(Object.entries(value).map(([nestedKey, nestedValue]) => [nestedKey, repairVietnameseText(nestedValue)]))
-      : repairVietnameseText(value),
-  ])
-));
 
 export default function ApproveSchedule() {
   const [data, setData] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedTicket, setSelectedTicket] = useState(null);
   const [activeTab, setActiveTab] = useState('PENDING');
+  const [actionModal, setActionModal] = useState({ isOpen: false, action: null, ticketId: null });
+  const [actionNote, setActionNote] = useState('');
 
   useEffect(() => {
-    const localData = localStorage.getItem('citizen-approvals-v5');
+    const localData = localStorage.getItem('citizen-approvals-v7');
     if (!localData) {
-      localStorage.setItem('citizen-approvals-v5', JSON.stringify(MOCK_DATA));
+      localStorage.setItem('citizen-approvals-v7', JSON.stringify(MOCK_DATA));
       setData(MOCK_DATA);
     } else {
-      const repairedData = repairScheduleData(JSON.parse(localData));
-      setData(repairedData);
-      localStorage.setItem('citizen-approvals-v5', JSON.stringify(repairedData));
+      setData(JSON.parse(localData));
     }
   }, []);
 
   const handleAction = (id, newStatus) => {
+    if (newStatus === 'REJECTED' || newStatus === 'CANCELED') {
+      setActionModal({ isOpen: true, action: newStatus, ticketId: id });
+      setActionNote('');
+      setIsModalOpen(false);
+      return;
+    }
+    executeAction(id, newStatus);
+  };
+
+  const executeAction = (id, newStatus, note = '') => {
     const updatedData = data.map(item => 
-      item.id === id ? { ...item, status: newStatus } : item
+      item.id === id ? { ...item, status: newStatus, note: note || item.note } : item
     );
     setData(updatedData);
-    localStorage.setItem('citizen-approvals-v5', JSON.stringify(updatedData));
+    localStorage.setItem('citizen-approvals-v7', JSON.stringify(updatedData));
     
     let msg = 'Đã cập nhật trạng thái';
     if (newStatus === 'APPROVED') msg = 'Đã duyệt lịch hẹn thành công';
@@ -188,6 +168,7 @@ export default function ApproveSchedule() {
     if (newStatus === 'DONE') msg = 'Đã đánh dấu tiếp xong';
     message.success(msg);
     setIsModalOpen(false);
+    setActionModal({ isOpen: false, action: null, ticketId: null });
   };
 
   const getInitials = (name) => {
@@ -495,8 +476,44 @@ export default function ApproveSchedule() {
               </div>
             </div>
 
+            {/* GHI CHÚ TỪ CHỐI / HỦY (NẾU CÓ) */}
+            {selectedTicket.note && (selectedTicket.status === 'REJECTED' || selectedTicket.status === 'CANCELED') && (
+              <div className="pt-2">
+                <h4 className="text-[12px] font-bold text-red-500 mb-2 uppercase tracking-wide">
+                  LÝ DO {selectedTicket.status === 'REJECTED' ? 'TỪ CHỐI' : 'HỦY LỊCH'}
+                </h4>
+                <div className="bg-red-50 border border-red-200 rounded-xl p-4">
+                  <p className="text-red-700 text-[14px] leading-relaxed m-0 font-medium">
+                    {selectedTicket.note}
+                  </p>
+                </div>
+              </div>
+            )}
           </div>
         )}
+      </Modal>
+
+      <Modal
+        title={actionModal.action === 'REJECTED' ? 'Xác nhận từ chối' : 'Xác nhận hủy lịch'}
+        open={actionModal.isOpen}
+        onCancel={() => setActionModal({ isOpen: false, action: null, ticketId: null })}
+        onOk={() => executeAction(actionModal.ticketId, actionModal.action, actionNote)}
+        okText="Xác nhận"
+        cancelText="Bỏ qua"
+        okButtonProps={{ danger: true, className: "bg-red-500 hover:bg-red-600 border-none shadow-md" }}
+        cancelButtonProps={{ className: "border-none shadow-sm" }}
+        centered
+      >
+        <div className="mb-4 text-gray-600 text-[15px]">
+          Bạn có chắc chắn muốn <strong className="text-red-500">{actionModal.action === 'REJECTED' ? 'từ chối' : 'hủy'}</strong> lịch hẹn này không?
+        </div>
+        <Input.TextArea
+          rows={4}
+          placeholder="Nhập ghi chú / lý do (không bắt buộc)..."
+          value={actionNote}
+          onChange={(e) => setActionNote(e.target.value)}
+          className="rounded-xl p-3"
+        />
       </Modal>
 
       <style jsx global>{`
