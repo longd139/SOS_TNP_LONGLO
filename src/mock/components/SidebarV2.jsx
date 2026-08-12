@@ -33,7 +33,7 @@ const ALL_MENUS = [
     ]
   },
   { id: 'large-screen', label: 'Màn hình lớn', icon: LayoutDashboard, path: '/dashboard/large-screen', roles: ['APPROVER','LEADER','ADMIN'] },
-  { id: 'digital-map', label: 'Bản đồ số', icon: Map, path: '/admin/digital-map', roles: ['APPROVER','LEADER','ADMIN'] },
+  { id: 'digital-map', label: 'Bản đồ quy hoạch', icon: Map, path: '/admin/digital-map', roles: ['APPROVER','LEADER','ADMIN'], externalUrl: 'https://tangnhonphu.thongtinquyhoach.vn/ban-do-quy-hoach' },
   { id: 'app-statistics', label: 'Thống kê lượt tải App', icon: Smartphone, path: '/admin/app-statistics', roles: ['APPROVER','LEADER','ADMIN'] },
   { id: 'satisfaction', label: 'Thống kê đánh giá', icon: Star, path: '/admin/satisfaction', roles: ['APPROVER','LEADER','ADMIN'] },
   { type: 'divider' },
@@ -156,6 +156,11 @@ export default function SidebarV2({ collapsed, onToggle }) {
                     <Icon className={`w-5 h-5 flex-shrink-0 text-gray-400 ${collapsed ? '' : 'mr-3'}`} />
                     {!collapsed && <><span className="font-medium flex-1">{item.label}</span><span className="text-[10px]">🔒</span></>}
                   </div>
+                ) : item.externalUrl ? (
+                  <a href={item.externalUrl} target="_blank" rel="noopener noreferrer" className={`flex items-center text-sm rounded-lg transition-all duration-200 ${collapsed ? 'px-3 py-3 justify-center' : 'px-4 py-3'} text-gray-700 hover:bg-gray-50`} title={collapsed ? item.label : ''}>
+                    <Icon className={`w-5 h-5 flex-shrink-0 text-gray-500 ${collapsed ? '' : 'mr-3'}`} />
+                    {!collapsed && <><span className="font-medium flex-1">{item.label}</span><span className="ml-auto text-gray-400">↗</span></>}
+                  </a>
                 ) : (
                   <Link to={item.path} className={`flex items-center text-sm rounded-lg transition-all duration-200 ${collapsed ? 'px-3 py-3 justify-center' : 'px-4 py-3'} ${isActive ? 'bg-blue-50 text-blue-600' : 'text-gray-700 hover:bg-gray-50'}`} title={collapsed ? item.label : ''}>
                     <Icon className={`w-5 h-5 flex-shrink-0 ${isActive ? 'text-blue-600' : 'text-gray-500'} ${collapsed ? '' : 'mr-3'}`} />

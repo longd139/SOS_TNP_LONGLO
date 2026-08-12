@@ -137,11 +137,12 @@ const menuItems = [
     },
     {
         id: 'digital-map',
-        label: 'Bản đồ số',
+        label: 'Bản đồ quy hoạch',
         icon: Map,
         path: ROUTE_PATH.DIGITAL_MAP,
         hasSubmenu: false,
-        requiresPermission: false
+        requiresPermission: false,
+        externalUrl: 'https://tangnhonphu.thongtinquyhoach.vn/ban-do-quy-hoach'
     }
 ];
 
@@ -256,6 +257,33 @@ export default function Sidebar({ collapsed, onToggle, onMobileClose }) {
                                             </>
                                         )}
                                     </div>
+                                ) : item.externalUrl ? (
+                                    <a
+                                        href={item.externalUrl}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        onClick={handleLinkClick}
+                                        className={`
+                                            flex items-center text-sm rounded-lg transition-all duration-200
+                                            ${collapsed ? 'px-3 py-3 justify-center' : 'px-4 py-3'}
+                                            text-gray-700 hover:bg-gray-50
+                                        `}
+                                        title={collapsed ? item.label : ''}
+                                    >
+                                        <Icon
+                                            className={`
+                                                w-5 h-5 flex-shrink-0 text-gray-500
+                                                ${collapsed ? '' : 'mr-3'}
+                                            `}
+                                        />
+
+                                        {!collapsed && (
+                                            <>
+                                                <span className="font-medium flex-1">{item.label}</span>
+                                                <span className="ml-auto text-gray-400">↗</span>
+                                            </>
+                                        )}
+                                    </a>
                                 ) : (
                                     <Link
                                         to={item.path}

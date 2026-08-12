@@ -17,8 +17,8 @@
 .citizen-brand strong { font-size: 16px; letter-spacing: -.02em; }
 .citizen-brand small { color: var(--citizen-muted); font-size: 11px; margin-top: 4px; }
 .citizen-nav { display: flex; align-items: center; gap: 7px; position: relative; }
-.citizen-nav a { padding: 10px 12px; color: #536579; text-decoration: none; font-size: 14px; font-weight: 600; border-radius: 9px; transition: color 0.2s ease; }
-.citizen-nav a:hover { color: var(--citizen-blue-dark); background: var(--citizen-blue-soft); } .citizen-nav a.active { color: var(--citizen-blue-dark); }
+.citizen-nav a, .citizen-nav .citizen-nav-link { padding: 10px 12px; color: #536579; text-decoration: none; font-size: 14px; font-weight: 600; border-radius: 9px; transition: color 0.2s ease; }
+.citizen-nav a:hover, .citizen-nav .citizen-nav-link:hover { color: var(--citizen-blue-dark); background: var(--citizen-blue-soft); } .citizen-nav a.active { color: var(--citizen-blue-dark); }
 .citizen-nav-indicator { position: absolute; bottom: 0; height: 2px; background: var(--citizen-blue); border-radius: 0; transition: left 0.35s cubic-bezier(0.4, 0, 0.2, 1), width 0.35s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease; pointer-events: none; }
 .citizen-menu-toggle { display: none; border: 0; background: transparent; color: var(--citizen-ink); padding: 8px; }
 .citizen-hero { overflow: hidden; color: white; background: linear-gradient(115deg, #1565C0 0%, #2563EB 57%, #1565C0 100%); }
@@ -112,7 +112,7 @@
 @media (max-width: 780px) { .procedure-list-layout { grid-template-columns: 1fr; }.procedure-filter { grid-template-columns: repeat(2, 1fr); }.detail-facts, .complaint-progress { grid-template-columns: 1fr 1fr; }.complaint-progress { gap: 4px; }.complaint-progress button { font-size: 10px; }.citizen-sort { margin-top: 16px; } }
 
 /* Lớp hoàn thiện UI: ít khung thừa, ưu tiên phân cấp và khả năng đọc cho dịch vụ công. */
-.citizen-app { background: #fff; }.citizen-app main { overflow: visible; }.citizen-header { box-shadow: 0 1px 0 rgba(21,101,192,.06); }.citizen-header-inner { max-width: 1440px; }.citizen-brand-mark { border-radius: 12px; box-shadow: none; }.citizen-nav { gap: 3px; }.citizen-nav a { padding: 10px 11px; }.citizen-officer-link { min-height: 42px; border-radius: 10px; }
+.citizen-app { background: #fff; }.citizen-app main { overflow: visible; }.citizen-header { box-shadow: 0 1px 0 rgba(21,101,192,.06); }.citizen-header-inner { max-width: 1440px; }.citizen-brand-mark { border-radius: 12px; box-shadow: none; }.citizen-nav { gap: 3px; }.citizen-nav a, .citizen-nav .citizen-nav-link { padding: 10px 11px; }.citizen-officer-link { min-height: 42px; border-radius: 10px; }
 .citizen-hero { position: relative; }.citizen-hero::after { position: absolute; inset: auto -120px -230px auto; width: 560px; height: 560px; border: 1px solid rgba(255,255,255,.15); border-radius: 50%; content: ''; pointer-events: none; }.citizen-hero-copy { position: relative; z-index: 1; }.citizen-hero h1 { letter-spacing: -.052em; }.citizen-hero-copy > p:not(.citizen-eyebrow) { max-width: 570px; line-height: 1.7; }.hero-visual-main { border-radius: 18px; box-shadow: 0 20px 50px rgba(17,24,39,.20); }.hero-float-card { border-radius: 12px; box-shadow: 0 14px 30px rgba(17,24,39,.14); }.hero-controls button { transition: background .18s ease, transform .18s ease; }.hero-controls button:hover { transform: translateY(-1px); }
 .citizen-quick-search { position: relative; z-index: 2; padding: 24px 0 0; border: 0; background: transparent; }.citizen-quick-search .citizen-container { min-height: 86px; padding: 16px 22px; border: 1px solid var(--citizen-line); border-radius: 14px; background: #fff; box-shadow: 0 14px 34px rgba(21,101,192,.10); transform: none; }.citizen-search { min-height: 50px; border-color: transparent; box-shadow: none; background: var(--citizen-soft); }.citizen-search:focus-within { box-shadow: 0 0 0 3px rgba(37,99,235,.16); }.citizen-search .citizen-button { border-radius: 9px; }
 .citizen-section-heading h2 { color: var(--citizen-ink); font-size: clamp(27px, 3vw, 38px); }.citizen-section-heading > div > p:last-child { font-size: 15px; line-height: 1.7; }.citizen-eyebrow { color: var(--citizen-blue-dark); letter-spacing: .09em; }.citizen-card, .citizen-feature-card, .citizen-mobile-feature, .citizen-service-card, .citizen-news-card, .citizen-notice-card { border-color: var(--citizen-line); box-shadow: none; }.citizen-card:hover, .citizen-feature-card:hover, .citizen-mobile-feature:hover, .citizen-service-card:hover, .citizen-news-card:hover { border-color: rgba(37,99,235,.40); box-shadow: 0 16px 30px rgba(21,101,192,.10); }
@@ -2777,7 +2777,7 @@
   .citizen-header-inner { gap: 48px; }
   .citizen-brand { gap: 14px; }
   .citizen-nav { gap: 7px; }
-  .citizen-nav a { padding: 11px 14px; }
+  .citizen-nav a, .citizen-nav .citizen-nav-link { padding: 11px 14px; }
 }
 
 @media (min-width: 781px) and (max-width: 1100px) {
@@ -3052,4 +3052,37 @@
   .skeleton-line::after { animation: none; }
   .reveal { transition: none !important; }
   .citizen-page-enter { animation: none !important; }
+}
+
+/* ── Nav dropdown (Bản đồ) ── */
+.citizen-nav-dropdown { position: relative; }
+.citizen-nav .citizen-nav-link {
+  background: none; border: none; cursor: pointer;
+  font-family: inherit;
+}
+
+.citizen-nav-dropdown-menu {
+  position: absolute; top: 100%; left: 0; min-width: 200px;
+  background: #fff; border-radius: 10px; box-shadow: 0 8px 30px rgba(0,0,0,.12);
+  padding: 6px; z-index: 1000; margin-top: 4px;
+  animation: citizenDropdownIn .15s ease;
+}
+@keyframes citizenDropdownIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.citizen-nav-dropdown-item {
+  display: block; padding: 10px 14px; border-radius: 7px;
+  color: #536579; font-size: 14px; font-weight: 600; text-decoration: none;
+  transition: background .15s, color .15s;
+}
+.citizen-nav-dropdown-item:hover { background: var(--citizen-blue-soft); color: var(--citizen-blue-dark); }
+
+/* Mobile: dropdown full-width inside collapse */
+@media (max-width: 991px) {
+  .citizen-nav-dropdown-menu {
+    position: static; box-shadow: none; margin-top: 0; padding-left: 16px;
+    animation: none;
+  }
+  .citizen-nav-dropdown-item { padding: 8px 12px; }
 }

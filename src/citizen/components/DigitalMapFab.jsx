@@ -7,7 +7,7 @@ export default function DigitalMapFab() {
     <Link
       to="/cong-dong/ban-do-so"
       className="map-fab"
-      title="Bản đồ số"
+      title="Bản đồ quy hoạch"
       aria-label="Mở bản đồ số"
     >
       <Map size={22} />

@@ -38,6 +38,14 @@ const ExtensionList = lazy(() => import('../pages-v2/admin/ExtensionList'));
 const ExtensionDetail = lazy(() => import('../pages-v2/admin/ExtensionDetail'));
 const DashboardLargeScreen = lazy(() => import('../pages-v2/dashboard/DashboardLargeScreen'));
 const DigitalMap = lazy(() => import('../pages/DigitalMap/DigitalMap'));
+
+function DigitalMapPlaceholder() {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '60vh' }}>
+      <p style={{ fontSize: 18, color: '#6b7280', fontWeight: 500 }}>Chờ thông tin</p>
+    </div>
+  );
+}
 const HistoryDocs = lazy(() => import('../pages-v2/admin/HistoryDocs'));
 const LegalDocs = lazy(() => import('../pages-v2/admin/LegalDocs'));
 const AppDownloadStatistics = lazy(() => import('../pages/Statistic/AppDownloadStatistics'));
@@ -81,7 +89,7 @@ export default function AppRoutesV2() {
         <Route path="/cong-dong/lich-tiep-dan" element={<ReceptionSchedulePage />} />
         <Route path="/cong-dong/huong-dan" element={<CitizenGuidePage />} />
         <Route path="/cong-dong/thu-vien-so" element={<DigitalLibraryPage />} />
-        <Route path="/cong-dong/ban-do-so" element={<DigitalMap />} />
+        <Route path="/cong-dong/ban-do-so" element={<DigitalMapPlaceholder />} />
         <Route path="/cong-dong/*" element={<CitizenNotFound />} />
       </Route>
       <Route element={<AuthLayout />}>

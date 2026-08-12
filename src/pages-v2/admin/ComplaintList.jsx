@@ -11,6 +11,19 @@ import {
 import { StatusBadge, UrgencyBadge } from "../../mock/components/Badges";
 import dayjs from "dayjs";
 
+// ---- Column definitions (used for visibility & export) ----
+const ALL_COLUMNS = [
+  { key: 'index', title: 'STT' },
+  { key: 'code', title: 'Mã PA' },
+  { key: 'title', title: 'Tiêu đề' },
+  { key: 'categoryId', title: 'Lĩnh vực' },
+  { key: 'neighborhoodId', title: 'Khu phố' },
+  { key: 'createdAt', title: 'Ngày gửi' },
+  { key: 'status', title: 'Trạng thái' },
+  { key: 'urgency', title: 'Độ khẩn' },
+  { key: 'deadline', title: 'Hạn xử lý' },
+];
+
 // ---- Badge renderers (shared from Badges.jsx) ----
 const renderCategoryBadge = (catId) => {
   const cat = getCategoryById(catId);
@@ -308,6 +321,13 @@ export default function ComplaintList() {
   const [sortDirection, setSortDirection] = useState('asc');
   const [statusDropdownOpen, setStatusDropdownOpen] = useState(false);
   const statusDropdownRef = useRef(null);
+  const [columnVisibility, setColumnVisibility] = useState(() => {
+    const initial = {};
+    ALL_COLUMNS.forEach(c => { initial[c.key] = true; });
+    return initial;
+  });
+  const [showColumnSettings, setShowColumnSettings] = useState(false);
+  const columnSettingsRef = useRef(null);
 
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -320,6 +340,18 @@ export default function ComplaintList() {
       return () => document.removeEventListener('mousedown', handleClickOutside);
     }
   }, [statusDropdownOpen]);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (columnSettingsRef.current && !columnSettingsRef.current.contains(e.target)) {
+        setShowColumnSettings(false);
+      }
+    };
+    if (showColumnSettings) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => document.removeEventListener('mousedown', handleClickOutside);
+    }
+  }, [showColumnSettings]);
 
   // ---- filters (khớp cấu trúc gốc) ----
   const [filters, setFilters] = useState({
@@ -459,6 +491,52 @@ export default function ComplaintList() {
     setPage(1);
   };
 
+  const handleExportExcel = () => {
+    const visibleKeys = ALL_COLUMNS.filter(c => columnVisibility[c.key]).map(c => c.key);
+    const visibleTitles = ALL_COLUMNS.filter(c => columnVisibility[c.key]).map(c => c.title);
+    const rows = filtered.map((item, idx) => {
+      const row = [];
+      visibleKeys.forEach(key => {
+        switch (key) {
+          case 'index': row.push(idx + 1); break;
+          case 'code': row.push(item.code || ''); break;
+          case 'title': row.push(item.title || ''); break;
+          case 'categoryId': row.push(getCategoryById(item.categoryId)?.name || ''); break;
+          case 'neighborhoodId': row.push(getNeighborhoodById(item.neighborhoodId)?.name || ''); break;
+          case 'createdAt': row.push(dayjs(item.createdAt).format('DD/MM/YYYY HH:mm')); break;
+          case 'status': {
+            const statusMap = { NEW: 'Đã gửi', PENDING_RECEPTION: 'Chờ tiếp nhận', RECEIVED: 'Đã tiếp nhận', ASSIGNED: 'Đã phân công', IN_PROGRESS: 'Đang xử lý', EXTENSION_PENDING: 'Chờ gia hạn', COMPLETED: 'Đã giải quyết', REJECTED: 'Từ chối' };
+            row.push(statusMap[item.status] || item.status || ''); break;
+          }
+          case 'urgency': {
+            const u = item.confirmedUrgency || item.citizenUrgency;
+            row.push(u === 'URGENT' ? 'Khẩn cấp' : 'Thông thường'); break;
+          }
+          case 'deadline': row.push(item.originalDeadline ? dayjs(item.currentDeadline || item.originalDeadline).format('DD/MM/YYYY HH:mm') : ''); break;
+          default: row.push(''); break;
+        }
+      });
+      return row;
+    });
+
+    const BOM = '﻿';
+    const csvContent = [visibleTitles, ...rows]
+      .map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(','))
+      .join('\n');
+    const blob = new Blob([BOM + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `PhanAnh_${dayjs().format('DD-MM-YYYY_HH-mm')}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const toggleColumn = (key) => {
+    if (key === 'index') return; // không cho phép ẩn STT
+    setColumnVisibility(prev => ({ ...prev, [key]: !prev[key] }));
+  };
+
   // ---- Columns (rút gọn: 8 cột, vừa 1 màn hình) ----
   const columns = [
     {
@@ -586,6 +664,8 @@ export default function ComplaintList() {
     },
   ];
 
+  const visibleColumns = columns.filter(col => columnVisibility[col.key] !== false);
+
   return (
     <div className="min-h-screen">
       {/* Page title — synchronized typography */}
@@ -627,6 +707,53 @@ export default function ComplaintList() {
               <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
               Bộ lọc
             </button>
+
+            {/* Spacer */}
+            <div className="flex-1" />
+
+            {/* Export Excel button */}
+            <button
+              onClick={handleExportExcel}
+              className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 transition-colors"
+              title="Xuất file Excel"
+            >
+              <svg className="w-4 h-4 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+              Xuất Excel
+            </button>
+
+            {/* Column settings button */}
+            <div className="relative" ref={columnSettingsRef}>
+              <button
+                onClick={() => setShowColumnSettings(!showColumnSettings)}
+                className={`inline-flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-lg border transition-colors ${showColumnSettings ? 'bg-gray-100 border-gray-400 text-gray-800' : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-50'}`}
+                title="Tùy chỉnh cột hiển thị"
+              >
+                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+              </button>
+              {showColumnSettings && (
+                <div className="absolute right-0 top-full mt-1 bg-white rounded-lg shadow-lg border border-gray-200 z-[100] py-2 min-w-[200px]">
+                  <div className="px-3 py-1 text-xs font-semibold text-gray-500 uppercase tracking-wide">Cột hiển thị</div>
+                  {ALL_COLUMNS.map(col => (
+                    <button
+                      key={col.key}
+                      onClick={() => toggleColumn(col.key)}
+                      disabled={col.key === 'index'}
+                      className={`flex items-center gap-2 w-full px-3 py-1.5 text-sm text-left ${col.key === 'index' ? 'text-gray-400 cursor-not-allowed' : 'text-gray-700 hover:bg-gray-50 cursor-pointer'}`}
+                    >
+                      <span className={`w-4 h-4 rounded border flex items-center justify-center flex-shrink-0 ${columnVisibility[col.key] ? 'bg-blue-600 border-blue-600' : 'border-gray-300'}`}>
+                        {columnVisibility[col.key] && (
+                          <svg className="w-3 h-3 text-white" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <polyline points="1.5,6 4.5,9 10.5,3" />
+                          </svg>
+                        )}
+                      </span>
+                      {col.title}
+                      {col.key === 'index' && <span className="text-[10px] text-gray-400 ml-auto">bắt buộc</span>}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Expanded filters */}
@@ -769,7 +896,7 @@ export default function ComplaintList() {
       {/* BaseTable — dùng component thật từ dự án gốc */}
       <BaseTable
         data={paginated}
-        columns={columns}
+        columns={visibleColumns}
         onView={handleView}
         onEdit={handleEdit}
         showActions={true}

@@ -7,9 +7,16 @@ import { CitizenGuidePage, PublicServicesPage, ReceptionSchedulePage } from './c
 import DigitalLibraryPage from './citizen/pages/DigitalLibraryPage';
 import SatisfactionPage from './citizen/pages/SatisfactionPage';
 
-// Admin - chỉ cần DigitalMap
+// Admin - chỉ cần MockProvider
 import { MockProvider } from './mock/MockContext';
-import DigitalMap from './pages/DigitalMap/DigitalMap';
+
+function DigitalMapPlaceholder() {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '60vh' }}>
+      <p style={{ fontSize: 18, color: '#6b7280', fontWeight: 500 }}>Chờ thông tin</p>
+    </div>
+  );
+}
 
 export default function CitizenApp() {
   return (
@@ -35,7 +42,7 @@ export default function CitizenApp() {
             <Route path="/cong-dong/lich-tiep-dan" element={<ReceptionSchedulePage />} />
             <Route path="/cong-dong/huong-dan" element={<CitizenGuidePage />} />
             <Route path="/cong-dong/thu-vien-so" element={<DigitalLibraryPage />} />
-            <Route path="/cong-dong/ban-do-so" element={<DigitalMap />} />
+            <Route path="/cong-dong/ban-do-so" element={<DigitalMapPlaceholder />} />
           </Route>
 
           {/* ========== 404 ========== */}

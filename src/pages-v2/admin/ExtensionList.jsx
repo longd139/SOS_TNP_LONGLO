@@ -2,7 +2,7 @@
 // EXTENSION LIST — Quản lý gia hạn (approver/leader view)
 // PAGE E-02
 // ============================================================
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Filter, X, ArrowRight } from "lucide-react";
 import { useMock } from "../../mock/MockContext";
@@ -10,6 +10,19 @@ import { getComplaintById, getDepartmentById, getUserById, neighborhoods, catego
 import dayjs from "dayjs";
 
 const PAGE_SIZE = 10;
+
+// ---- Column definitions (used for visibility & export) ----
+const ALL_COLUMNS = [
+  { key: 'index', title: 'STT' },
+  { key: 'code', title: 'Mã PA' },
+  { key: 'title', title: 'Tiêu đề' },
+  { key: 'department', title: 'Đơn vị' },
+  { key: 'requester', title: 'Người đề nghị' },
+  { key: 'deadline', title: 'Hạn' },
+  { key: 'reason', title: 'Lý do' },
+  { key: 'requestedAt', title: 'Ngày ĐN' },
+  { key: 'status', title: 'Trạng thái' },
+];
 
 const EXT_STATUS = {
   PENDING:  { label: "Chờ phê duyệt",  bg: "#FEF3C7", color: "#92400E" },
@@ -37,6 +50,25 @@ export default function ExtensionList() {
   });
   const [sortKey, setSortKey] = useState('');
   const [sortDirection, setSortDirection] = useState('asc');
+  const [columnVisibility, setColumnVisibility] = useState(() => {
+    const initial = {};
+    ALL_COLUMNS.forEach(c => { initial[c.key] = true; });
+    return initial;
+  });
+  const [showColumnSettings, setShowColumnSettings] = useState(false);
+  const columnSettingsRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (columnSettingsRef.current && !columnSettingsRef.current.contains(e.target)) {
+        setShowColumnSettings(false);
+      }
+    };
+    if (showColumnSettings) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => document.removeEventListener('mousedown', handleClickOutside);
+    }
+  }, [showColumnSettings]);
 
   // join extension with its complaint
   const enriched = useMemo(() => extensions.map(ext => {
@@ -112,6 +144,49 @@ export default function ExtensionList() {
     }
   };
 
+  const handleExportExcel = () => {
+    const visibleKeys = ALL_COLUMNS.filter(c => columnVisibility[c.key]).map(c => c.key);
+    const visibleTitles = ALL_COLUMNS.filter(c => columnVisibility[c.key]).map(c => c.title);
+    const rows = filtered.map((ext, idx) => {
+      const row = [];
+      visibleKeys.forEach(key => {
+        switch (key) {
+          case 'index': row.push(idx + 1); break;
+          case 'code': row.push(ext.complaint?.code || ''); break;
+          case 'title': row.push(ext.complaint?.title || ''); break;
+          case 'department': row.push(ext.dept?.name || ''); break;
+          case 'requester': row.push(ext.requester?.fullName || ''); break;
+          case 'deadline': row.push(ext.requestedDeadline ? dayjs(ext.requestedDeadline).format('DD/MM/YYYY HH:mm') : ''); break;
+          case 'reason': row.push(ext.reason || ''); break;
+          case 'requestedAt': row.push(ext.requestedAt ? dayjs(ext.requestedAt).format('DD/MM/YYYY HH:mm') : ''); break;
+          case 'status': {
+            const statusMap = { PENDING: 'Chờ phê duyệt', APPROVED: 'Đã phê duyệt', REJECTED: 'Đã từ chối' };
+            row.push(statusMap[ext.status] || ext.status || ''); break;
+          }
+          default: row.push(''); break;
+        }
+      });
+      return row;
+    });
+
+    const BOM = '﻿';
+    const csvContent = [visibleTitles, ...rows]
+      .map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(','))
+      .join('\n');
+    const blob = new Blob([BOM + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `GiaHan_${dayjs().format('DD-MM-YYYY_HH-mm')}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const toggleColumn = (key) => {
+    if (key === 'index') return; // không cho phép ẩn STT
+    setColumnVisibility(prev => ({ ...prev, [key]: !prev[key] }));
+  };
+
   const hasActiveFilters = filters.search || filters.extensionStatus || filters.neighborhoodId || filters.categoryId || filters.departmentId || filters.urgency;
 
   const renderSortIcon = (key) => {
@@ -161,6 +236,53 @@ export default function ExtensionList() {
               <Filter className="w-4 h-4" />Bộ lọc
             </button>
             {hasActiveFilters && <button onClick={handleResetFilters} className="inline-flex items-center gap-1 px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors"><X className="w-4 h-4" />Xoá bộ lọc</button>}
+
+            {/* Spacer */}
+            <div className="flex-1" />
+
+            {/* Export Excel button */}
+            <button
+              onClick={handleExportExcel}
+              className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 transition-colors"
+              title="Xuất file Excel"
+            >
+              <svg className="w-4 h-4 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+              Xuất Excel
+            </button>
+
+            {/* Column settings button */}
+            <div className="relative" ref={columnSettingsRef}>
+              <button
+                onClick={() => setShowColumnSettings(!showColumnSettings)}
+                className={`inline-flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-lg border transition-colors ${showColumnSettings ? 'bg-gray-100 border-gray-400 text-gray-800' : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-50'}`}
+                title="Tùy chỉnh cột hiển thị"
+              >
+                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+              </button>
+              {showColumnSettings && (
+                <div className="absolute right-0 top-full mt-1 bg-white rounded-lg shadow-lg border border-gray-200 z-[100] py-2 min-w-[200px]">
+                  <div className="px-3 py-1 text-xs font-semibold text-gray-500 uppercase tracking-wide">Cột hiển thị</div>
+                  {ALL_COLUMNS.map(col => (
+                    <button
+                      key={col.key}
+                      onClick={() => toggleColumn(col.key)}
+                      disabled={col.key === 'index'}
+                      className={`flex items-center gap-2 w-full px-3 py-1.5 text-sm text-left ${col.key === 'index' ? 'text-gray-400 cursor-not-allowed' : 'text-gray-700 hover:bg-gray-50 cursor-pointer'}`}
+                    >
+                      <span className={`w-4 h-4 rounded border flex items-center justify-center flex-shrink-0 ${columnVisibility[col.key] ? 'bg-blue-600 border-blue-600' : 'border-gray-300'}`}>
+                        {columnVisibility[col.key] && (
+                          <svg className="w-3 h-3 text-white" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <polyline points="1.5,6 4.5,9 10.5,3" />
+                          </svg>
+                        )}
+                      </span>
+                      {col.title}
+                      {col.key === 'index' && <span className="text-[10px] text-gray-400 ml-auto">bắt buộc</span>}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
           {showFilters && (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mt-4 pt-4 border-t border-gray-200">
@@ -196,34 +318,36 @@ export default function ExtensionList() {
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-3 py-2.5 text-left"><SortHeader label="Mã PA" sortKey="code" /></th>
-                <th className="px-3 py-2.5 text-left"><SortHeader label="Tiêu đề" sortKey="title" /></th>
-                <th className="px-3 py-2.5 text-left"><SortHeader label="Đơn vị" sortKey="department" /></th>
-                <th className="px-3 py-2.5 text-left"><SortHeader label="Người đề nghị" sortKey="requester" /></th>
-                <th className="px-3 py-2.5 text-left"><SortHeader label="Hạn" sortKey="deadline" /></th>
-                <th className="px-3 py-2.5 text-left"><SortHeader label="Lý do" sortKey="reason" /></th>
-                <th className="px-3 py-2.5 text-left"><SortHeader label="Ngày ĐN" sortKey="requestedAt" /></th>
-                <th className="px-3 py-2.5 text-left"><SortHeader label="Trạng thái" sortKey="status" /></th>
+                {columnVisibility.index && <th className="px-3 py-2.5 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">STT</th>}
+                {columnVisibility.code && <th className="px-3 py-2.5 text-left"><SortHeader label="Mã PA" sortKey="code" /></th>}
+                {columnVisibility.title && <th className="px-3 py-2.5 text-left"><SortHeader label="Tiêu đề" sortKey="title" /></th>}
+                {columnVisibility.department && <th className="px-3 py-2.5 text-left"><SortHeader label="Đơn vị" sortKey="department" /></th>}
+                {columnVisibility.requester && <th className="px-3 py-2.5 text-left"><SortHeader label="Người đề nghị" sortKey="requester" /></th>}
+                {columnVisibility.deadline && <th className="px-3 py-2.5 text-left"><SortHeader label="Hạn" sortKey="deadline" /></th>}
+                {columnVisibility.reason && <th className="px-3 py-2.5 text-left"><SortHeader label="Lý do" sortKey="reason" /></th>}
+                {columnVisibility.requestedAt && <th className="px-3 py-2.5 text-left"><SortHeader label="Ngày ĐN" sortKey="requestedAt" /></th>}
+                {columnVisibility.status && <th className="px-3 py-2.5 text-left"><SortHeader label="Trạng thái" sortKey="status" /></th>}
                 <th className="px-3 py-2.5 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">Thao tác</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {paginated.length === 0 ? (
-                <tr><td colSpan={9} className="px-6 py-8 text-center text-gray-500">{hasActiveFilters ? "Không tìm thấy yêu cầu gia hạn phù hợp với bộ lọc" : "Không có yêu cầu gia hạn nào"}</td></tr>
-              ) : paginated.map(ext => (
+                <tr><td colSpan={1 + Object.values(columnVisibility).filter(Boolean).length} className="px-6 py-8 text-center text-gray-500">{hasActiveFilters ? "Không tìm thấy yêu cầu gia hạn phù hợp với bộ lọc" : "Không có yêu cầu gia hạn nào"}</td></tr>
+              ) : paginated.map((ext, idx) => (
                 <tr key={ext.id} className="hover:bg-gray-50 cursor-pointer" onClick={() => handleView(ext)}>
-                  <td className="px-3 py-2.5 whitespace-nowrap text-sm font-mono text-blue-700">{ext.complaint?.code || "—"}</td>
-                  <td className="px-3 py-2.5 text-sm text-gray-900 max-w-[160px] truncate" title={ext.complaint?.title}>{ext.complaint?.title || "—"}</td>
-                  <td className="px-3 py-2.5 whitespace-nowrap text-sm text-gray-600">{ext.dept?.name || "—"}</td>
-                  <td className="px-3 py-2.5 whitespace-nowrap text-sm text-gray-600">{ext.requester?.fullName || "—"}</td>
-                  <td className="px-3 py-2.5 whitespace-nowrap text-xs text-gray-600">
+                  {columnVisibility.index && <td className="px-3 py-2.5 whitespace-nowrap text-sm font-medium text-gray-900">#{((safePage - 1) * PAGE_SIZE) + idx + 1}</td>}
+                  {columnVisibility.code && <td className="px-3 py-2.5 whitespace-nowrap text-sm font-mono text-blue-700">{ext.complaint?.code || "—"}</td>}
+                  {columnVisibility.title && <td className="px-3 py-2.5 text-sm text-gray-900 max-w-[160px] truncate" title={ext.complaint?.title}>{ext.complaint?.title || "—"}</td>}
+                  {columnVisibility.department && <td className="px-3 py-2.5 whitespace-nowrap text-sm text-gray-600">{ext.dept?.name || "—"}</td>}
+                  {columnVisibility.requester && <td className="px-3 py-2.5 whitespace-nowrap text-sm text-gray-600">{ext.requester?.fullName || "—"}</td>}
+                  {columnVisibility.deadline && <td className="px-3 py-2.5 whitespace-nowrap text-xs text-gray-600">
                     <span className="text-gray-400 line-through">{ext.oldDeadline ? dayjs(ext.oldDeadline).format("DD/MM") : "—"}</span>
                     <span className="mx-1 text-gray-300">→</span>
                     <span className="font-medium text-gray-700">{ext.requestedDeadline ? dayjs(ext.requestedDeadline).format("DD/MM HH:mm") : "—"}</span>
-                  </td>
-                  <td className="px-3 py-2.5 text-sm text-gray-600 max-w-[120px] truncate" title={ext.reason}>{ext.reason}</td>
-                  <td className="px-3 py-2.5 whitespace-nowrap text-xs text-gray-600">{dayjs(ext.requestedAt).format("DD/MM HH:mm")}</td>
-                  <td className="px-3 py-2.5 whitespace-nowrap">{renderStatusBadge(ext.status)}</td>
+                  </td>}
+                  {columnVisibility.reason && <td className="px-3 py-2.5 text-sm text-gray-600 max-w-[120px] truncate" title={ext.reason}>{ext.reason}</td>}
+                  {columnVisibility.requestedAt && <td className="px-3 py-2.5 whitespace-nowrap text-xs text-gray-600">{dayjs(ext.requestedAt).format("DD/MM HH:mm")}</td>}
+                  {columnVisibility.status && <td className="px-3 py-2.5 whitespace-nowrap">{renderStatusBadge(ext.status)}</td>}
                   <td className="px-3 py-2.5 whitespace-nowrap text-sm font-medium">
                     <button onClick={(e) => { e.stopPropagation(); handleView(ext); }} className="border border-gray-300 text-gray-700 px-2.5 py-1.5 rounded-lg hover:bg-gray-50 text-xs font-medium">Chi tiết</button>
                   </td>

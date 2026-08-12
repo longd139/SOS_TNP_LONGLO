@@ -4,6 +4,14 @@ export const citizenNavItems = [
   { label: 'Tin tức', to: '/cong-dong/tin-tuc' },
   { label: 'Lịch tiếp dân', to: '/cong-dong/lich-tiep-dan' },
   { label: 'Phản ánh', to: '/cong-dong/tra-cuu' },
+  {
+    label: 'Bản đồ',
+    to: '#',
+    submenu: [
+      { label: 'Bản đồ số', to: '/cong-dong/ban-do-so' },
+      { label: 'Bản đồ quy hoạch', to: 'https://tangnhonphu.thongtinquyhoach.vn/ban-do-quy-hoach', external: true },
+    ],
+  },
   { label: 'Thư viện số', to: '/cong-dong/thu-vien-so' },
   { label: 'Liên hệ', to: '/cong-dong/lien-he' },
 ];

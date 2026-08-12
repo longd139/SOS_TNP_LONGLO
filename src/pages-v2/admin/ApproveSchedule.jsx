@@ -10,6 +10,7 @@ const MOCK_DATA = [
     dayOfWeek: 'Thứ Sáu',
     timeSlot: 'Sáng (09:00 - 10:30)',
     status: 'PENDING',
+    result: null,
     citizenInfo: {
       name: 'Nguyễn Thị Lan',
       phone: '0901234501',
@@ -55,6 +56,7 @@ const MOCK_DATA = [
     dayOfWeek: 'Thứ Năm',
     timeSlot: 'Chiều (14:00 - 15:30)',
     status: 'APPROVED',
+    result: null,
     citizenInfo: {
       name: 'Phạm Quốc Đạt',
       phone: '0945678904',
@@ -133,6 +135,7 @@ export default function ApproveSchedule() {
   const [activeTab, setActiveTab] = useState('PENDING');
   const [actionModal, setActionModal] = useState({ isOpen: false, action: null, ticketId: null });
   const [actionNote, setActionNote] = useState('');
+  const [actionResult, setActionResult] = useState('');
 
   useEffect(() => {
     const localData = localStorage.getItem('citizen-approvals-v7');
@@ -151,16 +154,23 @@ export default function ApproveSchedule() {
       setIsModalOpen(false);
       return;
     }
+    if (newStatus === 'DONE') {
+      setActionModal({ isOpen: true, action: newStatus, ticketId: id });
+      setActionNote('');
+      setActionResult('');
+      setIsModalOpen(false);
+      return;
+    }
     executeAction(id, newStatus);
   };
 
-  const executeAction = (id, newStatus, note = '') => {
-    const updatedData = data.map(item => 
-      item.id === id ? { ...item, status: newStatus, note: note || item.note } : item
+  const executeAction = (id, newStatus, note = '', result = null) => {
+    const updatedData = data.map(item =>
+      item.id === id ? { ...item, status: newStatus, note: note || item.note, result: result !== null ? result : item.result } : item
     );
     setData(updatedData);
     localStorage.setItem('citizen-approvals-v7', JSON.stringify(updatedData));
-    
+
     let msg = 'Đã cập nhật trạng thái';
     if (newStatus === 'APPROVED') msg = 'Đã duyệt lịch hẹn thành công';
     if (newStatus === 'REJECTED') msg = 'Đã từ chối lịch hẹn';
@@ -241,6 +251,27 @@ export default function ApproveSchedule() {
           {record.citizenInfo?.content}
         </div>
       )
+    },
+    {
+      title: 'Kết quả xử lý',
+      key: 'result',
+      align: 'center',
+      width: 130,
+      render: (_, record) => {
+        if (record.status === 'PENDING' || record.status === 'APPROVED' || record.status === 'REJECTED' || record.status === 'CANCELED') {
+          return <span className="text-gray-400 text-[14px]">—</span>;
+        }
+        if (record.status === 'DONE') {
+          if (record.result === 'done') {
+            return <span className="bg-green-50 text-green-600 border border-green-200 text-[12px] font-medium px-2.5 py-1 rounded-full">Đã xong</span>;
+          }
+          if (record.result === 'not_done') {
+            return <span className="bg-red-50 text-red-500 border border-red-200 text-[12px] font-medium px-2.5 py-1 rounded-full">Chưa xong</span>;
+          }
+          return <span className="text-gray-400 text-[14px]">—</span>;
+        }
+        return <span className="text-gray-400 text-[14px]">—</span>;
+      }
     },
     {
       title: 'Hành động',
@@ -489,31 +520,96 @@ export default function ApproveSchedule() {
                 </div>
               </div>
             )}
+
+            {/* KẾT QUẢ XỬ LÝ (NẾU ĐÃ TIẾP XONG) */}
+            {selectedTicket.status === 'DONE' && selectedTicket.result && (
+              <div className="pt-2">
+                <h4 className="text-[12px] font-bold text-blue-500 mb-2 uppercase tracking-wide">KẾT QUẢ XỬ LÝ</h4>
+                <div className={`border rounded-xl p-4 ${selectedTicket.result === 'done' ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'}`}>
+                  <p className={`text-[14px] leading-relaxed m-0 font-bold ${selectedTicket.result === 'done' ? 'text-green-700' : 'text-red-700'}`}>
+                    {selectedTicket.result === 'done' ? 'Đã xong' : 'Chưa xong'}
+                  </p>
+                  {selectedTicket.note && (
+                    <p className="text-gray-600 text-[13px] mt-2 leading-relaxed m-0">{selectedTicket.note}</p>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
         )}
       </Modal>
 
       <Modal
-        title={actionModal.action === 'REJECTED' ? 'Xác nhận từ chối' : 'Xác nhận hủy lịch'}
+        title={actionModal.action === 'DONE' ? 'Xác nhận kết quả tiếp dân' : actionModal.action === 'REJECTED' ? 'Xác nhận từ chối' : 'Xác nhận hủy lịch'}
         open={actionModal.isOpen}
         onCancel={() => setActionModal({ isOpen: false, action: null, ticketId: null })}
-        onOk={() => executeAction(actionModal.ticketId, actionModal.action, actionNote)}
+        onOk={() => {
+          if (actionModal.action === 'DONE') {
+            if (!actionResult) { message.warning('Vui lòng chọn kết quả xử lý'); return; }
+            executeAction(actionModal.ticketId, actionModal.action, actionNote, actionResult);
+          } else {
+            executeAction(actionModal.ticketId, actionModal.action, actionNote);
+          }
+        }}
         okText="Xác nhận"
         cancelText="Bỏ qua"
-        okButtonProps={{ danger: true, className: "bg-red-500 hover:bg-red-600 border-none shadow-md" }}
+        okButtonProps={actionModal.action === 'DONE' ? { className: "bg-blue-600 hover:bg-blue-700 border-none shadow-md" } : { danger: true, className: "bg-red-500 hover:bg-red-600 border-none shadow-md" }}
         cancelButtonProps={{ className: "border-none shadow-sm" }}
         centered
       >
-        <div className="mb-4 text-gray-600 text-[15px]">
-          Bạn có chắc chắn muốn <strong className="text-red-500">{actionModal.action === 'REJECTED' ? 'từ chối' : 'hủy'}</strong> lịch hẹn này không?
-        </div>
-        <Input.TextArea
-          rows={4}
-          placeholder="Nhập ghi chú / lý do (không bắt buộc)..."
-          value={actionNote}
-          onChange={(e) => setActionNote(e.target.value)}
-          className="rounded-xl p-3"
-        />
+        {actionModal.action === 'DONE' ? (
+          <>
+            <div className="mb-4 text-gray-600 text-[15px]">
+              Vui lòng chọn <strong className="text-blue-600">kết quả xử lý</strong> sau buổi tiếp dân:
+            </div>
+            <div className="flex gap-3 mb-4">
+              <button
+                type="button"
+                onClick={() => setActionResult('done')}
+                className={`flex-1 py-3 px-4 rounded-xl border-2 text-[15px] font-semibold transition-all cursor-pointer ${
+                  actionResult === 'done'
+                    ? 'border-green-500 bg-green-50 text-green-700 shadow-sm'
+                    : 'border-gray-200 bg-white text-gray-600 hover:border-green-300 hover:bg-green-50/50'
+                }`}
+              >
+                <Check className="w-5 h-5 mx-auto mb-1" />
+                Đã xong
+              </button>
+              <button
+                type="button"
+                onClick={() => setActionResult('not_done')}
+                className={`flex-1 py-3 px-4 rounded-xl border-2 text-[15px] font-semibold transition-all cursor-pointer ${
+                  actionResult === 'not_done'
+                    ? 'border-red-400 bg-red-50 text-red-600 shadow-sm'
+                    : 'border-gray-200 bg-white text-gray-600 hover:border-red-300 hover:bg-red-50/50'
+                }`}
+              >
+                <X className="w-5 h-5 mx-auto mb-1" />
+                Chưa xong
+              </button>
+            </div>
+            <Input.TextArea
+              rows={3}
+              placeholder="Nhập ghi chú (không bắt buộc)..."
+              value={actionNote}
+              onChange={(e) => setActionNote(e.target.value)}
+              className="rounded-xl p-3"
+            />
+          </>
+        ) : (
+          <>
+            <div className="mb-4 text-gray-600 text-[15px]">
+              Bạn có chắc chắn muốn <strong className="text-red-500">{actionModal.action === 'REJECTED' ? 'từ chối' : 'hủy'}</strong> lịch hẹn này không?
+            </div>
+            <Input.TextArea
+              rows={4}
+              placeholder="Nhập ghi chú / lý do (không bắt buộc)..."
+              value={actionNote}
+              onChange={(e) => setActionNote(e.target.value)}
+              className="rounded-xl p-3"
+            />
+          </>
+        )}
       </Modal>
 
       <style jsx global>{`

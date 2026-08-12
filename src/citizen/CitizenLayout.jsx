@@ -10,19 +10,16 @@ function CitizenPageLoader() {
   return (
     <div className="citizen-page-loader">
       <div className="skeleton-container">
-        {/* Header skeleton */}
         <div className="skeleton-card">
           <div className="skeleton-line h28 w40" />
           <div className="skeleton-line w60" style={{ marginTop: 14 }} />
         </div>
-        {/* Content skeleton */}
         <div className="skeleton-card">
           <div className="skeleton-line h20 w30" />
           <div className="skeleton-line w100" style={{ marginTop: 16 }} />
           <div className="skeleton-line w100" />
           <div className="skeleton-line w80" />
         </div>
-        {/* Card skeleton */}
         <div className="skeleton-card">
           <div className="skeleton-line h20 w25" />
           <div className="skeleton-line w100" style={{ marginTop: 16 }} />
@@ -43,11 +40,29 @@ function PageTransitionWrapper({ children, locationKey }) {
 
 export default function CitizenLayout() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
   const closeMenu = () => setMenuOpen(false);
 
   const location = useLocation();
   const navRef = useRef(null);
+  const dropdownRef = useRef(null);
   const [indicatorStyle, setIndicatorStyle] = useState({ left: 0, width: 0, opacity: 0 });
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // Close dropdown on route change
+  useEffect(() => {
+    setDropdownOpen(false);
+  }, [location]);
 
   const updateIndicator = useCallback(() => {
     if (!navRef.current) return;
@@ -73,6 +88,12 @@ export default function CitizenLayout() {
     return () => window.removeEventListener('resize', updateIndicator);
   }, [updateIndicator]);
 
+  // Update indicator when dropdown toggles
+  useEffect(() => {
+    const timer = setTimeout(updateIndicator, 0);
+    return () => clearTimeout(timer);
+  }, [dropdownOpen, updateIndicator]);
+
   return (
     <div className="citizen-app">
       {/* Navbar */}
@@ -93,16 +114,55 @@ export default function CitizenLayout() {
           <Navbar.Collapse id="citizen-navbar">
             <Nav className="ms-auto citizen-nav align-items-lg-center gap-1" ref={navRef}>
               {citizenNavItems.map((item) => (
-                <Nav.Link
-                  as={NavLink}
-                  key={item.to}
-                  to={item.to}
-                  end={item.to === '/cong-dong'}
-                  onClick={closeMenu}
-                  className="citizen-nav-link"
-                >
-                  {item.label}
-                </Nav.Link>
+                item.submenu ? (
+                  <div key={item.label} className="citizen-nav-dropdown" ref={dropdownRef}>
+                    <button
+                      type="button"
+                      className={`citizen-nav-link ${dropdownOpen || item.submenu.some(sub => !sub.external && location.pathname === sub.to) ? 'active' : ''}`}
+                      onClick={() => setDropdownOpen(!dropdownOpen)}
+                    >
+                      {item.label}
+                    </button>
+                    {dropdownOpen && (
+                      <div className="citizen-nav-dropdown-menu">
+                        {item.submenu.map((sub) => (
+                          sub.external ? (
+                            <a
+                              key={sub.label}
+                              href={sub.to}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              onClick={() => { closeMenu(); setDropdownOpen(false); }}
+                              className="citizen-nav-dropdown-item"
+                            >
+                              {sub.label}
+                            </a>
+                          ) : (
+                            <Link
+                              key={sub.label}
+                              to={sub.to}
+                              onClick={() => { closeMenu(); setDropdownOpen(false); }}
+                              className="citizen-nav-dropdown-item"
+                            >
+                              {sub.label}
+                            </Link>
+                          )
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <Nav.Link
+                    as={NavLink}
+                    key={item.to}
+                    to={item.to}
+                    end={item.to === '/cong-dong'}
+                    onClick={closeMenu}
+                    className="citizen-nav-link"
+                  >
+                    {item.label}
+                  </Nav.Link>
+                )
               ))}
               <div className="citizen-nav-indicator" style={indicatorStyle} />
             </Nav>
