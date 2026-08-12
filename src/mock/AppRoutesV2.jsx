@@ -41,6 +41,7 @@ const DigitalMap = lazy(() => import('../pages/DigitalMap/DigitalMap'));
 const HistoryDocs = lazy(() => import('../pages-v2/admin/HistoryDocs'));
 const LegalDocs = lazy(() => import('../pages-v2/admin/LegalDocs'));
 const AppDownloadStatistics = lazy(() => import('../pages/Statistic/AppDownloadStatistics'));
+const ReceptionKiosk = lazy(() => import('../pages-v2/kiosk/ReceptionKiosk'));
 const SatisfactionDashboard = lazy(() => import('../pages-v2/admin/SatisfactionDashboard'));
 const CounterReceptionFeedbackPage = lazy(() => import('../pages-v2/admin/CounterReceptionFeedbackPage'));
 const LeaderMeetingFeedbackPage = lazy(() => import('../pages-v2/admin/LeaderMeetingFeedbackPage'));

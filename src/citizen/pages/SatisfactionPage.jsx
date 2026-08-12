@@ -53,7 +53,7 @@ export default function SatisfactionPage() {
       <div className="satisfaction-card satisfaction-record-card">
         <p className="citizen-eyebrow">SOS-018 · Chi tiết đánh giá</p>
         <h1>Đánh giá đã gửi</h1>
-        <p className="satisfaction-reference">Mã phản ánh: <strong>{code}</strong><br />{complaint.title}</p>
+        <p className="satisfaction-reference">Mã phản ánh: <strong>{code}</strong><br />{complaintFromStatus?.title || complaintFromAdmin?.comment || ''}</p>
         <div className="saved-rating-summary"><div className="satisfaction-stars" aria-label={`${savedRating.score} trên 5 sao`}>{[1, 2, 3, 4, 5].map((value) => <Star key={value} size={30} fill={value <= savedRating.score ? 'currentColor' : 'none'} />)}</div><strong>{savedRating.score}/5 sao · {satisfactionLabel(savedRating.score)}</strong></div>
         <div className="saved-rating-comment"><span>Góp ý</span><p>{savedRating.comment || 'Không có góp ý thêm.'}</p></div>
         <p className="saved-rating-date">Đã gửi ngày {savedRating.ratedAt}</p>

@@ -1,5 +1,4 @@
 export const SATISFACTION_STORAGE_KEY = 'sos_citizen_satisfaction_ratings_v2';
-export const SATISFACTION_UPDATED_EVENT = 'sos-citizen-satisfaction-updated';
 
 // Custom event được dispatch khi người dân gửi đánh giá mới — để Dashboard lắng nghe và cập nhật real-time.
 export const SATISFACTION_UPDATED_EVENT = 'satisfaction:updated';
