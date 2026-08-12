@@ -47,7 +47,7 @@ const initialState = {
 };
 
 function getRoleLabel(role) {
-  const map = { CITIZEN: 'Người dân', RECEPTION_OFFICER: 'Cán bộ tiếp nhận', PROCESSING_OFFICER: 'Cán bộ xử lý', APPROVER: 'Lãnh đạo', LEADER: 'Lãnh đạo', ADMIN: 'Quản trị viên' };
+  const map = { CITIZEN: 'Người dân', OFFICER: 'Cán bộ', RECEPTION_OFFICER: 'Cán bộ', PROCESSING_OFFICER: 'Cán bộ', APPROVER: 'Lãnh đạo', LEADER: 'Lãnh đạo', ADMIN: 'Quản trị viên' };
   return map[role] || role;
 }
 
@@ -55,7 +55,8 @@ function reducer(state, action) {
   switch (action.type) {
     case ACTIONS.SET_ROLE: {
       const role = action.payload;
-      const user = users.find(u => u.role === role) || state.currentUser;
+      const matchedUser = role === 'OFFICER' ? users.find(u => ['OFFICER', 'RECEPTION_OFFICER', 'PROCESSING_OFFICER'].includes(u.role)) : users.find(u => u.role === role);
+      const user = matchedUser ? { ...matchedUser, role: role === 'OFFICER' ? 'OFFICER' : matchedUser.role } : state.currentUser;
       return { ...state, currentRole: role, currentUser: user, roleLabel: getRoleLabel(role) };
     }
     case ACTIONS.SET_CURRENT_USER:

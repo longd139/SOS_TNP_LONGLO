@@ -122,7 +122,7 @@ function TimelineEntry({ entry, isLast, isLatest }) {
         </div>
         <p className="text-xs text-gray-500 mt-0.5">
           {actor?.fullName || entry.performedBy}
-          <span className="text-gray-400"> ({actor?.role === 'CITIZEN' ? 'Người dân' : actor?.role === 'RECEPTION_OFFICER' ? 'Cán bộ tiếp nhận' : actor?.role === 'PROCESSING_OFFICER' ? 'Cán bộ xử lý' : actor?.role || '—'})</span>
+          <span className="text-gray-400"> ({actor?.role === 'CITIZEN' ? 'Người dân' : ['RECEPTION_OFFICER', 'PROCESSING_OFFICER', 'OFFICER'].includes(actor?.role) ? 'Cán bộ' : actor?.role || '—'})</span>
         </p>
         {entry.oldValue && entry.newValue && (
           <p className="text-xs text-gray-500 mt-0.5">
@@ -290,7 +290,7 @@ export default function ComplaintDetail() {
   // ---- computed ----
   const officersForDept = useMemo(() => {
     if (!assignDeptId) return [];
-    return users.filter(u => u.departmentId === assignDeptId && u.role === 'PROCESSING_OFFICER');
+    return users.filter(u => u.departmentId === assignDeptId && u.role === 'OFFICER');
   }, [assignDeptId]);
 
   const slaPreview = useMemo(() => {
@@ -608,8 +608,8 @@ export default function ComplaintDetail() {
   // ---------------- ROLE-BASED ACTION BUTTONS (theo SOS-002 đến SOS-008) ----------------
   const renderActions = () => {
     const actions = [];
-    const isReception = currentRole === 'RECEPTION_OFFICER' || currentRole === 'ADMIN';
-    const isProcessor = currentRole === 'PROCESSING_OFFICER' || currentRole === 'ADMIN';
+    const isReception = ['OFFICER', 'RECEPTION_OFFICER'].includes(currentRole) || currentRole === 'ADMIN';
+    const isProcessor = ['OFFICER', 'PROCESSING_OFFICER'].includes(currentRole) || currentRole === 'ADMIN';
     const isApprover = currentRole === 'APPROVER' || currentRole === 'LEADER' || currentRole === 'ADMIN';
 
     // Cán bộ tiếp nhận (SOS-003, SOS-004): tiếp nhận, từ chối, phân công, sửa địa điểm
@@ -743,7 +743,7 @@ export default function ComplaintDetail() {
               </span>
               <span className="text-sm text-gray-600 flex items-center gap-1.5">
                 Mức độ xác nhận: {complaint.confirmedUrgency ? <UrgencyBadge urgency={complaint.confirmedUrgency} /> : <span className="text-xs text-gray-400">Chưa xác nhận</span>}
-                {(currentRole === 'RECEPTION_OFFICER' && (complaint.status === 'NEW' || complaint.status === 'PENDING_RECEPTION')) && (
+                {(['OFFICER', 'RECEPTION_OFFICER'].includes(currentRole) && (complaint.status === 'NEW' || complaint.status === 'PENDING_RECEPTION')) && (
                   <button onClick={openReceive} className="text-xs text-blue-600 hover:underline ml-1">Chỉnh sửa</button>
                 )}
               </span>
@@ -773,7 +773,7 @@ export default function ComplaintDetail() {
           <Section
             title="Địa điểm"
             icon={MapPin}
-            action={(currentRole === 'RECEPTION_OFFICER' && complaint.status !== 'COMPLETED' && complaint.status !== 'REJECTED') ? (
+            action={(['OFFICER', 'RECEPTION_OFFICER'].includes(currentRole) && complaint.status !== 'COMPLETED' && complaint.status !== 'REJECTED') ? (
               <button
                 onClick={e => { e.stopPropagation(); openLocationEdit(); }}
                 className="flex items-center gap-1 text-xs font-medium text-blue-600 hover:text-blue-800 px-2 py-1 rounded-md hover:bg-blue-50 transition-colors"
@@ -867,14 +867,14 @@ export default function ComplaintDetail() {
             ) : (
               <p className="text-sm text-gray-500">Chưa phân công xử lý</p>
             )}
-            {(currentRole === 'RECEPTION_OFFICER' || currentRole === 'ADMIN') && (complaint.status === 'RECEIVED' || !assignedDept) && (
+            {(['OFFICER', 'RECEPTION_OFFICER'].includes(currentRole) || currentRole === 'ADMIN') && (complaint.status === 'RECEIVED' || !assignedDept) && (
               <div className="flex flex-wrap gap-2 pt-3 mt-1 border-t border-gray-100">
                 <button onClick={openAssign} className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
                   <UserPlus className="w-4 h-4" /> Phân công
                 </button>
               </div>
             )}
-            {(currentRole === 'RECEPTION_OFFICER' || currentRole === 'APPROVER' || currentRole === 'LEADER' || currentRole === 'ADMIN') && assignedDept && complaint.status !== 'COMPLETED' && complaint.status !== 'REJECTED' && (
+            {(['OFFICER', 'RECEPTION_OFFICER'].includes(currentRole) || currentRole === 'APPROVER' || currentRole === 'LEADER' || currentRole === 'ADMIN') && assignedDept && complaint.status !== 'COMPLETED' && complaint.status !== 'REJECTED' && (
               <div className="flex flex-wrap gap-2 pt-3 mt-1 border-t border-gray-100">
                 <button onClick={openAssign} className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-purple-700 bg-purple-50 border border-purple-200 rounded-lg hover:bg-purple-100 transition-colors">
                   <UserPlus className="w-4 h-4" /> Chuyển đơn vị / Thay cán bộ

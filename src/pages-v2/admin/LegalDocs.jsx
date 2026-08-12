@@ -322,7 +322,7 @@ const LegalDocs = () => {
                 const updatedItem = { ...record, status: 'Đã duyệt', isEditing: false, approver: currentUser?.fullName || 'Lãnh đạo' };
                 setData(prev => prev.map(item => item.id === record.id ? updatedItem : item));
                 message.success('Đã duyệt tài liệu thành công!');
-                addNotification('Tài liệu đã được duyệt', `Văn bản Pháp luật "${record.title}" đã được Lãnh đạo phê duyệt thành công.`, 'PROCESSING_OFFICER');
+                addNotification('Tài liệu đã được duyệt', `Văn bản Pháp luật "${record.title}" đã được Lãnh đạo phê duyệt thành công.`, 'OFFICER');
               }
             }] : []),
             ...(record.status === 'Đã duyệt' ? [{
@@ -332,7 +332,7 @@ const LegalDocs = () => {
               onClick: () => {
                 setData(prev => prev.map(item => item.id === record.id ? { ...item, status: 'Đã thu hồi', isEditing: false, aiLearned: false, approver: null } : item));
                 message.warning('Đã thu hồi tài liệu thành công!');
-                addNotification('Tài liệu đã bị thu hồi', `Văn bản Pháp luật "${record.title}" đã bị Lãnh đạo thu hồi.`, 'PROCESSING_OFFICER');
+                addNotification('Tài liệu đã bị thu hồi', `Văn bản Pháp luật "${record.title}" đã bị Lãnh đạo thu hồi.`, 'OFFICER');
               }
             }] : []),
             ...(record.status === 'Đã duyệt' ? [{
@@ -340,6 +340,16 @@ const LegalDocs = () => {
               label: record.aiLearned ? 'Cập nhật tri thức cho Trợ lý AI' : 'Nạp tri thức cho Trợ lý AI',
               icon: <RobotOutlined className="text-blue-600" />,
               onClick: () => handleSyncAI(record.id)
+            }] : []),
+            ...(record.status === 'Đã duyệt' && record.securityLevel === 'Nội bộ' ? [{
+              key: 'make-public',
+              label: 'Chuyển sang công khai',
+              icon: <GlobalOutlined className="text-emerald-600" />,
+              onClick: () => {
+                setData(prev => prev.map(item => item.id === record.id ? { ...item, securityLevel: 'Công khai' } : item));
+                message.success('Đã chuyển tài liệu sang mức bảo mật Công khai!');
+                addNotification('Tài liệu chuyển sang Công khai', `Văn bản Pháp luật "${record.title}" đã được chuyển sang phạm vi Công khai.`, 'OFFICER');
+              }
             }] : []),
             {
               type: 'divider'

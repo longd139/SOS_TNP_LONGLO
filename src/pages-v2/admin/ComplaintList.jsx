@@ -255,7 +255,7 @@ function ComplaintDetailModal({ isOpen, onClose, complaint, mode, onModeChange, 
                           </div>
                           <div className="flex items-center gap-2 text-sm text-gray-600">
                             <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                            <span>{item.performedRole === 'CITIZEN' ? 'Người dân' : item.performedRole === 'RECEPTION_OFFICER' ? 'Cán bộ tiếp nhận' : item.performedRole === 'PROCESSING_OFFICER' ? 'Cán bộ xử lý' : item.performedRole}</span>
+                            <span>{item.performedRole === 'CITIZEN' ? 'Người dân' : ['RECEPTION_OFFICER', 'PROCESSING_OFFICER', 'OFFICER'].includes(item.performedRole) ? 'Cán bộ' : item.performedRole}</span>
                           </div>
                           {(item.internalNote || item.publicNote) && (
                             <div className="flex items-start gap-2 text-sm text-gray-700">
@@ -664,11 +664,11 @@ export default function ComplaintList() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Cán bộ xử lý</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Cán bộ</label>
                   <select value={filters.officerId} onChange={e => setFilters(p => ({ ...p, officerId: e.target.value }))}
                     className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                     <option value="">Tất cả</option>
-                    {users.filter(u => u.role === 'PROCESSING_OFFICER' && u.status === 'ACTIVE').map(u => <option key={u.id} value={u.id}>{u.fullName}</option>)}
+                    {users.filter(u => u.role === 'OFFICER' && u.status === 'ACTIVE').map(u => <option key={u.id} value={u.id}>{u.fullName}</option>)}
                   </select>
                 </div>
                 <div>
@@ -805,7 +805,7 @@ export default function ComplaintList() {
             <div className="relative z-10 bg-white rounded-xl shadow-xl max-w-lg w-full max-h-[85vh] overflow-y-auto">
               <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 z-10 rounded-t-xl">
                 <h3 className="text-lg font-semibold text-gray-900">Thêm phản ánh mới</h3>
-                <p className="text-sm text-gray-500 mt-0.5">Cán bộ tiếp nhận phản ánh từ người dân</p>
+                <p className="text-sm text-gray-500 mt-0.5">Cán bộ tiếp nhận và xử lý phản ánh từ người dân</p>
               </div>
               <div className="p-6 space-y-4">
                 <div>

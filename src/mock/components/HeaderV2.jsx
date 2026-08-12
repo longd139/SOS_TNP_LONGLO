@@ -8,8 +8,7 @@ import { useMock } from '../MockContext';
 
 const ROLES = [
   { role: 'CITIZEN', label: '👤 Người dân' },
-  { role: 'RECEPTION_OFFICER', label: '📋 Cán bộ tiếp nhận' },
-  { role: 'PROCESSING_OFFICER', label: '🔧 Cán bộ xử lý' },
+  { role: 'OFFICER', label: '👤 Cán bộ' },
   { role: 'APPROVER', label: '✅ Lãnh đạo', home: '/dashboard' },
   { role: 'ADMIN', label: '⚙️ Quản trị viên', home: '/dashboard' },
 ];
@@ -37,7 +36,7 @@ export default function HeaderV2({ onMobileMenuToggle, isMobileMenuOpen }) {
         message: 'Tài liệu "Nghị định 104/2022/NĐ-CP" đã được Lãnh đạo phê duyệt.',
         time: '09:15',
         read: true,
-        role: 'PROCESSING_OFFICER'
+        role: 'OFFICER'
       }
     ];
     return saved ? JSON.parse(saved) : defaultNotifications;
@@ -54,12 +53,12 @@ export default function HeaderV2({ onMobileMenuToggle, isMobileMenuOpen }) {
   }, []);
 
   const isUserLeader = ['APPROVER', 'LEADER', 'ADMIN'].includes(currentUser?.role);
-  const isUserOfficer = ['PROCESSING_OFFICER', 'RECEPTION_OFFICER'].includes(currentUser?.role);
+  const isUserOfficer = ['OFFICER', 'PROCESSING_OFFICER', 'RECEPTION_OFFICER'].includes(currentUser?.role);
   
   const displayNotifications = useMemo(() => {
     return notifications.filter(n => {
       if (isUserLeader) return n.role === 'LEADER';
-      if (isUserOfficer) return n.role === 'PROCESSING_OFFICER';
+      if (isUserOfficer) return n.role === 'OFFICER' || n.role === 'PROCESSING_OFFICER';
       return n.role === 'CITIZEN';
     });
   }, [notifications, isUserLeader, isUserOfficer]);
@@ -70,7 +69,7 @@ export default function HeaderV2({ onMobileMenuToggle, isMobileMenuOpen }) {
 
   const markAllAsRead = () => {
     const updated = notifications.map(n => {
-      const match = (isUserLeader && n.role === 'LEADER') || (isUserOfficer && n.role === 'PROCESSING_OFFICER');
+      const match = (isUserLeader && n.role === 'LEADER') || (isUserOfficer && ['OFFICER', 'PROCESSING_OFFICER'].includes(n.role));
       return match ? { ...n, read: true } : n;
     });
     localStorage.setItem('notifications_v2', JSON.stringify(updated));
@@ -85,7 +84,7 @@ export default function HeaderV2({ onMobileMenuToggle, isMobileMenuOpen }) {
 
   const clearAllNotifications = () => {
     const updated = notifications.filter(n => {
-      const match = (isUserLeader && n.role === 'LEADER') || (isUserOfficer && n.role === 'PROCESSING_OFFICER');
+      const match = (isUserLeader && n.role === 'LEADER') || (isUserOfficer && ['OFFICER', 'PROCESSING_OFFICER'].includes(n.role));
       return !match;
     });
     localStorage.setItem('notifications_v2', JSON.stringify(updated));

@@ -4,6 +4,7 @@
 import { lazy, Suspense } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { AdminLayoutV2 } from './layouts/Layouts';
+import { useMock } from './MockContext';
 import CitizenLayout from '../citizen/CitizenLayout';
 import RegisterLeaderMeeting from '../pages-v2/citizen/RegisterLeaderMeeting';
 import AuthLayout from '../layouts/AuthLayout';
@@ -41,9 +42,17 @@ const HistoryDocs = lazy(() => import('../pages-v2/admin/HistoryDocs'));
 const LegalDocs = lazy(() => import('../pages-v2/admin/LegalDocs'));
 const AppDownloadStatistics = lazy(() => import('../pages/Statistic/AppDownloadStatistics'));
 const SatisfactionDashboard = lazy(() => import('../pages-v2/admin/SatisfactionDashboard'));
+const CounterReceptionFeedbackPage = lazy(() => import('../pages-v2/admin/CounterReceptionFeedbackPage'));
+const LeaderMeetingFeedbackPage = lazy(() => import('../pages-v2/admin/LeaderMeetingFeedbackPage'));
 
 function RoleHome() {
   return <Navigate to="/cong-dong" replace />;
+}
+
+function ScheduleRoleGuard({ children }) {
+  const { currentUser } = useMock();
+  const allowed = ['APPROVER', 'LEADER', 'ADMIN'].includes(currentUser?.role);
+  return allowed ? children : <Navigate to="/dashboard" replace />;
 }
 
 export default function AppRoutesV2() {
@@ -52,7 +61,7 @@ export default function AppRoutesV2() {
     <Routes>
       <Route path="/" element={<RoleHome />} />
       <Route path="/register-meeting" element={<RegisterLeaderMeeting />} />
-      <Route path="/kiosk/feedback" element={<FeedbackKiosk />} />
+      <Route path="/kiosk/tiep-dan" element={<ReceptionKiosk />} />
       <Route element={<CitizenLayout />}>
         <Route path="/cong-dong" element={<CitizenHomePage />} />
         <Route path="/cong-dong/thu-tuc" element={<ProcedureListPage />} />
@@ -88,10 +97,12 @@ export default function AppRoutesV2() {
         <Route path="/admin/digital-map" element={<DigitalMap />} />
         <Route path="/admin/app-statistics" element={<AppDownloadStatistics />} />
         <Route path="/admin/satisfaction" element={<SatisfactionDashboard />} />
+        <Route path="/admin/counter-reception-feedback" element={<CounterReceptionFeedbackPage />} />
+        <Route path="/admin/leader-meeting-feedback" element={<LeaderMeetingFeedbackPage />} />
         <Route path="/admin/documents/history" element={<HistoryDocs />} />
         <Route path="/admin/documents/legal" element={<LegalDocs />} />
-        <Route path="/admin/schedules/approve" element={<ApproveSchedule />} />
-        <Route path="/admin/schedules/add" element={<AddSchedule />} />
+        <Route path="/admin/schedules/approve" element={<ScheduleRoleGuard><ApproveSchedule /></ScheduleRoleGuard>} />
+        <Route path="/admin/schedules/add" element={<ScheduleRoleGuard><AddSchedule /></ScheduleRoleGuard>} />
         <Route path="/placeholder" element={<PlaceholderPage />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />

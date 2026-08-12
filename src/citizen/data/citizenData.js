@@ -164,16 +164,13 @@ export const complaintStatuses = {
   'PA-2026-00022': { title: 'Cây xanh có cành nguy hiểm', category: 'Cây xanh đô thị', status: 'Đã giải quyết', statusTone: 'success', createdAt: '10/06/2026', location: 'Đường Võ Chí Công, Khu phố 1', description: 'Cây xà cừ lớn trước cổng trường Tiểu học Tăng Nhơn Phú có nhiều cành khô và cành mọc thấp, có nguy cơ gãy đổ khi mưa gió. Vị trí này có nhiều học sinh qua lại hàng ngày. Rất mong chính quyền cho kiểm tra và cắt tỉa để đảm bảo an toàn.', citizenName: 'Vũ Đức Minh', citizenPhone: '0903222789', images: ['https://images.unsplash.com/photo-1502082553048-f009c37129b9?w=400&h=300&fit=crop', 'https://images.unsplash.com/photo-1542273917363-3b1817f69a2d?w=400&h=300&fit=crop', 'https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?w=400&h=300&fit=crop'], timeline: [{ label: 'Đã gửi phản ánh', date: '10/06/2026, 07:40', done: true }, { label: 'Đã tiếp nhận', date: '10/06/2026, 09:22', done: true }, { label: 'Đã giải quyết', date: '12/06/2026, 15:45', done: true }] },
 };
 
-// Các phản ánh hoàn thành dùng cho luồng đánh giá SOS-018 trên bản demo.
+// 5 phản ánh hoàn thành dùng cho luồng đánh giá SOS-018 trên bản demo.
 Object.assign(complaintStatuses, {
   'PA-2026-00130': { title: 'Đèn tín hiệu tại ngã tư hoạt động chập chờn', category: 'Hạ tầng đô thị', status: 'Đã giải quyết', statusTone: 'success', createdAt: '13/07/2026', location: 'Ngã tư Tăng Nhơn Phú - Lê Văn Việt', timeline: [] },
   'PA-2026-00131': { title: 'Rác tồn đọng tại khu phố 4', category: 'Môi trường', status: 'Đã giải quyết', statusTone: 'success', createdAt: '12/07/2026', location: 'Khu phố 4, phường Tăng Nhơn Phú', timeline: [] },
   'PA-2026-00132': { title: 'Nắp cống bị hư hỏng trước trường học', category: 'Hạ tầng đô thị', status: 'Đã giải quyết', statusTone: 'success', createdAt: '11/07/2026', location: 'Đường Man Thiện, Khu phố 2', timeline: [] },
   'PA-2026-00133': { title: 'Đề nghị bổ sung thùng rác công cộng', category: 'Môi trường', status: 'Đã giải quyết', statusTone: 'success', createdAt: '10/07/2026', location: 'Công viên Khu phố 5', timeline: [] },
   'PA-2026-00134': { title: 'Vạch qua đường bị mờ', category: 'Trật tự đô thị', status: 'Đã giải quyết', statusTone: 'success', createdAt: '09/07/2026', location: 'Đường Võ Chí Công, Khu phố 1', timeline: [] },
-  'PA-2026-00135': { title: 'Cây xanh che khuất biển báo', category: 'Cây xanh đô thị', status: 'Đã giải quyết', statusTone: 'success', createdAt: '08/07/2026', location: 'Đường Nguyễn Văn Tăng, Khu phố 3', timeline: [] },
-  'PA-2026-00136': { title: 'Đề nghị sửa đèn chiếu sáng hẻm', category: 'Điện, nước, chiếu sáng', status: 'Đã giải quyết', statusTone: 'success', createdAt: '07/07/2026', location: 'Hẻm 18, Khu phố 2', timeline: [] },
-  'PA-2026-00137': { title: 'Mặt đường xuống cấp cần khắc phục', category: 'Hạ tầng đô thị', status: 'Đã giải quyết', statusTone: 'success', createdAt: '06/07/2026', location: 'Đường Lã Xuân Oai, Khu phố 6', timeline: [] },
 });
 
 export const contactInfo = {
