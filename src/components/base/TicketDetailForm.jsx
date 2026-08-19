@@ -3,7 +3,7 @@ import { X } from 'lucide-react';
 
 export function DetailField({ label, value, wide = false, muted = false }) {
   return (
-    <div className={`${wide ? 'sm:col-span-2' : ''} rounded-md bg-gray-50 p-3`}>
+    <div className={`${wide ? 'col-span-full' : ''} rounded-md bg-gray-50 p-3`}>
       <dt className="text-xs font-medium text-gray-500">{label}</dt>
       <dd className={`mt-1 whitespace-pre-wrap break-words text-sm ${muted ? 'text-gray-500' : 'font-semibold text-gray-900'}`}>
         {value === undefined || value === null || value === '' ? 'Chưa có dữ liệu' : value}
@@ -22,8 +22,9 @@ export function DetailSection({ title, children, tone = 'plain' }) {
   );
 }
 
-export function DetailGrid({ children }) {
-  return <dl className="grid gap-3 sm:grid-cols-2">{children}</dl>;
+export function DetailGrid({ children, cols = 2 }) {
+  const colClass = cols === 3 ? 'sm:grid-cols-3' : 'sm:grid-cols-2';
+  return <dl className={`grid gap-3 ${colClass}`}>{children}</dl>;
 }
 
 export function TicketDetailContent({ title, badges, meta = [], descriptionLabel = 'Mô tả chi tiết', description, location, sections, attachments, footerSection }) {

@@ -8,6 +8,6 @@ export default function CounterReceptionFeedbackPage() {
     title="Quản lý lịch tiếp dân tại quầy"
     description="Kiểm tra thông tin đơn, phê duyệt lượt tiếp dân và mời người dân đánh giá sau khi hoàn tất buổi tiếp."
     queue={counterReceptionFeedbackQueue}
-    allowedRoles={['OFFICER', 'ADMIN']}
+    allowedRoles={['OFFICER', 'RECEPTION_OFFICER', 'PROCESSING_OFFICER', 'APPROVER', 'LEADER', 'ADMIN']}
   />;
 }

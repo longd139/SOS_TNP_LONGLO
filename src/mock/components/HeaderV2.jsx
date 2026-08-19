@@ -2,13 +2,13 @@
 // HEADER V2 — Có role switcher để demo nhanh các vai trò
 // ============================================================
 import React, { useState, useEffect, useMemo } from 'react';
-import { Menu, Bell, Search, ChevronDown, ShieldCheck } from 'lucide-react';
+import { Menu, Bell, Search, ChevronDown, ShieldCheck, LogOut } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useMock } from '../MockContext';
 
 const ROLES = [
-  { role: 'CITIZEN', label: '👤 Người dân' },
-  { role: 'OFFICER', label: '👤 Cán bộ' },
+  { role: 'CITIZEN', label: '👤 Người dân', home: '/cong-dong' },
+  { role: 'OFFICER', label: '👤 Cán bộ', home: '/dashboard' },
   { role: 'APPROVER', label: '✅ Lãnh đạo', home: '/dashboard' },
   { role: 'ADMIN', label: '⚙️ Quản trị viên', home: '/dashboard' },
 ];
@@ -237,11 +237,25 @@ export default function HeaderV2({ onMobileMenuToggle, isMobileMenuOpen }) {
             )}
           </div>
 
-          <div className="flex items-center gap-2 pl-2 border-l border-gray-200">
+          <div className="flex items-center gap-3 pl-2 border-l border-gray-200">
             <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white text-sm font-medium">
               {currentUser?.fullName?.charAt(0) || 'U'}
             </div>
-            <span className="hidden md:inline text-sm text-gray-700">{currentUser?.fullName || 'Người dùng'}</span>
+            <span className="hidden md:inline text-sm font-medium text-gray-700">{currentUser?.fullName || 'Người dùng'}</span>
+            <button
+              onClick={() => {
+                localStorage.removeItem('accessToken');
+                localStorage.removeItem('refreshToken');
+                localStorage.removeItem('currentUserRole');
+                localStorage.removeItem('currentUserId');
+                window.location.href = '/login';
+              }}
+              title="Đăng xuất"
+              className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors flex items-center gap-1 text-xs"
+            >
+              <LogOut size={16} />
+              <span className="hidden lg:inline">Đăng xuất</span>
+            </button>
           </div>
         </div>
       </div>

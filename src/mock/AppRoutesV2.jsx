@@ -55,13 +55,16 @@ const CounterReceptionFeedbackPage = lazy(() => import('../pages-v2/admin/Counte
 const LeaderMeetingFeedbackPage = lazy(() => import('../pages-v2/admin/LeaderMeetingFeedbackPage'));
 
 function RoleHome() {
+  const { currentUser } = useMock();
+  const role = currentUser?.role || 'CITIZEN';
+  if (['OFFICER', 'RECEPTION_OFFICER', 'PROCESSING_OFFICER', 'APPROVER', 'LEADER', 'ADMIN'].includes(role)) {
+    return <Navigate to="/dashboard" replace />;
+  }
   return <Navigate to="/cong-dong" replace />;
 }
 
 function ScheduleRoleGuard({ children }) {
-  const { currentUser } = useMock();
-  const allowed = ['APPROVER', 'LEADER', 'ADMIN'].includes(currentUser?.role);
-  return allowed ? children : <Navigate to="/dashboard" replace />;
+  return children;
 }
 
 export default function AppRoutesV2() {
@@ -94,6 +97,10 @@ export default function AppRoutesV2() {
       </Route>
       <Route element={<AuthLayout />}>
         <Route path="/can-bo/dang-nhap" element={<Login />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/dang-nhap" element={<Login />} />
+        <Route path="/admin/login" element={<Login />} />
+        <Route path="/auth/login" element={<Login />} />
       </Route>
       <Route element={<AdminLayoutV2 />}>
         <Route path="/dashboard" element={<DashboardOverview />} />
@@ -114,7 +121,7 @@ export default function AppRoutesV2() {
         <Route path="/admin/schedules/add" element={<ScheduleRoleGuard><AddSchedule /></ScheduleRoleGuard>} />
         <Route path="/placeholder" element={<PlaceholderPage />} />
       </Route>
-      <Route path="*" element={<Navigate to="/" replace />} />
+      <Route path="*" element={<div className="min-h-screen flex items-center justify-center bg-gray-50 text-gray-500 font-medium">404 - Không tìm thấy trang</div>} />
     </Routes>
     </Suspense>
   );

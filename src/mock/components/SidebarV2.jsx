@@ -14,14 +14,14 @@ const ALL_MENUS = [
     id: 'reception-schedules-v2',
     label: 'Quản lý lịch tiếp công dân',
     icon: Calendar,
-    roles: ['RECEPTION_OFFICER','APPROVER','LEADER','ADMIN'],
+    roles: ['APPROVER','LEADER','ADMIN'],
     submenu: [
-      { id: 'approve-schedule', label: 'Duyệt lịch hẹn', path: '/admin/schedules/approve', roles: ['APPROVER','LEADER','ADMIN'] },
+      { id: 'approve-schedule', label: 'Quản lý lịch hẹn', path: '/admin/schedules/approve', roles: ['APPROVER','LEADER','ADMIN'] },
       { id: 'add-schedule', label: 'Thêm lịch hẹn', path: '/admin/schedules/add', roles: ['APPROVER','LEADER','ADMIN'] },
       { id: 'leader-meeting-feedback', label: 'Đánh giá gặp lãnh đạo', path: '/admin/leader-meeting-feedback', roles: ['APPROVER','LEADER','ADMIN'] },
     ],
   },
-  { id: 'counter-reception-feedback', label: 'Lịch tiếp dân', icon: Calendar, path: '/admin/counter-reception-feedback', roles: ['OFFICER','ADMIN'] },
+  { id: 'counter-reception-feedback', label: 'Lịch tiếp dân', icon: Calendar, path: '/admin/counter-reception-feedback', roles: ['OFFICER', 'RECEPTION_OFFICER', 'PROCESSING_OFFICER', 'ADMIN'] },
   {
     id: 'documents',
     label: 'Quản lý Tài liệu', 

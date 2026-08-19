@@ -25,14 +25,43 @@ const ACTIONS = {
   SET_FILTERS: 'SET_FILTERS',
 };
 
-// ---- role mặc định khi demo ----
-const DEFAULT_ROLE = 'APPROVER'; // có thể đổi để test
-const DEFAULT_USER = users.find(u => u.role === DEFAULT_ROLE) || users[0];
+function getRoleLabel(role) {
+  const map = { CITIZEN: 'Người dân', OFFICER: 'Cán bộ', RECEPTION_OFFICER: 'Cán bộ', PROCESSING_OFFICER: 'Cán bộ', APPROVER: 'Lãnh đạo', LEADER: 'Lãnh đạo', ADMIN: 'Quản trị viên' };
+  return map[role] || role;
+}
+
+const getInitialRoleAndUser = () => {
+  try {
+    const savedRole = localStorage.getItem('currentUserRole');
+    if (savedRole) {
+      const user = savedRole === 'OFFICER' 
+        ? users.find(u => ['OFFICER', 'RECEPTION_OFFICER', 'PROCESSING_OFFICER'].includes(u.role))
+        : users.find(u => u.role === savedRole);
+      if (user) {
+        return {
+          currentRole: savedRole,
+          currentUser: { ...user, role: savedRole === 'OFFICER' ? 'OFFICER' : user.role },
+          roleLabel: getRoleLabel(savedRole)
+        };
+      }
+    }
+  } catch (e) {}
+
+  const defaultRole = 'APPROVER';
+  const defaultUser = users.find(u => u.role === defaultRole) || users[0];
+  return {
+    currentRole: defaultRole,
+    currentUser: defaultUser,
+    roleLabel: getRoleLabel(defaultRole)
+  };
+};
+
+const initialAuth = getInitialRoleAndUser();
 
 const initialState = {
-  currentRole: DEFAULT_ROLE,
-  currentUser: DEFAULT_USER,
-  roleLabel: getRoleLabel(DEFAULT_ROLE),
+  currentRole: initialAuth.currentRole,
+  currentUser: initialAuth.currentUser,
+  roleLabel: initialAuth.roleLabel,
   complaints,
   users,
   neighborhoods,
@@ -46,15 +75,13 @@ const initialState = {
   notifications: [],
 };
 
-function getRoleLabel(role) {
-  const map = { CITIZEN: 'Người dân', OFFICER: 'Cán bộ', RECEPTION_OFFICER: 'Cán bộ', PROCESSING_OFFICER: 'Cán bộ', APPROVER: 'Lãnh đạo', LEADER: 'Lãnh đạo', ADMIN: 'Quản trị viên' };
-  return map[role] || role;
-}
-
 function reducer(state, action) {
   switch (action.type) {
     case ACTIONS.SET_ROLE: {
       const role = action.payload;
+      try {
+        localStorage.setItem('currentUserRole', role);
+      } catch (e) {}
       const matchedUser = role === 'OFFICER' ? users.find(u => ['OFFICER', 'RECEPTION_OFFICER', 'PROCESSING_OFFICER'].includes(u.role)) : users.find(u => u.role === role);
       const user = matchedUser ? { ...matchedUser, role: role === 'OFFICER' ? 'OFFICER' : matchedUser.role } : state.currentUser;
       return { ...state, currentRole: role, currentUser: user, roleLabel: getRoleLabel(role) };

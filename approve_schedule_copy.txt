@@ -1,10 +1,131 @@
 import React, { useEffect, useState } from 'react';
 import { Table, Dropdown, message, Tabs, Modal, Button, Input } from 'antd';
-import apiClient from '../../utils/apiClient';
-import { useMock } from '../../mock/MockContext';
 import { ClipboardCheck, User, MoreHorizontal, Eye, Check, X, Award, CalendarCheck } from 'lucide-react';
 
-
+const MOCK_DATA = [
+  {
+    id: 'PA-1001',
+    leader: 'Ông Nguyễn Văn An',
+    date: '2026-08-22',
+    dayOfWeek: 'Thứ Sáu',
+    timeSlot: 'Sáng (09:00 - 10:30)',
+    status: 'PENDING',
+    result: null,
+    citizenInfo: {
+      name: 'Nguyễn Thị Lan',
+      phone: '0901234501',
+      cccd: '079196001001',
+      address: '12 Đường số 5, Khu phố 2, Phường Tăng Nhơn Phú B',
+      content: 'Đường hẻm 23 đường số 7 xuống cấp nghiêm trọng, có nhiều ổ gà lớn gây nguy hiểm cho người đi xe máy vào ban đêm. Kính đề nghị...'
+    }
+  },
+  {
+    id: 'PA-1002',
+    leader: 'Bà Phạm Thị Mai',
+    date: '2026-08-23',
+    dayOfWeek: 'Thứ Bảy',
+    timeSlot: 'Chiều (14:00 - 15:30)',
+    status: 'PENDING',
+    citizenInfo: {
+      name: 'Trần Văn Hùng',
+      phone: '0912345502',
+      cccd: '079196001002',
+      address: '45/2 Đường số 15, Khu phố 3, Phường Tăng Nhơn Phú B',
+      content: 'Khu vực bãi rác tự phát tại cuối hẻm 45 đường số 15 gây ô nhiễm nặng. Mùi hôi thối ảnh hưởng đến cuộc sống sinh hoạt...'
+    }
+  },
+  {
+    id: 'PA-1003',
+    leader: 'Ông Trần Hoàng Nam',
+    date: '2026-08-25',
+    dayOfWeek: 'Thứ Ba',
+    timeSlot: 'Sáng (09:00 - 10:30)',
+    status: 'PENDING',
+    citizenInfo: {
+      name: 'Lê Thị Bích',
+      phone: '0934567803',
+      cccd: '079196001003',
+      address: '8 Đường số 3, Khu phố 1, Phường Tăng Nhơn Phú B',
+      content: 'Tình trạng tụ tập nhóm thanh niên gây mất trật tự công cộng vào buổi tối tại khu vực sân chơi khu phố 1. Đề nghị tăng cường tuần tra an ninh tại khu vực này.'
+    }
+  },
+  {
+    id: 'PA-1004',
+    leader: 'Ông Nguyễn Văn An',
+    date: '2026-08-20',
+    dayOfWeek: 'Thứ Năm',
+    timeSlot: 'Chiều (14:00 - 15:30)',
+    status: 'APPROVED',
+    result: null,
+    citizenInfo: {
+      name: 'Phạm Quốc Đạt',
+      phone: '0945678904',
+      cccd: '079196001004',
+      address: '102 Đường số 12, Khu phố 7, Phường Tăng Nhơn Phú B',
+      content: 'Hàng xóm xây dựng công trình sai phép, lấn chiếm phần diện tích đất nhà tôi theo bản đồ địa chính. Đề nghị cơ quan có thẩm quyền vào kiểm tra và xử lý theo quy định pháp luật.'
+    }
+  },
+  {
+    id: 'PA-1005',
+    leader: 'Bà Phạm Thị Mai',
+    date: '2026-08-27',
+    dayOfWeek: 'Thứ Năm',
+    timeSlot: 'Sáng (09:00 - 10:30)',
+    status: 'PENDING',
+    citizenInfo: {
+      name: 'Đinh Tuấn Tài',
+      phone: '0987654325',
+      cccd: '079196001005',
+      address: '33 Đường Bưng Ông Thoàn, Khu phố 2, Phường Tăng Nhơn Phú B',
+      content: 'Cây xanh trước nhà số 33 Bưng Ông Thoàn quá lớn, cành lá vướng vào đường dây điện nguy hiểm trong mùa mưa bão. Xin Lãnh đạo chỉ đạo cắt tỉa.'
+    }
+  },
+  {
+    id: 'PA-1006',
+    leader: 'Ông Trần Hoàng Nam',
+    date: '2026-08-28',
+    dayOfWeek: 'Thứ Sáu',
+    timeSlot: 'Chiều (14:00 - 15:30)',
+    status: 'PENDING',
+    citizenInfo: {
+      name: 'Ngô Thanh Vân',
+      phone: '0909090909',
+      cccd: '079196001006',
+      address: '40/12 Đình Phong Phú, Phường Tăng Nhơn Phú B',
+      content: 'Đề nghị Lãnh đạo hỗ trợ giải quyết thủ tục tách thửa đất nông nghiệp kéo dài hơn 6 tháng chưa có kết quả mặc dù đã nộp đủ hồ sơ.'
+    }
+  },
+  {
+    id: 'PA-1007',
+    leader: 'Ông Nguyễn Văn An',
+    date: '2026-08-29',
+    dayOfWeek: 'Thứ Bảy',
+    timeSlot: 'Sáng (09:00 - 10:30)',
+    status: 'PENDING',
+    citizenInfo: {
+      name: 'Phan Bá Cường',
+      phone: '0933112233',
+      cccd: '079196001007',
+      address: 'Chung cư Safira, Phường Tăng Nhơn Phú B',
+      content: 'Chủ đầu tư chung cư thu phí quản lý quá cao so với thỏa thuận ban đầu, gây bức xúc cho cư dân. Mong Lãnh đạo chính quyền đứng ra tổ chức đối thoại.'
+    }
+  },
+  {
+    id: 'PA-1008',
+    leader: 'Bà Phạm Thị Mai',
+    date: '2026-08-30',
+    dayOfWeek: 'Chủ Nhật',
+    timeSlot: 'Tùy chọn thời gian',
+    status: 'PENDING',
+    citizenInfo: {
+      name: 'Đoàn Nhật Lệ',
+      phone: '0911888999',
+      cccd: '079196001008',
+      address: '88 Lã Xuân Oai, Phường Tăng Nhơn Phú B',
+      content: 'Hệ thống cống thoát nước tại tuyến đường Lã Xuân Oai thường xuyên ngập nghẹt khi mưa lớn. Xin kiến nghị cải tạo nạo vét gấp.'
+    }
+  }
+];
 
 
 export default function ApproveSchedule() {
@@ -16,86 +137,15 @@ export default function ApproveSchedule() {
   const [actionNote, setActionNote] = useState('');
   const [actionResult, setActionResult] = useState('');
 
-
-  const { currentUser } = useMock();
-  const role = currentUser?.role || 'CITIZEN';
-  const isLeaderOrAdmin = ['APPROVER', 'LEADER', 'ADMIN'].includes(role);
-  const [loading, setLoading] = useState(false);
-
-  const formatDateDisplay = (dateVal) => {
-    if (!dateVal) return '---';
-    try {
-      const dStr = String(dateVal);
-      if (dStr.includes('T')) {
-        const dt = new Date(dStr);
-        if (!isNaN(dt.getTime())) return dt.toLocaleDateString('vi-VN');
-      }
-      if (dStr.includes('-')) {
-        return dStr.split('-').reverse().join('/');
-      }
-      return dStr;
-    } catch (e) {
-      return String(dateVal);
-    }
-  };
-
-  const fetchData = async () => {
-    setLoading(true);
-    try {
-      const res = await apiClient.get('/api/reception-registrations?size=100');
-      const list = res.data?.data || res.data || [];
-      const arrayList = Array.isArray(list) ? list : [];
-      const formatted = arrayList.map(item => {
-        const itemDate = item.receptionDate ? (item.receptionDate.includes('T') ? item.receptionDate.split('T')[0] : item.receptionDate) : (item.date || '');
-        return {
-          ...item,
-          key: item.id || item.receptionCode,
-          id: item.receptionCode || item.id,
-          rawId: item.id,
-          date: itemDate,
-          timeSlot: item.timeSlot || item.slot || '---',
-          leader: item.schedule?.officerName || item.approverName || item.leader || 'Lãnh đạo tiếp dân',
-          status: item.approvalStatus || item.status || 'PENDING',
-          content: item.workingContent || item.topic || item.content,
-          topic: item.topic || item.content,
-          citizenInfo: item.applicant ? {
-            name: item.applicant.fullName || item.applicantName,
-            phone: item.applicant.phoneNumber || item.phoneNumber,
-            cccd: item.applicant.citizenId || item.cccd,
-            address: item.applicant.address || item.address
-          } : (item.citizenInfo || {
-            name: item.applicantName || item.citizenName || '---',
-            phone: item.phoneNumber || item.phone || '---',
-            cccd: item.cccd || '---',
-            address: item.address || '---'
-          }),
-          scheduleInfo: item.schedule ? {
-            leader: item.schedule.officerName || item.leaderName,
-            position: item.approver?.title || 'Lãnh đạo tiếp dân',
-            date: item.receptionDate ? new Date(item.receptionDate).toLocaleDateString('vi-VN') : item.date,
-            time: item.timeSlot || item.timeRange || item.slot,
-            room: item.schedule.location || item.room || 'Phòng tiếp công dân'
-          } : (item.scheduleInfo || {
-            leader: item.approverName || 'Lãnh đạo UBND',
-            position: 'Lãnh đạo tiếp dân',
-            date: item.receptionDate ? new Date(item.receptionDate).toLocaleDateString('vi-VN') : (item.date || '---'),
-            time: item.timeSlot || item.slot || '---',
-            room: item.department || 'Phòng tiếp công dân'
-          })
-        };
-      });
-      setData(formatted);
-    } catch (error) {
-      console.error('Lỗi khi tải danh sách lịch tiếp dân', error);
-      setData([]);
-    }
-    setLoading(false);
-  };
-
   useEffect(() => {
-    fetchData();
+    const localData = localStorage.getItem('citizen-approvals-v7');
+    if (!localData) {
+      localStorage.setItem('citizen-approvals-v7', JSON.stringify(MOCK_DATA));
+      setData(MOCK_DATA);
+    } else {
+      setData(JSON.parse(localData));
+    }
   }, []);
-
 
   const handleAction = (id, newStatus) => {
     if (newStatus === 'REJECTED' || newStatus === 'CANCELED') {
@@ -114,31 +164,22 @@ export default function ApproveSchedule() {
     executeAction(id, newStatus);
   };
 
+  const executeAction = (id, newStatus, note = '', result = null) => {
+    const updatedData = data.map(item =>
+      item.id === id ? { ...item, status: newStatus, note: note || item.note, result: result !== null ? result : item.result } : item
+    );
+    setData(updatedData);
+    localStorage.setItem('citizen-approvals-v7', JSON.stringify(updatedData));
 
-  const executeAction = async (id, newStatus, note = '', result = null) => {
-    try {
-      await apiClient.patch(`/api/reception-registrations/${id}/approve`, {
-        status: newStatus,
-        note: note,
-        result: result
-      });
-
-      let msg = 'Đã cập nhật trạng thái';
-      if (newStatus === 'APPROVED') msg = 'Đã duyệt lịch hẹn thành công';
-      if (newStatus === 'REJECTED') msg = 'Đã từ chối lịch hẹn';
-      if (newStatus === 'CANCELED') msg = 'Đã hủy lịch hẹn';
-      if (newStatus === 'DONE') msg = 'Đã đánh dấu tiếp xong';
-      message.success(msg);
-      
-      fetchData(); // Reload from backend
-    } catch (error) {
-      message.error('Có lỗi xảy ra khi cập nhật trạng thái');
-    }
-
+    let msg = 'Đã cập nhật trạng thái';
+    if (newStatus === 'APPROVED') msg = 'Đã duyệt lịch hẹn thành công';
+    if (newStatus === 'REJECTED') msg = 'Đã từ chối lịch hẹn';
+    if (newStatus === 'CANCELED') msg = 'Đã hủy lịch hẹn';
+    if (newStatus === 'DONE') msg = 'Đã đánh dấu tiếp xong';
+    message.success(msg);
     setIsModalOpen(false);
     setActionModal({ isOpen: false, action: null, ticketId: null });
   };
-
 
   const getInitials = (name) => {
     if (!name) return 'U';
@@ -198,7 +239,7 @@ export default function ApproveSchedule() {
       render: (_, record) => (
         <div className="flex flex-col">
           <span className="text-[13px] font-medium text-gray-800 leading-none mb-1">{record.timeSlot}</span>
-          <span className="text-[12px] text-gray-500 leading-none">{record.dayOfWeek ? `${record.dayOfWeek} — ` : ''}{formatDateDisplay(record.date || record.receptionDate)}</span>
+          <span className="text-[12px] text-gray-500 leading-none">{record.dayOfWeek} — {record.date.split('-').reverse().join('/')}</span>
         </div>
       )
     },
@@ -245,7 +286,7 @@ export default function ApproveSchedule() {
           }
         ];
 
-        if (record.status === 'PENDING' && isLeaderOrAdmin) {
+        if (record.status === 'PENDING') {
           items.push({ type: 'divider' });
           items.push({ 
             key: 'approve', 
@@ -257,7 +298,7 @@ export default function ApproveSchedule() {
             label: <span className="flex items-center text-[#ef4444] font-medium"><X className="w-4 h-4 mr-2" /> Từ chối</span>, 
             onClick: () => handleAction(record.id, 'REJECTED') 
           });
-        } else if (record.status === 'APPROVED' && isLeaderOrAdmin) {
+        } else if (record.status === 'APPROVED') {
           items.push({ type: 'divider' });
           items.push({ 
             key: 'done', 
@@ -282,12 +323,11 @@ export default function ApproveSchedule() {
     }
   ];
 
-  const safeData = Array.isArray(data) ? data : [];
-  const pendingCount = safeData.filter(d => d.status === 'PENDING').length;
-  const approvedCount = safeData.filter(d => d.status === 'APPROVED').length;
-  const doneCount = safeData.filter(d => d.status === 'DONE').length;
-  const rejectedCount = safeData.filter(d => d.status === 'REJECTED').length;
-  const canceledCount = safeData.filter(d => d.status === 'CANCELED').length;
+  const pendingCount = data.filter(d => d.status === 'PENDING').length;
+  const approvedCount = data.filter(d => d.status === 'APPROVED').length;
+  const doneCount = data.filter(d => d.status === 'DONE').length;
+  const rejectedCount = data.filter(d => d.status === 'REJECTED').length;
+  const canceledCount = data.filter(d => d.status === 'CANCELED').length;
 
   const customModalTitle = selectedTicket && (
     <div className="flex items-center justify-between w-full pb-3 border-b border-gray-100">
@@ -387,9 +427,9 @@ export default function ApproveSchedule() {
         <div>
           <Table 
             columns={columns} 
-            dataSource={safeData.filter(d => d.status === activeTab)} 
+            dataSource={data.filter(d => d.status === activeTab)} 
             rowKey="id" 
-            pagination={false} loading={loading}
+            pagination={false}
             className="custom-table"
           />
         </div>
@@ -445,7 +485,7 @@ export default function ApproveSchedule() {
                 <div>
                   <div className="text-[12px] text-gray-400 mb-1">Ngày tiếp</div>
                   <div className="font-semibold text-gray-800 text-[15px]">
-                    {formatDateDisplay(selectedTicket.date || selectedTicket.receptionDate)}
+                    {selectedTicket.date.split('-').reverse().join('/')}
                   </div>
                 </div>
                 <div>
@@ -614,3 +654,4 @@ export default function ApproveSchedule() {
     </div>
   );
 }
+
