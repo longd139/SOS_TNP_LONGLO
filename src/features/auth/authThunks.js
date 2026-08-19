@@ -60,6 +60,39 @@ export const SEED_ACCOUNTS = {
             permissions: ['COMPLAINTS', 'SCHEDULES', 'RECEPTION']
         }
     },
+    'canbo2': {
+        password: '123456',
+        user: {
+            userId: 'USR-011',
+            username: 'canbo2',
+            fullName: 'Cán bộ Tiếp nhận 2',
+            role: 'OFFICER',
+            email: 'canbo2@ubnd.gov.vn',
+            permissions: ['COMPLAINTS', 'SCHEDULES', 'RECEPTION']
+        }
+    },
+    'canbo3': {
+        password: '123456',
+        user: {
+            userId: 'USR-012',
+            username: 'canbo3',
+            fullName: 'Cán bộ Tiếp nhận 3',
+            role: 'OFFICER',
+            email: 'canbo3@ubnd.gov.vn',
+            permissions: ['COMPLAINTS', 'SCHEDULES', 'RECEPTION']
+        }
+    },
+    'canbo4': {
+        password: '123456',
+        user: {
+            userId: 'USR-013',
+            username: 'canbo4',
+            fullName: 'Cán bộ Tiếp nhận 4',
+            role: 'OFFICER',
+            email: 'canbo4@ubnd.gov.vn',
+            permissions: ['COMPLAINTS', 'SCHEDULES', 'RECEPTION']
+        }
+    },
     'lanhdao': {
         password: '123456',
         user: {
@@ -69,6 +102,39 @@ export const SEED_ACCOUNTS = {
             role: 'LEADER',
             email: 'lanhdao@tangnhonphu.gov.vn',
             permissions: ['ALL', 'LEADER_APPROVAL', 'SCHEDULES', 'COMPLAINTS']
+        }
+    },
+    'lanhdao2': {
+        password: '123456',
+        user: {
+            userId: 'USR-031',
+            username: 'lanhdao2',
+            fullName: 'Lãnh đạo UBND 2',
+            role: 'LEADER',
+            email: 'lanhdao2@ubnd.gov.vn',
+            permissions: ['ALL', 'LEADER_APPROVAL', 'SCHEDULES', 'COMPLAINTS']
+        }
+    },
+    'lanhdao3': {
+        password: '123456',
+        user: {
+            userId: 'USR-033',
+            username: 'lanhdao3',
+            fullName: 'Lãnh đạo UBND 3',
+            role: 'LEADER',
+            email: 'lanhdao3@ubnd.gov.vn',
+            permissions: ['ALL', 'LEADER_APPROVAL', 'SCHEDULES', 'COMPLAINTS']
+        }
+    },
+    'swagger_reception_demo': {
+        password: 'Swagger@2026',
+        user: {
+            userId: '50000000-0000-4000-8000-000000000001',
+            username: 'swagger_reception_demo',
+            fullName: 'Cán bộ Demo Swagger',
+            role: 'OFFICER',
+            email: 'swagger.reception.demo@example.local',
+            permissions: ['COMPLAINTS', 'SCHEDULES', 'RECEPTION']
         }
     }
 };
@@ -116,7 +182,7 @@ export const loginUser = createAsyncThunk(
             const decoded = decodeToken(response.access_token);
             storeTokens(response.access_token, response.refresh_token);
 
-            const role = decoded?.role || (credentials.tenDangNhap === 'canbo' ? 'OFFICER' : credentials.tenDangNhap === 'lanhdao' ? 'LEADER' : 'ADMIN');
+            const role = decoded?.role || (credentials.tenDangNhap?.startsWith('canbo') ? 'OFFICER' : credentials.tenDangNhap?.startsWith('lanhdao') ? 'LEADER' : 'ADMIN');
             localStorage.setItem('currentUserRole', role);
             localStorage.setItem('currentUserId', decoded?.userId || decoded?.id || 'USR-001');
 
@@ -193,7 +259,7 @@ export const loginUserWithCaptcha = createAsyncThunk(
             const decoded = decodeToken(response.access_token);
             storeTokens(response.access_token, response.refresh_token);
 
-            const role = decoded?.role || (credentials.tenDangNhap === 'canbo' ? 'OFFICER' : credentials.tenDangNhap === 'lanhdao' ? 'LEADER' : 'ADMIN');
+            const role = decoded?.role || (credentials.tenDangNhap?.startsWith('canbo') ? 'OFFICER' : credentials.tenDangNhap?.startsWith('lanhdao') ? 'LEADER' : 'ADMIN');
             localStorage.setItem('currentUserRole', role);
             localStorage.setItem('currentUserId', decoded?.userId || decoded?.id || 'USR-001');
 
