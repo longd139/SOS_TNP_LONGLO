@@ -128,7 +128,7 @@ export default function Login() {
         }
 
         if (result?.success || result?.user || result?.access_token) {
-            window.location.href = '/dashboard';
+            navigate(ROUTE_PATH.DASHBOARD, { replace: true });
             return;
         }
 
@@ -149,7 +149,7 @@ export default function Login() {
         dispatch(restoreUser());
         await dispatch(fetchMyProfile());
 
-        window.location.href = '/dashboard';
+        navigate(ROUTE_PATH.DASHBOARD, { replace: true });
     };
 
     const handle2FAError = (error) => {

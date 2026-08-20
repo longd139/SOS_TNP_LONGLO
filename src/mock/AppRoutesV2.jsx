@@ -67,6 +67,15 @@ function ScheduleRoleGuard({ children }) {
   return children;
 }
 
+// Simple auth guard for V2 — checks localStorage directly, avoids Redux/AuthContext
+function V2AuthGuard({ children }) {
+  const token = localStorage.getItem('accessToken');
+  if (!token) {
+    return <Navigate to="/login" replace />;
+  }
+  return children;
+}
+
 export default function AppRoutesV2() {
   return (
     <Suspense fallback={<div className="min-h-screen flex items-center justify-center text-gray-500">Đang tải trang...</div>}>
@@ -102,7 +111,7 @@ export default function AppRoutesV2() {
         <Route path="/admin/login" element={<Login />} />
         <Route path="/auth/login" element={<Login />} />
       </Route>
-      <Route element={<AdminLayoutV2 />}>
+      <Route element={<V2AuthGuard><AdminLayoutV2 /></V2AuthGuard>}>
         <Route path="/dashboard" element={<DashboardOverview />} />
         <Route path="/dashboard/neighborhood" element={<Navigate to="/dashboard" replace />} />
         <Route path="/dashboard/large-screen" element={<DashboardLargeScreen />} />
