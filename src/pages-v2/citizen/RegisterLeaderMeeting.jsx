@@ -1,55 +1,92 @@
 import React, { useEffect, useState } from 'react';
-import { Modal, Form, Input, message, Button, Empty, Tag } from 'antd';
-import { Calendar, Clock, User, ArrowRight } from 'lucide-react';
+import { Modal, Form, Input, message, Button, Empty, Tag, Spin } from 'antd';
+import { Calendar, Clock, User, ArrowRight, CheckCircle2 } from 'lucide-react';
 import dayjs from 'dayjs';
+import LEADER_MEETING_API from '../../apis/leaderMeeting';
+
+const getDayOfWeek = (dateString) => {
+  const days = ['Chủ Nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy'];
+  return days[dayjs(dateString).day()];
+};
 
 export default function RegisterLeaderMeeting() {
   const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedSlot, setSelectedSlot] = useState(null);
+  const [successInfo, setSuccessInfo] = useState(null);
   const [form] = Form.useForm();
+
+  const loadData = async () => {
+    setLoading(true);
+    try {
+      const res = await LEADER_MEETING_API.getSchedules();
+      const list = res.data || [];
+      const formatted = list.flatMap(item => {
+        const dateStr = item.receptionDate ? (item.receptionDate.includes('T') ? item.receptionDate.split('T')[0] : item.receptionDate) : '';
+        const slots = item.slots || [];
+        return slots.filter(s => (s.remainingCapacity ?? 1) > 0).map(s => ({
+          id: `${item.id}-${s.id}`,
+          scheduleId: item.id,
+          slotId: s.id,
+          date: dateStr,
+          dayOfWeek: getDayOfWeek(dateStr),
+          timeSlot: `${s.startTime} - ${s.endTime}`,
+          leader: item.leader?.fullName || 'Lãnh đạo UBND',
+          location: item.location || 'Phòng tiếp công dân',
+          remainingCapacity: s.remainingCapacity ?? 1
+        }));
+      });
+      setData(formatted);
+    } catch (e) {
+      console.error('Lỗi khi tải lịch gặp lãnh đạo:', e);
+      setData([]);
+    }
+    setLoading(false);
+  };
 
   useEffect(() => {
     loadData();
-    window.addEventListener('storage', loadData);
-    return () => window.removeEventListener('storage', loadData);
   }, []);
-
-  const loadData = () => {
-    const localData = localStorage.getItem('leader-schedules-v1');
-    if (localData) {
-      setData(JSON.parse(localData));
-    }
-  };
 
   const openBookModal = (slot) => {
     setSelectedSlot(slot);
     setIsModalOpen(true);
   };
 
-  const handleSubmit = (values) => {
-    const updatedData = data.map(item => {
-      if (item.id === selectedSlot.id) {
-        return {
-          ...item,
-          status: 'BOOKED',
-          citizenInfo: values
-        };
-      }
-      return item;
-    });
+  const handleSubmit = async (values) => {
+    setSubmitting(true);
+    try {
+      const formData = new FormData();
+      formData.append('scheduleId', selectedSlot.scheduleId);
+      formData.append('slotId', selectedSlot.slotId);
+      formData.append('fullName', values.name);
+      formData.append('phoneNumber', values.phone);
+      formData.append('citizenId', values.cccd);
+      formData.append('address', values.address || 'Phường Tăng Nhơn Phú');
+      formData.append('reason', values.content);
 
-    localStorage.setItem('leader-schedules-v1', JSON.stringify(updatedData));
-    setData(updatedData);
-    message.success('Đăng ký lịch thành công! Cơ quan sẽ liên hệ lại với bạn.');
-    setIsModalOpen(false);
-    form.resetFields();
+      const res = await LEADER_MEETING_API.createRegistration(formData);
+      const regCode = res.data?.registrationCode || res.data?.receptionCode || 'LMR' + Date.now();
+
+      setSuccessInfo({
+        code: regCode,
+        name: values.name,
+        leader: selectedSlot.leader,
+        time: `${selectedSlot.timeSlot} ngày ${selectedSlot.date.split('-').reverse().join('/')}`
+      });
+
+      message.success('Đăng ký lịch hẹn thành công!');
+      setIsModalOpen(false);
+      form.resetFields();
+      await loadData();
+    } catch (error) {
+      console.error('Lỗi đăng ký lịch gặp lãnh đạo:', error);
+      message.error(error.response?.data?.message || 'Đăng ký thất bại. Vui lòng thử lại.');
+    }
+    setSubmitting(false);
   };
-
-  // Lọc ra AVAILABLE và ngày >= hôm nay
-  const availableSlots = data
-    .filter(d => d.status === 'AVAILABLE' && dayjs(d.date).isAfter(dayjs().subtract(1, 'day')))
-    .sort((a, b) => new Date(a.date) - new Date(b.date));
 
   return (
     <div className="min-h-screen bg-gray-50/50 p-4 md:p-12">
@@ -128,14 +165,61 @@ export default function RegisterLeaderMeeting() {
               </Form.Item>
             </div>
 
-            <Form.Item name="content" label={<span className="font-bold text-gray-700">Nội dung tóm tắt vấn đề</span>} rules={[{ required: true, message: 'Vui lòng nhập nội dung' }]}>
+            <Form.Item name="address" label={<span className="font-bold text-gray-700">Địa chỉ cư trú</span>}>
+              <Input size="large" placeholder="Số nhà, đường, khu phố..." className="rounded-xl h-12" />
+            </Form.Item>
+
+            <Form.Item name="content" label={<span className="font-bold text-gray-700">Nội dung tóm tắt vấn đề kiến nghị</span>} rules={[{ required: true, message: 'Vui lòng nhập nội dung' }]}>
               <Input.TextArea size="large" rows={4} placeholder="Ví dụ: Xin giải đáp về thủ tục đất đai tại phường..." className="rounded-xl p-3" />
             </Form.Item>
 
-            <Button type="primary" htmlType="submit" size="large" className="w-full bg-blue-600 hover:bg-blue-700 h-14 rounded-2xl mt-4 text-lg font-bold shadow-lg hover:shadow-xl transition-all">
+            <Button type="primary" htmlType="submit" size="large" loading={submitting} className="w-full bg-blue-600 hover:bg-blue-700 h-14 rounded-2xl mt-4 text-lg font-bold shadow-lg hover:shadow-xl transition-all">
               Xác Nhận Đăng Ký
             </Button>
           </Form>
+        </Modal>
+
+        {/* Success Modal */}
+        <Modal
+          open={!!successInfo}
+          onCancel={() => setSuccessInfo(null)}
+          footer={[
+            <Button key="close" type="primary" size="large" onClick={() => setSuccessInfo(null)} className="w-full bg-blue-600 rounded-xl h-12">
+              Đóng
+            </Button>
+          ]}
+          centered
+          width={500}
+        >
+          {successInfo && (
+            <div className="text-center py-4">
+              <div className="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                <CheckCircle2 className="w-10 h-10" />
+              </div>
+              <h3 className="text-2xl font-bold text-gray-800 mb-2">Đăng Ký Thành Công!</h3>
+              <p className="text-gray-500 text-sm mb-4">Yêu cầu gặp Lãnh đạo của bạn đã được gửi vào hệ thống xét duyệt.</p>
+              
+              <div className="bg-gray-50 rounded-2xl p-4 text-left space-y-2 border border-gray-100 mb-4">
+                <div className="flex justify-between items-center pb-2 border-b border-gray-200">
+                  <span className="text-gray-500 text-xs uppercase font-medium">Mã tra cứu</span>
+                  <span className="text-blue-600 font-extrabold text-base">{successInfo.code}</span>
+                </div>
+                <div className="flex justify-between items-center text-sm">
+                  <span className="text-gray-500">Người đăng ký</span>
+                  <span className="font-semibold text-gray-800">{successInfo.name}</span>
+                </div>
+                <div className="flex justify-between items-center text-sm">
+                  <span className="text-gray-500">Lãnh đạo tiếp</span>
+                  <span className="font-semibold text-gray-800">{successInfo.leader}</span>
+                </div>
+                <div className="flex justify-between items-center text-sm">
+                  <span className="text-gray-500">Thời gian hẹn</span>
+                  <span className="font-semibold text-emerald-600">{successInfo.time}</span>
+                </div>
+              </div>
+              <p className="text-xs text-gray-400">Vui lòng lưu lại mã tra cứu để theo dõi kết quả phê duyệt từ UBND Phường.</p>
+            </div>
+          )}
         </Modal>
       </div>
     </div>

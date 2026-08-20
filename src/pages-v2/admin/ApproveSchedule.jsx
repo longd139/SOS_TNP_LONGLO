@@ -1,11 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { Table, Dropdown, message, Tabs, Modal, Button, Input } from 'antd';
-import apiClient from '../../utils/apiClient';
+import { Table, Dropdown, message, Tabs, Modal, Button, Input, Tag } from 'antd';
+import LEADER_MEETING_API from '../../apis/leaderMeeting';
 import { useMock } from '../../mock/MockContext';
-import { ClipboardCheck, User, MoreHorizontal, Eye, Check, X, Award, CalendarCheck } from 'lucide-react';
-
-
-
+import { ClipboardCheck, User, MoreHorizontal, Eye, Check, X, Award, CalendarCheck, Paperclip } from 'lucide-react';
 
 export default function ApproveSchedule() {
   const [data, setData] = useState([]);
@@ -15,7 +12,6 @@ export default function ApproveSchedule() {
   const [actionModal, setActionModal] = useState({ isOpen: false, action: null, ticketId: null });
   const [actionNote, setActionNote] = useState('');
   const [actionResult, setActionResult] = useState('');
-
 
   const { currentUser } = useMock();
   const role = currentUser?.role || 'CITIZEN';
@@ -42,51 +38,53 @@ export default function ApproveSchedule() {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const res = await apiClient.get('/api/reception-registrations?size=100');
+      const res = await LEADER_MEETING_API.getRegistrations({ size: 100 });
       const list = res.data?.data || res.data || [];
       const arrayList = Array.isArray(list) ? list : [];
       const formatted = arrayList.map(item => {
         const itemDate = item.receptionDate ? (item.receptionDate.includes('T') ? item.receptionDate.split('T')[0] : item.receptionDate) : (item.date || '');
+        const rawStatus = item.approvalStatus || item.status || 'PENDING';
+        const normalizedStatus = rawStatus === 'COMPLETED' ? 'DONE' : rawStatus;
+        const leaderName = item.leader?.fullName || item.schedule?.officerName || item.approverName || item.leader || 'Lãnh đạo tiếp dân';
+        const applicantName = item.applicant?.fullName || item.applicantName || item.citizenName || '---';
+        const applicantPhone = item.applicant?.phoneNumber || item.phoneNumber || item.phone || '---';
+        const applicantCccd = item.applicant?.citizenId || item.cccd || '---';
+        const applicantAddress = item.applicant?.address || item.address || '---';
+        const content = item.reason || item.workingContent || item.topic || item.content || '';
+
         return {
           ...item,
-          key: item.id || item.receptionCode,
-          id: item.receptionCode || item.id,
+          key: item.id || item.registrationCode || item.receptionCode,
+          id: item.registrationCode || item.receptionCode || item.id,
           rawId: item.id,
           date: itemDate,
-          timeSlot: item.timeSlot || item.slot || '---',
-          leader: item.schedule?.officerName || item.approverName || item.leader || 'Lãnh đạo tiếp dân',
-          status: item.approvalStatus || item.status || 'PENDING',
-          content: item.workingContent || item.topic || item.content,
-          topic: item.topic || item.content,
-          citizenInfo: item.applicant ? {
-            name: item.applicant.fullName || item.applicantName,
-            phone: item.applicant.phoneNumber || item.phoneNumber,
-            cccd: item.applicant.citizenId || item.cccd,
-            address: item.applicant.address || item.address
-          } : (item.citizenInfo || {
-            name: item.applicantName || item.citizenName || '---',
-            phone: item.phoneNumber || item.phone || '---',
-            cccd: item.cccd || '---',
-            address: item.address || '---'
-          }),
-          scheduleInfo: item.schedule ? {
-            leader: item.schedule.officerName || item.leaderName,
-            position: item.approver?.title || 'Lãnh đạo tiếp dân',
-            date: item.receptionDate ? new Date(item.receptionDate).toLocaleDateString('vi-VN') : item.date,
-            time: item.timeSlot || item.timeRange || item.slot,
-            room: item.schedule.location || item.room || 'Phòng tiếp công dân'
-          } : (item.scheduleInfo || {
-            leader: item.approverName || 'Lãnh đạo UBND',
-            position: 'Lãnh đạo tiếp dân',
-            date: item.receptionDate ? new Date(item.receptionDate).toLocaleDateString('vi-VN') : (item.date || '---'),
-            time: item.timeSlot || item.slot || '---',
-            room: item.department || 'Phòng tiếp công dân'
-          })
+          timeSlot: item.timeSlot || item.slot || (item.startTime && item.endTime ? `${item.startTime} - ${item.endTime}` : '---'),
+          leader: leaderName,
+          status: normalizedStatus,
+          content: content,
+          topic: content,
+          note: item.rejectReason || item.note || '',
+          result: item.result || '',
+          attachments: item.attachments || [],
+          citizenInfo: {
+            name: applicantName,
+            phone: applicantPhone,
+            cccd: applicantCccd,
+            address: applicantAddress,
+            content: content
+          },
+          scheduleInfo: {
+            leader: leaderName,
+            position: item.approver?.title || 'Lãnh đạo UBND',
+            date: itemDate ? itemDate.split('-').reverse().join('/') : '---',
+            time: item.timeSlot || item.slot || (item.startTime && item.endTime ? `${item.startTime} - ${item.endTime}` : '---'),
+            room: item.location || item.schedule?.location || 'Phòng tiếp công dân'
+          }
         };
       });
       setData(formatted);
     } catch (error) {
-      console.error('Lỗi khi tải danh sách lịch tiếp dân', error);
+      console.error('Lỗi khi tải danh sách lịch gặp lãnh đạo', error);
       setData([]);
     }
     setLoading(false);
@@ -96,7 +94,6 @@ export default function ApproveSchedule() {
     fetchData();
   }, []);
 
-
   const handleAction = (id, newStatus) => {
     if (newStatus === 'REJECTED' || newStatus === 'CANCELED') {
       setActionModal({ isOpen: true, action: newStatus, ticketId: id });
@@ -104,7 +101,7 @@ export default function ApproveSchedule() {
       setIsModalOpen(false);
       return;
     }
-    if (newStatus === 'DONE') {
+    if (newStatus === 'DONE' || newStatus === 'COMPLETED') {
       setActionModal({ isOpen: true, action: newStatus, ticketId: id });
       setActionNote('');
       setActionResult('');
@@ -115,32 +112,34 @@ export default function ApproveSchedule() {
   };
 
   const executeAction = async (id, newStatus, note = '', result = null) => {
+    // Find ticket by key or id or rawId
+    const target = data.find(d => d.id === id || d.rawId === id || d.key === id);
+    const targetId = target?.rawId || target?.id || id;
+
     try {
       if (newStatus === 'APPROVED') {
-        await apiClient.patch(`/api/reception-registrations/${id}/approve`, {
-          department: 'QUAY_1'
-        });
-        message.success('Đã duyệt lịch hẹn thành công');
-      } else if (newStatus === 'REJECTED' || newStatus === 'CANCELED') {
-        await apiClient.patch(`/api/reception-registrations/${id}/reject`, {
-          reason: note && note.trim().length >= 5 ? note.trim() : 'Cơ quan từ chối lịch hẹn tiếp dân'
-        });
-        message.success('Đã từ chối lịch hẹn');
+        await LEADER_MEETING_API.approveRegistration(targetId);
+        message.success('Đã duyệt lịch hẹn gặp lãnh đạo thành công');
+      } else if (newStatus === 'REJECTED') {
+        const reasonText = note && note.trim().length >= 5 ? note.trim() : 'Lãnh đạo bận lịch công tác đột xuất';
+        await LEADER_MEETING_API.rejectRegistration(targetId, reasonText);
+        message.success('Đã từ chối lịch hẹn gặp lãnh đạo');
+      } else if (newStatus === 'CANCELED') {
+        const reasonText = note && note.trim().length >= 5 ? note.trim() : 'Hủy lịch hẹn gặp lãnh đạo';
+        await LEADER_MEETING_API.cancelRegistration(targetId, reasonText);
+        message.success('Đã hủy lịch hẹn');
+      } else if (newStatus === 'PROCESSING') {
+        await LEADER_MEETING_API.processRegistration(targetId);
+        message.success('Đã chuyển sang trạng thái đang tiếp');
       } else if (newStatus === 'DONE' || newStatus === 'COMPLETED') {
-        await apiClient.patch(`/api/reception-registrations/${id}/complete`);
-        message.success('Đã đánh dấu tiếp xong');
-      } else {
-        await apiClient.patch(`/api/reception-registrations/${id}/approve`, {
-          status: newStatus,
-          note: note,
-          result: result
-        });
-        message.success('Đã cập nhật trạng thái');
+        const resultText = note || (result === 'done' ? 'Đã giải quyết xong nội dung tiếp dân' : 'Cần chuyển bộ phận chuyên môn giải quyết tiếp');
+        await LEADER_MEETING_API.completeRegistration(targetId, resultText);
+        message.success('Đã đánh dấu hoàn thành buổi tiếp dân');
       }
       
-      fetchData(); // Reload from backend
+      await fetchData(); // Reload from API
     } catch (error) {
-      console.error('Lỗi khi cập nhật trạng thái:', error);
+      console.error('Lỗi khi cập nhật trạng thái lịch hẹn:', error);
       message.error(error.response?.data?.message || 'Có lỗi xảy ra khi cập nhật trạng thái');
     }
 

@@ -107,7 +107,8 @@ export default function ReceptionFeedbackDispatchPage({ title, description, queu
   const fetchTickets = async () => {
     setLoading(true);
     try {
-      const res = await apiClient.get('/api/reception-registrations?size=100');
+      const endpoint = isLeaderMeeting ? '/api/leader-meeting-registrations?size=100' : '/api/reception-registrations?size=100';
+      const res = await apiClient.get(endpoint);
       const tickets = res?.data?.data || res?.data || [];
       if (Array.isArray(tickets)) {
         setDbTickets(tickets);
@@ -120,7 +121,7 @@ export default function ReceptionFeedbackDispatchPage({ title, description, queu
 
   useEffect(() => {
     fetchTickets();
-  }, []);
+  }, [isLeaderMeeting]);
 
   const [detailLoading, setDetailLoading] = useState(false);
 
@@ -131,15 +132,16 @@ export default function ReceptionFeedbackDispatchPage({ title, description, queu
 
     try {
       setDetailLoading(true);
-      const res = await apiClient.get(`/api/reception-registrations/${targetId}`);
+      const detailEndpoint = isLeaderMeeting ? `/api/leader-meeting-registrations/${targetId}` : `/api/reception-registrations/${targetId}`;
+      const res = await apiClient.get(detailEndpoint);
       const d = res.data?.data || res.data;
       if (d) {
         setSelectedReception({
           ...reception,
-          ticketNo: d.receptionCode || reception.ticketNo,
+          ticketNo: d.registrationCode || d.receptionCode || reception.ticketNo,
           receptionId: d.id || reception.receptionId,
           rawId: d.id || reception.rawId,
-          topic: d.topic || reception.topic,
+          topic: d.reason || d.topic || reception.topic,
           date: d.receptionDate ? new Date(d.receptionDate).toLocaleDateString('vi-VN') : (reception.date || reception.receptionDate),
           slot: d.timeSlot || reception.slot,
           fullName: d.applicant?.fullName || reception.fullName || reception.citizenName,
@@ -147,11 +149,11 @@ export default function ReceptionFeedbackDispatchPage({ title, description, queu
           phone: d.applicant?.phoneNumber || reception.phone,
           cccd: d.applicant?.citizenId || reception.cccd || '---',
           address: d.applicant?.address || reception.address || '---',
-          description: d.workingContent || reception.description || reception.reason,
-          reason: d.workingContent || reception.reason,
+          description: d.reason || d.workingContent || reception.description || reception.reason,
+          reason: d.reason || d.workingContent || reception.reason,
           department: d.department || reception.department || 'QUAY_1',
-          office: d.schedule?.location || reception.office || d.department || 'Bộ phận tiếp công dân',
-          leaderName: d.schedule?.officerName || d.approver?.name || reception.leaderName,
+          office: d.location || d.schedule?.location || reception.office || d.department || 'Phòng tiếp công dân',
+          leaderName: d.leader?.fullName || d.schedule?.officerName || d.approver?.name || reception.leaderName,
           leaderPosition: d.approver?.title || reception.leaderPosition,
           approvalStatus: d.approvalStatus || reception.status,
           status: d.approvalStatus || reception.status,
@@ -172,9 +174,13 @@ export default function ReceptionFeedbackDispatchPage({ title, description, queu
     const targetId = reception.rawId || reception.id || reception.receptionId;
     const targetDept = reception.department || 'QUAY_1';
     try {
-      await apiClient.patch(`/api/reception-registrations/${targetId}/approve`, {
-        department: targetDept
-      });
+      if (isLeaderMeeting) {
+        await apiClient.put(`/api/leader-meeting-registrations/${targetId}/approve`);
+      } else {
+        await apiClient.patch(`/api/reception-registrations/${targetId}/approve`, {
+          department: targetDept
+        });
+      }
       message.success('Đã phê duyệt tiếp nhận thành công!');
       fetchTickets();
       setApprovedReceptionIds((current) => new Set([...current, targetId]));
@@ -187,7 +193,13 @@ export default function ReceptionFeedbackDispatchPage({ title, description, queu
   const completeReception = async (receptionId, rawId) => {
     const targetId = rawId || receptionId;
     try {
-      await apiClient.patch(`/api/reception-registrations/${targetId}/complete`);
+      if (isLeaderMeeting) {
+        await apiClient.put(`/api/leader-meeting-registrations/${targetId}/complete`, {
+          result: 'Đã hoàn thành buổi tiếp dân'
+        });
+      } else {
+        await apiClient.patch(`/api/reception-registrations/${targetId}/complete`);
+      }
       message.success('Đã hoàn thành buổi tiếp dân! Người dân có thể đánh giá trên iPad.');
       fetchTickets();
     } catch (error) {
@@ -210,9 +222,15 @@ export default function ReceptionFeedbackDispatchPage({ title, description, queu
     const targetId = rejectTarget.rawId || rejectTarget.id || rejectTarget.receptionId;
     try {
       setRejectLoading(true);
-      await apiClient.patch(`/api/reception-registrations/${targetId}/reject`, {
-        reason: rejectReason.trim()
-      });
+      if (isLeaderMeeting) {
+        await apiClient.put(`/api/leader-meeting-registrations/${targetId}/reject`, {
+          reason: rejectReason.trim()
+        });
+      } else {
+        await apiClient.patch(`/api/reception-registrations/${targetId}/reject`, {
+          reason: rejectReason.trim()
+        });
+      }
       message.success('Đã từ chối đơn tiếp dân thành công');
       setRejectModalOpen(false);
       setRejectTarget(null);
