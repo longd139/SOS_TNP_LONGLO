@@ -1,4 +1,5 @@
 import { createSelector } from '@reduxjs/toolkit';
+import { normalizeDate } from '../../utils/dateUtils';
 
 const selectWorkScheduleState = (state) => state.workSchedule;
 
@@ -71,8 +72,12 @@ export const selectSchedulesForMonth = createSelector(
     [selectAllSchedulesList, selectSelectedMonth, selectSelectedYear],
     (schedules, month, year) => {
         return schedules.filter(schedule => {
-            const scheduleDate = new Date(getScheduleDateField(schedule));
-            return scheduleDate.getMonth() + 1 === month && scheduleDate.getFullYear() === year;
+            const norm = normalizeDate(getScheduleDateField(schedule));
+            if (/^\d{4}-\d{2}-\d{2}$/.test(norm)) {
+                const [sYear, sMonth] = norm.split('-').map(Number);
+                return sMonth === month && sYear === year;
+            }
+            return false;
         });
     }
 );
@@ -83,16 +88,19 @@ export const selectHasScheduleForDay = createSelector(
         if (!day) return false;
 
         if (typeof day === 'string') {
+            const targetNorm = normalizeDate(day);
             return monthSchedules.some(schedule => {
-                const scheduleDate = new Date(getScheduleDateField(schedule));
-                const dStr = `${scheduleDate.getFullYear()}-${String(scheduleDate.getMonth() + 1).padStart(2, '0')}-${String(scheduleDate.getDate()).padStart(2, '0')}`;
-                return dStr === day;
+                return normalizeDate(getScheduleDateField(schedule)) === targetNorm;
             });
         }
 
         return monthSchedules.some(schedule => {
-            const scheduleDate = new Date(getScheduleDateField(schedule));
-            return scheduleDate.getDate() === day;
+            const norm = normalizeDate(getScheduleDateField(schedule));
+            if (/^\d{4}-\d{2}-\d{2}$/.test(norm)) {
+                const [, , sDay] = norm.split('-').map(Number);
+                return sDay === day;
+            }
+            return false;
         });
     }
 );
@@ -101,9 +109,10 @@ export const selectSchedulesForDate = createSelector(
     [selectSchedulesList, (state, date) => date],
     (schedules, date) => {
         if (!date) return [];
+        const targetNorm = normalizeDate(date);
         return schedules.filter(schedule => {
             const scheduleDate = getScheduleDateField(schedule);
-            return scheduleDate === date;
+            return normalizeDate(scheduleDate) === targetNorm;
         }).sort((a, b) => {
             const timeA = a.thoi_gian || a.time || '';
             const timeB = b.thoi_gian || b.time || '';

@@ -1,5 +1,6 @@
 import { Clock, MapPin, User, FileText, Pencil, Trash2, ToggleLeft, Calendar, ChevronLeft, ChevronRight } from "lucide-react";
 import { isPastSchedule } from "../../validator/workScheduleValidator";
+import { normalizeDate } from "../../utils/dateUtils";
 
 export default function ScheduleList({
     schedules,
@@ -57,8 +58,9 @@ export default function ScheduleList({
 
     const getDisplayMessage = () => {
         if (selectedDate) {
+            const targetNorm = normalizeDate(selectedDate);
             const selectedSchedules = schedules.filter(
-                (s) => getFieldValue(s, "date") === selectedDate
+                (s) => normalizeDate(getFieldValue(s, "date")) === targetNorm
             );
             if (selectedSchedules.length === 0) {
                 const formattedDate = formatDate

@@ -87,14 +87,14 @@ const menuItems = [
         hasSubmenu: false,
         modulePrefix: 'UB' 
     },
-    // {
-    //     id: 'schedule',
-    //     label: 'Lịch tiếp dân',
-    //     icon: Calendar,
-    //     path: ROUTE_PATH.SCHEDULES,
-    //     hasSubmenu: false,
-    //     modulePrefix: 'LTD' 
-    // },
+    {
+        id: 'schedule',
+        label: 'Lịch tiếp dân',
+        icon: Calendar,
+        path: ROUTE_PATH.SCHEDULES,
+        hasSubmenu: false,
+        modulePrefix: 'LTD' 
+    },
     {
         id: 'statistics',
         label: 'Báo cáo & Thống kê',

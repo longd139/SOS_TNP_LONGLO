@@ -18,10 +18,20 @@ const ALL_MENUS = [
     submenu: [
       { id: 'approve-schedule', label: 'Quản lý lịch hẹn', path: '/admin/schedules/approve', roles: ['APPROVER','LEADER','ADMIN'] },
       { id: 'add-schedule', label: 'Thêm lịch hẹn', path: '/admin/schedules/add', roles: ['APPROVER','LEADER','ADMIN'] },
+      { id: 'reception-counters-leader', label: 'Quản lý Quầy & Phân công', path: '/schedules', roles: ['APPROVER','LEADER','ADMIN'] },
       { id: 'leader-meeting-feedback', label: 'Đánh giá gặp lãnh đạo', path: '/admin/leader-meeting-feedback', roles: ['APPROVER','LEADER','ADMIN'] },
     ],
   },
-  { id: 'counter-reception-feedback', label: 'Lịch tiếp dân', icon: Calendar, path: '/admin/counter-reception-feedback', roles: ['OFFICER', 'RECEPTION_OFFICER', 'PROCESSING_OFFICER', 'ADMIN'] },
+  {
+    id: 'officer-reception-management',
+    label: 'Quản lý lịch tiếp công dân',
+    icon: Calendar,
+    roles: ['OFFICER', 'RECEPTION_OFFICER', 'PROCESSING_OFFICER'],
+    submenu: [
+      { id: 'counter-reception-feedback', label: 'Lịch tiếp dân', path: '/admin/counter-reception-feedback', roles: ['OFFICER', 'RECEPTION_OFFICER', 'PROCESSING_OFFICER'] },
+      { id: 'counter-management-officer', label: 'Xem ca trực', path: '/schedules', roles: ['OFFICER', 'RECEPTION_OFFICER', 'PROCESSING_OFFICER'] },
+    ],
+  },
   {
     id: 'documents',
     label: 'Quản lý Tài liệu', 
@@ -48,7 +58,7 @@ export default function SidebarV2({ collapsed, onToggle }) {
   const location = useLocation();
   const { currentUser } = useMock();
   const role = currentUser?.role || 'CITIZEN';
-  const [openMenus, setOpenMenus] = useState({ documents: true, 'reception-schedules-v2': true });
+  const [openMenus, setOpenMenus] = useState({ documents: true, 'reception-schedules-v2': true, 'officer-reception-management': true });
 
   const toggleSubmenu = (id) => {
     setOpenMenus(prev => ({ ...prev, [id]: !prev[id] }));
