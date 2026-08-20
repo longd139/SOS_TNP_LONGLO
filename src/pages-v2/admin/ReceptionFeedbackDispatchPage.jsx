@@ -21,6 +21,18 @@ import {
   TicketDetailModal,
 } from '../../components/base/TicketDetailForm';
 
+export const RECEPTION_DEPARTMENTS = [
+  { value: '', label: 'Tất cả quầy / phòng ban' },
+  { value: 'QUAY_1', label: 'Quầy 1: Hộ tịch - Tư pháp' },
+  { value: 'QUAY_2', label: 'Quầy 2: Địa chính - Xây dựng' },
+  { value: 'QUAY_3', label: 'Quầy 3: Lao động - Thương binh - Xã hội' },
+  { value: 'QUAY_4', label: 'Quầy 4: Tài chính - Kế hoạch' },
+  { value: 'QUAY_5', label: 'Quầy 5: Công an phường' },
+  { value: 'QUAY_6', label: 'Quầy 6: Bảo hiểm xã hội' },
+  { value: 'QUAY_7', label: 'Quầy 7: Đăng ký kinh doanh' },
+  { value: 'QUAY_8', label: 'Quầy 8: Tiếp nhận chung' },
+];
+
 export default function ReceptionFeedbackDispatchPage({ title, description, queue, allowedRoles, eyebrow }) {
   const { currentUser } = useMock();
   const role = currentUser?.role || 'CITIZEN';
@@ -42,19 +54,19 @@ export default function ReceptionFeedbackDispatchPage({ title, description, queu
       leaderSection: 'Thông tin lãnh đạo và lịch hẹn',
     }
     : {
-      listTitle: 'Danh sách đơn tiếp dân',
-      listDescription: 'Mở mã đơn để xem nội dung, phê duyệt trước khi mời người dân đánh giá trên iPad.',
+      listTitle: 'Danh sách đơn tiếp dân tại quầy',
+      listDescription: 'Mở mã đơn để xem nội dung, phân công quầy và phê duyệt trước khi mời người dân đánh giá trên iPad.',
       code: 'Mã đơn tiếp dân',
       date: 'Ngày / giờ tiếp',
       topic: 'Nội dung làm việc',
-      approve: 'Phê duyệt đơn',
-      approved: 'Đã phê duyệt đơn',
+      approve: 'Phê duyệt & Phân quầy',
+      approved: 'Đã phân quầy & tiếp dân',
       invite: 'Mời người dân đánh giá',
-      detailTitle: 'Chi tiết đơn tiếp dân',
+      detailTitle: 'Chi tiết đơn tiếp dân tại quầy',
       detailSubtitle: 'Đơn đăng ký tiếp dân tại quầy',
       detailDescription: 'Nội dung cần trao đổi',
       receptionInfo: 'Thông tin tiếp nhận',
-      leaderSection: 'Thông tin lãnh đạo và lịch hẹn',
+      leaderSection: 'Thông tin phòng ban và quầy tiếp nhận',
     }), [isLeaderMeeting]);
 
   const [activeReception, setActiveReception] = useState(() => readActiveReceptionFeedback());
@@ -66,6 +78,7 @@ export default function ReceptionFeedbackDispatchPage({ title, description, queu
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [dateFilter, setDateFilter] = useState('');
+  const [departmentFilter, setDepartmentFilter] = useState('');
 
   // Reject Modal state
   const [rejectModalOpen, setRejectModalOpen] = useState(false);
@@ -113,7 +126,7 @@ export default function ReceptionFeedbackDispatchPage({ title, description, queu
 
   const handleOpenDetail = async (reception) => {
     setSelectedReception(reception);
-    const targetId = reception.id || reception.receptionId;
+    const targetId = reception.rawId || reception.id || reception.receptionId;
     if (!targetId) return;
 
     try {
@@ -125,6 +138,7 @@ export default function ReceptionFeedbackDispatchPage({ title, description, queu
           ...reception,
           ticketNo: d.receptionCode || reception.ticketNo,
           receptionId: d.id || reception.receptionId,
+          rawId: d.id || reception.rawId,
           topic: d.topic || reception.topic,
           date: d.receptionDate ? new Date(d.receptionDate).toLocaleDateString('vi-VN') : (reception.date || reception.receptionDate),
           slot: d.timeSlot || reception.slot,
@@ -135,6 +149,7 @@ export default function ReceptionFeedbackDispatchPage({ title, description, queu
           address: d.applicant?.address || reception.address || '---',
           description: d.workingContent || reception.description || reception.reason,
           reason: d.workingContent || reception.reason,
+          department: d.department || reception.department || 'QUAY_1',
           office: d.schedule?.location || reception.office || d.department || 'Bộ phận tiếp công dân',
           leaderName: d.schedule?.officerName || d.approver?.name || reception.leaderName,
           leaderPosition: d.approver?.title || reception.leaderPosition,
@@ -153,25 +168,26 @@ export default function ReceptionFeedbackDispatchPage({ title, description, queu
 
   const invite = (reception) => setActiveReception(announceReceptionFeedback(reception));
 
-  const approveReception = async (receptionId) => {
+  const approveReception = async (reception) => {
+    const targetId = reception.rawId || reception.id || reception.receptionId;
+    const targetDept = reception.department || 'QUAY_1';
     try {
-      await apiClient.patch(`/api/reception-registrations/${receptionId}/approve`, {
-        department: 'QUAY_1'
+      await apiClient.patch(`/api/reception-registrations/${targetId}/approve`, {
+        department: targetDept
       });
       message.success('Đã phê duyệt tiếp nhận thành công!');
       fetchTickets();
+      setApprovedReceptionIds((current) => new Set([...current, targetId]));
     } catch (error) {
       console.error("Failed to approve ticket", error);
-      message.error('Lỗi khi phê duyệt tiếp nhận');
+      message.error(error.response?.data?.message || 'Lỗi khi phê duyệt tiếp nhận');
     }
-    
-    // Also update local state for immediate UI feedback if needed
-    setApprovedReceptionIds((current) => new Set([...current, receptionId]));
   };
 
-  const completeReception = async (receptionId) => {
+  const completeReception = async (receptionId, rawId) => {
+    const targetId = rawId || receptionId;
     try {
-      await apiClient.patch(`/api/reception-registrations/${receptionId}/complete`);
+      await apiClient.patch(`/api/reception-registrations/${targetId}/complete`);
       message.success('Đã hoàn thành buổi tiếp dân! Người dân có thể đánh giá trên iPad.');
       fetchTickets();
     } catch (error) {
@@ -191,13 +207,15 @@ export default function ReceptionFeedbackDispatchPage({ title, description, queu
       message.warning('Vui lòng nhập lý do từ chối tối thiểu 5 ký tự');
       return;
     }
+    const targetId = rejectTarget.rawId || rejectTarget.id || rejectTarget.receptionId;
     try {
       setRejectLoading(true);
-      await apiClient.patch(`/api/reception-registrations/${rejectTarget.receptionId || rejectTarget.id}/reject`, {
+      await apiClient.patch(`/api/reception-registrations/${targetId}/reject`, {
         reason: rejectReason.trim()
       });
       message.success('Đã từ chối đơn tiếp dân thành công');
       setRejectModalOpen(false);
+      setRejectTarget(null);
       fetchTickets();
     } catch (error) {
       console.error("Failed to reject ticket", error);
@@ -214,6 +232,7 @@ export default function ReceptionFeedbackDispatchPage({ title, description, queu
       if (leaderDbTickets.length > 0) {
         rawItems = leaderDbTickets.map(item => ({
           ...item,
+          rawId: item.id,
           receptionId: item.id || item.receptionCode,
           ticketNo: item.receptionCode || item.id,
           citizenName: item.applicantName || item.citizenName || item.citizenInfo?.name
@@ -226,6 +245,7 @@ export default function ReceptionFeedbackDispatchPage({ title, description, queu
       if (counterDbTickets.length > 0) {
         rawItems = counterDbTickets.map(item => ({
           ...item,
+          rawId: item.id,
           receptionId: item.id || item.receptionCode,
           ticketNo: item.receptionCode || item.id,
           citizenName: item.applicantName || item.citizenName || item.citizenInfo?.name
@@ -274,7 +294,17 @@ export default function ReceptionFeedbackDispatchPage({ title, description, queu
       processed = processed.filter(item => item.currentStatusKey === statusFilter);
     }
 
-    // 3. Date Filter
+    // 3. Department Filter
+    if (departmentFilter) {
+      processed = processed.filter(item => 
+        item.department === departmentFilter || 
+        item.office === departmentFilter || 
+        (item.department && item.department.includes(departmentFilter)) ||
+        (item.office && item.office.includes(departmentFilter))
+      );
+    }
+
+    // 4. Date Filter
     if (dateFilter) {
       processed = processed.filter(item => {
         const itemDate = item.receptionDate ? new Date(item.receptionDate).toISOString().slice(0, 10) : item.date;
@@ -282,7 +312,7 @@ export default function ReceptionFeedbackDispatchPage({ title, description, queu
       });
     }
 
-    // 4. Smart Priority Sorting:
+    // 5. Smart Priority Sorting:
     // PENDING first (1), then APPROVED (2), COMPLETED (3), RATED (4), REJECTED (5)
     // Within same priority rank, sort newest date/created first
     processed.sort((a, b) => {
@@ -295,7 +325,7 @@ export default function ReceptionFeedbackDispatchPage({ title, description, queu
     });
 
     return processed;
-  }, [dbTickets, queue, isLeaderMeeting, approvedReceptionIds, ratedReceptionIds, search, statusFilter, dateFilter]);
+  }, [dbTickets, queue, isLeaderMeeting, approvedReceptionIds, ratedReceptionIds, search, statusFilter, dateFilter, departmentFilter]);
 
   // Phân trang
   const [currentPage, setCurrentPage] = useState(1);
@@ -303,7 +333,7 @@ export default function ReceptionFeedbackDispatchPage({ title, description, queu
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [search, statusFilter, dateFilter]);
+  }, [search, statusFilter, dateFilter, departmentFilter]);
 
   const totalPages = Math.max(1, Math.ceil(displayItems.length / pageSize));
   const paginatedItems = useMemo(() => {
@@ -329,10 +359,10 @@ export default function ReceptionFeedbackDispatchPage({ title, description, queu
               <Filter size={16} className="text-blue-600" />
               <span>Bộ lọc danh sách</span>
             </div>
-            {(search || statusFilter || dateFilter) && (
+            {(search || statusFilter || dateFilter || departmentFilter) && (
               <button
                 type="button"
-                onClick={() => { setSearch(''); setStatusFilter(''); setDateFilter(''); }}
+                onClick={() => { setSearch(''); setStatusFilter(''); setDateFilter(''); setDepartmentFilter(''); }}
                 className="inline-flex items-center gap-1 text-xs font-medium text-blue-600 hover:text-blue-800 hover:underline"
               >
                 <RotateCcw size={13} /> Đặt lại bộ lọc
@@ -340,7 +370,7 @@ export default function ReceptionFeedbackDispatchPage({ title, description, queu
             )}
           </div>
 
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
             {/* Search input */}
             <div className="relative">
               <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
@@ -352,6 +382,21 @@ export default function ReceptionFeedbackDispatchPage({ title, description, queu
                 className="w-full rounded-xl border border-gray-200 bg-gray-50/50 py-2 pl-9 pr-3 text-xs text-gray-800 focus:border-blue-500 focus:bg-white focus:outline-none"
               />
             </div>
+
+            {/* Department filter for Counter Reception */}
+            {!isLeaderMeeting && (
+              <div>
+                <select
+                  value={departmentFilter}
+                  onChange={(e) => setDepartmentFilter(e.target.value)}
+                  className="w-full rounded-xl border border-gray-200 bg-gray-50/50 px-3 py-2 text-xs text-gray-800 focus:border-blue-500 focus:bg-white focus:outline-none"
+                >
+                  {RECEPTION_DEPARTMENTS.map(d => (
+                    <option key={d.value} value={d.value}>{d.label}</option>
+                  ))}
+                </select>
+              </div>
+            )}
 
             {/* Status filter */}
             <div>
@@ -409,13 +454,17 @@ export default function ReceptionFeedbackDispatchPage({ title, description, queu
                   paginatedItems.map((reception) => {
                     const isRejected = reception.approvalStatus === "REJECTED" || reception.status === "REJECTED";
                     const isCompleted = reception.approvalStatus === "COMPLETED" || reception.status === "COMPLETED";
-                    const isApproved = approvedReceptionIds.has(reception.receptionId) || reception.approvalStatus === "APPROVED" || reception.status === "APPROVED" || isCompleted;
-                    const isRated = ratedReceptionIds.has(reception.receptionId) || ratedReceptionIds.has(reception.ticketNo) || reception.ratingStatus === "RATED" || reception.status === "RATED";
+                    const isApproved = approvedReceptionIds.has(reception.receptionId) || approvedReceptionIds.has(reception.rawId) || reception.approvalStatus === "APPROVED" || reception.status === "APPROVED" || isCompleted;
+                    const isRated = ratedReceptionIds.has(reception.receptionId) || ratedReceptionIds.has(reception.rawId) || ratedReceptionIds.has(reception.ticketNo) || reception.ratingStatus === "RATED" || reception.status === "RATED";
+                    const deptLabel = RECEPTION_DEPARTMENTS.find(d => d.value === reception.department)?.label;
                     return <tr key={reception.receptionId}>
                       <td className="px-5 py-4 font-bold text-blue-700">
                         <button type="button" className="hover:underline text-sm font-bold text-blue-600 hover:text-blue-800" onClick={() => handleOpenDetail(reception)}>
                           {reception.ticketNo}
                         </button>
+                        {deptLabel && !isLeaderMeeting && (
+                          <div className="text-[11px] font-normal text-gray-500 mt-0.5">{deptLabel}</div>
+                        )}
                       </td>
                       <td className="px-5 py-4 text-gray-700">{reception.citizenName || reception.applicantName}</td><td className="px-5 py-4 text-gray-600">{(reception.date || (reception.receptionDate ? new Date(reception.receptionDate).toLocaleDateString('vi-VN') : ''))}<br />{(reception.slot || reception.timeSlot)}</td><td className="px-5 py-4 text-gray-700">{(reception.topic || reception.content || reception.citizenInfo?.content)}</td>
                       <td className="px-5 py-4">
@@ -459,7 +508,7 @@ export default function ReceptionFeedbackDispatchPage({ title, description, queu
                             items.push({
                               key: 'approve',
                               label: <span className="flex items-center gap-2 font-medium text-blue-600"><Check size={15} /> {labels.approve || 'Phê duyệt đơn'}</span>,
-                              onClick: () => approveReception(reception.receptionId)
+                              onClick: () => approveReception(reception)
                             });
                             items.push({
                               key: 'reject',
@@ -471,7 +520,7 @@ export default function ReceptionFeedbackDispatchPage({ title, description, queu
                             items.push({
                               key: 'complete',
                               label: <span className="flex items-center gap-2 font-medium text-emerald-600"><CheckCircle2 size={15} /> Hoàn thành tiếp dân</span>,
-                              onClick: () => completeReception(reception.receptionId)
+                              onClick: () => completeReception(reception.receptionId, reception.rawId)
                             });
                           }
 

@@ -1,5 +1,6 @@
 import { Calendar, ChevronLeft, ChevronRight } from "lucide-react";
 import { useMemo, useState } from "react";
+import { normalizeDate } from "../../utils/dateUtils";
 
 export default function MonthCalendar({
     month,
@@ -77,7 +78,7 @@ export default function MonthCalendar({
     const isSelected = (dayOrDate) => {
         if (!dayOrDate || !selectedDate) return false;
         const dateStr = getDateString(dayOrDate);
-        return dateStr === selectedDate;
+        return normalizeDate(dateStr) === normalizeDate(selectedDate);
     };
 
     const getISOWeekInfo = (date) => {
@@ -265,7 +266,7 @@ export default function MonthCalendar({
             <div className="grid grid-cols-7 gap-0.5 md:gap-1">
                 {days.map((day, index) => {
                     const dateStr = getDateString(day);
-                    const hasSchedule = hasScheduleForDay?.(dateStr) || false;
+                    const hasSchedule = (day && hasScheduleForDay?.(dateStr)) || (day && hasScheduleForDay?.(day.getDate())) || false;
                     const isTodayDay = isToday(day);
                     const isSelectedDay = isSelected(day);
 
@@ -277,12 +278,12 @@ export default function MonthCalendar({
                 aspect-square flex items-center justify-center text-xs md:text-sm rounded-md md:rounded-lg
                 ${!day ? "invisible" : "cursor-pointer"}
                 ${hasSchedule
-                                    ? "bg-blue-600 text-white font-semibold hover:bg-blue-700"
+                                    ? "bg-blue-600 text-white font-bold shadow-sm hover:bg-blue-700"
                                     : "text-gray-700 hover:bg-gray-100"
                                 }
                 ${isSelectedDay ? "ring-2 ring-blue-400 ring-offset-2" : ""}
                 ${isTodayDay && !hasSchedule
-                                    ? "border-2 border-blue-600 font-semibold"
+                                    ? "border-2 border-blue-600 font-bold text-blue-600"
                                     : ""
                                 }
                 transition-all

@@ -114,31 +114,39 @@ export default function ApproveSchedule() {
     executeAction(id, newStatus);
   };
 
-
   const executeAction = async (id, newStatus, note = '', result = null) => {
     try {
-      await apiClient.patch(`/api/reception-registrations/${id}/approve`, {
-        status: newStatus,
-        note: note,
-        result: result
-      });
-
-      let msg = 'Đã cập nhật trạng thái';
-      if (newStatus === 'APPROVED') msg = 'Đã duyệt lịch hẹn thành công';
-      if (newStatus === 'REJECTED') msg = 'Đã từ chối lịch hẹn';
-      if (newStatus === 'CANCELED') msg = 'Đã hủy lịch hẹn';
-      if (newStatus === 'DONE') msg = 'Đã đánh dấu tiếp xong';
-      message.success(msg);
+      if (newStatus === 'APPROVED') {
+        await apiClient.patch(`/api/reception-registrations/${id}/approve`, {
+          department: 'QUAY_1'
+        });
+        message.success('Đã duyệt lịch hẹn thành công');
+      } else if (newStatus === 'REJECTED' || newStatus === 'CANCELED') {
+        await apiClient.patch(`/api/reception-registrations/${id}/reject`, {
+          reason: note && note.trim().length >= 5 ? note.trim() : 'Cơ quan từ chối lịch hẹn tiếp dân'
+        });
+        message.success('Đã từ chối lịch hẹn');
+      } else if (newStatus === 'DONE' || newStatus === 'COMPLETED') {
+        await apiClient.patch(`/api/reception-registrations/${id}/complete`);
+        message.success('Đã đánh dấu tiếp xong');
+      } else {
+        await apiClient.patch(`/api/reception-registrations/${id}/approve`, {
+          status: newStatus,
+          note: note,
+          result: result
+        });
+        message.success('Đã cập nhật trạng thái');
+      }
       
       fetchData(); // Reload from backend
     } catch (error) {
-      message.error('Có lỗi xảy ra khi cập nhật trạng thái');
+      console.error('Lỗi khi cập nhật trạng thái:', error);
+      message.error(error.response?.data?.message || 'Có lỗi xảy ra khi cập nhật trạng thái');
     }
 
     setIsModalOpen(false);
     setActionModal({ isOpen: false, action: null, ticketId: null });
   };
-
 
   const getInitials = (name) => {
     if (!name) return 'U';
@@ -250,24 +258,24 @@ export default function ApproveSchedule() {
           items.push({ 
             key: 'approve', 
             label: <span className="flex items-center text-[#049669] font-medium"><Check className="w-4 h-4 mr-2" /> Duyệt hẹn</span>, 
-            onClick: () => handleAction(record.id, 'APPROVED') 
+            onClick: () => handleAction(record.rawId || record.id, 'APPROVED') 
           });
           items.push({ 
             key: 'reject', 
             label: <span className="flex items-center text-[#ef4444] font-medium"><X className="w-4 h-4 mr-2" /> Từ chối</span>, 
-            onClick: () => handleAction(record.id, 'REJECTED') 
+            onClick: () => handleAction(record.rawId || record.id, 'REJECTED') 
           });
         } else if (record.status === 'APPROVED' && isLeaderOrAdmin) {
           items.push({ type: 'divider' });
           items.push({ 
             key: 'done', 
             label: <span className="flex items-center text-blue-600 font-medium"><CalendarCheck className="w-4 h-4 mr-2" /> Đánh dấu Tiếp xong</span>, 
-            onClick: () => handleAction(record.id, 'DONE') 
+            onClick: () => handleAction(record.rawId || record.id, 'DONE') 
           });
           items.push({ 
             key: 'cancel', 
             label: <span className="flex items-center text-[#ef4444] font-medium"><X className="w-4 h-4 mr-2" /> Hủy lịch hẹn</span>, 
-            onClick: () => handleAction(record.id, 'CANCELED') 
+            onClick: () => handleAction(record.rawId || record.id, 'CANCELED') 
           });
         }
 
