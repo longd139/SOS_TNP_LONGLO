@@ -53,6 +53,7 @@ const ReceptionKiosk = lazy(() => import('../pages-v2/kiosk/ReceptionKiosk'));
 const SatisfactionDashboard = lazy(() => import('../pages-v2/admin/SatisfactionDashboard'));
 const CounterReceptionFeedbackPage = lazy(() => import('../pages-v2/admin/CounterReceptionFeedbackPage'));
 const LeaderMeetingFeedbackPage = lazy(() => import('../pages-v2/admin/LeaderMeetingFeedbackPage'));
+const WorkSchedule = lazy(() => import('../pages/Schedules/WorkSchedule'));
 
 function RoleHome() {
   const { currentUser } = useMock();
@@ -119,6 +120,9 @@ export default function AppRoutesV2() {
         <Route path="/admin/documents/legal" element={<LegalDocs />} />
         <Route path="/admin/schedules/approve" element={<ScheduleRoleGuard><ApproveSchedule /></ScheduleRoleGuard>} />
         <Route path="/admin/schedules/add" element={<ScheduleRoleGuard><AddSchedule /></ScheduleRoleGuard>} />
+        <Route path="/schedules" element={<WorkSchedule />} />
+        <Route path="/admin/schedules" element={<WorkSchedule />} />
+        <Route path="/admin/reception-counters" element={<WorkSchedule />} />
         <Route path="/placeholder" element={<PlaceholderPage />} />
       </Route>
       <Route path="*" element={<div className="min-h-screen flex items-center justify-center bg-gray-50 text-gray-500 font-medium">404 - Không tìm thấy trang</div>} />
