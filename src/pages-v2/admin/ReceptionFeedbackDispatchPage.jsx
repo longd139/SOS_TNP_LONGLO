@@ -38,6 +38,11 @@ export default function ReceptionFeedbackDispatchPage({ title, description, queu
   const { currentUser } = useMock();
   const role = currentUser?.role || 'CITIZEN';
   const isLeaderMeeting = queue[0]?.feedbackType === 'LEADER_MEETING';
+  const isCounterOfficer = !isLeaderMeeting && [
+    'OFFICER',
+    'RECEPTION_OFFICER',
+    'PROCESSING_OFFICER',
+  ].includes(role);
   const labels = useMemo(() => (isLeaderMeeting
     ? {
       listTitle: 'Danh sách đơn đăng ký gặp lãnh đạo',
@@ -80,6 +85,7 @@ export default function ReceptionFeedbackDispatchPage({ title, description, queu
   const [statusFilter, setStatusFilter] = useState('');
   const [dateFilter, setDateFilter] = useState('');
   const [departmentFilter, setDepartmentFilter] = useState('');
+  const [listScope, setListScope] = useState('ALL');
 
   // Reject Modal state
   const [rejectModalOpen, setRejectModalOpen] = useState(false);
@@ -110,7 +116,10 @@ export default function ReceptionFeedbackDispatchPage({ title, description, queu
     try {
       const response = isLeaderMeeting
         ? await LEADER_MEETING_API.getRegistrations({ limit: 100 })
-        : await RECEPTION_API.getRegistrations({ size: 100 });
+        : await RECEPTION_API.getRegistrations({
+          size: 100,
+          scope: isCounterOfficer ? listScope : 'ALL',
+        });
       const tickets = response?.data || response || [];
       if (Array.isArray(tickets)) {
         setDbTickets(tickets);
@@ -123,7 +132,7 @@ export default function ReceptionFeedbackDispatchPage({ title, description, queu
 
   useEffect(() => {
     fetchTickets();
-  }, [isLeaderMeeting]);
+  }, [isLeaderMeeting, isCounterOfficer, listScope]);
 
   const [detailLoading, setDetailLoading] = useState(false);
 
@@ -365,7 +374,7 @@ export default function ReceptionFeedbackDispatchPage({ title, description, queu
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [search, statusFilter, dateFilter, departmentFilter]);
+  }, [search, statusFilter, dateFilter, departmentFilter, listScope]);
 
   const totalPages = Math.max(1, Math.ceil(displayItems.length / pageSize));
   const paginatedItems = useMemo(() => {
@@ -383,6 +392,37 @@ export default function ReceptionFeedbackDispatchPage({ title, description, queu
             <p className="mt-1 max-w-2xl text-sm text-gray-500">{description}</p>
           </div>
         </header>
+
+        {isCounterOfficer && (
+          <section className="mb-4 rounded-2xl border border-blue-100 bg-white p-2 shadow-sm">
+            <div className="inline-flex w-full gap-2 sm:w-auto" role="tablist" aria-label="Phạm vi đơn tiếp dân">
+              <button
+                type="button"
+                role="tab"
+                aria-selected={listScope === 'ALL'}
+                onClick={() => setListScope('ALL')}
+                className={`inline-flex flex-1 items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-colors sm:flex-none ${listScope === 'ALL'
+                  ? 'bg-blue-600 text-white shadow-sm'
+                  : 'text-gray-600 hover:bg-blue-50 hover:text-blue-700'
+                }`}
+              >
+                <ClipboardCheck size={16} /> Tất cả đơn
+              </button>
+              <button
+                type="button"
+                role="tab"
+                aria-selected={listScope === 'MY'}
+                onClick={() => setListScope('MY')}
+                className={`inline-flex flex-1 items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-colors sm:flex-none ${listScope === 'MY'
+                  ? 'bg-blue-600 text-white shadow-sm'
+                  : 'text-gray-600 hover:bg-blue-50 hover:text-blue-700'
+                }`}
+              >
+                <CheckCircle2 size={16} /> Đơn của tôi
+              </button>
+            </div>
+          </section>
+        )}
 
         {/* BỘ LỌC TÌM KIẾM & TRẠNG THÁI */}
         <section className="mb-6 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
@@ -462,7 +502,16 @@ export default function ReceptionFeedbackDispatchPage({ title, description, queu
 
         <section className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
           <div className="flex flex-wrap items-center justify-between gap-3 border-b border-gray-200 px-5 py-4">
-            <div><h2 className="font-semibold text-gray-900">{labels.listTitle}</h2><p className="mt-1 text-xs text-gray-500">{labels.listDescription}</p></div>
+            <div>
+              <h2 className="font-semibold text-gray-900">
+                {isCounterOfficer && listScope === 'MY' ? 'Đơn tiếp dân của tôi' : labels.listTitle}
+              </h2>
+              <p className="mt-1 text-xs text-gray-500">
+                {isCounterOfficer && listScope === 'MY'
+                  ? 'Các đơn bạn đã phê duyệt, hoàn thành hoặc từ chối xử lý.'
+                  : labels.listDescription}
+              </p>
+            </div>
             <span className="text-xs font-semibold text-blue-600 bg-blue-50 px-3 py-1 rounded-full border border-blue-100">{displayItems.length} đơn</span>
           </div>
           <div className="overflow-x-auto">
@@ -480,7 +529,9 @@ export default function ReceptionFeedbackDispatchPage({ title, description, queu
                 ) : paginatedItems.length === 0 ? (
                   <tr>
                     <td colSpan={7} className="py-12 text-center text-gray-400">
-                      Không tìm thấy đơn tiếp dân nào phù hợp với bộ lọc.
+                      {isCounterOfficer && listScope === 'MY'
+                        ? 'Bạn chưa xử lý đơn tiếp dân nào phù hợp với bộ lọc.'
+                        : 'Không tìm thấy đơn tiếp dân nào phù hợp với bộ lọc.'}
                     </td>
                   </tr>
                 ) : (
