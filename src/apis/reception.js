@@ -31,8 +31,8 @@ export const RECEPTION_API = {
     await apiClient.get(`/api/reception-registrations/rating-lookup/${encodeURIComponent(receptionCode)}`)
   ),
 
-  approveRegistration: async (id, department) => dataOf(
-    await apiClient.patch(`/api/reception-registrations/${id}/approve`, { department })
+  approveRegistration: async (id) => dataOf(
+    await apiClient.patch(`/api/reception-registrations/${id}/approve`, {})
   ),
 
   completeRegistration: async (id) => dataOf(

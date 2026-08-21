@@ -239,9 +239,11 @@ export default function HeaderV2({ onMobileMenuToggle, isMobileMenuOpen }) {
 
           <div className="flex items-center gap-3 pl-2 border-l border-gray-200">
             <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white text-sm font-medium">
-              {currentUser?.fullName?.charAt(0) || 'U'}
+              {(currentUser?.fullName || currentUser?.username)?.charAt(0)?.toUpperCase() || 'U'}
             </div>
-            <span className="hidden md:inline text-sm font-medium text-gray-700">{currentUser?.fullName || 'Người dùng'}</span>
+            <span className="hidden md:inline text-sm font-medium text-gray-700">
+              {currentUser?.fullName || currentUser?.username || 'Người dùng'}
+            </span>
             <button
               onClick={() => {
                 localStorage.removeItem('accessToken');

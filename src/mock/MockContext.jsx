@@ -1,7 +1,9 @@
 // ============================================================
 // MOCK CONTEXT — State management giả lập cho prototype
 // ============================================================
-import { createContext, useContext, useReducer, useCallback, useMemo } from 'react';
+import { createContext, useContext, useReducer, useCallback, useEffect, useMemo } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchMyProfile } from '../features/userProfile/userProfileThunks';
 import {
   users, complaints, neighborhoods, categories, departments,
   attachments, assignments, extensions, history,
@@ -86,8 +88,15 @@ function reducer(state, action) {
       const user = matchedUser ? { ...matchedUser, role: role === 'OFFICER' ? 'OFFICER' : matchedUser.role } : state.currentUser;
       return { ...state, currentRole: role, currentUser: user, roleLabel: getRoleLabel(role) };
     }
-    case ACTIONS.SET_CURRENT_USER:
-      return { ...state, currentUser: action.payload };
+    case ACTIONS.SET_CURRENT_USER: {
+      const user = action.payload;
+      return {
+        ...state,
+        currentRole: user.role,
+        currentUser: user,
+        roleLabel: getRoleLabel(user.role),
+      };
+    }
 
     case ACTIONS.ADD_COMPLAINT: {
       const newComplaint = action.payload;
@@ -137,6 +146,49 @@ function reducer(state, action) {
 // ---- provider ----
 export function MockProvider({ children }) {
   const [state, dispatch] = useReducer(reducer, initialState);
+  const reduxDispatch = useDispatch();
+  const authenticatedUser = useSelector((reduxState) => reduxState.auth?.user);
+  const profile = useSelector((reduxState) => reduxState.userProfile?.profile);
+  const profileLoading = useSelector((reduxState) => reduxState.userProfile?.loading);
+  const profileError = useSelector((reduxState) => reduxState.userProfile?.error);
+
+  useEffect(() => {
+    if (authenticatedUser && !profile && !profileLoading && !profileError) {
+      reduxDispatch(fetchMyProfile());
+    }
+  }, [authenticatedUser, profile, profileLoading, profileError, reduxDispatch]);
+
+  useEffect(() => {
+    if (!authenticatedUser) return;
+
+    const userId = profile?.id || authenticatedUser.userId || authenticatedUser.id;
+    const username = profile?.tenDangNhap || authenticatedUser.username;
+    const fullName =
+      profile?.hoVaTen ||
+      authenticatedUser.fullName ||
+      authenticatedUser.ho_va_ten ||
+      username ||
+      'Người dùng';
+
+    dispatch({
+      type: ACTIONS.SET_CURRENT_USER,
+      payload: {
+        ...authenticatedUser,
+        id: userId,
+        userId,
+        username,
+        tenDangNhap: username,
+        fullName,
+        ho_va_ten: fullName,
+        role: authenticatedUser.role,
+      },
+    });
+  }, [
+    authenticatedUser,
+    profile?.id,
+    profile?.tenDangNhap,
+    profile?.hoVaTen,
+  ]);
 
   const switchRole = useCallback((role) => {
     dispatch({ type: ACTIONS.SET_ROLE, payload: role });

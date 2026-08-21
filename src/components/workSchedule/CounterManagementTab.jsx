@@ -20,6 +20,8 @@ export default function CounterManagementTab({ initialDate }) {
   const { currentUser } = useMock() || {};
   const isOfficer = ["OFFICER", "RECEPTION_OFFICER", "PROCESSING_OFFICER"].includes(currentUser?.role);
   const isLeader = !isOfficer; // APPROVER, LEADER, ADMIN
+  const currentUserId = currentUser?.id || currentUser?._id || currentUser?.userId;
+  const currentUsername = currentUser?.username || currentUser?.tenDangNhap || currentUser?.ten_dang_nhap;
 
   const [subTab, setSubTab] = useState("assignment"); // "assignment" | "counters"
   const [loading, setLoading] = useState(false);
@@ -57,15 +59,39 @@ export default function CounterManagementTab({ initialDate }) {
       const [countersData, officersData, assignmentsData, schedulesData] = await Promise.all([
         RECEPTION_COUNTER_API.getCounters(),
         RECEPTION_COUNTER_API.getOfficers(),
-        RECEPTION_COUNTER_API.getAssignments(),
+        RECEPTION_COUNTER_API.getAssignments({ isActive: true }),
         RECEPTION_COUNTER_API.getSchedules({ date: selectedDate }),
       ]);
 
       const scheduleList = Array.isArray(schedulesData) ? schedulesData : [];
+      const assignmentList = Array.isArray(assignmentsData) ? assignmentsData : [];
       setCounters(Array.isArray(countersData) ? countersData : []);
       setOfficers(Array.isArray(officersData) ? officersData : []);
-      setAssignments(Array.isArray(assignmentsData) ? assignmentsData : []);
+      setAssignments(assignmentList);
       setSchedules(scheduleList);
+
+      if (isOfficer && (currentUserId || currentUsername)) {
+        const ownAssignmentDates = assignmentList
+          .filter((assignment) =>
+            assignment.officer?.id === currentUserId ||
+            assignment.officer?.username === currentUsername
+          )
+          .map((assignment) => dayjs(assignment.receptionDate).format("YYYY-MM-DD"))
+          .filter((date, index, dates) => date && dates.indexOf(date) === index)
+          .sort();
+
+        if (!ownAssignmentDates.includes(selectedDate) && ownAssignmentDates.length > 0) {
+          const today = dayjs().format("YYYY-MM-DD");
+          const nearestDate =
+            ownAssignmentDates.find((date) => date >= today) ||
+            ownAssignmentDates[ownAssignmentDates.length - 1];
+          if (nearestDate !== selectedDate) {
+            setSelectedDate(nearestDate);
+            return;
+          }
+        }
+      }
+
       const detail = scheduleList[0]?.id
         ? await RECEPTION_COUNTER_API.getScheduleDetail(scheduleList[0].id)
         : null;
@@ -87,7 +113,7 @@ export default function CounterManagementTab({ initialDate }) {
 
   useEffect(() => {
     fetchData();
-  }, [selectedDate]);
+  }, [selectedDate, currentUserId, currentUsername]);
 
   useEffect(() => {
     if (initialDate && initialDate !== selectedDate) {
@@ -141,8 +167,6 @@ export default function CounterManagementTab({ initialDate }) {
   // Find which counter the current officer is assigned to
   const myAssignedCounter = useMemo(() => {
     if (!isOfficer || !currentUser) return null;
-    const currentUserId = currentUser.id || currentUser._id || currentUser.userId;
-    const currentUsername = currentUser.username || currentUser.tenDangNhap || currentUser.ten_dang_nhap;
 
     return counters.find((c) => {
       const assignedOfficerId = counterAssignmentsMap[c.id];
@@ -154,7 +178,7 @@ export default function CounterManagementTab({ initialDate }) {
         assignedOfficer?.username === currentUsername
       );
     }) || null;
-  }, [isOfficer, currentUser, counters, counterAssignmentsMap, officers]);
+  }, [isOfficer, currentUser, currentUserId, currentUsername, counters, counterAssignmentsMap, officers]);
 
   // Handle Officer selection for a counter (Leader only)
   const handleSelectOfficer = (counterId, officerId) => {

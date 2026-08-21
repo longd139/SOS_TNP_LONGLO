@@ -639,7 +639,7 @@ export default function WorkSchedule() {
                 />
             )}
 
-            {!isOfficer && mainTab === "counters" ? (
+            {isOfficer || mainTab === "counters" ? (
                 <CounterManagementTab initialDate={counterAssignmentDate} />
             ) : (
                 <>

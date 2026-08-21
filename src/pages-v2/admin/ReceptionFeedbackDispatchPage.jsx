@@ -23,15 +23,15 @@ import {
 } from '../../components/base/TicketDetailForm';
 
 export const RECEPTION_DEPARTMENTS = [
-  { value: '', label: 'Tất cả quầy / phòng ban' },
-  { value: 'QUAY_1', label: 'Quầy 1: Hộ tịch - Tư pháp' },
-  { value: 'QUAY_2', label: 'Quầy 2: Địa chính - Xây dựng' },
-  { value: 'QUAY_3', label: 'Quầy 3: Lao động - Thương binh - Xã hội' },
-  { value: 'QUAY_4', label: 'Quầy 4: Tài chính - Kế hoạch' },
-  { value: 'QUAY_5', label: 'Quầy 5: Công an phường' },
-  { value: 'QUAY_6', label: 'Quầy 6: Bảo hiểm xã hội' },
-  { value: 'QUAY_7', label: 'Quầy 7: Đăng ký kinh doanh' },
-  { value: 'QUAY_8', label: 'Quầy 8: Tiếp nhận chung' },
+  { value: '', label: 'Tất cả quầy' },
+  { value: 'QUAY_1', label: 'Quầy 1' },
+  { value: 'QUAY_2', label: 'Quầy 2' },
+  { value: 'QUAY_3', label: 'Quầy 3' },
+  { value: 'QUAY_4', label: 'Quầy 4' },
+  { value: 'QUAY_5', label: 'Quầy 5' },
+  { value: 'QUAY_6', label: 'Quầy 6' },
+  { value: 'QUAY_7', label: 'Quầy 7' },
+  { value: 'QUAY_8', label: 'Quầy 8' },
 ];
 
 export default function ReceptionFeedbackDispatchPage({ title, description, queue, allowedRoles, eyebrow }) {
@@ -154,7 +154,7 @@ export default function ReceptionFeedbackDispatchPage({ title, description, queu
           address: d.applicant?.address || reception.address || '---',
           description: d.reason || d.workingContent || reception.description || reception.reason,
           reason: d.reason || d.workingContent || reception.reason,
-          department: d.department || reception.department || 'QUAY_1',
+          department: d.department || reception.department || null,
           office: d.location || d.schedule?.location || reception.office || d.department || 'Phòng tiếp công dân',
           leaderName: d.leader?.fullName || d.schedule?.officerName || d.approver?.name || reception.leaderName,
           leaderPosition: d.approver?.title || reception.leaderPosition,
@@ -175,12 +175,13 @@ export default function ReceptionFeedbackDispatchPage({ title, description, queu
 
   const approveReception = async (reception) => {
     const targetId = reception.rawId || reception.id || reception.receptionId;
-    const targetDept = reception.department || 'QUAY_1';
     try {
       if (isLeaderMeeting) {
         await LEADER_MEETING_API.approveRegistration(targetId);
       } else {
-        await RECEPTION_API.approveRegistration(targetId, targetDept);
+        // Backend xác định quầy từ tài khoản cán bộ và phân công trong đúng ca.
+        // Không gửi mã quầy từ giao diện để tránh gán nhầm QUAY_1.
+        await RECEPTION_API.approveRegistration(targetId);
       }
       message.success('Đã phê duyệt tiếp nhận thành công!');
       fetchTickets();
