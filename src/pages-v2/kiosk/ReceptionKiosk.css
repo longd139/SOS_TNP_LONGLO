@@ -84,7 +84,10 @@
 .reception-kiosk-comment-panel { max-width: 760px; }
 .reception-kiosk-reasons { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin: 32px auto 25px; }
 .reception-kiosk-reasons button { min-height: 48px; padding: 10px 16px; border: 1px solid var(--kiosk-line); border-radius: 12px; color: #3d536d; background: #fff; font-weight: 700; }
-.reception-kiosk-reasons button:hover, .reception-kiosk-reasons button.is-selected { border-color: var(--kiosk-blue); color: var(--kiosk-blue-strong); background: var(--kiosk-blue-soft); }
+.reception-kiosk-reasons button.is-selected { border-color: var(--kiosk-blue); color: #fff; background: var(--kiosk-blue); }
+@media (hover: hover) {
+  .reception-kiosk-reasons button:hover:not(.is-selected) { border-color: var(--kiosk-blue); color: var(--kiosk-blue-strong); background: var(--kiosk-blue-soft); }
+}
 .reception-kiosk-comment-field { display: block; text-align: left; }
 .reception-kiosk-comment-field span { display: block; margin-bottom: 8px; font-weight: 700; }
 .reception-kiosk-comment-field textarea { width: 100%; min-height: 132px; padding: 15px 16px; resize: none; border: 1px solid var(--kiosk-line); border-radius: 14px; outline: 0; color: var(--kiosk-ink); background: #fff; line-height: 1.55; }

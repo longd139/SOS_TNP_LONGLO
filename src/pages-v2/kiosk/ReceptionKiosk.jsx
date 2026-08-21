@@ -1,6 +1,11 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Check, ChevronLeft, ChevronRight, Clock3, HeartHandshake, MessageCircle, ShieldCheck, Star, UsersRound, Search } from 'lucide-react';
 import RECEPTION_API from '../../apis/reception';
+import {
+  addSuggestionToComment,
+  removeSuggestionFromComment,
+  removeSuggestionsFromComment,
+} from './receptionFeedbackComment';
 import './ReceptionKiosk.css';
 
 export const RECEPTION_FEEDBACK_STORAGE_KEY = 'sos_reception_feedback_v1';
@@ -101,7 +106,21 @@ export default function ReceptionKiosk() {
     return () => window.clearTimeout(timer);
   }, [submitted]);
 
-  const toggleReason = (reason) => setSelectedReasons((current) => current.includes(reason) ? current.filter((item) => item !== reason) : [...current, reason]);
+  const toggleReason = (reason) => {
+    const isSelected = selectedReasons.includes(reason);
+    setSelectedReasons((current) => isSelected
+      ? current.filter((item) => item !== reason)
+      : [...current, reason]);
+    setComment((current) => isSelected
+      ? removeSuggestionFromComment(current, reason)
+      : addSuggestionToComment(current, reason, commentMaxLength));
+  };
+
+  const handleOverallChange = (score) => {
+    setComment((current) => removeSuggestionsFromComment(current, selectedReasons));
+    setSelectedReasons([]);
+    setOverall(score);
+  };
 
   const handleLookup = async (e) => {
     e?.preventDefault();
@@ -150,14 +169,16 @@ export default function ReceptionKiosk() {
       const code = (activeSession?.ticketNo || activeSession?.receptionCode || receptionCode || '').trim().toUpperCase();
       const validSuggestionsForScore = backendSuggestions[overall] || backendSuggestions[String(overall)] || [];
       const safeSelectedSuggestions = selectedReasons.filter(r => validSuggestionsForScore.includes(r));
+      const citizenComment = removeSuggestionsFromComment(
+        comment,
+        safeSelectedSuggestions
+      ).trim();
 
       await RECEPTION_API.createRating({
         receptionCode: code,
         score: Number(overall) || 5,
-        selectedSuggestions: safeSelectedSuggestions.length > 0 
-          ? safeSelectedSuggestions 
-          : (validSuggestionsForScore.length > 0 ? [validSuggestionsForScore[0]] : []),
-        comment: comment ? comment.trim() : '',
+        selectedSuggestions: safeSelectedSuggestions,
+        comment: citizenComment,
       });
     } catch (error) {
       console.error("Failed to submit feedback:", error);
@@ -221,9 +242,9 @@ export default function ReceptionKiosk() {
 
       {activeSession && step === 0 && <div className="reception-kiosk-welcome"><div className="reception-kiosk-hero-icon"><UsersRound size={42} /></div><p className="reception-kiosk-eyebrow">Hồ sơ hợp lệ</p><h1>Hãy đánh giá trải nghiệm của bạn</h1><div className="reception-kiosk-active-ticket"><span>Mã tiếp dân</span><strong>{activeSession.ticketNo}</strong><div><b>{activeSession.date}</b><b>{activeSession.slot}</b></div><div className="reception-kiosk-citizen"><b>Người dân</b><span>{activeSession.fullName || 'Chưa cập nhật'}</span><b>Điện thoại</b><span>{activeSession.phone || 'Chưa cập nhật'}</span></div><p>{activeSession.topic}</p></div></div>}
 
-      {activeSession && step === 1 && <div className="reception-kiosk-panel"><p className="reception-kiosk-eyebrow">Bước 1 · Đánh giá chung</p><h1>Buổi tiếp dân hôm nay của bạn thế nào?</h1><p className="reception-kiosk-lead">Chạm vào số sao phù hợp nhất với trải nghiệm của bạn.</p><RatingStars value={overall} onChange={setOverall} label="Đánh giá chung từ 1 đến 5 sao" /><strong className="reception-kiosk-rating-label">{overall ? `${overall}/5 · ${ratingLabels[overall]}` : 'Chọn số sao để tiếp tục'}</strong></div>}
+      {activeSession && step === 1 && <div className="reception-kiosk-panel"><p className="reception-kiosk-eyebrow">Bước 1 · Đánh giá chung</p><h1>Buổi tiếp dân hôm nay của bạn thế nào?</h1><p className="reception-kiosk-lead">Chạm vào số sao phù hợp nhất với trải nghiệm của bạn.</p><RatingStars value={overall} onChange={handleOverallChange} label="Đánh giá chung từ 1 đến 5 sao" /><strong className="reception-kiosk-rating-label">{overall ? `${overall}/5 · ${ratingLabels[overall]}` : 'Chọn số sao để tiếp tục'}</strong></div>}
 
-      {activeSession && step === 2 && <div className="reception-kiosk-panel reception-kiosk-comment-panel"><p className="reception-kiosk-eyebrow">Bước 2 · Góp ý thêm</p><h1>Bạn có muốn chia sẻ thêm không?</h1><p className="reception-kiosk-lead">Gợi ý được điều chỉnh theo mức đánh giá của bạn. Nội dung góp ý là không bắt buộc.</p><div className="reception-kiosk-reasons">{suggestedReasons.map((reason) => <button key={reason} type="button" className={selectedReasons.includes(reason) ? 'is-selected' : ''} onClick={() => toggleReason(reason)}>{reason}</button>)}</div><label className="reception-kiosk-comment-field"><span>Góp ý của bạn</span><textarea maxLength={commentMaxLength} value={comment} onChange={(event) => setComment(event.target.value)} placeholder="Chia sẻ điều bạn muốn chúng tôi cải thiện..." /><small>{comment.length}/{commentMaxLength} ký tự</small></label></div>}
+      {activeSession && step === 2 && <div className="reception-kiosk-panel reception-kiosk-comment-panel"><p className="reception-kiosk-eyebrow">Bước 2 · Góp ý thêm</p><h1>Bạn có muốn chia sẻ thêm không?</h1><p className="reception-kiosk-lead">Gợi ý được điều chỉnh theo mức đánh giá của bạn. Nội dung góp ý là không bắt buộc.</p><div className="reception-kiosk-reasons">{suggestedReasons.map((reason) => <button key={reason} type="button" aria-pressed={selectedReasons.includes(reason)} className={selectedReasons.includes(reason) ? 'is-selected' : ''} onClick={() => toggleReason(reason)}>{reason}</button>)}</div><label className="reception-kiosk-comment-field"><span>Góp ý của bạn</span><textarea maxLength={commentMaxLength} value={comment} onChange={(event) => setComment(event.target.value)} placeholder="Chia sẻ điều bạn muốn chúng tôi cải thiện..." /><small>{comment.length}/{commentMaxLength} ký tự</small></label></div>}
     </section>
     
     {activeSession && <footer className="reception-kiosk-footer">
