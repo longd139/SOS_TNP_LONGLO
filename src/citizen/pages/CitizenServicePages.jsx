@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button, Card, Col, Row } from 'react-bootstrap';
 import { ArrowRight, Calendar3, CheckCircle, Clock, FileText, GeoAlt, ShieldCheck, Telephone } from 'react-bootstrap-icons';
-import { citizenReceptionSchedule, publicServices } from '../data/citizenMockDb';
+import { publicServices } from '../data/citizenMockDb';
 import { PageHero, SectionHeading } from '../components/CitizenPrimitives';
 import useScrollReveal from '../hooks/useScrollReveal';
+import RECEPTION_API from '../../apis/reception';
 
 const serviceIcons = [FileText, ShieldCheck, CheckCircle, Clock];
 
@@ -51,6 +52,40 @@ export function PublicServicesPage() {
 
 export function ReceptionSchedulePage() {
   useScrollReveal();
+  const [schedules, setSchedules] = useState([]);
+  const [loadingSchedules, setLoadingSchedules] = useState(true);
+
+  useEffect(() => {
+    let active = true;
+    RECEPTION_API.getAvailableSchedules()
+      .then((data) => {
+        if (active) setSchedules(Array.isArray(data) ? data : []);
+      })
+      .catch(() => {
+        if (active) setSchedules([]);
+      })
+      .finally(() => {
+        if (active) setLoadingSchedules(false);
+      });
+    return () => { active = false; };
+  }, []);
+
+  const displaySchedules = schedules.flatMap((schedule) => {
+    const date = new Date(`${schedule.receptionDate}T00:00:00+07:00`);
+    const day = Number.isNaN(date.getTime())
+      ? schedule.receptionDate
+      : date.toLocaleDateString('vi-VN', { weekday: 'long', day: '2-digit', month: '2-digit', year: 'numeric' });
+    return (schedule.slots || []).map((slot) => ({
+      id: `${schedule.id}-${slot.slotId || slot.timeSlot}`,
+      day,
+      time: slot.timeSlot,
+      host: schedule.officerName || 'Bộ phận tiếp công dân',
+      place: schedule.location || 'Bộ phận Một cửa',
+      status: slot.isFull ? 'Đã đầy' : `Còn ${slot.remainingCapacity} chỗ`,
+      isFull: slot.isFull,
+    }));
+  });
+
   return <>
     <section className="schedule-page">
       <div className="schedule-hero">
@@ -65,8 +100,10 @@ export function ReceptionSchedulePage() {
           <Col lg={7}>
             <h2>Lịch trong tuần</h2>
             <div className="sch-list">
-              {citizenReceptionSchedule.map((schedule) => (
-                <div key={schedule.day} className="sch-item">
+              {loadingSchedules && <p className="text-muted small">Đang tải lịch tiếp công dân...</p>}
+              {!loadingSchedules && displaySchedules.length === 0 && <p className="text-muted small">Hiện chưa có lịch tiếp công dân khả dụng trong 7 ngày tới.</p>}
+              {displaySchedules.map((schedule) => (
+                <div key={schedule.id} className="sch-item">
                   <div className="sch-day">
                     <Calendar3 size={20} />
                     <div>
@@ -80,7 +117,7 @@ export function ReceptionSchedulePage() {
                   </div>
                   <div className="sch-status">
                     <span className="sch-status-dot" />
-                    <span>Đang áp dụng</span>
+                    <span>{schedule.status}</span>
                   </div>
                 </div>
               ))}

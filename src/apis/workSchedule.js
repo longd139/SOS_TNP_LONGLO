@@ -5,7 +5,11 @@ const importWorkSchedule = async (file) => {
     const formData = new FormData();
     formData.append('file', file);
 
-    const response = await apiFormClient.post('/api/lich-tiep-dan/import', formData);
+    const response = await apiFormClient.post(
+      '/api/reception-schedules/management/import',
+      formData,
+      { params: { overwrite: true } }
+    );
 
     if (response.data.success) {
       return response.data;
@@ -39,7 +43,7 @@ const getWorkSchedules = async (
     if (date) params.append('date', date);
     if (typeof isActive === 'boolean') params.append('isActive', isActive);
 
-    const response = await apiFormClient.get('/api/lich-tiep-dan', { params });
+    const response = await apiFormClient.get('/api/reception-schedules/management', { params });
 
     if (response.data.success) {
       return response.data.data;
@@ -56,7 +60,7 @@ const getWorkSchedules = async (
 
 const updateWorkScheduleStatus = async (scheduleId, isActive) => {
   try {
-    const response = await apiFormClient.put(`/api/lich-tiep-dan/update-status/${scheduleId}`, { isActive });
+    const response = await apiFormClient.put(`/api/reception-schedules/management/${scheduleId}/status`, { isActive });
     if (response.data.success) {
       return response.data.data;
     } else {
@@ -72,7 +76,7 @@ const updateWorkScheduleStatus = async (scheduleId, isActive) => {
 
 const deleteWorkSchedule = async (scheduleId) => {
   try {
-    const response = await apiFormClient.delete(`/api/lich-tiep-dan/${scheduleId}`);
+    const response = await apiFormClient.delete(`/api/reception-schedules/management/${scheduleId}`);
     if (response.data.success) {
       return response.data.data;
     } else {
@@ -88,7 +92,7 @@ const deleteWorkSchedule = async (scheduleId) => {
 
 const getTemplateWorkSchedule = async () => {
   try {
-    const response = await apiFormClient.get('/api/lich-tiep-dan/template');
+    const response = await apiFormClient.get('/api/reception-schedules/management/template');
     if (response.data.success) {
       return response.data;
     } else {
@@ -104,7 +108,7 @@ const getTemplateWorkSchedule = async () => {
 
 const getWorkScheduleById = async (scheduleId) => {
   try {
-    const response = await apiFormClient.get(`/api/lich-tiep-dan/${scheduleId}`);
+    const response = await apiFormClient.get(`/api/reception-schedules/management/${scheduleId}`);
     if (response.data.success) {
       return response.data.data;
     }
@@ -121,7 +125,7 @@ const getWorkScheduleById = async (scheduleId) => {
 
 const updateWorkSchedule = async (scheduleId, scheduleData) => {
   try {
-    const response = await apiFormClient.put(`/api/lich-tiep-dan/${scheduleId}`, scheduleData);
+    const response = await apiFormClient.put(`/api/reception-schedules/management/${scheduleId}`, scheduleData);
     if (response.data.success) {
       return response.data.data;
     } else {
@@ -137,7 +141,7 @@ const updateWorkSchedule = async (scheduleId, scheduleData) => {
 
 const createWorkSchedule = async (scheduleData) => {
   try {
-    const response = await apiFormClient.post('/api/lich-tiep-dan', scheduleData);
+    const response = await apiFormClient.post('/api/reception-schedules/management', scheduleData);
     if (response.data.success) {
       return response.data.data;
     } else {
@@ -169,7 +173,7 @@ const getWorkSchedulesPagination = async (
     if (date) params.append('date', date);
     if (typeof isActive === 'boolean') params.append('isActive', isActive);
 
-    const response = await apiFormClient.get('/api/lich-tiep-dan/pagination', { params });
+    const response = await apiFormClient.get('/api/reception-schedules/management/pagination', { params });
 
     if (response.data.success) {
       return response.data;
@@ -194,7 +198,7 @@ const countWorkSchedules = async (
     if (weekYear) params.append('weekYear', weekYear);
     if (monthYear) params.append('monthYear', monthYear);
     if (date) params.append('date', date);
-    const response = await apiFormClient.get('/api/lich-tiep-dan/count', { params });
+    const response = await apiFormClient.get('/api/reception-schedules/management/count', { params });
 
     if (response.data.success) {
       return response.data.data;

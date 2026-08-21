@@ -75,6 +75,15 @@ export default function MonthCalendar({
         );
     };
 
+    const isPastDay = (dayOrDate) => {
+        if (!dayOrDate) return false;
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const date = new Date(dayOrDate);
+        date.setHours(0, 0, 0, 0);
+        return date < today;
+    };
+
     const isSelected = (dayOrDate) => {
         if (!dayOrDate || !selectedDate) return false;
         const dateStr = getDateString(dayOrDate);
@@ -269,6 +278,7 @@ export default function MonthCalendar({
                     const hasSchedule = (day && hasScheduleForDay?.(dateStr)) || (day && hasScheduleForDay?.(day.getDate())) || false;
                     const isTodayDay = isToday(day);
                     const isSelectedDay = isSelected(day);
+                    const isPastScheduleDay = hasSchedule && isPastDay(day);
 
                     return (
                         <div
@@ -277,7 +287,9 @@ export default function MonthCalendar({
                             className={`
                 aspect-square flex items-center justify-center text-xs md:text-sm rounded-md md:rounded-lg
                 ${!day ? "invisible" : "cursor-pointer"}
-                ${hasSchedule
+                ${isPastScheduleDay
+                                    ? "bg-amber-200 text-amber-900 font-bold shadow-sm hover:bg-amber-300"
+                                    : hasSchedule
                                     ? "bg-blue-600 text-white font-bold shadow-sm hover:bg-blue-700"
                                     : "text-gray-700 hover:bg-gray-100"
                                 }

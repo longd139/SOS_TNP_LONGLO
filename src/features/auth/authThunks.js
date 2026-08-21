@@ -3,6 +3,7 @@ import { jwtDecode } from 'jwt-decode';
 import { AUTH_API } from '../../apis/auth';
 import { validateAuth } from '../../validator/loginValidator';
 import { showToast } from '../../utils/toastNotification';
+import { resolveAppRole } from './authRole';
 
 const decodeToken = (token) => {
     try {
@@ -116,7 +117,7 @@ export const loginUser = createAsyncThunk(
             const decoded = decodeToken(response.access_token);
             storeTokens(response.access_token, response.refresh_token);
 
-            const role = decoded?.role || (credentials.tenDangNhap === 'canbo' ? 'OFFICER' : credentials.tenDangNhap === 'lanhdao' ? 'LEADER' : 'ADMIN');
+            const role = resolveAppRole(decoded, 'CITIZEN');
             localStorage.setItem('currentUserRole', role);
             localStorage.setItem('currentUserId', decoded?.userId || decoded?.id || 'USR-001');
 
@@ -193,7 +194,7 @@ export const loginUserWithCaptcha = createAsyncThunk(
             const decoded = decodeToken(response.access_token);
             storeTokens(response.access_token, response.refresh_token);
 
-            const role = decoded?.role || (credentials.tenDangNhap === 'canbo' ? 'OFFICER' : credentials.tenDangNhap === 'lanhdao' ? 'LEADER' : 'ADMIN');
+            const role = resolveAppRole(decoded, 'CITIZEN');
             localStorage.setItem('currentUserRole', role);
             localStorage.setItem('currentUserId', decoded?.userId || decoded?.id || 'USR-001');
 
@@ -249,7 +250,7 @@ export const verifyOtpUser = createAsyncThunk(
                 user: {
                     userId: decoded.userId,
                     username: decoded.username,
-                    role: decoded.role,
+                    role: resolveAppRole(decoded, 'CITIZEN'),
                     email: decoded.email,
                     permissions: decoded.permissions || [],
                 },

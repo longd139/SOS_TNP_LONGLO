@@ -1,4 +1,4 @@
-import apiClient from '../utils/apiClient';
+import apiClient, { apiFormClient } from '../utils/apiClient';
 
 export const LEADER_MEETING_API = {
   // 1. Quản lý lịch gặp lãnh đạo (Schedules)
@@ -28,6 +28,11 @@ export const LEADER_MEETING_API = {
     return response.data;
   },
 
+  updateSchedule: async (id, data) => {
+    const response = await apiClient.put(`/api/leader-meeting-schedules/management/${id}`, data);
+    return response.data;
+  },
+
   deleteSchedule: async (id) => {
     const response = await apiClient.delete(`/api/leader-meeting-schedules/management/${id}`);
     return response.data;
@@ -45,35 +50,46 @@ export const LEADER_MEETING_API = {
   },
 
   createRegistration: async (formData) => {
-    const response = await apiClient.post('/api/leader-meeting-registrations', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' }
-    });
+    const response = await apiFormClient.post('/api/leader-meeting-registrations', formData);
+    return response.data;
+  },
+
+  lookupRegistration: async (data) => {
+    const response = await apiClient.post('/api/leader-meeting-registrations/lookup', data);
     return response.data;
   },
 
   approveRegistration: async (id, data = {}) => {
-    const response = await apiClient.put(`/api/leader-meeting-registrations/${id}/approve`, data);
+    const response = await apiClient.patch(`/api/leader-meeting-registrations/${id}/approve`, data);
     return response.data;
   },
 
   rejectRegistration: async (id, reason) => {
-    const response = await apiClient.put(`/api/leader-meeting-registrations/${id}/reject`, { reason });
+    const response = await apiClient.patch(`/api/leader-meeting-registrations/${id}/reject`, { reason });
     return response.data;
   },
 
-  processRegistration: async (id) => {
-    const response = await apiClient.put(`/api/leader-meeting-registrations/${id}/process`);
+  processRegistration: async (id, note = '') => {
+    const response = await apiClient.patch(`/api/leader-meeting-registrations/${id}/process`, { note });
     return response.data;
   },
 
-  completeRegistration: async (id, result = '') => {
-    const response = await apiClient.put(`/api/leader-meeting-registrations/${id}/complete`, { result });
+  completeRegistration: async (id, note = '') => {
+    const response = await apiClient.patch(`/api/leader-meeting-registrations/${id}/complete`, { note });
     return response.data;
   },
 
   cancelRegistration: async (id, reason) => {
-    const response = await apiClient.put(`/api/leader-meeting-registrations/${id}/cancel`, { reason });
+    const response = await apiClient.patch(`/api/leader-meeting-registrations/${id}/cancel`, { reason });
     return response.data;
+  },
+
+  getRegistrationAttachment: async (id, attachmentId, download = false) => {
+    const response = await apiClient.get(
+      `/api/leader-meeting-registrations/${id}/attachments/${attachmentId}`,
+      { params: { download }, responseType: 'blob' }
+    );
+    return response;
   },
 
   // 3. Đánh giá gặp lãnh đạo (Ratings)
@@ -89,6 +105,11 @@ export const LEADER_MEETING_API = {
 
   getRatingConfiguration: async () => {
     const response = await apiClient.get('/api/leader-meeting-ratings/configuration');
+    return response.data;
+  },
+
+  getRatingDetail: async (id) => {
+    const response = await apiClient.get(`/api/leader-meeting-ratings/${id}`);
     return response.data;
   },
 

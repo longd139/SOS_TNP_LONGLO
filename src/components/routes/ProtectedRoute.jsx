@@ -3,7 +3,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { isPathDisabled, getDefaultEnabledRoute } from '../../utils/routeRedirectUtils';
 import ROUTE_PATH from '../../constants/routes';
 
-const ProtectedRoute = ({ children }) => {
+const ProtectedRoute = ({ children, loginPath = ROUTE_PATH.LOGIN }) => {
     const { auth, isLoading } = useAuth();
     const location = useLocation();
 
@@ -23,7 +23,7 @@ const ProtectedRoute = ({ children }) => {
     }
 
     if (!auth.isAuthenticated) {
-        return <Navigate to={ROUTE_PATH.LOGIN} state={{ from: location }} replace />;
+        return <Navigate to={loginPath} state={{ from: location }} replace />;
     }
 
     // if (requiredRole) {

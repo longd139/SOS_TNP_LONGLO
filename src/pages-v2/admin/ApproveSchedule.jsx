@@ -38,7 +38,7 @@ export default function ApproveSchedule() {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const res = await LEADER_MEETING_API.getRegistrations({ size: 100 });
+      const res = await LEADER_MEETING_API.getRegistrations({ limit: 100 });
       const list = res.data?.data || res.data || [];
       const arrayList = Array.isArray(list) ? list : [];
       const formatted = arrayList.map(item => {
@@ -158,6 +158,28 @@ export default function ApproveSchedule() {
     setIsModalOpen(true);
   };
 
+  const openAttachment = async (attachment, download = false) => {
+    try {
+      const registrationId = selectedTicket?.rawId;
+      if (!registrationId || !attachment?.id) return;
+      const response = await LEADER_MEETING_API.getRegistrationAttachment(
+        registrationId,
+        attachment.id,
+        download
+      );
+      const url = window.URL.createObjectURL(response.data);
+      const anchor = document.createElement('a');
+      anchor.href = url;
+      anchor.target = download ? '_self' : '_blank';
+      anchor.rel = 'noopener noreferrer';
+      if (download) anchor.download = attachment.originalName || 'tai-lieu-dinh-kem';
+      anchor.click();
+      window.setTimeout(() => window.URL.revokeObjectURL(url), 1000);
+    } catch (error) {
+      message.error(error.response?.data?.message || 'Không thể mở tài liệu đính kèm');
+    }
+  };
+
   const columns = [
     {
       title: 'Mã phiếu',
@@ -267,14 +289,21 @@ export default function ApproveSchedule() {
         } else if (record.status === 'APPROVED' && isLeaderOrAdmin) {
           items.push({ type: 'divider' });
           items.push({ 
-            key: 'done', 
-            label: <span className="flex items-center text-blue-600 font-medium"><CalendarCheck className="w-4 h-4 mr-2" /> Đánh dấu Tiếp xong</span>, 
-            onClick: () => handleAction(record.rawId || record.id, 'DONE') 
+            key: 'process',
+            label: <span className="flex items-center text-blue-600 font-medium"><CalendarCheck className="w-4 h-4 mr-2" /> Bắt đầu buổi gặp</span>,
+            onClick: () => handleAction(record.rawId || record.id, 'PROCESSING')
           });
           items.push({ 
             key: 'cancel', 
             label: <span className="flex items-center text-[#ef4444] font-medium"><X className="w-4 h-4 mr-2" /> Hủy lịch hẹn</span>, 
             onClick: () => handleAction(record.rawId || record.id, 'CANCELED') 
+          });
+        } else if (record.status === 'IN_PROGRESS' && isLeaderOrAdmin) {
+          items.push({ type: 'divider' });
+          items.push({
+            key: 'done',
+            label: <span className="flex items-center text-blue-600 font-medium"><CalendarCheck className="w-4 h-4 mr-2" /> Đánh dấu Tiếp xong</span>,
+            onClick: () => handleAction(record.rawId || record.id, 'DONE')
           });
         }
 
@@ -292,6 +321,7 @@ export default function ApproveSchedule() {
   const safeData = Array.isArray(data) ? data : [];
   const pendingCount = safeData.filter(d => d.status === 'PENDING').length;
   const approvedCount = safeData.filter(d => d.status === 'APPROVED').length;
+  const processingCount = safeData.filter(d => d.status === 'IN_PROGRESS').length;
   const doneCount = safeData.filter(d => d.status === 'DONE').length;
   const rejectedCount = safeData.filter(d => d.status === 'REJECTED').length;
   const canceledCount = safeData.filter(d => d.status === 'CANCELED').length;
@@ -320,6 +350,11 @@ export default function ApproveSchedule() {
         {selectedTicket?.status === 'APPROVED' && (
           <span className="border border-blue-300 text-blue-600 text-[12px] font-medium px-3 py-1 rounded-full bg-blue-50 shadow-sm">
             Đã duyệt
+          </span>
+        )}
+        {selectedTicket?.status === 'IN_PROGRESS' && (
+          <span className="border border-violet-300 text-violet-600 text-[12px] font-medium px-3 py-1 rounded-full bg-violet-50 shadow-sm">
+            Đang tiếp
           </span>
         )}
         {selectedTicket?.status === 'DONE' && (
@@ -364,6 +399,7 @@ export default function ApproveSchedule() {
           {[
             { key: 'PENDING',  label: 'Chờ duyệt',      count: pendingCount },
             { key: 'APPROVED', label: 'Đã duyệt',       count: approvedCount },
+            { key: 'IN_PROGRESS', label: 'Đang tiếp',   count: processingCount },
             { key: 'DONE',     label: 'Đã tiếp xong',   count: doneCount },
             { key: 'REJECTED', label: 'Từ chối',        count: rejectedCount },
             { key: 'CANCELED', label: 'Đã hủy',         count: canceledCount },
@@ -473,6 +509,26 @@ export default function ApproveSchedule() {
                 </p>
               </div>
             </div>
+
+            {selectedTicket.attachments?.length > 0 && (
+              <div className="pt-1">
+                <h4 className="text-[12px] font-bold text-gray-400 mb-2 uppercase tracking-wide">TÀI LIỆU ĐÍNH KÈM</h4>
+                <div className="space-y-2">
+                  {selectedTicket.attachments.map((attachment) => (
+                    <div key={attachment.id} className="flex items-center justify-between gap-3 rounded-xl border border-gray-200 bg-white p-3">
+                      <span className="flex min-w-0 items-center gap-2 text-[13px] font-medium text-gray-700">
+                        <Paperclip className="h-4 w-4 shrink-0 text-blue-500" />
+                        <span className="truncate">{attachment.originalName || 'Tài liệu đính kèm'}</span>
+                      </span>
+                      <span className="flex shrink-0 gap-2">
+                        <Button size="small" onClick={() => openAttachment(attachment, false)}>Xem</Button>
+                        {attachment.canDownload && <Button size="small" onClick={() => openAttachment(attachment, true)}>Tải xuống</Button>}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* GHI CHÚ TỪ CHỐI / HỦY (NẾU CÓ) */}
             {selectedTicket.note && (selectedTicket.status === 'REJECTED' || selectedTicket.status === 'CANCELED') && (

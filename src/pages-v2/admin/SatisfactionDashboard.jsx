@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { Star, TrendingUp, Users, MessageSquare, Search, Filter, Calendar, Award, Eye, CheckCircle2, ChevronLeft, ChevronRight } from 'lucide-react';
 import { message, Modal } from 'antd';
-import apiClient from '../../utils/apiClient';
+import RECEPTION_API from '../../apis/reception';
 import { DetailField, DetailGrid, DetailSection, TicketDetailContent, TicketDetailModal } from '../../components/base/TicketDetailForm';
 import './SatisfactionDashboard.css';
 
@@ -50,10 +50,8 @@ export default function SatisfactionDashboard() {
       if (fromDate) params.fromDate = fromDate;
       if (toDate) params.toDate = toDate;
 
-      const res = await apiClient.get('/api/reception-ratings/statistics', { params });
-      if (res.data?.success && res.data?.data) {
-        setStats(res.data.data);
-      }
+      const data = await RECEPTION_API.getRatingStatistics(params);
+      if (data) setStats(data);
     } catch (err) {
       console.error('Failed to fetch rating stats', err);
     } finally {
@@ -75,11 +73,11 @@ export default function SatisfactionDashboard() {
       if (fromDate) params.fromDate = fromDate;
       if (toDate) params.toDate = toDate;
 
-      const res = await apiClient.get('/api/reception-ratings', { params });
-      if (res.data?.success) {
-        setRatings(res.data.data || []);
-        if (res.data.pagination) {
-          setPagination(res.data.pagination);
+      const response = await RECEPTION_API.getRatings(params);
+      if (response?.success) {
+        setRatings(response.data || []);
+        if (response.pagination) {
+          setPagination(response.pagination);
         }
       }
     } catch (err) {
@@ -101,10 +99,8 @@ export default function SatisfactionDashboard() {
     setRatingDetail(null);
     try {
       setDetailLoading(true);
-      const res = await apiClient.get(`/api/reception-ratings/${id}`);
-      if (res.data?.success && res.data?.data) {
-        setRatingDetail(res.data.data);
-      }
+      const data = await RECEPTION_API.getRatingDetail(id);
+      if (data) setRatingDetail(data);
     } catch (err) {
       console.error('Failed to fetch rating detail', err);
       message.error('Lỗi khi tải chi tiết đánh giá');

@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import { Download, Upload, Plus, RotateCcw, Calendar as CalendarIcon, Users, UserCheck } from "lucide-react";
+import { FileSpreadsheet, Plus, RotateCcw, Calendar as CalendarIcon, Users } from "lucide-react";
 import { showToast } from "../../utils/toastNotification";
 import { ConfirmModal } from "../../components/base/BaseModal";
 import { useSchedule } from "../../hooks/useSchedule";
@@ -7,11 +7,11 @@ import MonthCalendar from "../../components/workSchedule/MonthCalendar";
 import ScheduleList from "../../components/workSchedule/ScheduleList";
 import WorkScheduleModal from "../../components/workSchedule/WorkScheduleModal";
 import CounterManagementTab from "../../components/workSchedule/CounterManagementTab";
+import ScheduleImportPanel from "../../components/workSchedule/ScheduleImportPanel";
 import { usePermission } from "../../hooks/usePermission";
 import { PermissionHidden } from "../../components/PermissionGuard";
 import { useMock } from "../../mock/MockContext";
 import dayjs from "dayjs";
-import { validateFileImport } from "../../validator/fileValidator";
 import { downloadUtils } from "../../utils/downLoadUtils";
 import { WORK_SCHEDULE_API } from "../../apis/workSchedule";
 import { normalizeDate } from "../../utils/dateUtils";
@@ -62,6 +62,13 @@ export default function WorkSchedule() {
     const [currentPage, setCurrentPage] = useState(1);
     const [isFetching, setIsFetching] = useState(false);
     const [monthSchedulesRaw, setMonthSchedulesRaw] = useState([]);
+    const [showImportPanel, setShowImportPanel] = useState(false);
+    const [isDownloadingTemplate, setIsDownloadingTemplate] = useState(false);
+    const [isImportingSchedule, setIsImportingSchedule] = useState(false);
+    const [importResult, setImportResult] = useState(null);
+    const [counterAssignmentDate, setCounterAssignmentDate] = useState(
+        dayjs().format("YYYY-MM-DD")
+    );
 
     const pageSize = 10;
 
@@ -264,6 +271,7 @@ export default function WorkSchedule() {
     };
 
     const handleDownload = async () => {
+        setIsDownloadingTemplate(true);
         try {
             const result = await getTemplate();
             if (result.success) {
@@ -276,46 +284,61 @@ export default function WorkSchedule() {
             }
         } catch (error) {
             showToast.error("Có lỗi xảy ra khi tải template lịch tiếp dân.");
+        } finally {
+            setIsDownloadingTemplate(false);
         }
     };
 
-    const handleImport = async () => {
-        const input = document.createElement("input");
-        input.type = "file";
-        input.accept = ".xlsx,.xls,.csv";
-        input.onchange = async (event) => {
-            const file = event.target.files[0];
-            if (!file) return;
+    const handleImport = async (file) => {
+        if (!file) return false;
 
-            const validation = await validateFileImport({ file });
-            if (!validation.valid) {
-                showToast.error(validation.errors.file);
-                return;
-            }
+        setIsImportingSchedule(true);
+        setImportResult(null);
 
-                try {
-                showToast.info(`Đang import file ${file.name}...`);
-                const result = await importSchedule(file);
-                if (result.success) {
-                    const monthYear = `${selectedMonth}/${selectedYear}`;
-                    showToast.success(result.data?.message || "Import lịch tiếp dân thành công!");
-                    setCurrentPage(1);
-                    setActiveFilter("all");
-                    setSelectedDate(null);
-                    await fetchAllSchedulesData(monthYear);
-                } else {
-                    showToast.error(
-                        result.error ||
-                        "Import lịch tiếp dân thất bại. Vui lòng kiểm tra định dạng file."
-                    );
+        try {
+            const result = await importSchedule(file);
+            if (result.success) {
+                const response = result.data || {};
+                const stats = response.data || response;
+                const message = response.message || "Import lịch tiếp dân thành công!";
+
+                setImportResult({ success: true, message, stats });
+                if (stats.dateFrom) {
+                    setCounterAssignmentDate(stats.dateFrom);
                 }
-            } catch (error) {
-                showToast.error(
-                    "Có lỗi xảy ra khi import. Vui lòng thử lại hoặc kiểm tra định dạng file."
-                );
+                showToast.success(message);
+                setCurrentPage(1);
+                setActiveFilter("all");
+                setSelectedDate(null);
+
+                const [importedYear, importedMonth] = String(stats.dateFrom || "")
+                    .split("-")
+                    .map(Number);
+                if (
+                    importedYear &&
+                    importedMonth &&
+                    (importedMonth !== selectedMonth || importedYear !== selectedYear)
+                ) {
+                    setSelectedMonth(importedMonth);
+                    setSelectedYear(importedYear);
+                } else {
+                    await fetchAllSchedulesData(`${selectedMonth}/${selectedYear}`);
+                }
+                return true;
             }
-        };
-        input.click();
+
+            const message = result.error || "Import lịch tiếp dân thất bại. Vui lòng kiểm tra dữ liệu trong file.";
+            setImportResult({ success: false, message });
+            showToast.error(message);
+            return false;
+        } catch (error) {
+            const message = error.message || "Có lỗi xảy ra khi import. Vui lòng thử lại hoặc kiểm tra dữ liệu trong file.";
+            setImportResult({ success: false, message });
+            showToast.error(message);
+            return false;
+        } finally {
+            setIsImportingSchedule(false);
+        }
     };
 
     const handleAddSchedule = () => {
@@ -545,26 +568,21 @@ export default function WorkSchedule() {
 
                 {!isOfficer && mainTab === "schedules" && (
                     <div className="flex gap-2 md:gap-3 flex-wrap">
-                        <PermissionHidden modulePrefix="LTD" action="CREATE">
-                            <button
-                                onClick={handleDownload}
-                                className="px-3 md:px-4 py-2 bg-white border border-gray-300 text-gray-700 text-sm md:text-base rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center justify-center gap-2 shadow-2xs"
-                            >
-                                <Download className="w-4 h-4" />
-                                <span className="hidden sm:inline">Download Template</span>
-                                <span className="sm:hidden">Excel</span>
-                            </button>
-                        </PermissionHidden>
-                        <PermissionHidden modulePrefix="LTD" action="CREATE">
-                            <button
-                                onClick={handleImport}
-                                className="px-3 md:px-4 py-2 bg-white border border-gray-300 text-gray-700 text-sm md:text-base rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center justify-center gap-2 shadow-2xs"
-                            >
-                                <Upload className="w-4 h-4" />
-                                <span className="hidden sm:inline">Import</span>
-                                <span className="sm:hidden">Import</span>
-                            </button>
-                        </PermissionHidden>
+                        <button
+                            onClick={() => {
+                                setShowImportPanel((value) => !value);
+                                setImportResult(null);
+                            }}
+                            className={`px-3 md:px-4 py-2 border text-sm md:text-base rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center justify-center gap-2 shadow-2xs transition ${
+                                showImportPanel
+                                    ? "border-blue-200 bg-blue-50 text-blue-700"
+                                    : "border-gray-300 bg-white text-gray-700 hover:bg-gray-50"
+                            }`}
+                        >
+                            <FileSpreadsheet className="w-4 h-4" />
+                            <span className="hidden sm:inline">Import lịch Excel</span>
+                            <span className="sm:hidden">Import</span>
+                        </button>
                         <PermissionHidden modulePrefix="LTD" action="CREATE">
                             <button
                                 onClick={handleAddSchedule}
@@ -592,7 +610,7 @@ export default function WorkSchedule() {
                         }`}
                     >
                         <CalendarIcon size={16} />
-                        <span>Lịch Tiếp dân & Import Excel</span>
+                        <span>Lịch tiếp dân</span>
                     </button>
 
                     <button
@@ -610,8 +628,19 @@ export default function WorkSchedule() {
                 </div>
             )}
 
+            {!isOfficer && mainTab === "schedules" && showImportPanel && (
+                <ScheduleImportPanel
+                    onClose={() => setShowImportPanel(false)}
+                    onDownloadTemplate={handleDownload}
+                    onImport={handleImport}
+                    isDownloading={isDownloadingTemplate}
+                    isImporting={isImportingSchedule}
+                    result={importResult}
+                />
+            )}
+
             {!isOfficer && mainTab === "counters" ? (
-                <CounterManagementTab />
+                <CounterManagementTab initialDate={counterAssignmentDate} />
             ) : (
                 <>
                     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3 md:p-4 mb-4">

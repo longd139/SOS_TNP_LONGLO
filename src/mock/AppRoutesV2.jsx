@@ -9,6 +9,7 @@ import CitizenLayout from '../citizen/CitizenLayout';
 import RegisterLeaderMeeting from '../pages-v2/citizen/RegisterLeaderMeeting';
 import AuthLayout from '../layouts/AuthLayout';
 import Login from '../pages/Auth/Login';
+import ProtectedRoute from '../components/routes/ProtectedRoute';
 import DashboardOverview from '../pages-v2/dashboard/DashboardOverview';
 import PlaceholderPage from '../pages-v2/PlaceholderPage';
 import AddSchedule from '../pages-v2/admin/AddSchedule';
@@ -103,7 +104,7 @@ export default function AppRoutesV2() {
         <Route path="/admin/login" element={<Login />} />
         <Route path="/auth/login" element={<Login />} />
       </Route>
-      <Route element={<AdminLayoutV2 />}>
+      <Route element={<ProtectedRoute loginPath="/login"><AdminLayoutV2 /></ProtectedRoute>}>
         <Route path="/dashboard" element={<DashboardOverview />} />
         <Route path="/dashboard/neighborhood" element={<Navigate to="/dashboard" replace />} />
         <Route path="/dashboard/large-screen" element={<DashboardLargeScreen />} />

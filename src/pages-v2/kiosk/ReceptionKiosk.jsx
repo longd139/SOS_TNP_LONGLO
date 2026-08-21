@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Check, ChevronLeft, ChevronRight, Clock3, HeartHandshake, MessageCircle, ShieldCheck, Star, UsersRound, Search } from 'lucide-react';
-import apiClient from '../../utils/apiClient';
+import RECEPTION_API from '../../apis/reception';
 import './ReceptionKiosk.css';
 
 export const RECEPTION_FEEDBACK_STORAGE_KEY = 'sos_reception_feedback_v1';
@@ -44,6 +44,7 @@ export default function ReceptionKiosk() {
   const [receptionCode, setReceptionCode] = useState('');
   const [isLookingUp, setIsLookingUp] = useState(false);
   const [lookupError, setLookupError] = useState('');
+  const [commentMaxLength, setCommentMaxLength] = useState(2000);
 
   // Config states
   const [backendSuggestions, setBackendSuggestions] = useState({
@@ -58,11 +59,13 @@ export default function ReceptionKiosk() {
 
   useEffect(() => {
     // Fetch dynamic criteria configuration
-    apiClient.get('/api/reception-ratings/configuration')
-      .then(res => {
-        const payload = res.data?.data || res.data;
+    RECEPTION_API.getRatingConfiguration()
+      .then(payload => {
         if (payload?.suggestionsByScore) {
           setBackendSuggestions(payload.suggestionsByScore);
+        }
+        if (Number.isInteger(payload?.commentMaxLength)) {
+          setCommentMaxLength(payload.commentMaxLength);
         }
       })
       .catch(err => {
@@ -108,8 +111,7 @@ export default function ReceptionKiosk() {
     setLookupError('');
     
     try {
-      const res = await apiClient.get(`/api/reception-registrations/rating-lookup/${encodeURIComponent(receptionCode.trim())}`);
-      const data = res.data?.data || res.data;
+      const data = await RECEPTION_API.lookupRegistrationForRating(receptionCode.trim());
       
       const formatDate = (d) => {
         if (!d) return '';
@@ -149,7 +151,7 @@ export default function ReceptionKiosk() {
       const validSuggestionsForScore = backendSuggestions[overall] || backendSuggestions[String(overall)] || [];
       const safeSelectedSuggestions = selectedReasons.filter(r => validSuggestionsForScore.includes(r));
 
-      await apiClient.post('/api/reception-ratings', {
+      await RECEPTION_API.createRating({
         receptionCode: code,
         score: Number(overall) || 5,
         selectedSuggestions: safeSelectedSuggestions.length > 0 
@@ -221,7 +223,7 @@ export default function ReceptionKiosk() {
 
       {activeSession && step === 1 && <div className="reception-kiosk-panel"><p className="reception-kiosk-eyebrow">Bước 1 · Đánh giá chung</p><h1>Buổi tiếp dân hôm nay của bạn thế nào?</h1><p className="reception-kiosk-lead">Chạm vào số sao phù hợp nhất với trải nghiệm của bạn.</p><RatingStars value={overall} onChange={setOverall} label="Đánh giá chung từ 1 đến 5 sao" /><strong className="reception-kiosk-rating-label">{overall ? `${overall}/5 · ${ratingLabels[overall]}` : 'Chọn số sao để tiếp tục'}</strong></div>}
 
-      {activeSession && step === 2 && <div className="reception-kiosk-panel reception-kiosk-comment-panel"><p className="reception-kiosk-eyebrow">Bước 2 · Góp ý thêm</p><h1>Bạn có muốn chia sẻ thêm không?</h1><p className="reception-kiosk-lead">Gợi ý được điều chỉnh theo mức đánh giá của bạn. Nội dung góp ý là không bắt buộc.</p><div className="reception-kiosk-reasons">{suggestedReasons.map((reason) => <button key={reason} type="button" className={selectedReasons.includes(reason) ? 'is-selected' : ''} onClick={() => toggleReason(reason)}>{reason}</button>)}</div><label className="reception-kiosk-comment-field"><span>Góp ý của bạn</span><textarea maxLength={500} value={comment} onChange={(event) => setComment(event.target.value)} placeholder="Chia sẻ điều bạn muốn chúng tôi cải thiện..." /><small>{comment.length}/500 ký tự</small></label></div>}
+      {activeSession && step === 2 && <div className="reception-kiosk-panel reception-kiosk-comment-panel"><p className="reception-kiosk-eyebrow">Bước 2 · Góp ý thêm</p><h1>Bạn có muốn chia sẻ thêm không?</h1><p className="reception-kiosk-lead">Gợi ý được điều chỉnh theo mức đánh giá của bạn. Nội dung góp ý là không bắt buộc.</p><div className="reception-kiosk-reasons">{suggestedReasons.map((reason) => <button key={reason} type="button" className={selectedReasons.includes(reason) ? 'is-selected' : ''} onClick={() => toggleReason(reason)}>{reason}</button>)}</div><label className="reception-kiosk-comment-field"><span>Góp ý của bạn</span><textarea maxLength={commentMaxLength} value={comment} onChange={(event) => setComment(event.target.value)} placeholder="Chia sẻ điều bạn muốn chúng tôi cải thiện..." /><small>{comment.length}/{commentMaxLength} ký tự</small></label></div>}
     </section>
     
     {activeSession && <footer className="reception-kiosk-footer">

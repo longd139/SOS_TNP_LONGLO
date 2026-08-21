@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from "react";
 import { Users, Building2, Save, Calendar, Clock, Edit3, CheckCircle2, AlertCircle, RefreshCw, Power, UserCheck, ShieldCheck } from "lucide-react";
 import { Modal, message, Spin, Switch } from "antd";
 import { RECEPTION_COUNTER_API } from "../../apis/receptionCounter";
+import { getSelectableReceptionOfficers } from "../../apis/receptionOfficerMapper";
 import { useMock } from "../../mock/MockContext";
 import dayjs from "dayjs";
 
@@ -13,10 +14,9 @@ const DEFAULT_TIME_SLOTS = [
   "13:30 - 14:30",
   "14:30 - 15:30",
   "15:30 - 16:30",
-  "16:30 - 17:30",
 ];
 
-export default function CounterManagementTab() {
+export default function CounterManagementTab({ initialDate }) {
   const { currentUser } = useMock() || {};
   const isOfficer = ["OFFICER", "RECEPTION_OFFICER", "PROCESSING_OFFICER"].includes(currentUser?.role);
   const isLeader = !isOfficer; // APPROVER, LEADER, ADMIN
@@ -30,9 +30,12 @@ export default function CounterManagementTab() {
   const [officers, setOfficers] = useState([]);
   const [schedules, setSchedules] = useState([]);
   const [assignments, setAssignments] = useState([]);
+  const [scheduleDetail, setScheduleDetail] = useState(null);
 
   // Assignment Form State
-  const [selectedDate, setSelectedDate] = useState(dayjs().format("YYYY-MM-DD"));
+  const [selectedDate, setSelectedDate] = useState(
+    initialDate || dayjs().format("YYYY-MM-DD")
+  );
   const [selectedSlot, setSelectedSlot] = useState(DEFAULT_TIME_SLOTS[0]);
   const [counterAssignmentsMap, setCounterAssignmentsMap] = useState({}); // { [counterId]: officerId }
 
@@ -49,18 +52,31 @@ export default function CounterManagementTab() {
   // Load all initial data
   const fetchData = async () => {
     setLoading(true);
+    setScheduleDetail(null);
     try {
       const [countersData, officersData, assignmentsData, schedulesData] = await Promise.all([
         RECEPTION_COUNTER_API.getCounters(),
         RECEPTION_COUNTER_API.getOfficers(),
         RECEPTION_COUNTER_API.getAssignments(),
-        RECEPTION_COUNTER_API.getSchedules({ monthYear: dayjs(selectedDate).format("MM/YYYY") }),
+        RECEPTION_COUNTER_API.getSchedules({ date: selectedDate }),
       ]);
 
+      const scheduleList = Array.isArray(schedulesData) ? schedulesData : [];
       setCounters(Array.isArray(countersData) ? countersData : []);
       setOfficers(Array.isArray(officersData) ? officersData : []);
       setAssignments(Array.isArray(assignmentsData) ? assignmentsData : []);
-      setSchedules(Array.isArray(schedulesData) ? schedulesData : []);
+      setSchedules(scheduleList);
+      const detail = scheduleList[0]?.id
+        ? await RECEPTION_COUNTER_API.getScheduleDetail(scheduleList[0].id)
+        : null;
+      setScheduleDetail(detail);
+      if (detail?.slots?.length > 0) {
+        setSelectedSlot((currentSlot) =>
+          detail.slots.some((slot) => slot.timeSlot === currentSlot)
+            ? currentSlot
+            : detail.slots[0].timeSlot
+        );
+      }
     } catch (err) {
       console.error("Lỗi khi tải dữ liệu quầy và phân công:", err);
       message.error("Lỗi khi tải dữ liệu quầy tiếp dân");
@@ -71,13 +87,22 @@ export default function CounterManagementTab() {
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [selectedDate]);
+
+  useEffect(() => {
+    if (initialDate && initialDate !== selectedDate) {
+      setSelectedDate(initialDate);
+    }
+  }, [initialDate, selectedDate]);
 
   // Update counter assignments mapping when selectedDate or selectedSlot changes
   useEffect(() => {
     const currentAssignments = assignments.filter((a) => {
       const aDate = a.receptionDate ? dayjs(a.receptionDate).format("YYYY-MM-DD") : "";
-      return aDate === selectedDate;
+      const assignmentSlot = a.startTime && a.endTime
+        ? `${a.startTime} - ${a.endTime}`
+        : a.timeSlot;
+      return aDate === selectedDate && assignmentSlot === selectedSlot;
     });
 
     const map = {};
@@ -90,27 +115,34 @@ export default function CounterManagementTab() {
       }
     });
 
-    // Default fallback: assign officer1 to counter 1 if map is empty
-    if (Object.keys(map).length === 0 && counters.length > 0 && officers.length > 0) {
-      map[counters[0].id] = officers[0].id || officers[0]._id;
-    }
-
     setCounterAssignmentsMap(map);
   }, [selectedDate, selectedSlot, assignments, counters, officers]);
 
   // Find active schedule and shift for current date
   const activeSchedule = useMemo(() => {
+    if (scheduleDetail) return scheduleDetail;
     return schedules.find((s) => {
       const sDate = s.ngay_tiep_dan ? dayjs(s.ngay_tiep_dan).format("YYYY-MM-DD") : "";
       return sDate === selectedDate;
     });
-  }, [schedules, selectedDate]);
+  }, [schedules, selectedDate, scheduleDetail]);
+
+  const selectedSlotDetail = useMemo(() => {
+    return activeSchedule?.slots?.find((slot) => slot.timeSlot === selectedSlot) || null;
+  }, [activeSchedule, selectedSlot]);
+
+  const availableTimeSlots = useMemo(() => {
+    const scheduleSlots = activeSchedule?.slots
+      ?.map((slot) => slot.timeSlot)
+      .filter(Boolean);
+    return scheduleSlots?.length ? scheduleSlots : DEFAULT_TIME_SLOTS;
+  }, [activeSchedule]);
 
   // Find which counter the current officer is assigned to
   const myAssignedCounter = useMemo(() => {
     if (!isOfficer || !currentUser) return null;
-    const currentUserId = currentUser.id || currentUser._id;
-    const currentUsername = currentUser.username || currentUser.tenDangNhap;
+    const currentUserId = currentUser.id || currentUser._id || currentUser.userId;
+    const currentUsername = currentUser.username || currentUser.tenDangNhap || currentUser.ten_dang_nhap;
 
     return counters.find((c) => {
       const assignedOfficerId = counterAssignmentsMap[c.id];
@@ -118,9 +150,10 @@ export default function CounterManagementTab() {
       return (
         assignedOfficerId === currentUserId ||
         assignedOfficer?.tenDangNhap === currentUsername ||
+        assignedOfficer?.ten_dang_nhap === currentUsername ||
         assignedOfficer?.username === currentUsername
       );
-    }) || counters[0]; // fallback to counter 1 for demo
+    }) || null;
   }, [isOfficer, currentUser, counters, counterAssignmentsMap, officers]);
 
   // Handle Officer selection for a counter (Leader only)
@@ -136,20 +169,31 @@ export default function CounterManagementTab() {
   const handleSaveAssignments = async () => {
     setSaving(true);
     try {
-      const shiftId = activeSchedule?.id || "0007891c-ef11-4784-84f8-573a80916a4c";
+      const slotCounters = selectedSlotDetail?.counters || [];
+      const shiftId = selectedSlotDetail?.shiftId || slotCounters[0]?.shiftId;
+      if (!shiftId || slotCounters.length === 0) {
+        message.error("Ngày và khung giờ này chưa có cấu hình ca tiếp dân");
+        return;
+      }
       const payloadAssignments = counters
         .filter((c) => counterAssignmentsMap[c.id])
-        .map((c) => ({
-          counterId: c.id,
-          officerId: counterAssignmentsMap[c.id],
-        }));
+        .map((c) => {
+          const configuration = slotCounters.find(
+            (item) => item.counterId === c.id || item.counterCode === c.counterCode
+          );
+          return configuration ? {
+            counterConfigurationId: configuration.id,
+            officerId: counterAssignmentsMap[c.id],
+          } : null;
+        })
+        .filter(Boolean);
 
       await RECEPTION_COUNTER_API.replaceShiftAssignments(shiftId, payloadAssignments);
       message.success("Đã lưu phân công cán bộ vào các quầy thành công!");
       fetchData();
     } catch (err) {
-      console.warn("Lưu phân công thông báo:", err);
-      message.success("Đã cập nhật phân công cán bộ - quầy thành công!");
+      console.error("Lỗi lưu phân công:", err);
+      message.error(err.response?.data?.message || "Không thể lưu phân công cán bộ - quầy");
     } finally {
       setSaving(false);
     }
@@ -314,7 +358,7 @@ export default function CounterManagementTab() {
                     onChange={(e) => setSelectedSlot(e.target.value)}
                     className="rounded-xl border border-gray-300 bg-white px-3 py-1.5 text-xs font-semibold text-gray-800 focus:border-blue-500 focus:outline-none"
                   >
-                    {DEFAULT_TIME_SLOTS.map((slot) => (
+                    {availableTimeSlots.map((slot) => (
                       <option key={slot} value={slot}>
                         {slot}
                       </option>
@@ -325,27 +369,39 @@ export default function CounterManagementTab() {
 
               {/* Save Button (Leader only) */}
               {isLeader && (
-                <button
-                  type="button"
-                  onClick={handleSaveAssignments}
-                  disabled={saving}
-                  className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-2 text-xs font-bold text-white shadow-sm hover:bg-blue-700 transition-all disabled:opacity-50"
-                >
-                  <Save size={15} />
-                  <span>{saving ? "Đang lưu..." : "Lưu phân công ca trực"}</span>
-                </button>
+                <div className="flex flex-wrap items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={handleSaveAssignments}
+                    disabled={saving || !selectedSlotDetail}
+                    title={!selectedSlotDetail ? "Ngày đang chọn chưa có lịch tiếp dân" : undefined}
+                    className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-2 text-xs font-bold text-white shadow-sm hover:bg-blue-700 transition-all disabled:opacity-50"
+                  >
+                    <Save size={15} />
+                    <span>{saving ? "Đang lưu..." : "Lưu chỉnh sửa phân công"}</span>
+                  </button>
+                </div>
               )}
             </div>
 
+            {!activeSchedule && (
+              <div className="mt-3 flex items-center gap-2 rounded-xl border border-amber-200 bg-amber-50 px-3.5 py-2 text-xs font-semibold text-amber-800">
+                <AlertCircle size={15} className="shrink-0" />
+                <span>
+                  Ngày {dayjs(selectedDate).format("DD/MM/YYYY")} chưa có lịch tiếp dân. Hãy chọn ngày đã import lịch.
+                </span>
+              </div>
+            )}
+
             {/* Note banner */}
-            <div className="mt-3 flex items-center gap-2 rounded-xl bg-blue-50/70 px-3.5 py-2 text-xs text-blue-900 border border-blue-100">
+            {activeSchedule && <div className="mt-3 flex items-center gap-2 rounded-xl bg-blue-50/70 px-3.5 py-2 text-xs text-blue-900 border border-blue-100">
               <AlertCircle size={15} className="shrink-0 text-blue-600" />
               <span>
                 {isOfficer
                   ? "Dưới đây là danh sách phân công trực tại 8 quầy tiếp nhận Một cửa trong ca này."
                   : "Lãnh đạo phân công cán bộ vào từng quầy. Cán bộ khi đăng nhập sẽ tự động nhận diện và duyệt đơn tại quầy được gán."}
               </span>
-            </div>
+            </div>}
           </div>
 
           {/* 8 Counters Grid */}
@@ -353,6 +409,11 @@ export default function CounterManagementTab() {
             {counters.map((counter, idx) => {
               const currentOfficerId = counterAssignmentsMap[counter.id] || "";
               const assignedOfficer = officers.find((o) => o.id === currentOfficerId || o._id === currentOfficerId);
+              const selectableOfficers = getSelectableReceptionOfficers(
+                officers,
+                counterAssignmentsMap,
+                currentOfficerId
+              );
               const isCounterActive = counter.isActive !== false;
               const isMyCounter = isOfficer && myAssignedCounter?.id === counter.id;
 
@@ -447,7 +508,7 @@ export default function CounterManagementTab() {
                           }`}
                         >
                           <option value="">-- Chưa phân công --</option>
-                          {officers.map((officer) => (
+                          {selectableOfficers.map((officer) => (
                             <option key={officer.id || officer._id} value={officer.id || officer._id}>
                               {officer.ho_va_ten || officer.fullName || officer.tenDangNhap || officer.username} ({officer.tenDangNhap || officer.username})
                             </option>

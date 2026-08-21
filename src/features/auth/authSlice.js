@@ -1,6 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { loginUser, loginUserWithCaptcha, verifyOtpUser, changePassword } from './authThunks';
 import { jwtDecode } from 'jwt-decode';
+import { resolveAppRole } from './authRole';
 
 const getUserFromToken = () => {
     try {
@@ -18,7 +19,7 @@ const getUserFromToken = () => {
         return {
             userId: decoded.userId,
             username: decoded.username,
-            role: decoded.role,
+            role: resolveAppRole(decoded, 'CITIZEN'),
             email: decoded.email,
             permissions: decoded.permissions || [],
         };

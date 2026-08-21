@@ -190,6 +190,7 @@ export default function ScheduleList({
                     </div>
                 ) : (
                     sortedSchedules.map((schedule, index) => {
+                        const hasPassed = isSchedulePassed(schedule);
                         const displayIndex = selectedDate
                             ? index + 1
                             : ((pagination?.currentPage || 1) - 1) * (pagination?.pageSize || 10) + index + 1;
@@ -197,7 +198,9 @@ export default function ScheduleList({
                         return (
                             <div
                                 key={schedule.id}
-                                className={`bg-gray-50 rounded-lg p-2 md:p-3 border border-gray-200 hover:border-blue-300 transition-colors ${isSchedulePassed(schedule) ? "opacity-75" : ""
+                                className={`rounded-lg p-2 md:p-3 border transition-colors ${hasPassed
+                                    ? "bg-amber-50 border-amber-200 hover:border-amber-300"
+                                    : "bg-gray-50 border-gray-200 hover:border-blue-300"
                                     }`}
                             >
                                 <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 md:gap-3 mb-2 md:mb-3">
@@ -205,15 +208,15 @@ export default function ScheduleList({
                                         <span className="text-xs md:text-sm font-medium text-gray-500">
                                             #{displayIndex}
                                         </span>
-                                        <div className={`px-2 md:px-3 py-1 rounded text-xs md:text-sm font-medium ${isSchedulePassed(schedule)
-                                                ? "bg-gray-100 text-gray-600"
+                                        <div className={`px-2 md:px-3 py-1 rounded text-xs md:text-sm font-medium ${hasPassed
+                                                ? "bg-amber-200 text-amber-900"
                                                 : "bg-blue-100 text-blue-700"
                                             }`}>
                                             {formatDate
                                                 ? formatDate(getFieldValue(schedule, "date"))
                                                 : getFieldValue(schedule, "date")}
-                                            {isSchedulePassed(schedule) && (
-                                                <span className="ml-1 text-xs">(Đã qua)</span>
+                                            {hasPassed && (
+                                                <span className="ml-1 text-xs font-semibold">(Đã qua)</span>
                                             )}
                                         </div>
                                         <div className="flex items-center gap-1 text-gray-600">
@@ -224,7 +227,7 @@ export default function ScheduleList({
                                         </div>
                                     </div>
                                     <div className="flex gap-2 self-end sm:self-auto">
-                                        {onEdit && !isSchedulePassed(schedule) && (!canEdit || canEdit(schedule)) && (
+                                        {onEdit && !hasPassed && (!canEdit || canEdit(schedule)) && (
                                             <button
                                                 onClick={() => onEdit(schedule)}
                                                 className="p-1.5 text-blue-600 hover:bg-blue-50 rounded transition-colors"

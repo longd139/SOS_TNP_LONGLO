@@ -3,8 +3,7 @@ import { validateSchema } from "../utils/validationUtils";
 
 const ALLOWED_IMPORT_TYPES = [
     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", 
-    "application/vnd.ms-excel", 
-    "text/csv", 
+    "application/vnd.ms-excel",
 ];
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; 
@@ -17,9 +16,11 @@ export const fileImportSchema = yup.object().shape({
             if (!value) return false;
             return value.size <= MAX_FILE_SIZE;
         })
-        .test("fileType", "Định dạng file không hỗ trợ. Vui lòng chọn file .xlsx, .xls hoặc .csv", (value) => {
+        .test("fileType", "Định dạng file không hỗ trợ. Vui lòng chọn file .xlsx hoặc .xls", (value) => {
             if (!value) return false;
-            return ALLOWED_IMPORT_TYPES.includes(value.type);
+            const fileName = String(value.name || "").toLowerCase();
+            const hasExcelExtension = fileName.endsWith(".xlsx") || fileName.endsWith(".xls");
+            return hasExcelExtension && ALLOWED_IMPORT_TYPES.includes(value.type);
         }),
 });
 

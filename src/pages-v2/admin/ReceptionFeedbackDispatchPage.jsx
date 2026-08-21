@@ -1,7 +1,8 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { CheckCircle2, ClipboardCheck, MonitorUp, MoreHorizontal, Eye, Check, X, AlertTriangle, Search, Filter, RotateCcw, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Navigate } from 'react-router-dom';
-import apiClient from '../../utils/apiClient';
+import RECEPTION_API from '../../apis/reception';
+import LEADER_MEETING_API from '../../apis/leaderMeeting';
 import { message, Dropdown, Modal } from 'antd';
 import { useMock } from '../../mock/MockContext';
 import {
@@ -107,9 +108,10 @@ export default function ReceptionFeedbackDispatchPage({ title, description, queu
   const fetchTickets = async () => {
     setLoading(true);
     try {
-      const endpoint = isLeaderMeeting ? '/api/leader-meeting-registrations?size=100' : '/api/reception-registrations?size=100';
-      const res = await apiClient.get(endpoint);
-      const tickets = res?.data?.data || res?.data || [];
+      const response = isLeaderMeeting
+        ? await LEADER_MEETING_API.getRegistrations({ limit: 100 })
+        : await RECEPTION_API.getRegistrations({ size: 100 });
+      const tickets = response?.data || response || [];
       if (Array.isArray(tickets)) {
         setDbTickets(tickets);
       }
@@ -132,9 +134,10 @@ export default function ReceptionFeedbackDispatchPage({ title, description, queu
 
     try {
       setDetailLoading(true);
-      const detailEndpoint = isLeaderMeeting ? `/api/leader-meeting-registrations/${targetId}` : `/api/reception-registrations/${targetId}`;
-      const res = await apiClient.get(detailEndpoint);
-      const d = res.data?.data || res.data;
+      const response = isLeaderMeeting
+        ? await LEADER_MEETING_API.getRegistrationDetail(targetId)
+        : await RECEPTION_API.getRegistrationDetail(targetId);
+      const d = response?.data || response;
       if (d) {
         setSelectedReception({
           ...reception,
@@ -175,11 +178,9 @@ export default function ReceptionFeedbackDispatchPage({ title, description, queu
     const targetDept = reception.department || 'QUAY_1';
     try {
       if (isLeaderMeeting) {
-        await apiClient.put(`/api/leader-meeting-registrations/${targetId}/approve`);
+        await LEADER_MEETING_API.approveRegistration(targetId);
       } else {
-        await apiClient.patch(`/api/reception-registrations/${targetId}/approve`, {
-          department: targetDept
-        });
+        await RECEPTION_API.approveRegistration(targetId, targetDept);
       }
       message.success('Đã phê duyệt tiếp nhận thành công!');
       fetchTickets();
@@ -194,17 +195,27 @@ export default function ReceptionFeedbackDispatchPage({ title, description, queu
     const targetId = rawId || receptionId;
     try {
       if (isLeaderMeeting) {
-        await apiClient.put(`/api/leader-meeting-registrations/${targetId}/complete`, {
-          result: 'Đã hoàn thành buổi tiếp dân'
-        });
+        await LEADER_MEETING_API.completeRegistration(targetId, 'Đã hoàn thành buổi gặp lãnh đạo');
       } else {
-        await apiClient.patch(`/api/reception-registrations/${targetId}/complete`);
+        await RECEPTION_API.completeRegistration(targetId);
       }
       message.success('Đã hoàn thành buổi tiếp dân! Người dân có thể đánh giá trên iPad.');
       fetchTickets();
     } catch (error) {
       console.error("Failed to complete ticket", error);
       message.error(error.response?.data?.message || 'Lỗi khi hoàn thành buổi tiếp dân');
+    }
+  };
+
+  const processLeaderMeeting = async (receptionId, rawId) => {
+    const targetId = rawId || receptionId;
+    try {
+      await LEADER_MEETING_API.processRegistration(targetId, 'Bắt đầu buổi gặp lãnh đạo');
+      message.success('Đã chuyển lịch hẹn sang trạng thái đang xử lý');
+      fetchTickets();
+    } catch (error) {
+      console.error('Failed to process leader meeting', error);
+      message.error(error.response?.data?.message || 'Lỗi khi bắt đầu buổi gặp lãnh đạo');
     }
   };
 
@@ -223,13 +234,9 @@ export default function ReceptionFeedbackDispatchPage({ title, description, queu
     try {
       setRejectLoading(true);
       if (isLeaderMeeting) {
-        await apiClient.put(`/api/leader-meeting-registrations/${targetId}/reject`, {
-          reason: rejectReason.trim()
-        });
+        await LEADER_MEETING_API.rejectRegistration(targetId, rejectReason.trim());
       } else {
-        await apiClient.patch(`/api/reception-registrations/${targetId}/reject`, {
-          reason: rejectReason.trim()
-        });
+        await RECEPTION_API.rejectRegistration(targetId, rejectReason.trim());
       }
       message.success('Đã từ chối đơn tiếp dân thành công');
       setRejectModalOpen(false);
@@ -246,27 +253,32 @@ export default function ReceptionFeedbackDispatchPage({ title, description, queu
   const displayItems = useMemo(() => {
     let rawItems = [];
     if (isLeaderMeeting) {
-      const leaderDbTickets = dbTickets.filter(item => item.receptionType === 'LEADER_MEETING');
+      const leaderDbTickets = dbTickets;
       if (leaderDbTickets.length > 0) {
         rawItems = leaderDbTickets.map(item => ({
           ...item,
           rawId: item.id,
-          receptionId: item.id || item.receptionCode,
-          ticketNo: item.receptionCode || item.id,
-          citizenName: item.applicantName || item.citizenName || item.citizenInfo?.name
+          receptionId: item.id || item.registrationCode,
+          ticketNo: item.registrationCode || item.receptionCode || item.id,
+          citizenName: item.applicant?.fullName || item.applicantName || item.citizenName || item.citizenInfo?.name,
+          phone: item.applicant?.phoneNumber || item.phone,
+          topic: item.reason || item.topic,
+          department: item.department || '',
         }));
       } else {
         rawItems = queue;
       }
     } else {
-      const counterDbTickets = dbTickets.filter(item => item.receptionType !== 'LEADER_MEETING');
+      const counterDbTickets = dbTickets;
       if (counterDbTickets.length > 0) {
         rawItems = counterDbTickets.map(item => ({
           ...item,
           rawId: item.id,
           receptionId: item.id || item.receptionCode,
           ticketNo: item.receptionCode || item.id,
-          citizenName: item.applicantName || item.citizenName || item.citizenInfo?.name
+          citizenName: item.applicant?.fullName || item.applicantName || item.citizenName || item.citizenInfo?.name,
+          phone: item.applicant?.phoneNumber || item.phone,
+          topic: item.topic || item.workingContent,
         }));
       } else {
         rawItems = queue;
@@ -275,17 +287,18 @@ export default function ReceptionFeedbackDispatchPage({ title, description, queu
 
     // Map each item's computed status
     let processed = rawItems.map(item => {
-      const isRejected = item.approvalStatus === "REJECTED" || item.status === "REJECTED";
+      const isRejected = item.approvalStatus === "REJECTED" || item.status === "REJECTED" || item.status === "CANCELED";
       const isRated = ratedReceptionIds.has(item.receptionId) || ratedReceptionIds.has(item.ticketNo) || item.ratingStatus === "RATED" || item.status === "RATED";
       const isCompleted = !isRated && (item.approvalStatus === "COMPLETED" || item.status === "COMPLETED");
-      const isApproved = !isRated && !isCompleted && (approvedReceptionIds.has(item.receptionId) || item.approvalStatus === "APPROVED" || item.status === "APPROVED");
-      const isPending = !isRejected && !isRated && !isCompleted && !isApproved;
+      const isProcessing = !isRated && !isCompleted && (item.status === "IN_PROGRESS" || item.status === "PROCESSING");
+      const isApproved = !isRated && !isCompleted && !isProcessing && (approvedReceptionIds.has(item.receptionId) || item.approvalStatus === "APPROVED" || item.status === "APPROVED");
+      const isPending = !isRejected && !isRated && !isCompleted && !isProcessing && !isApproved;
 
       // Status key
-      const currentStatusKey = isRejected ? 'REJECTED' : isRated ? 'RATED' : isCompleted ? 'COMPLETED' : isApproved ? 'APPROVED' : 'PENDING';
+      const currentStatusKey = isRejected ? 'REJECTED' : isRated ? 'RATED' : isCompleted ? 'COMPLETED' : isProcessing ? 'IN_PROGRESS' : isApproved ? 'APPROVED' : 'PENDING';
 
       // Priority rank: PENDING (1) -> APPROVED (2) -> COMPLETED (3) -> RATED (4) -> REJECTED (5)
-      const rank = isPending ? 1 : isApproved ? 2 : isCompleted ? 3 : isRated ? 4 : 5;
+      const rank = isPending ? 1 : isApproved ? 2 : isProcessing ? 3 : isCompleted ? 4 : isRated ? 5 : 6;
 
       return {
         ...item,
@@ -426,6 +439,7 @@ export default function ReceptionFeedbackDispatchPage({ title, description, queu
                 <option value="">Tất cả trạng thái</option>
                 <option value="PENDING">🟡 Chờ phê duyệt (Ưu tiên)</option>
                 <option value="APPROVED">🔵 Đang tiếp dân</option>
+                {isLeaderMeeting && <option value="IN_PROGRESS">🟣 Đang xử lý buổi gặp</option>}
                 <option value="COMPLETED">🟢 Chờ dân đánh giá</option>
                 <option value="RATED">✅ Đã đánh giá</option>
                 <option value="REJECTED">🔴 Đã từ chối</option>
@@ -472,7 +486,8 @@ export default function ReceptionFeedbackDispatchPage({ title, description, queu
                   paginatedItems.map((reception) => {
                     const isRejected = reception.approvalStatus === "REJECTED" || reception.status === "REJECTED";
                     const isCompleted = reception.approvalStatus === "COMPLETED" || reception.status === "COMPLETED";
-                    const isApproved = approvedReceptionIds.has(reception.receptionId) || approvedReceptionIds.has(reception.rawId) || reception.approvalStatus === "APPROVED" || reception.status === "APPROVED" || isCompleted;
+                    const isProcessing = reception.status === "IN_PROGRESS" || reception.status === "PROCESSING";
+                    const isApproved = approvedReceptionIds.has(reception.receptionId) || approvedReceptionIds.has(reception.rawId) || reception.approvalStatus === "APPROVED" || reception.status === "APPROVED" || isProcessing || isCompleted;
                     const isRated = ratedReceptionIds.has(reception.receptionId) || ratedReceptionIds.has(reception.rawId) || ratedReceptionIds.has(reception.ticketNo) || reception.ratingStatus === "RATED" || reception.status === "RATED";
                     const deptLabel = RECEPTION_DEPARTMENTS.find(d => d.value === reception.department)?.label;
                     return <tr key={reception.receptionId}>
@@ -492,6 +507,8 @@ export default function ReceptionFeedbackDispatchPage({ title, description, queu
                           <Status tone="green" icon={<CheckCircle2 size={13} />}>Đã đánh giá</Status>
                         ) : isCompleted ? (
                           <Status tone="green" icon={<CheckCircle2 size={13} />}>Chờ dân đánh giá</Status>
+                        ) : isProcessing ? (
+                          <Status tone="blue" icon={<MonitorUp size={13} />}>Đang xử lý</Status>
                         ) : isApproved ? (
                           <Status tone="blue" icon={<CheckCircle2 size={13} />}>Đang tiếp dân</Status>
                         ) : (
@@ -532,6 +549,13 @@ export default function ReceptionFeedbackDispatchPage({ title, description, queu
                               key: 'reject',
                               label: <span className="flex items-center gap-2 font-medium text-rose-600"><X size={15} /> Từ chối đơn</span>,
                               onClick: () => handleOpenRejectModal(reception)
+                            });
+                          } else if (isLeaderMeeting && isApproved && !isProcessing && !isCompleted && !isRated && !isRejected) {
+                            items.push({ type: 'divider' });
+                            items.push({
+                              key: 'process',
+                              label: <span className="flex items-center gap-2 font-medium text-blue-600"><MonitorUp size={15} /> Bắt đầu buổi gặp</span>,
+                              onClick: () => processLeaderMeeting(reception.receptionId, reception.rawId)
                             });
                           } else if (isApproved && !isCompleted && !isRated && !isRejected) {
                             items.push({ type: 'divider' });
