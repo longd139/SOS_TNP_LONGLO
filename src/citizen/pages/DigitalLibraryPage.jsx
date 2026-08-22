@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { ArrowRight, Bank, Book, Download, Eye, FileEarmarkText, FileText, Map, Search, ShieldCheck, Upload } from 'react-bootstrap-icons';
 import { Link } from 'react-router-dom';
-import { libraryCategories, libraryDocuments } from '../data/citizenMockDb';
+import { libraryCategories } from '../data/citizenMockDb';
 import { SectionHeading, LoadingState } from '../components/CitizenPrimitives';
-import { searchLaws } from '../../services/libraryService';
+import { searchLaws, getTaiLieuVanHoa } from '../../services/libraryService';
 import useScrollReveal from '../hooks/useScrollReveal';
 
 /* ─── Icon map cho danh mục ─── */
@@ -22,10 +22,39 @@ export default function DigitalLibraryPage() {
   const [isSearching, setIsSearching] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
 
-  useScrollReveal();
+  useScrollReveal([selectedDoc]);
+
+  const [apiDocuments, setApiDocuments] = useState([]);
+
+  useEffect(() => {
+    const fetchApiDocs = async () => {
+      try {
+        const res = await getTaiLieuVanHoa({ page: 1, size: 50, trangThai: 'DA_DUYET' });
+        if (res?.success && res.data) {
+          const mapped = res.data.map(item => ({
+            id: item.id,
+            title: item.tieu_de,
+            description: item.mo_ta || item.tieu_de,
+            category: 'sach', // Default to a known category for now
+            cover: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&w=600&q=80',
+            author: item.ten_nguoi_tao || 'UBND Phường',
+            downloads: item.so_luot_tai || 0,
+            docType: item.thu_vien_danh_muc?.ten || 'Tài liệu',
+            isApiData: true
+          }));
+          setApiDocuments(mapped);
+        }
+      } catch (err) {
+        console.error('Failed to fetch api docs:', err);
+      }
+    };
+    fetchApiDocs();
+  }, []);
+
+  const allDocuments = apiDocuments;
 
   /* Lọc tài liệu địa phương — CHỈ theo category, KHÔNG theo search */
-  const filteredDocs = libraryDocuments.filter((doc) => {
+  const filteredDocs = allDocuments.filter((doc) => {
     return !activeCategory || doc.category === activeCategory;
   });
 
@@ -38,7 +67,7 @@ export default function DigitalLibraryPage() {
 
     // Search local
     const q = searchValue.toLowerCase().trim();
-    const local = libraryDocuments.filter((doc) =>
+    const local = allDocuments.filter((doc) =>
       doc.title.toLowerCase().includes(q) ||
       doc.description.toLowerCase().includes(q) ||
       (doc.tags && doc.tags.some((t) => t.includes(q))) ||
@@ -156,9 +185,9 @@ export default function DigitalLibraryPage() {
         {/* Related */}
         <section className="citizen-section citizen-section-soft">
           <div className="citizen-container">
-            <SectionHeading eyebrow="Có thể bạn quan tâm" title={`Tài liệu liên quan (${libraryDocuments.filter((d) => d.category === selectedDoc.category && d.id !== selectedDoc.id).length})`} />
+            <SectionHeading eyebrow="Có thể bạn quan tâm" title={`Tài liệu liên quan (${allDocuments.filter((d) => d.category === selectedDoc.category && d.id !== selectedDoc.id).length})`} />
             <div className="lib-related-scroll">
-              {libraryDocuments.filter((d) => d.category === selectedDoc.category && d.id !== selectedDoc.id).map((doc) => (
+              {allDocuments.filter((d) => d.category === selectedDoc.category && d.id !== selectedDoc.id).map((doc) => (
                 <div key={doc.id} className="lib-related-item">
                   <DocCardV2 doc={doc} onClick={() => { setSelectedDoc(doc); window.scrollTo(0, 0); }} />
                 </div>
@@ -186,12 +215,12 @@ export default function DigitalLibraryPage() {
           <div className="hero-pillars">
             <div className="hero-pillar">
               <div className="hero-pillar-icon hero-pillar-library"><Book size={22} /></div>
-              <div><strong>{(libraryDocuments.reduce((s, d) => s + d.downloads, 0) / 1000).toFixed(1)}k+</strong><span>Lượt tải tài liệu</span></div>
+              <div><strong>{(allDocuments.reduce((s, d) => s + (d.downloads || 0), 0) / 1000).toFixed(1)}k+</strong><span>Lượt tải tài liệu</span></div>
             </div>
             <div className="hero-pillar-divider" />
             <div className="hero-pillar">
               <div className="hero-pillar-icon hero-pillar-police"><ShieldCheck size={22} /></div>
-              <div><strong>{libraryDocuments.length}+</strong><span>Tài liệu pháp luật</span></div>
+              <div><strong>{allDocuments.length}+</strong><span>Tài liệu pháp luật</span></div>
             </div>
           </div>
         </div>
@@ -257,7 +286,7 @@ export default function DigitalLibraryPage() {
                       </span>
                       <h4>{doc.title}</h4>
                       <p>{doc.description}</p>
-                      <span className="lib-result-meta">{doc.author} • {doc.downloads.toLocaleString('vi-VN')} lượt tải</span>
+                      <span className="lib-result-meta">{doc.author} • {(doc.downloads || 0).toLocaleString('vi-VN')} lượt tải</span>
                     </div>
                     <div className="lib-result-action">
                       <span>Xem <ArrowRight size={15} /></span>
@@ -334,7 +363,7 @@ export default function DigitalLibraryPage() {
             </button>
             {libraryCategories.map((cat) => {
               const Icon = categoryIcons[cat.icon] || FileText;
-              const count = libraryDocuments.filter((d) => d.category === cat.id).length;
+              const count = allDocuments.filter((d) => d.category === cat.id).length;
               return (
                 <button
                   key={cat.id}
@@ -444,7 +473,7 @@ export default function DigitalLibraryPage() {
    ═══════════════════════════════════════════════ */
 
 function DocCardV2({ doc, onClick }) {
-  const cat = libraryCategories.find((c) => c.id === doc.category);
+  const cat = libraryCategories.find((c) => c.id === doc.category) || { label: doc.docType || 'Tài liệu', color: '#2563EB', icon: 'FileText' };
   const CatIcon = categoryIcons[cat?.icon] || FileText;
   return (
     <button className="lib-doc-card-v2" onClick={onClick} style={{ fontFamily: 'inherit', textAlign: 'left' }}>
@@ -453,7 +482,7 @@ function DocCardV2({ doc, onClick }) {
           src={doc.cover}
           alt={`Ảnh bìa ${doc.title}`}
           loading="lazy"
-          onError={(e) => { e.target.src = `data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="260" fill="%23DBEAFE"><rect width="400" height="260"/><text x="200" y="140" text-anchor="middle" fill="%232563EB" font-size="16" font-family="Arial">${encodeURIComponent(doc.title.slice(0, 20))}</text></svg>`; }}
+          onError={(e) => { e.target.src = `data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="260" fill="%23DBEAFE"><rect width="400" height="260"/><text x="200" y="140" text-anchor="middle" fill="%232563EB" font-size="16" font-family="Arial">${encodeURIComponent((doc.title || '').slice(0, 20))}</text></svg>`; }}
         />
         <div className="lib-doc-overlay-v2">
           <Eye size={22} />
@@ -468,11 +497,11 @@ function DocCardV2({ doc, onClick }) {
           <CatIcon size={13} /> {cat?.label}
         </span>
         <h4>{doc.title}</h4>
-        <p>{doc.description.slice(0, 80)}...</p>
+        <p>{(doc.description || '').slice(0, 80)}...</p>
         <div className="lib-doc-foot-v2">
           <div className="lib-doc-meta-left">
             <span className="lib-doc-author-v2">{doc.author}</span>
-            <span className="lib-doc-dl"><Download size={13} /> {doc.downloads.toLocaleString('vi-VN')}</span>
+            <span className="lib-doc-dl"><Download size={13} /> {(doc.downloads || 0).toLocaleString('vi-VN')}</span>
           </div>
           <span className="lib-doc-read">Đọc ngay <ArrowRight size={14} /></span>
         </div>

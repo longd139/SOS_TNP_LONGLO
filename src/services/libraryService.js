@@ -8,7 +8,7 @@
  * Cấu trúc response mô phỏng đúng format backend sẽ trả về.
  */
 
-import { apiClient } from '../utils/apiClient'; // eslint-disable-line no-unused-vars
+import apiClient from '../utils/apiClient'; // eslint-disable-line no-unused-vars
 
 /* ─── CONFIG ─── */
 const MOCK_MODE = true; // ← Đổi thành false khi có backend thật
@@ -351,4 +351,19 @@ export async function getLibraryStats() {
 }
 
 const libraryService = { searchLaws, getLawById, getFeaturedLaws, getLibraryStats };
+
+/**
+ * Lấy danh sách tài liệu văn hóa (tích hợp API thật)
+ */
+export async function getTaiLieuVanHoa(params = {}) {
+  try {
+    const res = await apiClient.get('/api/tai-lieu-van-hoa/paging', { params });
+    return res.data;
+  } catch (error) {
+    console.error('Error fetching tai-lieu-van-hoa:', error);
+    return { success: false, data: [], pagination: {} };
+  }
+}
+
+export { getTaiLieuVanHoa as getTaiLieuVanHoaList }; // Alias if needed
 export default libraryService;

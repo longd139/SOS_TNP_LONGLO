@@ -25,7 +25,7 @@ export default function CitizenApp() {
         <Routes>
           {/* ========== CITIZEN ROUTES ========== */}
           <Route element={<CitizenLayout />}>
-            <Route path="/" element={<CitizenHomePage />} />
+            <Route path="/" element={<Navigate to="/cong-dong" replace />} />
             <Route path="/cong-dong" element={<CitizenHomePage />} />
             <Route path="/cong-dong/thu-tuc" element={<ProcedureListPage />} />
             <Route path="/cong-dong/thu-tuc/:id" element={<ProcedureDetailPage />} />

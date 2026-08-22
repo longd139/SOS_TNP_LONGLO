@@ -57,11 +57,6 @@ const LeaderMeetingFeedbackPage = lazy(() => import('../pages-v2/admin/LeaderMee
 const WorkSchedule = lazy(() => import('../pages/Schedules/WorkSchedule'));
 
 function RoleHome() {
-  const { currentUser } = useMock();
-  const role = currentUser?.role || 'CITIZEN';
-  if (['OFFICER', 'RECEPTION_OFFICER', 'PROCESSING_OFFICER', 'APPROVER', 'LEADER', 'ADMIN'].includes(role)) {
-    return <Navigate to="/dashboard" replace />;
-  }
   return <Navigate to="/cong-dong" replace />;
 }
 
