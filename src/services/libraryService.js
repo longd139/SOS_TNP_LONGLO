@@ -353,17 +353,29 @@ export async function getLibraryStats() {
 const libraryService = { searchLaws, getLawById, getFeaturedLaws, getLibraryStats };
 
 /**
- * Lấy danh sách tài liệu văn hóa (tích hợp API thật)
+ * Lấy danh sách tài liệu công khai (Văn hóa & Pháp luật)
  */
-export async function getTaiLieuVanHoa(params = {}) {
+export async function getTaiLieuCongKhai(params = {}) {
   try {
-    const res = await apiClient.get('/api/tai-lieu-van-hoa/paging', { params });
+    const res = await apiClient.get('/api/tai-lieu-cong-khai/paging', { params });
     return res.data;
   } catch (error) {
-    console.error('Error fetching tai-lieu-van-hoa:', error);
+    console.error('Error fetching tai-lieu-cong-khai:', error);
     return { success: false, data: [], pagination: {} };
   }
 }
 
-export { getTaiLieuVanHoa as getTaiLieuVanHoaList }; // Alias if needed
+/**
+ * Lấy chi tiết tài liệu công khai
+ */
+export async function getChiTietTaiLieuCongKhai(id) {
+  try {
+    const res = await apiClient.get(`/api/tai-lieu-cong-khai/${id}`);
+    return res.data;
+  } catch (error) {
+    console.error(`Error fetching tai-lieu-cong-khai detail ${id}:`, error);
+    return { success: false, data: null };
+  }
+}
+
 export default libraryService;

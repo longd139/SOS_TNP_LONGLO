@@ -3,8 +3,9 @@ import { ArrowRight, Bank, Book, Download, Eye, FileEarmarkText, FileText, Map, 
 import { Link } from 'react-router-dom';
 import { libraryCategories } from '../data/citizenMockDb';
 import { SectionHeading, LoadingState } from '../components/CitizenPrimitives';
-import { searchLaws, getTaiLieuVanHoa } from '../../services/libraryService';
+import { getTaiLieuCongKhai, getChiTietTaiLieuCongKhai } from '../../services/libraryService';
 import useScrollReveal from '../hooks/useScrollReveal';
+import DOMPurify from 'dompurify';
 
 /* ─── Icon map cho danh mục ─── */
 const categoryIcons = { BookOpen: Book, FileText, ScrollText: FileEarmarkText, Map };
@@ -21,6 +22,7 @@ export default function DigitalLibraryPage() {
   const [localResults, setLocalResults] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useScrollReveal([selectedDoc]);
 
@@ -28,24 +30,32 @@ export default function DigitalLibraryPage() {
 
   useEffect(() => {
     const fetchApiDocs = async () => {
+      setIsLoading(true);
       try {
-        const res = await getTaiLieuVanHoa({ page: 1, size: 50, trangThai: 'DA_DUYET' });
+        const res = await getTaiLieuCongKhai({ page: 1, size: 50 });
         if (res?.success && res.data) {
           const mapped = res.data.map(item => ({
             id: item.id,
             title: item.tieu_de,
             description: item.mo_ta || item.tieu_de,
-            category: 'sach', // Default to a known category for now
-            cover: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&w=600&q=80',
+            category: item.loai === 'PHAP_LUAT' ? 'van-ban' : 'sach',
+            cover: item.thu_vien_tai_lieu_media?.find(m => m.loai === 'IMAGE')?.url
+              ? `${process.env.REACT_APP_API_URL || 'http://localhost:8880'}${item.thu_vien_tai_lieu_media.find(m => m.loai === 'IMAGE').url}`
+              : 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&w=600&q=80',
             author: item.ten_nguoi_tao || 'UBND Phường',
             downloads: item.so_luot_tai || 0,
-            docType: item.thu_vien_danh_muc?.ten || 'Tài liệu',
-            isApiData: true
+            views: item.luot_xem || 0,
+            docType: item.thu_vien_danh_muc?.ten || (item.loai === 'PHAP_LUAT' ? 'Văn bản pháp luật' : 'Tài liệu'),
+            isApiData: true,
+            loai: item.loai,
+            date: item.ngay_ban_hanh || item.thoi_gian_tao
           }));
           setApiDocuments(mapped);
         }
       } catch (err) {
         console.error('Failed to fetch api docs:', err);
+      } finally {
+        setIsLoading(false);
       }
     };
     fetchApiDocs();
@@ -65,22 +75,36 @@ export default function DigitalLibraryPage() {
     setHasSearched(true);
     setActiveCategory(null);
 
-    // Search local
-    const q = searchValue.toLowerCase().trim();
-    const local = allDocuments.filter((doc) =>
-      doc.title.toLowerCase().includes(q) ||
-      doc.description.toLowerCase().includes(q) ||
-      (doc.tags && doc.tags.some((t) => t.includes(q))) ||
-      (doc.author && doc.author.toLowerCase().includes(q))
-    );
-    setLocalResults(local);
-
-    // Search national laws
     try {
-      const result = await searchLaws({ query: searchValue, limit: 20 });
-      if (result.success) setLawResults(result.data.items);
+      const res = await getTaiLieuCongKhai({ search: searchValue, page: 1, size: 50 });
+      if (res?.success && res.data) {
+        const mapped = res.data.map(item => ({
+          id: item.id,
+          title: item.tieu_de,
+          description: item.mo_ta || item.tieu_de,
+          category: item.loai === 'PHAP_LUAT' ? 'van-ban' : 'sach',
+          cover: item.thu_vien_tai_lieu_media?.find(m => m.loai === 'IMAGE')?.url
+            ? `${process.env.REACT_APP_API_URL || 'http://localhost:8880'}${item.thu_vien_tai_lieu_media.find(m => m.loai === 'IMAGE').url}`
+            : 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&w=600&q=80',
+          author: item.ten_nguoi_tao || 'UBND Phường',
+          downloads: item.so_luot_tai || 0,
+          views: item.luot_xem || 0,
+          docType: item.thu_vien_danh_muc?.ten || (item.loai === 'PHAP_LUAT' ? 'Văn bản pháp luật' : 'Tài liệu'),
+          isApiData: true,
+          loai: item.loai,
+          date: item.ngay_ban_hanh || item.thoi_gian_tao
+        }));
+        
+        const local = mapped.filter(d => d.loai !== 'PHAP_LUAT');
+        const law = mapped.filter(d => d.loai === 'PHAP_LUAT');
+        setLocalResults(local);
+        setLawResults(law);
+      } else {
+        setLocalResults([]);
+        setLawResults([]);
+      }
     } catch (err) {
-      console.error('Law search error:', err);
+      console.error('Search error:', err);
     } finally {
       setIsSearching(false);
     }
@@ -93,6 +117,29 @@ export default function DigitalLibraryPage() {
     setLawResults([]);
   };
   const handleHintClick = (term) => { setSearchValue(term); };
+
+  const handleSelectDoc = async (doc) => {
+    window.scrollTo(0, 0);
+    setSelectedDoc(doc);
+    if (doc.isApiData) {
+      try {
+        const res = await getChiTietTaiLieuCongKhai(doc.id);
+        if (res?.success && res.data) {
+          const detail = res.data;
+          setSelectedDoc(prev => ({
+            ...prev,
+            noi_dung: detail.noi_dung,
+            files: detail.thu_vien_tai_lieu_file || [],
+            media: detail.thu_vien_tai_lieu_media || [],
+            issuingAgency: detail.ten_nguoi_tao || 'UBND',
+            issuedDate: detail.ngay_ban_hanh ? new Date(detail.ngay_ban_hanh).toLocaleDateString('vi-VN') : null
+          }));
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
+  };
 
   /* ─── Trang chi tiết tài liệu ─── */
   if (selectedDoc) {
@@ -124,7 +171,13 @@ export default function DigitalLibraryPage() {
                   </div>
                 )}
                 <div className="lib-detail-hero-actions">
-                  <button className="citizen-button citizen-button-primary"><Download size={16} /> Tải về</button>
+                  {selectedDoc.files && selectedDoc.files.length > 0 ? (
+                    <a href={`${process.env.REACT_APP_API_URL || 'http://localhost:8880'}${selectedDoc.files[0].duong_dan}`} download className="citizen-button citizen-button-primary">
+                      <Download size={16} /> Tải về ({selectedDoc.files[0].kich_thuoc_mb}MB)
+                    </a>
+                  ) : (
+                    <button className="citizen-button citizen-button-primary" disabled><Download size={16} /> Tải về</button>
+                  )}
                   <button className="citizen-button citizen-button-secondary"><Eye size={16} /> Đọc trực tuyến</button>
                 </div>
               </div>
@@ -167,7 +220,33 @@ export default function DigitalLibraryPage() {
                     <p>{sec.content}</p>
                   </div>
                 ))}
-                {selectedDoc.content && !sections.length && (
+                
+                {selectedDoc.noi_dung && (
+                  <div className="lib-detail-section">
+                    <h3>Nội dung chi tiết</h3>
+                    <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(selectedDoc.noi_dung) }} />
+                  </div>
+                )}
+
+                {selectedDoc.media && selectedDoc.media.length > 0 && (
+                  <div className="lib-detail-section">
+                    <h3>Hình ảnh / Video</h3>
+                    <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', marginTop: 16 }}>
+                      {selectedDoc.media.map(m => {
+                        const url = `${process.env.REACT_APP_API_URL || 'http://localhost:8880'}${m.url}`;
+                        if (m.loai === 'IMAGE') {
+                          return <img key={m.id} src={url} alt={m.ten_file_goc} style={{ width: '100%', maxWidth: 300, borderRadius: 8, objectFit: 'cover' }} />;
+                        }
+                        if (m.loai === 'VIDEO') {
+                          return <video key={m.id} src={url} controls style={{ width: '100%', maxWidth: 300, borderRadius: 8 }} />;
+                        }
+                        return null;
+                      })}
+                    </div>
+                  </div>
+                )}
+                
+                {selectedDoc.content && !sections.length && !selectedDoc.noi_dung && (
                   <div className="lib-detail-section">
                     <h3>Nội dung</h3>
                     <p>{selectedDoc.content}</p>
@@ -189,7 +268,7 @@ export default function DigitalLibraryPage() {
             <div className="lib-related-scroll">
               {allDocuments.filter((d) => d.category === selectedDoc.category && d.id !== selectedDoc.id).map((doc) => (
                 <div key={doc.id} className="lib-related-item">
-                  <DocCardV2 doc={doc} onClick={() => { setSelectedDoc(doc); window.scrollTo(0, 0); }} />
+                  <DocCardV2 doc={doc} onClick={() => handleSelectDoc(doc)} />
                 </div>
               ))}
             </div>
@@ -276,7 +355,7 @@ export default function DigitalLibraryPage() {
             {localResults.length + lawResults.length > 0 ? (
               <div className="lib-results-list">
                 {localResults.map((doc) => (
-                  <button key={doc.id} className="lib-result-row" onClick={() => { setSelectedDoc(doc); window.scrollTo(0, 0); }} style={{ fontFamily: 'inherit' }}>
+                  <button key={doc.id} className="lib-result-row" onClick={() => handleSelectDoc(doc)} style={{ fontFamily: 'inherit' }}>
                     <div className="lib-result-thumb">
                       <img src={doc.cover} alt={`Ảnh bìa ${doc.title}`} />
                     </div>
@@ -297,10 +376,7 @@ export default function DigitalLibraryPage() {
                   <button
                     key={law.id}
                     className="lib-result-row lib-result-law"
-                    onClick={() => {
-                      setSelectedDoc({ ...law, category: 'van-ban', docType: law.type, author: law.issuingAgency, cover: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&w=600&q=80', description: law.summary, downloads: law.downloads, sections: (law.chapters || []).map(c => ({ heading: c.title, content: c.articles ? c.articles.join('. ') : '' })), issuingAgency: law.issuingAgency, issuedDate: law.issuedDate, effectiveDate: law.effectiveDate, status: law.status, tags: law.tags });
-                      window.scrollTo(0, 0);
-                    }}
+                    onClick={() => handleSelectDoc(law)}
                     style={{ fontFamily: 'inherit' }}
                   >
                     <div className="lib-result-thumb lib-result-thumb-law">
@@ -379,11 +455,15 @@ export default function DigitalLibraryPage() {
             })}
           </div>
 
-          {filteredDocs.length > 0 ? (
+          {isLoading ? (
+            <div style={{ padding: '40px 0' }}>
+              <LoadingState />
+            </div>
+          ) : filteredDocs.length > 0 ? (
             <>
               <div className="lib-doc-grid-v2">
                 {(showAll ? filteredDocs : filteredDocs.slice(0, 8)).map((doc) => (
-                  <DocCardV2 key={doc.id} doc={doc} onClick={() => { setSelectedDoc(doc); window.scrollTo(0, 0); }} />
+                  <DocCardV2 key={doc.id} doc={doc} onClick={() => handleSelectDoc(doc)} />
                 ))}
               </div>
               {!showAll && filteredDocs.length > 8 && (
