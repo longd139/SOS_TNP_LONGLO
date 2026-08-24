@@ -478,6 +478,8 @@
 .lib-detail-hero-actions { display: flex; flex-wrap: wrap; gap: 10px; }
 
 .lib-detail-layout-v2 { display: grid; grid-template-columns: 260px 1fr; gap: 48px; align-items: start; }
+.lib-detail-layout-v2.no-sidebar { display: block; }
+.lib-detail-content-section { padding-top: 24px !important; padding-bottom: 64px; }
 .lib-detail-sidebar { position: sticky; top: 100px; }
 .lib-detail-side-card { padding: 20px; border-radius: 14px; background: #F8FAFC; border: 1px solid #E8ECF2; margin-bottom: 16px; }
 .lib-detail-side-card h4 { display: flex; align-items: center; gap: 6px; margin: 0 0 14px; font-size: 13px; font-weight: 700; color: var(--citizen-ink); }

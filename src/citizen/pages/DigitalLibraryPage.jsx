@@ -2,13 +2,104 @@ import React, { useState, useEffect } from 'react';
 import { ArrowRight, Bank, Book, Download, Eye, FileEarmarkText, FileText, Map, Search, ShieldCheck, Upload } from 'react-bootstrap-icons';
 import { Link } from 'react-router-dom';
 import { libraryCategories } from '../data/citizenMockDb';
-import { SectionHeading, LoadingState } from '../components/CitizenPrimitives';
 import { getTaiLieuCongKhai, getChiTietTaiLieuCongKhai } from '../../services/libraryService';
 import useScrollReveal from '../hooks/useScrollReveal';
 import DOMPurify from 'dompurify';
 
+/* ─── Local Loading State Component ─── */
+function LoadingState() {
+  return (
+    <div className="citizen-loading" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '40px 0' }} aria-label="Đang tải">
+      <div style={{ width: 36, height: 36, border: '3px solid #E2E8F0', borderTopColor: '#2563EB', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
+    </div>
+  );
+}
+
+/* ─── Helper lấy hình ảnh từ API ─── */
+function resolveCoverImage(item) {
+  if (!item) return '';
+
+  const mediaList = item.thu_vien_tai_lieu_media || item.media || item.thuVienTaiLieuMedia || item.danh_sach_media || [];
+  if (Array.isArray(mediaList) && mediaList.length > 0) {
+    const imgMedia = mediaList.find(m => {
+      const loai = (m.loai || m.type || '').toUpperCase();
+      const path = m.url || m.duong_dan || m.path || m.file_url || '';
+      return loai.includes('IMAGE') || loai.includes('ANH') || loai.includes('HINH') || /\.(jpg|jpeg|png|webp|gif|svg)$/i.test(path);
+    });
+    const target = imgMedia || mediaList[0];
+    const path = target?.url || target?.duong_dan || target?.path || target?.file_url;
+    if (path && typeof path === 'string') {
+      return path.startsWith('http') ? path : `${process.env.REACT_APP_API_URL || 'http://localhost:8880'}${path.startsWith('/') ? '' : '/'}${path}`;
+    }
+  }
+
+  const direct = item.anh_dai_dien || item.hinh_anh || item.url_hinh_anh || item.url_anh || item.thumbnail || item.cover || item.image || item.imageUrl || item.avatar;
+  if (direct && typeof direct === 'string') {
+    return direct.startsWith('http') ? direct : `${process.env.REACT_APP_API_URL || 'http://localhost:8880'}${direct.startsWith('/') ? '' : '/'}${direct}`;
+  }
+
+  if (Array.isArray(item.images) && item.images.length > 0) {
+    const first = item.images[0];
+    const path = typeof first === 'string' ? first : (first?.url || first?.duong_dan || first?.path);
+    if (path && typeof path === 'string') {
+      return path.startsWith('http') ? path : `${process.env.REACT_APP_API_URL || 'http://localhost:8880'}${path.startsWith('/') ? '' : '/'}${path}`;
+    }
+  }
+
+  return '';
+}
+
 /* ─── Icon map cho danh mục ─── */
 const categoryIcons = { BookOpen: Book, FileText, ScrollText: FileEarmarkText, Map };
+
+function DocCardV2({ doc, onClick }) {
+  const cat = libraryCategories.find((c) => c.id === doc.category) || { label: doc.docType || 'Tài liệu', color: '#2563EB', icon: 'FileText' };
+  const CatIcon = categoryIcons[cat?.icon] || FileText;
+  const coverUrl = resolveCoverImage(doc) || doc.cover;
+
+  return (
+    <button className="lib-doc-card-v2" onClick={onClick} style={{ fontFamily: 'inherit', textAlign: 'left' }}>
+      <div className="lib-doc-img-v2">
+        {coverUrl ? (
+          <img
+            src={coverUrl}
+            alt={`Ảnh bìa ${doc.title}`}
+            loading="lazy"
+            onError={(e) => {
+              e.target.onerror = null;
+              e.target.style.display = 'none';
+              if (e.target.nextElementSibling) e.target.nextElementSibling.style.display = 'flex';
+            }}
+          />
+        ) : null}
+        <div style={{ width: '100%', height: '100%', display: coverUrl ? 'none' : 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(135deg, #1E293B 0%, #0F172A 100%)', color: '#93C5FD' }}>
+          <CatIcon size={44} />
+        </div>
+        <div className="lib-doc-overlay-v2">
+          <Eye size={22} />
+          <span>Xem chi tiết</span>
+        </div>
+        <span className="lib-doc-badge-v2" style={{ background: cat?.color || '#2563EB' }}>
+          <CatIcon size={12} /> {cat?.label}
+        </span>
+      </div>
+      <div className="lib-doc-body-v2">
+        <span className="lib-doc-type-v2" style={{ color: cat?.color }}>
+          <CatIcon size={13} /> {cat?.label}
+        </span>
+        <h4>{doc.title}</h4>
+        <p>{(doc.description || '').slice(0, 80)}...</p>
+        <div className="lib-doc-foot-v2">
+          <div className="lib-doc-meta-left">
+            <span className="lib-doc-author-v2">{doc.author}</span>
+            <span className="lib-doc-dl"><Download size={13} /> {(doc.downloads || 0).toLocaleString('vi-VN')}</span>
+          </div>
+          <span className="lib-doc-read">Đọc ngay <ArrowRight size={14} /></span>
+        </div>
+      </div>
+    </button>
+  );
+}
 
 /* ============================================================
    DIGITAL LIBRARY PAGE — Trang chủ Thư viện số cho người dân
@@ -39,9 +130,11 @@ export default function DigitalLibraryPage() {
             title: item.tieu_de,
             description: item.mo_ta || item.tieu_de,
             category: item.loai === 'PHAP_LUAT' ? 'van-ban' : 'sach',
-            cover: item.thu_vien_tai_lieu_media?.find(m => m.loai === 'IMAGE')?.url
-              ? `${process.env.REACT_APP_API_URL || 'http://localhost:8880'}${item.thu_vien_tai_lieu_media.find(m => m.loai === 'IMAGE').url}`
-              : 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&w=600&q=80',
+            cover: resolveCoverImage(item),
+            thu_vien_tai_lieu_media: item.thu_vien_tai_lieu_media || item.media || [],
+            thu_vien_tai_lieu_file: item.thu_vien_tai_lieu_file || item.files || [],
+            files: item.thu_vien_tai_lieu_file || item.files || [],
+            media: item.thu_vien_tai_lieu_media || item.media || [],
             author: item.ten_nguoi_tao || 'UBND Phường',
             downloads: item.so_luot_tai || 0,
             views: item.luot_xem || 0,
@@ -83,9 +176,11 @@ export default function DigitalLibraryPage() {
           title: item.tieu_de,
           description: item.mo_ta || item.tieu_de,
           category: item.loai === 'PHAP_LUAT' ? 'van-ban' : 'sach',
-          cover: item.thu_vien_tai_lieu_media?.find(m => m.loai === 'IMAGE')?.url
-            ? `${process.env.REACT_APP_API_URL || 'http://localhost:8880'}${item.thu_vien_tai_lieu_media.find(m => m.loai === 'IMAGE').url}`
-            : 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&w=600&q=80',
+          cover: resolveCoverImage(item),
+          thu_vien_tai_lieu_media: item.thu_vien_tai_lieu_media || item.media || [],
+          thu_vien_tai_lieu_file: item.thu_vien_tai_lieu_file || item.files || [],
+          files: item.thu_vien_tai_lieu_file || item.files || [],
+          media: item.thu_vien_tai_lieu_media || item.media || [],
           author: item.ten_nguoi_tao || 'UBND Phường',
           downloads: item.so_luot_tai || 0,
           views: item.luot_xem || 0,
@@ -126,12 +221,14 @@ export default function DigitalLibraryPage() {
         const res = await getChiTietTaiLieuCongKhai(doc.id);
         if (res?.success && res.data) {
           const detail = res.data;
+          const detailCover = resolveCoverImage(detail);
           setSelectedDoc(prev => ({
             ...prev,
+            cover: detailCover || prev.cover,
             noi_dung: detail.noi_dung,
-            files: detail.thu_vien_tai_lieu_file || [],
-            media: detail.thu_vien_tai_lieu_media || [],
-            issuingAgency: detail.ten_nguoi_tao || 'UBND',
+            files: detail.thu_vien_tai_lieu_file || detail.files || prev.files || [],
+            media: detail.thu_vien_tai_lieu_media || detail.media || prev.media || [],
+            issuingAgency: detail.ten_nguoi_tao || detail.co_quan_ban_hanh || 'UBND Phường',
             issuedDate: detail.ngay_ban_hanh ? new Date(detail.ngay_ban_hanh).toLocaleDateString('vi-VN') : null
           }));
         }
@@ -146,16 +243,38 @@ export default function DigitalLibraryPage() {
     const category = libraryCategories.find((c) => c.id === selectedDoc.category);
     const isLegal = selectedDoc.category === 'van-ban' || selectedDoc.type;
     const sections = selectedDoc.sections || [];
+    const hasSidebar = Boolean((isLegal && (selectedDoc.issuingAgency || selectedDoc.issuedDate)) || sections.length > 0);
+    const currentCover = resolveCoverImage(selectedDoc) || selectedDoc.cover;
+
     return (
       <>
         {/* Hero card */}
         <section className="lib-detail-hero-v2">
-          <div className="lib-detail-hero-bg" style={{ backgroundImage: `url(${selectedDoc.cover || 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&w=1200&q=80'})` }} />
+          <div 
+            className="lib-detail-hero-bg" 
+            style={currentCover 
+              ? { backgroundImage: `url(${currentCover})` } 
+              : { background: 'linear-gradient(135deg, #1E3A8A 0%, #0F172A 100%)' }
+            } 
+          />
           <div className="citizen-container lib-detail-hero-inner">
             <button className="back-link" onClick={() => setSelectedDoc(null)} style={{ color: '#fff' }}>← Quay lại Thư viện số</button>
             <div className="lib-detail-hero-card">
               <div className="lib-detail-hero-img">
-                <img src={selectedDoc.cover} alt={`Ảnh bìa ${selectedDoc.title}`} />
+                {currentCover ? (
+                  <img 
+                    src={currentCover} 
+                    alt={`Ảnh bìa ${selectedDoc.title}`} 
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.style.display = 'none';
+                      if (e.target.nextElementSibling) e.target.nextElementSibling.style.display = 'flex';
+                    }}
+                  />
+                ) : null}
+                <div style={{ width: '100%', height: '100%', display: currentCover ? 'none' : 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(135deg, #1E293B 0%, #0F172A 100%)', color: '#93C5FD' }}>
+                  <Book size={64} />
+                </div>
               </div>
               <div className="lib-detail-hero-body">
                 <span className="lib-detail-hero-tag" style={{ background: category?.color || '#2563EB' }}>{category?.label || 'Tài liệu'}</span>
@@ -171,14 +290,23 @@ export default function DigitalLibraryPage() {
                   </div>
                 )}
                 <div className="lib-detail-hero-actions">
-                  {selectedDoc.files && selectedDoc.files.length > 0 ? (
-                    <a href={`${process.env.REACT_APP_API_URL || 'http://localhost:8880'}${selectedDoc.files[0].duong_dan}`} download className="citizen-button citizen-button-primary">
-                      <Download size={16} /> Tải về ({selectedDoc.files[0].kich_thuoc_mb}MB)
-                    </a>
-                  ) : (
+                  {selectedDoc.files && selectedDoc.files.length > 0 ? (() => {
+                    const firstFile = selectedDoc.files[0];
+                    const rawPath = firstFile.duong_dan || firstFile.url || firstFile.path;
+                    const firstUrl = rawPath?.startsWith('http')
+                      ? rawPath
+                      : `${process.env.REACT_APP_API_URL || 'http://localhost:8880'}${rawPath?.startsWith('/') ? '' : '/'}${rawPath}`;
+                    const sizeStr = firstFile.kich_thuoc_mb 
+                      ? `${firstFile.kich_thuoc_mb}MB` 
+                      : (firstFile.kich_thuoc ? `${(firstFile.kich_thuoc / (1024 * 1024)).toFixed(2)}MB` : '');
+                    return (
+                      <a href={firstUrl} download className="citizen-button citizen-button-primary">
+                        <Download size={16} /> Tải về {sizeStr ? `(${sizeStr})` : ''}
+                      </a>
+                    );
+                  })() : (
                     <button className="citizen-button citizen-button-primary" disabled><Download size={16} /> Tải về</button>
                   )}
-                  <button className="citizen-button citizen-button-secondary"><Eye size={16} /> Đọc trực tuyến</button>
                 </div>
               </div>
             </div>
@@ -186,40 +314,44 @@ export default function DigitalLibraryPage() {
         </section>
 
         {/* Content */}
-        <section className="citizen-section">
+        <section className="citizen-section lib-detail-content-section">
           <div className="citizen-container">
-            <div className="lib-detail-layout-v2">
-              <aside className="lib-detail-sidebar">
-                {isLegal && (selectedDoc.issuingAgency || selectedDoc.issuedDate) && (
-                  <div className="lib-detail-side-card">
-                    <h4><ShieldCheck size={15} /> Thông tin văn bản</h4>
-                    {selectedDoc.code && <div className="lib-detail-side-row"><span>Số hiệu</span><strong>{selectedDoc.code}</strong></div>}
-                    {selectedDoc.issuingAgency && <div className="lib-detail-side-row"><span>Cơ quan ban hành</span><strong>{selectedDoc.issuingAgency}</strong></div>}
-                    {selectedDoc.issuedDate && <div className="lib-detail-side-row"><span>Ngày ban hành</span><strong>{selectedDoc.issuedDate}</strong></div>}
-                    {selectedDoc.effectiveDate && <div className="lib-detail-side-row"><span>Ngày hiệu lực</span><strong>{selectedDoc.effectiveDate}</strong></div>}
-                    {selectedDoc.status && <div className="lib-detail-side-row"><span>Trạng thái</span><strong className="lib-legal-status">{selectedDoc.status}</strong></div>}
-                  </div>
-                )}
-                {sections.length > 0 && (
-                  <div className="lib-detail-side-card">
-                    <h4>Mục lục</h4>
+            <div className={`lib-detail-layout-v2 ${!hasSidebar ? 'no-sidebar' : ''}`}>
+                  {hasSidebar && (
+                    <aside className="lib-detail-sidebar">
+                      {isLegal && (selectedDoc.issuingAgency || selectedDoc.issuedDate) && (
+                        <div className="lib-detail-side-card">
+                          <h4><ShieldCheck size={15} /> Thông tin văn bản</h4>
+                          {selectedDoc.code && <div className="lib-detail-side-row"><span>Số hiệu</span><strong>{selectedDoc.code}</strong></div>}
+                          {selectedDoc.issuingAgency && <div className="lib-detail-side-row"><span>Cơ quan ban hành</span><strong>{selectedDoc.issuingAgency}</strong></div>}
+                          {selectedDoc.issuedDate && <div className="lib-detail-side-row"><span>Ngày ban hành</span><strong>{selectedDoc.issuedDate}</strong></div>}
+                          {selectedDoc.effectiveDate && <div className="lib-detail-side-row"><span>Ngày hiệu lực</span><strong>{selectedDoc.effectiveDate}</strong></div>}
+                          {selectedDoc.status && <div className="lib-detail-side-row"><span>Trạng thái</span><strong className="lib-legal-status">{selectedDoc.status}</strong></div>}
+                        </div>
+                      )}
+                      {sections.length > 0 && (
+                        <div className="lib-detail-side-card">
+                          <h4>Mục lục</h4>
+                          {sections.map((sec, i) => (
+                            <a key={i} href={`#section-${i}`} className="lib-detail-toc-link">{sec.heading}</a>
+                          ))}
+                        </div>
+                      )}
+                    </aside>
+                  )}
+                  <div className="lib-detail-main">
+                    {selectedDoc.description && (
+                      <div className="lib-detail-section">
+                        <h3>Giới thiệu</h3>
+                        <p>{selectedDoc.description}</p>
+                      </div>
+                    )}
                     {sections.map((sec, i) => (
-                      <a key={i} href={`#section-${i}`} className="lib-detail-toc-link">{sec.heading}</a>
+                      <div key={i} id={`section-${i}`} className="lib-detail-section">
+                        <h3>{sec.heading}</h3>
+                        <p>{sec.content}</p>
+                      </div>
                     ))}
-                  </div>
-                )}
-              </aside>
-              <div className="lib-detail-main">
-                <div className="lib-detail-section">
-                  <h3>Giới thiệu</h3>
-                  <p>{selectedDoc.description}</p>
-                </div>
-                {sections.map((sec, i) => (
-                  <div key={i} id={`section-${i}`} className="lib-detail-section">
-                    <h3>{sec.heading}</h3>
-                    <p>{sec.content}</p>
-                  </div>
-                ))}
                 
                 {selectedDoc.noi_dung && (
                   <div className="lib-detail-section">
@@ -228,33 +360,105 @@ export default function DigitalLibraryPage() {
                   </div>
                 )}
 
-                {selectedDoc.media && selectedDoc.media.length > 0 && (
-                  <div className="lib-detail-section">
-                    <h3>Hình ảnh / Video</h3>
-                    <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', marginTop: 16 }}>
-                      {selectedDoc.media.map(m => {
-                        const url = `${process.env.REACT_APP_API_URL || 'http://localhost:8880'}${m.url}`;
-                        if (m.loai === 'IMAGE') {
-                          return <img key={m.id} src={url} alt={m.ten_file_goc} style={{ width: '100%', maxWidth: 300, borderRadius: 8, objectFit: 'cover' }} />;
-                        }
-                        if (m.loai === 'VIDEO') {
-                          return <video key={m.id} src={url} controls style={{ width: '100%', maxWidth: 300, borderRadius: 8 }} />;
-                        }
-                        return null;
-                      })}
-                    </div>
-                  </div>
-                )}
-                
                 {selectedDoc.content && !sections.length && !selectedDoc.noi_dung && (
                   <div className="lib-detail-section">
                     <h3>Nội dung</h3>
                     <p>{selectedDoc.content}</p>
                   </div>
                 )}
+
+                {/* PDF Viewer */}
+                {selectedDoc.files && selectedDoc.files.length > 0 && (
+                  <div className="lib-detail-section">
+                    <h3>Tài liệu đính kèm</h3>
+                    {selectedDoc.files.map((file, idx) => {
+                      const rawPath = file.duong_dan || file.url || file.path;
+                      const fileUrl = rawPath?.startsWith('http')
+                        ? rawPath
+                        : `${process.env.REACT_APP_API_URL || 'http://localhost:8880'}${rawPath?.startsWith('/') ? '' : '/'}${rawPath}`;
+                      const fileName = file.ten_file_goc || file.ten_file || file.name || 'Tài liệu';
+                      const sizeStr = file.kich_thuoc_mb 
+                        ? `${file.kich_thuoc_mb}MB` 
+                        : (file.kich_thuoc ? `${(file.kich_thuoc / (1024 * 1024)).toFixed(2)}MB` : '');
+                      const isPdf = !rawPath || 
+                                    rawPath.toLowerCase().endsWith('.pdf') || 
+                                    file.loai_file?.toLowerCase().includes('pdf') || 
+                                    file.mime_type?.includes('pdf') ||
+                                    fileName.toLowerCase().endsWith('.pdf');
+
+                      return (
+                        <div key={file.id || idx} style={{ marginBottom: 24 }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12, padding: '10px 16px', background: '#F8FAFC', borderRadius: '10px', border: '1px solid #E2E8F0', flexWrap: 'wrap', gap: 10 }}>
+                            <span style={{ fontWeight: 600, fontSize: 14, color: 'var(--citizen-ink)' }}>
+                              📄 {fileName} {sizeStr ? `(${sizeStr})` : ''}
+                            </span>
+                            <div style={{ display: 'flex', gap: 10 }}>
+                              <a
+                                href={fileUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="citizen-button citizen-button-secondary"
+                                style={{ fontSize: 13, padding: '6px 14px' }}
+                              >
+                                Mở tab mới
+                              </a>
+                              <a
+                                href={fileUrl}
+                                download
+                                className="citizen-button citizen-button-primary"
+                                style={{ fontSize: 13, padding: '6px 14px' }}
+                              >
+                                <Download size={14} /> Tải về
+                              </a>
+                            </div>
+                          </div>
+
+                          {isPdf ? (
+                            <div style={{ width: '100%', height: '800px', borderRadius: '12px', overflow: 'hidden', border: '1px solid #CBD5E1', background: '#525659', boxShadow: '0 4px 16px rgba(0,0,0,0.06)' }}>
+                              <iframe
+                                src={`${fileUrl}#toolbar=1&navpanes=0`}
+                                title={fileName}
+                                width="100%"
+                                height="100%"
+                                style={{ border: 'none', display: 'block' }}
+                              />
+                            </div>
+                          ) : (
+                            <div style={{ padding: '24px', background: '#F8FAFC', borderRadius: '12px', border: '1px solid #E2E8F0', textAlign: 'center' }}>
+                              <p style={{ margin: '0 0 12px', color: '#64748B', fontSize: 14 }}>Định dạng file không hỗ trợ xem trực tiếp.</p>
+                              <a href={fileUrl} download className="citizen-button citizen-button-primary">
+                                <Download size={16} /> Tải về {sizeStr ? `(${sizeStr})` : ''}
+                              </a>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+
+                {selectedDoc.media && selectedDoc.media.length > 0 && (
+                  <div className="lib-detail-section">
+                    <h3>Hình ảnh / Video</h3>
+                    <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', marginTop: 16 }}>
+                      {selectedDoc.media.map(m => {
+                        const rawMediaUrl = m.url || m.duong_dan || m.path;
+                        const url = rawMediaUrl?.startsWith('http')
+                          ? rawMediaUrl
+                          : `${process.env.REACT_APP_API_URL || 'http://localhost:8880'}${rawMediaUrl?.startsWith('/') ? '' : '/'}${rawMediaUrl}`;
+                        const isVideo = m.loai === 'VIDEO' || m.mime_type?.includes('video') || /\.(mp4|webm|ogg|mov)$/i.test(rawMediaUrl || '');
+                        if (!isVideo) {
+                          return <img key={m.id || url} src={url} alt={m.ten_file_goc || m.ten_file || 'Hình ảnh'} style={{ width: '100%', maxWidth: 300, borderRadius: 8, objectFit: 'cover' }} />;
+                        }
+                        return <video key={m.id || url} src={url} controls style={{ width: '100%', maxWidth: 300, borderRadius: 8 }} />;
+                      })}
+                    </div>
+                  </div>
+                )}
+                
                 <div className="lib-detail-trust">
                   <ShieldCheck size={16} />
-                  <span>Nội dung được cung cấp bởi <strong>{selectedDoc.issuingAgency || selectedDoc.author || 'UBND Phường Tăng Nhơn Phú'}</strong>.</span>
+                  <span>Nội dung được cung cấp bởi <strong>Phường Tăng Nhơn Phú</strong>.</span>
                 </div>
               </div>
             </div>
@@ -264,7 +468,12 @@ export default function DigitalLibraryPage() {
         {/* Related */}
         <section className="citizen-section citizen-section-soft">
           <div className="citizen-container">
-            <SectionHeading eyebrow="Có thể bạn quan tâm" title={`Tài liệu liên quan (${allDocuments.filter((d) => d.category === selectedDoc.category && d.id !== selectedDoc.id).length})`} />
+            <div className="lib-section-head">
+              <div>
+                <span className="lib-section-tag">Có thể bạn quan tâm</span>
+                <h2 className="lib-section-title">{`Tài liệu liên quan (${allDocuments.filter((d) => d.category === selectedDoc.category && d.id !== selectedDoc.id).length})`}</h2>
+              </div>
+            </div>
             <div className="lib-related-scroll">
               {allDocuments.filter((d) => d.category === selectedDoc.category && d.id !== selectedDoc.id).map((doc) => (
                 <div key={doc.id} className="lib-related-item">
@@ -357,7 +566,18 @@ export default function DigitalLibraryPage() {
                 {localResults.map((doc) => (
                   <button key={doc.id} className="lib-result-row" onClick={() => handleSelectDoc(doc)} style={{ fontFamily: 'inherit' }}>
                     <div className="lib-result-thumb">
-                      <img src={doc.cover} alt={`Ảnh bìa ${doc.title}`} />
+                      {doc.cover ? (
+                        <img 
+                          src={doc.cover} 
+                          alt={`Ảnh bìa ${doc.title}`} 
+                          onError={(e) => {
+                            e.target.onerror = null;
+                            e.target.style.display = 'none';
+                            if (e.target.nextElementSibling) e.target.nextElementSibling.style.display = 'block';
+                          }} 
+                        />
+                      ) : null}
+                      <Book size={20} style={{ color: 'var(--citizen-blue)', display: doc.cover ? 'none' : 'block' }} />
                     </div>
                     <div className="lib-result-info">
                       <span className="lib-result-type" style={{ color: 'var(--citizen-blue)' }}>
@@ -533,59 +753,20 @@ export default function DigitalLibraryPage() {
               { step: '02', icon: Eye, title: 'Xem trực tuyến', text: 'Đọc ngay trên website không cần tải về. Tương thích mọi thiết bị.' },
               { step: '03', icon: Download, title: 'Tải về dễ dàng', text: 'Lưu tài liệu về máy để đọc khi không có mạng. Hỗ trợ định dạng PDF.' },
               { step: '04', icon: ShieldCheck, title: 'Nội dung tin cậy', text: 'Mọi tài liệu đều được kiểm duyệt từ nguồn chính thức của địa phương.' },
-            ].map((item) => (
-              <div key={item.step} className="lib-how-card">
-                <span className="lib-how-step">{item.step}</span>
-                <div className="lib-how-icon"><item.icon size={24} /></div>
-                <h3>{item.title}</h3>
-                <p>{item.text}</p>
-              </div>
-            ))}
+            ].map((item) => {
+              const StepIcon = item.icon;
+              return (
+                <div key={item.step} className="lib-how-card">
+                  <span className="lib-how-step">{item.step}</span>
+                  <div className="lib-how-icon"><StepIcon size={24} /></div>
+                  <h3>{item.title}</h3>
+                  <p>{item.text}</p>
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>
     </>
-  );
-}
-
-/* ═══════════════════════════════════════════════
-   COMPONENTS
-   ═══════════════════════════════════════════════ */
-
-function DocCardV2({ doc, onClick }) {
-  const cat = libraryCategories.find((c) => c.id === doc.category) || { label: doc.docType || 'Tài liệu', color: '#2563EB', icon: 'FileText' };
-  const CatIcon = categoryIcons[cat?.icon] || FileText;
-  return (
-    <button className="lib-doc-card-v2" onClick={onClick} style={{ fontFamily: 'inherit', textAlign: 'left' }}>
-      <div className="lib-doc-img-v2">
-        <img
-          src={doc.cover}
-          alt={`Ảnh bìa ${doc.title}`}
-          loading="lazy"
-          onError={(e) => { e.target.src = `data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="260" fill="%23DBEAFE"><rect width="400" height="260"/><text x="200" y="140" text-anchor="middle" fill="%232563EB" font-size="16" font-family="Arial">${encodeURIComponent((doc.title || '').slice(0, 20))}</text></svg>`; }}
-        />
-        <div className="lib-doc-overlay-v2">
-          <Eye size={22} />
-          <span>Xem chi tiết</span>
-        </div>
-        <span className="lib-doc-badge-v2" style={{ background: cat?.color || '#2563EB' }}>
-          <CatIcon size={12} /> {cat?.label}
-        </span>
-      </div>
-      <div className="lib-doc-body-v2">
-        <span className="lib-doc-type-v2" style={{ color: cat?.color }}>
-          <CatIcon size={13} /> {cat?.label}
-        </span>
-        <h4>{doc.title}</h4>
-        <p>{(doc.description || '').slice(0, 80)}...</p>
-        <div className="lib-doc-foot-v2">
-          <div className="lib-doc-meta-left">
-            <span className="lib-doc-author-v2">{doc.author}</span>
-            <span className="lib-doc-dl"><Download size={13} /> {(doc.downloads || 0).toLocaleString('vi-VN')}</span>
-          </div>
-          <span className="lib-doc-read">Đọc ngay <ArrowRight size={14} /></span>
-        </div>
-      </div>
-    </button>
   );
 }
